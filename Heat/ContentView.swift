@@ -10,7 +10,7 @@ struct ContentView: View {
     @State var selectedChat: AgentChat? = nil
     @State var isShowingAgents = false
     @State var isShowingSettings = false
-    @State var settings: Settings = .empty
+    @State var preferences: Preferences = .empty
     
     var body: some View {
         NavigationSplitView {
@@ -49,7 +49,7 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isShowingSettings) {
             NavigationStack {
-                SettingsView(settings: $settings)
+                SettingsView(preferences: $preferences)
                     .navigationTitle("Settings")
                     .toolbar {
                         ToolbarItem {
@@ -62,14 +62,14 @@ struct ContentView: View {
             }
             .frame(idealWidth: 400, idealHeight: 500)
         }
-        .onChange(of: store.settings) { _, newValue in
-            settings = newValue
+        .onChange(of: store.preferences) { _, newValue in
+            preferences = newValue
         }
     }
     
     func handleSaveSettings() {
         Task {
-            await store.upsert(settings: settings)
+            await store.upsert(preferences: preferences)
             try await store.saveAll()
         }
         isShowingSettings.toggle()

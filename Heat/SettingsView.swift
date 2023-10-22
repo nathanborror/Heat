@@ -2,16 +2,18 @@ import SwiftUI
 import HeatKit
 
 struct SettingsView: View {
-    @Binding var settings: Settings
+    @Binding var preferences: Preferences
     
     var body: some View {
         Form {
             Section {
-                TextField("Model Name", text: $settings.model)
+                TextField("Model Name", text: $preferences.model)
                     .autocorrectionDisabled()
+                    #if os(iOS)
                     .textInputAutocapitalization(.never)
+                    #endif
                 
-                Picker("Model Name", selection: $settings.model) {
+                Picker("Model Name", selection: $preferences.model) {
                     Text("Llama2 7B Chat").tag("llama2:7b-chat")
                     Text("Llama2 13B Chat").tag("llama2:13b-chat")
                     Text("Llama2 70B Chat").tag("llama2:70b-chat")
@@ -27,10 +29,12 @@ struct SettingsView: View {
             }
             
             Section {
-                TextField("Host Address", text: $settings.host)
+                TextField("Host Address", text: $preferences.host)
                     .autocorrectionDisabled()
                     .textContentType(.URL)
+                    #if os(iOS)
                     .textInputAutocapitalization(.never)
+                    #endif
             } header: {
                 Text("Host")
             } footer: {

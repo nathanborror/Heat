@@ -9,7 +9,7 @@ public final class Store {
     
     public private(set) var agents: [Agent] = [.grimes, .richardFeynman, .theMoon]
     public private(set) var chats: [AgentChat] = []
-    public private(set) var settings: Settings = .init()
+    public private(set) var preferences: Preferences = .init()
 
     private var client = OllamaClient()
     private var persistence: Persistence
@@ -45,7 +45,7 @@ public final class Store {
     }
     
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
-        .init(model: settings.model, kind: kind, role: role, content: content, done: done)
+        .init(model: preferences.model, kind: kind, role: role, content: content, done: done)
     }
     
     // Getters
@@ -86,11 +86,11 @@ extension Store {
         upsert(chat: chat)
     }
     
-    public func upsert(settings: Settings) {
-        var settings = settings
-        settings.modified = .now
-        self.settings = settings
-        self.client = OllamaClient(host: self.settings.host)
+    public func upsert(preferences: Preferences) {
+        var preferences = preferences
+        preferences.modified = .now
+        self.preferences = preferences
+        self.client = OllamaClient(host: self.preferences.host)
     }
     
     public func set(context: [Int]?, chatID: String) {
@@ -116,30 +116,30 @@ extension Store {
     public func restore() async throws {
         let agents: [Agent] = try await persistence.load(objects: "agents.json")
         let chats: [AgentChat] = try await persistence.load(objects: "chats.json")
-        let settings: Settings? = try await persistence.load(object: "settings.json")
+        let preferences: Preferences? = try await persistence.load(object: "preferences.json")
         
         DispatchQueue.main.async {
             self.agents = agents
             self.chats = chats
-            self.settings = settings ?? self.settings
-            self.client = OllamaClient(host: self.settings.host)
+            self.preferences = preferences ?? self.preferences
+            self.client = OllamaClient(host: self.preferences.host)
         }
     }
     
     public func saveAll() async throws {
         try await persistence.save(filename: "agents.json", objects: agents)
         try await persistence.save(filename: "chats.json", objects: chats)
-        try await persistence.save(filename: "settings.json", object: settings)
+        try await persistence.save(filename: "preferences.json", object: preferences)
     }
     
     public func deleteAll() throws {
         try persistence.delete(filename: "agents.json")
         try persistence.delete(filename: "chats.json")
-        try persistence.delete(filename: "settings.json")
+        try persistence.delete(filename: "preferences.json")
         
         self.agents = []
         self.chats = []
-        self.settings = .init()
+        self.preferences = .init()
         self.client = OllamaClient()
     }
 }

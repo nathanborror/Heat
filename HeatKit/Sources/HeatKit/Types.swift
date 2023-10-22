@@ -103,7 +103,7 @@ public enum Media: Codable, Equatable, Hashable {
     case none
 }
 
-public struct Settings: Codable, Hashable {
+public struct Preferences: Codable, Hashable {
     public var host: String
     public var model: String
     public var modified: Date
@@ -118,5 +118,5 @@ public struct Settings: Codable, Hashable {
         hasher.combine(modified)
     }
     
-    public static var empty = Settings()
+    public static var empty = Preferences()
 }
