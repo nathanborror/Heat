@@ -60,6 +60,7 @@ struct ContentView: View {
                         }
                     }
             }
+            .environment(store)
             .frame(idealWidth: 400, idealHeight: 500)
         }
         .onChange(of: store.preferences) { _, newValue in

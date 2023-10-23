@@ -5,9 +5,24 @@ struct AgentListView: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) var dismiss
     
+    @State private var isShowingForm = false
+    
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
+                Button(action: { isShowingForm.toggle() }) {
+                    HStack {
+                        Spacer()
+                        Text("Create Agent")
+                        Spacer()
+                    }
+                    .padding()
+                }
+                .background(.tint.opacity(0.1))
+                .clipShape(.rect(cornerRadius: 12))
+                .padding(.horizontal)
+                .padding(.top)
+                
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(store.agents) { agent in
                         AgentTile(agent: agent, height: proxy.size.width/heightDivisor, selection: handleSelection)
@@ -15,6 +30,11 @@ struct AgentListView: View {
                 }
                 .padding()
             }
+        }
+        .sheet(isPresented: $isShowingForm) {
+            NavigationStack {
+                AgentForm()
+            }.environment(store)
         }
     }
     

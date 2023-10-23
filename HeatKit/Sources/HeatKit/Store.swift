@@ -62,6 +62,16 @@ public final class Store {
 @MainActor
 extension Store {
     
+    public func upsert(agent: Agent) {
+        if let index = agents.firstIndex(where: { $0.id == agent.id }) {
+            var agent = agent
+            agent.modified = .now
+            agents[index] = agent
+        } else {
+            self.agents.append(agent)
+        }
+    }
+    
     public func upsert(chat: AgentChat, context: [Int]? = nil) {
         if let index = chats.firstIndex(where: { $0.id == chat.id }) {
             var chat = chat
