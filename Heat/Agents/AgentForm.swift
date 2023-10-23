@@ -13,7 +13,9 @@ struct AgentForm: View {
         Form {
             Section {
                 TextField("Name", text: $name)
+                    #if os(iOS)
                     .textInputAutocapitalization(.words)
+                    #endif
             } header: {
                 Text("Name")
             }
