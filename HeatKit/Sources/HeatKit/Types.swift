@@ -10,12 +10,12 @@ public struct Agent: Codable, Identifiable, Hashable {
     public var created: Date
     public var modified: Date
     
-    init(id: String = UUID().uuidString, name: String, tagline: String, picture: Media, system: String) {
+    init(id: String = UUID().uuidString, name: String, tagline: String, picture: Media, preferredModel: String? = nil, system: String) {
         self.id = id
         self.name = name
         self.tagline = tagline
         self.picture = picture
-        self.preferredModel = nil
+        self.preferredModel = preferredModel
         self.system = system
         self.created = .now
         self.modified = .now

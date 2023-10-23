@@ -8,6 +8,7 @@ struct AgentForm: View {
     @State var name = ""
     @State var tagline = ""
     @State var system = ""
+    @State var preferredModel = ""
     
     var body: some View {
         Form {
@@ -31,6 +32,17 @@ struct AgentForm: View {
             } header: {
                 Text("System Prompt")
             }
+            
+            Section {
+                Picker("Preferred Model", selection: $preferredModel) {
+                    Text("None").tag("")
+                    ForEach(store.models, id:\.name) { model in
+                        Text(model.name).tag(model.name)
+                    }
+                }
+            } header: {
+                Text("Model")
+            }
         }
         .navigationTitle("Create Agent")
         .toolbar {
@@ -41,12 +53,19 @@ struct AgentForm: View {
                 Button("Cancel", action: { dismiss() })
             }
         }
+        .onAppear {
+            handleLoadModels()
+        }
     }
     
     func handleDone() {
-        let agent = store.createAgent(name: name, tagline: tagline, system: system)
+        let agent = store.createAgent(name: name, tagline: tagline, preferredModel: preferredModel.isEmpty ? nil : preferredModel, system: system)
         Task { await store.upsert(agent: agent) }
         dismiss()
+    }
+    
+    func handleLoadModels() {
+        Task { try await store.models() }
     }
 }
 

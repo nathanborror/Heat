@@ -40,8 +40,8 @@ public final class Store {
 
 extension Store {
     
-    public func createAgent(name: String, tagline: String, picture: Media = .none, system: String) -> Agent {
-        .init(name: name, tagline: tagline, picture: picture, system: system)
+    public func createAgent(name: String, tagline: String, picture: Media = .none, preferredModel: String? = nil, system: String) -> Agent {
+        .init(name: name, tagline: tagline, picture: picture, preferredModel: preferredModel, system: system)
     }
     
     public func createChat(agentID: String) -> AgentChat {
