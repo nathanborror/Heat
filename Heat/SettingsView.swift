@@ -43,17 +43,11 @@ struct SettingsView: View {
     }
     
     func handleLoadModels() {
-        Task {
-            do {
-                try await store.models()
-            } catch {
-                print(error)
-            }
-        }
+        Task { try await store.models() }
     }
     
     func handleDeleteAll() {
-        Task { try await store.deleteAll() }
+        Task { try store.deleteAll() }
         dismiss()
     }
 }
