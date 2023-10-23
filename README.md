@@ -7,4 +7,8 @@ Heat is a desktop and mobile client to be used with [Ollama](https://ollama.ai).
 3. Run the ollama server on port 8080 `OLLAMA_HOST=0.0.0.0:8080 ollama serve`.
 4. Build the iOS or macOS app
 
+[![image](https://github.com/nathanborror/Heat/blob/main/Screens/Screens.png?raw=true)](https://github.com/nathanborror/Heat/blob/main/Screens/Screens.png?raw=true)
+
 Plans are to add support for the rest of the Ollama API and figure out how to run the Ollama go package as an embedded framework so we can run models locally on devices like iPhones or iPads.
+
+*Heat, because it's gonna make your devices hot!*

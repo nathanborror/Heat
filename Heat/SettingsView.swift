@@ -3,6 +3,7 @@ import HeatKit
 
 struct SettingsView: View {
     @Environment(Store.self) private var store
+    @Environment(\.dismiss) var dismiss
     
     @Binding var preferences: Preferences
     
@@ -30,6 +31,10 @@ struct SettingsView: View {
             } footer: {
                 Text("Example: 127.0.0.1:8080")
             }
+            
+            Button(role: .destructive, action: handleDeleteAll) {
+                Text("Delete All Data")
+            }
         }
         .formStyle(.grouped)
         .onAppear {
@@ -45,5 +50,10 @@ struct SettingsView: View {
                 print(error)
             }
         }
+    }
+    
+    func handleDeleteAll() {
+        Task { try await store.deleteAll() }
+        dismiss()
     }
 }
