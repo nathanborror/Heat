@@ -7,7 +7,7 @@ public final class Store {
     
     public static let shared = Store(persistence: DiskPersistence.shared)
     
-    public private(set) var agents: [Agent] = [.grimes, .richardFeynman, .theMoon]
+    public private(set) var agents: [Agent] = []
     public private(set) var chats: [AgentChat] = []
     public private(set) var models: [Model] = []
     public private(set) var preferences: Preferences = .init()
@@ -141,6 +141,10 @@ extension Store {
             self.chats = chats
             self.preferences = preferences ?? self.preferences
             self.client = OllamaClient(host: self.preferences.host)
+            
+            if self.agents.isEmpty {
+                self.agents = self.defaultAgents
+            }
         }
     }
     
@@ -155,9 +159,11 @@ extension Store {
         try persistence.delete(filename: "chats.json")
         try persistence.delete(filename: "preferences.json")
         
-        self.agents = []
+        self.agents = defaultAgents
         self.chats = []
         self.preferences = .init()
         self.client = OllamaClient()
     }
+    
+    private var defaultAgents: [Agent] { [.grimes, .richardFeynman, .theMoon] }
 }
