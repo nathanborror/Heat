@@ -34,6 +34,10 @@ struct ContentView: View {
             if let chat = selectedChat {
                 ChatView(chatID: chat.id)
                     .navigationTitle(store.get(agentID: chat.agentID)?.name ?? "Unknown")
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+                    .background(.background)
             }
         }
         .sheet(isPresented: $isShowingAgents) {
