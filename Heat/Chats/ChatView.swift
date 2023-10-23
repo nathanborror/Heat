@@ -13,6 +13,11 @@ struct ChatView: View {
         ScrollView {
             ScrollViewReader { proxy in
                 LazyVStack {
+                    Text(chat?.preferredModel ?? store.preferences.model)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                    
                     ForEach(messages) { message in
                         ChatMessageContainerView(agent: agent, message: message)
                     }

@@ -12,6 +12,12 @@ public final class ChatManager {
     }
     
     @discardableResult public func inject(message: Message) async -> Self {
+        guard let chat = store.get(chatID: chatID) else { return self }
+        
+        // Override model if the chat prefers another model.
+        var message = message
+        message.model = chat.preferredModel ?? message.model
+        
         await store.upsert(message: message, chatID: chatID)
         return self
     }

@@ -5,6 +5,7 @@ public struct Agent: Codable, Identifiable, Hashable {
     public var name: String
     public var tagline: String
     public var picture: Media
+    public var preferredModel: String?
     public var system: String
     public var created: Date
     public var modified: Date
@@ -14,6 +15,7 @@ public struct Agent: Codable, Identifiable, Hashable {
         self.name = name
         self.tagline = tagline
         self.picture = picture
+        self.preferredModel = nil
         self.system = system
         self.created = .now
         self.modified = .now
@@ -28,6 +30,7 @@ public struct Agent: Codable, Identifiable, Hashable {
 public struct AgentChat: Codable, Identifiable, Hashable {
     public var id: String
     public var agentID: String
+    public var preferredModel: String?
     public var system: String
     public var messages: [Message]
     public var context: [Int]
@@ -41,9 +44,10 @@ public struct AgentChat: Codable, Identifiable, Hashable {
         case none
     }
     
-    init(id: String = UUID().uuidString, agentID: String, system: String) {
+    init(id: String = UUID().uuidString, agentID: String, preferredModel: String? = nil, system: String) {
         self.id = id
         self.agentID = agentID
+        self.preferredModel = preferredModel
         self.system = system
         self.messages = []
         self.context = []
