@@ -33,7 +33,7 @@ public final class Store {
     }
     
     public func models() async throws {
-        let resp = try await client.tags()
+        let resp = try await client.modelList()
         self.models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
     }
 }
