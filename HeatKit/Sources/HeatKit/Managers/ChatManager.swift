@@ -11,7 +11,9 @@ public final class ChatManager {
         self.chatID = chat.id
     }
     
-    @discardableResult public func inject(message: Message) async -> Self {
+    @discardableResult public func inject(message: Message) async throws -> Self {
+        try Task.checkCancellation()
+        
         guard let chat = store.get(chatID: chatID) else { return self }
         
         // Override model if the chat prefers another model.
@@ -23,6 +25,8 @@ public final class ChatManager {
     }
     
     @discardableResult public func generate() async throws -> Self {
+        try Task.checkCancellation()
+        
         guard let chat = store.get(chatID: chatID) else { return self }
         guard let message = chat.messages.last else { return self }
         guard message.role == .user else { return self }
@@ -40,6 +44,8 @@ public final class ChatManager {
     }
     
     @discardableResult public func generateStream() async throws -> Self {
+        try Task.checkCancellation()
+        
         guard let chat = store.get(chatID: chatID) else { return self }
         guard let message = chat.messages.last else { return self }
         guard message.role == .user else { return self }

@@ -8,6 +8,7 @@ struct ChatView: View {
 
     @State private var composerText = ""
     @State private var composerState: ChatComposerView.ViewState = .init()
+    @State private var generateTask: Task<(), Error>? = nil
     
     var body: some View {
         ScrollView {
@@ -63,7 +64,7 @@ struct ChatView: View {
         guard let chat = store.get(chatID: chatID) else { return }
         guard chat.messages.isEmpty else { return }
         
-        Task {
+        generateTask = Task {
             let message = store.createMessage(kind: .instruction, role: .user, content: "Introduce yourself")
             try await ChatManager(store: store, chat: chat)
                 .inject(message: message)
@@ -74,7 +75,7 @@ struct ChatView: View {
     func handleSubmitText(_ text: String) {
         guard let chat = store.get(chatID: chatID) else { return }
         
-        Task {
+        generateTask = Task {
             let message = store.createMessage(role: .user, content: text)
             try await ChatManager(store: store, chat: chat)
                 .inject(message: message)
@@ -83,6 +84,6 @@ struct ChatView: View {
     }
     
     func handleCancel() {
-        print("not implemented")
+        generateTask?.cancel()
     }
 }
