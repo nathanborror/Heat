@@ -46,6 +46,9 @@ final class DiskPersistence: Persistence {
         guard let url = documents?.appending(path: filename, directoryHint: .notDirectory) else {
             return []
         }
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            return []
+        }
         let task = Task<[T], Error> {
             let data = try Data(contentsOf: url)
             return try JSONDecoder().decode([T].self, from: data)
@@ -55,6 +58,9 @@ final class DiskPersistence: Persistence {
     
     func load<T: Codable>(object filename: String) async throws -> T? {
         guard let url = documents?.appending(path: filename, directoryHint: .notDirectory) else {
+            return nil
+        }
+        guard FileManager.default.fileExists(atPath: url.path) else {
             return nil
         }
         let task = Task<T?, Error> {
