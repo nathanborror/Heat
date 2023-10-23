@@ -68,6 +68,19 @@ final public class OllamaClient {
         }
     }
     
+    public func tags() async throws -> ListResponse {
+        var req = URLRequest(url: host.appending(path: "tags"))
+        req.httpMethod = "GET"
+        req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        
+        let (data, resp) = try await URLSession.shared.data(for: req)
+        if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
+            throw URLError(.badServerResponse)
+        }
+        
+        return try decoder.decode(ListResponse.self, from: data)
+    }
+    
     private var decoder: JSONDecoder {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")

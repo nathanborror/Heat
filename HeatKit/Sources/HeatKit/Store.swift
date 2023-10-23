@@ -9,6 +9,7 @@ public final class Store {
     
     public private(set) var agents: [Agent] = [.grimes, .richardFeynman, .theMoon]
     public private(set) var chats: [AgentChat] = []
+    public private(set) var models: [Model] = []
     public private(set) var preferences: Preferences = .init()
 
     private var client = OllamaClient()
@@ -31,7 +32,13 @@ public final class Store {
         }
     }
     
-    // Creators
+    public func models() async throws {
+        let resp = try await client.tags()
+        self.models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
+    }
+}
+
+extension Store {
     
     public func createAgent(name: String, tagline: String, picture: Media = .none, system: String) -> Agent {
         .init(name: name, tagline: tagline, picture: picture, system: system)
@@ -47,8 +54,9 @@ public final class Store {
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
         .init(model: preferences.model, kind: kind, role: role, content: content, done: done)
     }
-    
-    // Getters
+}
+
+extension Store {
     
     public func get(agentID: String) -> Agent? {
         agents.first(where: { $0.id == agentID })

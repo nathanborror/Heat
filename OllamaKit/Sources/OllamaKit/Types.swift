@@ -50,6 +50,16 @@ public struct GenerateResponse: Codable {
     }
 }
 
+public struct ListResponse: Codable {
+    public let models: [ModelResponse]
+}
+
+public struct ModelResponse: Codable {
+    public let name: String
+    public let size: Int64
+    public let digest: String
+}
+
 public enum AnyValue: Codable {
     case string(String)
     case int(Int)

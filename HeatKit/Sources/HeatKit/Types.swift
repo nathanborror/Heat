@@ -120,3 +120,15 @@ public struct Preferences: Codable, Hashable {
     
     public static var empty = Preferences()
 }
+
+public struct Model: Codable {
+    public let name: String
+    public let size: Int64
+    public let digest: String
+    
+    init(name: String, size: Int64, digest: String) {
+        self.name = name
+        self.size = size
+        self.digest = digest
+    }
+}
