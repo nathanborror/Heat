@@ -1,8 +1,0 @@
-framework module "Ollama" {
-	header "ref.h"
-    header "Ollama.objc.h"
-    header "Universe.objc.h"
-    header "Ollama.h"
-
-    export *
-}

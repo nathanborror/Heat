@@ -23,11 +23,10 @@
 		D41E19462AE4D7C8002516C1 /* ChatMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E19452AE4D7C8002516C1 /* ChatMessageView.swift */; };
 		D41E19482AE589E5002516C1 /* ChatTypingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E19472AE589E5002516C1 /* ChatTypingView.swift */; };
 		D41E194C2AE591EA002516C1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E194B2AE591EA002516C1 /* SettingsView.swift */; };
-		D4CFB6FF2AE714C3005F0122 /* Ollama.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4CFB6FE2AE714C3005F0122 /* Ollama.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		D41E191B2AE45C9B002516C1 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D41E191B2AE45C9B002516C1 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Heat.app; path = /Users/nborror/Desktop/Work/Prototypes/Heat/build/Debug/Heat.app; sourceTree = "<absolute>"; };
 		D41E191E2AE45C9B002516C1 /* MainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainApp.swift; sourceTree = "<group>"; };
 		D41E19202AE45C9B002516C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D41E19222AE45C9C002516C1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -47,7 +46,6 @@
 		D41E19452AE4D7C8002516C1 /* ChatMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageView.swift; sourceTree = "<group>"; };
 		D41E19472AE589E5002516C1 /* ChatTypingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTypingView.swift; sourceTree = "<group>"; };
 		D41E194B2AE591EA002516C1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		D4CFB6FE2AE714C3005F0122 /* Ollama.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Ollama.xcframework; path = Frameworks/Ollama.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,7 +54,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D41E19322AE467F5002516C1 /* HeatKit in Frameworks */,
-				D4CFB6FF2AE714C3005F0122 /* Ollama.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,17 +66,7 @@
 				D41E191D2AE45C9B002516C1 /* Heat */,
 				D41E192D2AE45CE2002516C1 /* HeatKit */,
 				D41E192F2AE4623A002516C1 /* OllamaKit */,
-				D41E191C2AE45C9B002516C1 /* Products */,
-				D4CFB6FD2AE714C3005F0122 /* Frameworks */,
 			);
-			sourceTree = "<group>";
-		};
-		D41E191C2AE45C9B002516C1 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D41E191B2AE45C9B002516C1 /* Heat.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		D41E191D2AE45C9B002516C1 /* Heat */ = {
@@ -146,14 +133,6 @@
 			path = Chats;
 			sourceTree = "<group>";
 		};
-		D4CFB6FD2AE714C3005F0122 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				D4CFB6FE2AE714C3005F0122 /* Ollama.xcframework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -201,7 +180,7 @@
 				Base,
 			);
 			mainGroup = D41E19122AE45C9B002516C1;
-			productRefGroup = D41E191C2AE45C9B002516C1 /* Products */;
+			productRefGroup = D41E19122AE45C9B002516C1;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (

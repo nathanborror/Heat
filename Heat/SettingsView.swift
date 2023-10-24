@@ -35,18 +35,6 @@ struct SettingsView: View {
                 Text("Example: 127.0.0.1:8080")
             }
             
-            Section {
-                TextField("Model Name", text: $modelToPull)
-                if let status = modelPullStatus {
-                    Text(status)
-                }
-                Button(action: handleModelPull) {
-                    Text("Pull Model")
-                }
-            } header: {
-                Text("Pull Model")
-            }
-            
             Button(role: .destructive, action: handleDeleteAll) {
                 Text("Delete All Data")
             }
@@ -66,17 +54,5 @@ struct SettingsView: View {
     func handleDeleteAll() {
         Task { try store.deleteAll() }
         dismiss()
-    }
-    
-    func handleModelPull() {
-        Task(priority: .background) {
-            let name = modelToPull
-            try await store.modelPull(name: name) { progress in
-                DispatchQueue.main.async {
-                    modelPullStatus = progress.status
-                }
-            }
-            modelPullStatus = nil
-        }
     }
 }
