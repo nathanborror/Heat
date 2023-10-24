@@ -1,8 +1,10 @@
 import SwiftUI
+import HeatKit
 
 struct ChatTypingIndicatorView: View {
     
     let alignment: Alignment
+    let agent: Agent?
     let foregroundColor: Color
     let backgroundColor: Color
     
@@ -11,8 +13,9 @@ struct ChatTypingIndicatorView: View {
         case trailing
     }
     
-    init(_ alignment: Alignment, foregroundColor: Color = .secondary, backgroundColor: Color = .secondary.opacity(0.15)) {
+    init(_ alignment: Alignment, agent: Agent? = nil, foregroundColor: Color = .secondary, backgroundColor: Color = .secondary.opacity(0.15)) {
         self.alignment = alignment
+        self.agent = agent
         self.foregroundColor = foregroundColor
         self.backgroundColor = backgroundColor
     }
@@ -21,6 +24,11 @@ struct ChatTypingIndicatorView: View {
         HStack(alignment: .bottom) {
             switch alignment {
             case .leading:
+                if let agent = agent {
+                    PictureView(picture: agent.picture)
+                        .frame(width: 32, height: 32)
+                        .clipShape(Squircle())
+                }
                 ChatTypingEllipsis(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
                 Spacer()
             case .trailing:

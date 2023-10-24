@@ -23,7 +23,7 @@ struct ChatView: View {
                         ChatMessageContainerView(agent: agent, message: message)
                     }
                     if chat?.state == .processing {
-                        ChatTypingIndicatorView(.leading)
+                        ChatTypingIndicatorView(.leading, agent: agent)
                     }
                 }
                 .padding()
