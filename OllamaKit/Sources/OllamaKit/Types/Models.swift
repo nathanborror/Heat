@@ -12,6 +12,10 @@ public struct ModelResponse: Codable {
 
 public struct ModelShowRequest: Codable {
     public var name: String
+    
+    public init(name: String) {
+        self.name = name
+    }
 }
 
 public struct ModelShowResponse: Codable {
@@ -26,23 +30,46 @@ public struct ModelCreateRequest: Codable {
     public var name: String
     public var path: String
     public var stream: Bool?
+    
+    public init(name: String, path: String, stream: Bool? = nil) {
+        self.name = name
+        self.path = path
+        self.stream = stream
+    }
 }
 
 public struct ModelDeleteRequest: Codable {
     public var name: String
+    
+    public init(name: String) {
+        self.name = name
+    }
 }
 
 public struct ModelCopyRequest: Codable {
     public var source: String
     public var destination: String
+    
+    public init(source: String, destination: String) {
+        self.source = source
+        self.destination = destination
+    }
 }
 
 public struct ModelPullRequest: Codable {
     public var name: String
     public var insecure: Bool?
-    public var username: String
-    public var password: String
+    public var username: String?
+    public var password: String?
     public var stream: Bool?
+    
+    public init(name: String, insecure: Bool? = nil, username: String? = nil, password: String? = nil, stream: Bool? = nil) {
+        self.name = name
+        self.insecure = insecure
+        self.username = username
+        self.password = password
+        self.stream = stream
+    }
 }
 
 public struct ModelPushRequest: Codable {
@@ -51,6 +78,14 @@ public struct ModelPushRequest: Codable {
     public var username: String
     public var password: String
     public var stream: Bool?
+    
+    public init(name: String, insecure: Bool? = nil, username: String, password: String, stream: Bool? = nil) {
+        self.name = name
+        self.insecure = insecure
+        self.username = username
+        self.password = password
+        self.stream = stream
+    }
 }
 
 public struct ProgressResponse: Codable {

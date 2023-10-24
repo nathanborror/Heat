@@ -7,6 +7,9 @@ struct SettingsView: View {
     
     @Binding var preferences: Preferences
     
+    @State var modelToPull = ""
+    @State var modelPullStatus: String? = nil
+    
     var body: some View {
         Form {
             Section {
@@ -32,6 +35,18 @@ struct SettingsView: View {
                 Text("Example: 127.0.0.1:8080")
             }
             
+            Section {
+                TextField("Model Name", text: $modelToPull)
+                if let status = modelPullStatus {
+                    Text(status)
+                }
+                Button(action: handleModelPull) {
+                    Text("Pull Model")
+                }
+            } header: {
+                Text("Pull Model")
+            }
+            
             Button(role: .destructive, action: handleDeleteAll) {
                 Text("Delete All Data")
             }
@@ -43,11 +58,25 @@ struct SettingsView: View {
     }
     
     func handleLoadModels() {
-        Task { try await store.models() }
+        Task {
+            try await store.models()
+        }
     }
     
     func handleDeleteAll() {
         Task { try store.deleteAll() }
         dismiss()
+    }
+    
+    func handleModelPull() {
+        Task(priority: .background) {
+            let name = modelToPull
+            try await store.modelPull(name: name) { progress in
+                DispatchQueue.main.async {
+                    modelPullStatus = progress.status
+                }
+            }
+            modelPullStatus = nil
+        }
     }
 }

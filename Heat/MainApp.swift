@@ -1,6 +1,7 @@
 import SwiftUI
 import OSLog
 import HeatKit
+import Ollama
 
 private let logger = Logger(subsystem: "MainApp", category: "Heat")
 
@@ -13,7 +14,10 @@ struct MainApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .task { await handleRestore() }
+                .task {
+                    await handleRestore()
+                    initialize()
+                }
                 .onChange(of: scenePhase) { _, newValue in
                     switch newValue {
                     case .inactive:
@@ -33,5 +37,12 @@ struct MainApp: App {
     func handleSave() async {
         do { try await store.saveAll() }
         catch { logger.error("Persistence Save: \(error, privacy: .public)") }
+    }
+    
+    func initialize() {
+        print(Filename.document("").url?.absoluteString)
+        Task {
+            OllamaRunServer()
+        }
     }
 }

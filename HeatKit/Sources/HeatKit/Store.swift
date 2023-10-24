@@ -36,6 +36,13 @@ public final class Store {
         let resp = try await client.modelList()
         self.models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
     }
+    
+    public func modelPull(name: String, callback: (ProgressResponse) async -> Void) async throws {
+        let request = ModelPullRequest(name: name)
+        for try await response in client.modelPull(request: request) {
+            await callback(response)
+        }
+    }
 }
 
 extension Store {

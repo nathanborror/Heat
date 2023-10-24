@@ -68,13 +68,13 @@ final public class OllamaClient {
         return
     }
     
-    public func modelPull(request: ModelPullRequest) async throws -> AsyncThrowingStream<ProgressResponse, Error> {
+    public func modelPull(request: ModelPullRequest) -> AsyncThrowingStream<ProgressResponse, Error> {
         var body = request
         body.stream = true
         return makeAsyncRequest(path: "pull", method: "POST", body: body)
     }
     
-    public func modelPush(request: ModelPushRequest) async throws -> AsyncThrowingStream<ProgressResponse, Error> {
+    public func modelPush(request: ModelPushRequest) -> AsyncThrowingStream<ProgressResponse, Error> {
         var body = request
         body.stream = true
         return makeAsyncRequest(path: "push", method: "POST", body: body)
