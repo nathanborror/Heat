@@ -21,6 +21,11 @@ struct ChatListView: View {
                 }
             }
         }
+        .overlay {
+            if store.chats.isEmpty {
+                ContentUnavailableView("No Chats", systemImage: "bubble", description: Text("Chats you start will appear here."))
+            }
+        }
     }
     
     func handleDelete(_ chat: AgentChat) {
