@@ -2,9 +2,20 @@ import Foundation
 
 extension Agent {
     
+    public static var uhura: Self {
+        .init(
+            id: "bundle-uhura",
+            modelID: "mistral:instruct",
+            name: "Mistral",
+            tagline: "Assistant",
+            picture: .bundle("Uhura")
+        )
+    }
+    
     public static var richardFeynman: Self {
         .init(
             id: "bundle-richard-fenyman",
+            modelID: "llama2:70b-chat",
             name: "Richard Feynman",
             tagline: "Physicist",
             picture: .bundle("RichardFeynman"),
@@ -26,6 +37,7 @@ extension Agent {
     public static var grimes: Self {
         .init(
             id: "bundle-grimes",
+            modelID: "llama2:70b-chat",
             name: "Grimes",
             tagline: "Enigmatic Musician",
             picture: .bundle("Grimes"),
@@ -47,6 +59,7 @@ extension Agent {
     public static var theMoon: Self {
         .init(
             id: "bundle-moon",
+            modelID: "llama2:70b-chat",
             name: "The Moon",
             tagline: "Quiet Observer",
             picture: .bundle("TheMoon"),

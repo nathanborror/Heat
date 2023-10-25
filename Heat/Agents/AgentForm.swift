@@ -8,10 +8,36 @@ struct AgentForm: View {
     @State var name = ""
     @State var tagline = ""
     @State var system = ""
-    @State var preferredModel = ""
+    @State var modelID: String? = nil
     
     var body: some View {
         Form {
+            Section {
+                NavigationLink {
+                    ModelListView(modelID: $modelID)
+                } label: {
+                    HStack {
+                        if let model = model {
+                            Text("Model")
+                            Spacer()
+                            Text(model.name)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text("Model Name")
+                        }
+                    }
+                }
+                if let model = model {
+                    NavigationLink {
+                        ModelView(modelID: model.id)
+                    } label: {
+                        Text("Model Details")
+                    }
+                }
+            } header: {
+                Text("Model")
+            }
+            
             Section {
                 TextField("Name", text: $name)
                     #if os(iOS)
@@ -32,25 +58,11 @@ struct AgentForm: View {
             } header: {
                 Text("System Prompt")
             }
-            
-            Section {
-                Picker("Preferred Model", selection: $preferredModel) {
-                    Text("None").tag("")
-                    ForEach(store.models, id:\.name) { model in
-                        Text(model.name).tag(model.name)
-                    }
-                }
-            } header: {
-                Text("Model")
-            }
         }
         .navigationTitle("Create Agent")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done", action: handleDone)
-            }
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel", action: { dismiss() })
             }
         }
         .onAppear {
@@ -58,8 +70,14 @@ struct AgentForm: View {
         }
     }
     
+    var model: Model? {
+        guard let modelID = modelID else { return nil }
+        return store.get(modelID: modelID)
+    }
+    
     func handleDone() {
-        let agent = store.createAgent(name: name, tagline: tagline, preferredModel: preferredModel.isEmpty ? nil : preferredModel, system: system)
+        guard let modelID = modelID else { return }
+        let agent = store.createAgent(modelID: modelID, name: name, tagline: tagline, system: system)
         Task { await store.upsert(agent: agent) }
         dismiss()
     }

@@ -14,12 +14,6 @@ public final class ChatManager {
     @discardableResult public func inject(message: Message) async throws -> Self {
         try Task.checkCancellation()
         
-        guard let chat = store.get(chatID: chatID) else { return self }
-        
-        // Override model if the chat prefers another model.
-        var message = message
-        message.model = chat.preferredModel ?? message.model
-        
         await store.upsert(message: message, chatID: chatID)
         return self
     }
@@ -28,13 +22,14 @@ public final class ChatManager {
         try Task.checkCancellation()
         
         guard let chat = store.get(chatID: chatID) else { return self }
+        guard let model = store.get(modelID: chat.modelID) else { return self }
         guard let message = chat.messages.last else { return self }
         guard message.role == .user else { return self }
         
         await store.set(state: .processing, chatID: chatID)
         
-        let resp = try await store.generate(model: message.model, prompt: message.content, system: chat.system, context: chat.context)
-        let newAssistantMessage = Message(model: message.model, role: .assistant, content: resp.response, done: resp.done)
+        let resp = try await store.generate(model: model, prompt: message.content, system: chat.system, context: chat.context)
+        let newAssistantMessage = Message(role: .assistant, content: resp.response, done: resp.done)
         
         await store.set(state: .none, chatID: chatID)
         await store.upsert(message: newAssistantMessage, chatID: chatID)
@@ -47,6 +42,7 @@ public final class ChatManager {
         try Task.checkCancellation()
         
         guard let chat = store.get(chatID: chatID) else { return self }
+        guard let model = store.get(modelID: chat.modelID) else { return self }
         guard let message = chat.messages.last else { return self }
         guard message.role == .user else { return self }
         
@@ -54,8 +50,8 @@ public final class ChatManager {
         
         let newAssistantMessageID = UUID().uuidString
         
-        try await store.generateStream(model: message.model, prompt: message.content, system: chat.system, context: chat.context) { resp in
-            let newAssistantMessage = Message(id: newAssistantMessageID, model: message.model, role: .assistant, content: resp.response, done: resp.done)
+        try await store.generateStream(model: model, prompt: message.content, system: chat.system, context: chat.context) { resp in
+            let newAssistantMessage = Message(id: newAssistantMessageID, role: .assistant, content: resp.response, done: resp.done)
             
             await store.set(state: .streaming, chatID: chatID)
             await store.upsert(message: newAssistantMessage, chatID: chatID)

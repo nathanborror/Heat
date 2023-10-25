@@ -5,25 +5,11 @@ struct SettingsView: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) var dismiss
     
-    @Binding var preferences: Preferences
-    
-    @State var modelToPull = ""
-    @State var modelPullStatus: String? = nil
-    
     var body: some View {
+        @Bindable var store = store
         Form {
             Section {
-                Picker("Model Name", selection: $preferences.model) {
-                    ForEach(store.models, id:\.name) { model in
-                        Text(model.name).tag(model.name)
-                    }
-                }
-            } header: {
-                Text("Model")
-            }
-            
-            Section {
-                TextField("Host Address", text: $preferences.host)
+                TextField("Host Address", text: $store.preferences.host)
                     .autocorrectionDisabled()
                     .textContentType(.URL)
                     #if os(iOS)
@@ -40,15 +26,19 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear {
-            handleLoadModels()
+        .navigationTitle("Settings")
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done", action: handleDone)
+            }
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel", action: { dismiss() })
+            }
         }
     }
     
-    func handleLoadModels() {
-        Task {
-            try await store.models()
-        }
+    func handleDone() {
+        dismiss()
     }
     
     func handleDeleteAll() {

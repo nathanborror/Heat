@@ -10,7 +10,7 @@ public final class Store {
     public private(set) var agents: [Agent] = []
     public private(set) var chats: [AgentChat] = []
     public private(set) var models: [Model] = []
-    public private(set) var preferences: Preferences = .init()
+    public var preferences: Preferences = .init()
 
     private var client = OllamaClient()
     private var persistence: Persistence
@@ -19,14 +19,14 @@ public final class Store {
         self.persistence = persistence
     }
     
-    public func generate(model: String, prompt: String, system: String, context: [Int]) async throws -> GenerateResponse {
-        let request = GenerateRequest(model: model, prompt: prompt, system: system, context: context)
+    public func generate(model: Model, prompt: String, system: String?, context: [Int]) async throws -> GenerateResponse {
+        let request = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
         let response = try await client.generate(request: request)
         return response
     }
     
-    public func generateStream(model: String, prompt: String, system: String, context: [Int], callback: (GenerateResponse) async -> Void) async throws {
-        let request = GenerateRequest(model: model, prompt: prompt, system: system, context: context)
+    public func generateStream(model: Model, prompt: String, system: String?, context: [Int], callback: (GenerateResponse) async -> Void) async throws {
+        let request = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
         for try await response in client.generateStream(request: request) {
             await callback(response)
         }
@@ -35,6 +35,20 @@ public final class Store {
     public func models() async throws {
         let resp = try await client.modelList()
         self.models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
+        
+        for model in models { // Load and cache model info
+            try await modelShow(modelID: model.name)
+        }
+    }
+    
+    public func modelShow(modelID: String) async throws {
+        let request = ModelShowRequest(name: modelID)
+        do {
+            let modelDetails = try await client.modelShow(request: request)
+            await upsert(modelDetails: modelDetails, modelID: modelID)
+        } catch {
+            print(error)
+        }
     }
     
     public func modelPull(name: String, callback: (ProgressResponse) async -> Void) async throws {
@@ -47,23 +61,27 @@ public final class Store {
 
 extension Store {
     
-    public func createAgent(name: String, tagline: String, picture: Media = .none, preferredModel: String? = nil, system: String) -> Agent {
-        .init(name: name, tagline: tagline, picture: picture, preferredModel: preferredModel, system: system)
+    public func createAgent(modelID: String, name: String, tagline: String, picture: Media = .none, system: String) -> Agent {
+        .init(modelID: modelID, name: name, tagline: tagline, picture: picture, system: system)
     }
     
     public func createChat(agentID: String) -> AgentChat {
         guard let agent = get(agentID: agentID) else {
             fatalError("Agent does not exist")
         }
-        return AgentChat(agentID: agent.id, preferredModel: agent.preferredModel, system: agent.system)
+        return AgentChat(modelID: agent.modelID, agentID: agent.id, system: agent.system)
     }
     
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
-        .init(model: preferences.model, kind: kind, role: role, content: content, done: done)
+        return .init(kind: kind, role: role, content: content, done: done)
     }
 }
 
 extension Store {
+    
+    public func get(modelID: String) -> Model? {
+        models.first(where: { $0.id == modelID })
+    }
     
     public func get(agentID: String) -> Agent? {
         agents.first(where: { $0.id == agentID })
@@ -76,6 +94,16 @@ extension Store {
 
 @MainActor
 extension Store {
+    
+    public func upsert(modelDetails: ModelShowResponse, modelID: String) {
+        if let index = models.firstIndex(where: { $0.id == modelID }) {
+            models[index].license = modelDetails.license
+            models[index].modelfile = modelDetails.modelfile
+            models[index].parameters = modelDetails.parameters
+            models[index].template = modelDetails.template
+            models[index].system = modelDetails.system
+        }
+    }
     
     public func upsert(agent: Agent) {
         if let index = agents.firstIndex(where: { $0.id == agent.id }) {
@@ -139,38 +167,51 @@ extension Store {
 extension Store {
     
     public func restore() async throws {
-        let agents: [Agent] = try await persistence.load(objects: "agents.json")
-        let chats: [AgentChat] = try await persistence.load(objects: "chats.json")
-        let preferences: Preferences? = try await persistence.load(object: "preferences.json")
-        
-        DispatchQueue.main.async {
-            self.agents = agents
-            self.chats = chats
-            self.preferences = preferences ?? self.preferences
-            self.client = OllamaClient(host: self.preferences.host)
+        do {
+            let agents: [Agent] = try await persistence.load(objects: "agents.json")
+            let chats: [AgentChat] = try await persistence.load(objects: "chats.json")
+            let models: [Model] = try await persistence.load(objects: "models.json")
+            let preferences: Preferences? = try await persistence.load(object: "preferences.json")
             
-            if self.agents.isEmpty {
-                self.agents = self.defaultAgents
+            DispatchQueue.main.async {
+                self.agents = agents
+                self.chats = chats
+                self.models = models
+                self.preferences = preferences ?? self.preferences
+                self.client = OllamaClient(host: self.preferences.host)
+                
+                if self.agents.isEmpty {
+                    self.agents = self.defaultAgents
+                }
             }
+        } catch is DecodingError {
+            try deleteAll()
         }
     }
     
     public func saveAll() async throws {
         try await persistence.save(filename: "agents.json", objects: agents)
         try await persistence.save(filename: "chats.json", objects: chats)
+        try await persistence.save(filename: "models.json", objects: models)
         try await persistence.save(filename: "preferences.json", object: preferences)
     }
     
     public func deleteAll() throws {
         try persistence.delete(filename: "agents.json")
         try persistence.delete(filename: "chats.json")
+        try persistence.delete(filename: "models.json")
         try persistence.delete(filename: "preferences.json")
         
+        resetAll()
+    }
+    
+    public func resetAll() {
         self.agents = defaultAgents
         self.chats = []
+        self.models = []
         self.preferences = .init()
         self.client = OllamaClient()
     }
     
-    private var defaultAgents: [Agent] { [.grimes, .richardFeynman, .theMoon] }
+    private var defaultAgents: [Agent] { [.uhura, .richardFeynman, .theMoon, .grimes] }
 }

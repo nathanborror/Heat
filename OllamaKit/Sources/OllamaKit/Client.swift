@@ -42,7 +42,9 @@ final public class OllamaClient {
     }
     
     public func modelShow(request: ModelShowRequest) async throws -> ModelShowResponse {
-        let req = makeRequest(path: "show", method: "POST")
+        var req = makeRequest(path: "show", method: "POST")
+        req.httpBody = try JSONEncoder().encode(request)
+        
         let (data, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
             throw URLError(.badServerResponse)
@@ -51,7 +53,9 @@ final public class OllamaClient {
     }
     
     public func modelCopy(request: ModelCopyRequest) async throws {
-        let req = makeRequest(path: "copy", method: "POST")
+        var req = makeRequest(path: "copy", method: "POST")
+        req.httpBody = try JSONEncoder().encode(request)
+        
         let (_, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
             throw URLError(.badServerResponse)
@@ -60,7 +64,9 @@ final public class OllamaClient {
     }
     
     public func modelDelete(request: ModelDeleteRequest) async throws {
-        let req = makeRequest(path: "delete", method: "DELETE")
+        var req = makeRequest(path: "delete", method: "DELETE")
+        req.httpBody = try JSONEncoder().encode(request)
+        
         let (_, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
             throw URLError(.badServerResponse)

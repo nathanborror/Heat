@@ -6,6 +6,7 @@ private let logger = Logger(subsystem: "ContentView", category: "Heat")
 
 struct ContentView: View {
     @Environment(Store.self) private var store
+    @Environment(Router.self) private var router
     
     @State var selectedChat: AgentChat? = nil
     @State var isShowingAgents = false
@@ -23,10 +24,10 @@ struct ContentView: View {
                 .navigationTitle("Chats")
                 .navigationSplitViewColumnWidth(220)
                 .toolbar {
-                    Button(action: { isShowingAgents.toggle() }) {
+                    Button(action: { router.present(.agentList) }) {
                         Image(systemName: "plus")
                     }
-                    Button(action: { isShowingSettings.toggle() }) {
+                    Button(action: { router.present(.preferences) }) {
                         Image(systemName: "ellipsis")
                     }
                 }
@@ -40,44 +41,9 @@ struct ContentView: View {
                     .background(.background)
             }
         }
-        .sheet(isPresented: $isShowingAgents) {
-            NavigationStack {
-                AgentListView()
-                    .navigationTitle("Pick Agent")
-                    .toolbar {
-                        Button("Done", action: { isShowingAgents.toggle() })
-                    }
-            }
-            .environment(store)
-            .frame(idealWidth: 400, idealHeight: 500)
-        }
-        .sheet(isPresented: $isShowingSettings) {
-            NavigationStack {
-                SettingsView(preferences: $preferences)
-                    .navigationTitle("Settings")
-                    .toolbar {
-                        ToolbarItem {
-                            Button("Done", action: handleSaveSettings)
-                        }
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel", action: { isShowingSettings.toggle() })
-                        }
-                    }
-            }
-            .environment(store)
-            .frame(idealWidth: 400, idealHeight: 500)
-        }
         .onChange(of: store.preferences) { _, newValue in
             preferences = newValue
         }
-    }
-    
-    func handleSaveSettings() {
-        Task {
-            await store.upsert(preferences: preferences)
-            try await store.saveAll()
-        }
-        isShowingSettings.toggle()
     }
 }
 

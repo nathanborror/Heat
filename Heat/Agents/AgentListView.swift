@@ -3,14 +3,14 @@ import HeatKit
 
 struct AgentListView: View {
     @Environment(Store.self) private var store
-    @Environment(\.dismiss) var dismiss
+    @Environment(Router.self) private var router
     
-    @State private var isShowingForm = false
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
-                Button(action: { isShowingForm.toggle() }) {
+                Button(action: { router.navigate(to: .agentForm(nil)) }) {
                     HStack {
                         Spacer()
                         Text("Create Agent")
@@ -25,16 +25,22 @@ struct AgentListView: View {
                 
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(store.agents) { agent in
-                        AgentTile(agent: agent, height: proxy.size.width/heightDivisor, selection: handleSelection)
+                        AgentTile(
+                            agent: agent,
+                            model: store.get(modelID: agent.modelID),
+                            height: proxy.size.width/heightDivisor,
+                            selection: handleSelection
+                        )
                     }
                 }
                 .padding()
             }
         }
-        .sheet(isPresented: $isShowingForm) {
-            NavigationStack {
-                AgentForm()
-            }.environment(store)
+        .navigationTitle("Agents")
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done", action: { dismiss() })
+            }
         }
     }
     
@@ -59,13 +65,26 @@ struct AgentTile: View {
     typealias AgentCallback = (Agent) -> Void
     
     let agent: Agent
+    let model: Model?
     let height: CGFloat
     let selection: AgentCallback
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Button(action: { selection(agent) }) {
-                AgentTilePicture(picture: agent.picture, height: height, cornerRadius: 12)
+                ZStack(alignment: .topTrailing) {
+                    AgentTilePicture(picture: agent.picture, height: height, cornerRadius: 12)
+                    if let model = model, let family = model.family {
+                        Text(family)
+                            .font(.footnote)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .foregroundStyle(.regularMaterial)
+                            .background(.ultraThinMaterial)
+                            .clipShape(.rect(cornerRadius: 4))
+                            .padding(8)
+                    }
+                }
             }
             .frame(height: height)
             .buttonStyle(.borderless)
@@ -109,7 +128,10 @@ struct AgentTileText: View {
 }
 
 #Preview {
-    NavigationStack {
+    let store = Store.shared
+    store.resetAll()
+    
+    return NavigationStack {
         AgentListView()
             .navigationTitle("Explore")
             .toolbar {
@@ -119,5 +141,5 @@ struct AgentTileText: View {
                     }
                 }
             }
-    }.environment(Store.shared)
+    }.environment(store)
 }

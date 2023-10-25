@@ -24,3 +24,33 @@ extension Color {
         self.init(hex: UInt(hexInt), alpha: alpha)
     }
 }
+
+extension Int64 {
+
+    var toSizeString: String {
+        let KB: Double = 1024
+        let MB = KB * 1024
+        let GB = MB * 1024
+        let TB = GB * 1024
+        let PB = TB * 1024
+        let EB = PB * 1024
+        
+        let bytes = Double(self)
+        
+        if bytes < KB {
+            return "\(self) Bytes"
+        } else if bytes < MB {
+            return String(format: "%.2f KB", Double(self) / KB)
+        } else if bytes < GB {
+            return String(format: "%.2f MB", Double(self) / MB)
+        } else if bytes < TB {
+            return String(format: "%.2f GB", Double(self) / GB)
+        } else if bytes < PB {
+            return String(format: "%.2f TB", Double(self) / TB)
+        } else if bytes < EB {
+            return String(format: "%.2f PB", Double(self) / PB)
+        } else {
+            return String(format: "%.2f EB", Double(self) / EB)
+        }
+    }
+}
