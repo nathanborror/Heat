@@ -5,6 +5,7 @@ struct ChatView: View {
     @Environment(Store.self) private var store
     
     let chatID: String
+    @State var router: MainRouter
 
     @State private var composerText = ""
     @State private var composerState: ChatComposerView.ViewState = .init()
@@ -42,6 +43,21 @@ struct ChatView: View {
             )
             .padding(.vertical, 8)
             .background(.background)
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Button(action: { router.presentChatInfo(chatID) }) {
+                    HStack {
+                        Text(agent?.name ?? "Unknown")
+                            .font(.headline)
+                        Image(systemName: "chevron.right.circle.fill")
+                            .symbolRenderingMode(.hierarchical)
+                            .imageScale(.small)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .tint(.primary)
+            }
         }
         .onAppear {
             handleIntroduction()

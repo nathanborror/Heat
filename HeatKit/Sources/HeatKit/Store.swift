@@ -32,11 +32,17 @@ public final class Store {
         }
     }
     
-    public func models() async throws {
+    public func loadModels() async throws {
         let resp = try await client.modelList()
         self.models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
         
-        for model in models { // Load and cache model info
+        for model in models {
+            await upsert(model: model)
+        }
+    }
+    
+    public func loadModelDetails() async throws {
+        for model in self.models {
             try await modelShow(modelID: model.name)
         }
     }
@@ -61,15 +67,15 @@ public final class Store {
 
 extension Store {
     
-    public func createAgent(modelID: String, name: String, tagline: String, picture: Media = .none, system: String) -> Agent {
-        .init(modelID: modelID, name: name, tagline: tagline, picture: picture, system: system)
+    public func createAgent(name: String, tagline: String, picture: Media = .none, system: String) -> Agent {
+        .init(name: name, tagline: tagline, picture: picture, system: system)
     }
     
-    public func createChat(agentID: String) -> AgentChat {
+    public func createChat(modelID: String, agentID: String) -> AgentChat {
         guard let agent = get(agentID: agentID) else {
             fatalError("Agent does not exist")
         }
-        return AgentChat(modelID: agent.modelID, agentID: agent.id, system: agent.system)
+        return AgentChat(modelID: modelID, agentID: agent.id, system: agent.system)
     }
     
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
@@ -95,13 +101,24 @@ extension Store {
 @MainActor
 extension Store {
     
+    public func upsert(model: Model) {
+        if let index = models.firstIndex(where: { $0.id == model.name }) {
+            let existing = models[index]
+            models[index] = existing
+        } else {
+            models.append(model)
+        }
+    }
+    
     public func upsert(modelDetails: ModelShowResponse, modelID: String) {
         if let index = models.firstIndex(where: { $0.id == modelID }) {
-            models[index].license = modelDetails.license
-            models[index].modelfile = modelDetails.modelfile
-            models[index].parameters = modelDetails.parameters
-            models[index].template = modelDetails.template
-            models[index].system = modelDetails.system
+            var existing = models[index]
+            existing.license = modelDetails.license
+            existing.modelfile = modelDetails.modelfile
+            existing.parameters = modelDetails.parameters
+            existing.template = modelDetails.template
+            existing.system = modelDetails.system
+            models[index] = existing
         }
     }
     
@@ -111,7 +128,7 @@ extension Store {
             agent.modified = .now
             agents[index] = agent
         } else {
-            self.agents.append(agent)
+            agents.append(agent)
         }
     }
     
@@ -121,7 +138,7 @@ extension Store {
             chat.modified = .now
             chats[index] = chat
         } else {
-            self.chats.append(chat)
+            chats.append(chat)
         }
     }
     
@@ -185,7 +202,7 @@ extension Store {
                 }
             }
         } catch is DecodingError {
-            try deleteAll()
+            try await deleteAll()
         }
     }
     
@@ -196,12 +213,11 @@ extension Store {
         try await persistence.save(filename: "preferences.json", object: preferences)
     }
     
-    public func deleteAll() throws {
+    public func deleteAll() async throws {
         try persistence.delete(filename: "agents.json")
         try persistence.delete(filename: "chats.json")
         try persistence.delete(filename: "models.json")
         try persistence.delete(filename: "preferences.json")
-        
         resetAll()
     }
     
@@ -213,5 +229,17 @@ extension Store {
         self.client = OllamaClient()
     }
     
-    private var defaultAgents: [Agent] { [.uhura, .richardFeynman, .theMoon, .grimes] }
+    public func resetAgents() async throws {
+        self.agents = defaultAgents
+    }
+    
+    private var defaultAgents: [Agent] {
+        [
+            .uhura,
+            .richardFeynman,
+            .theMoon,
+            .grimes,
+            .anthonyBourdain,
+        ]
+    }
 }

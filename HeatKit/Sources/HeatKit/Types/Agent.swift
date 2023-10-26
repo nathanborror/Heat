@@ -2,7 +2,6 @@ import Foundation
 
 public struct Agent: Codable, Identifiable, Hashable {
     public var id: String
-    public var modelID: String
     public var name: String
     public var tagline: String
     public var picture: Media
@@ -10,9 +9,8 @@ public struct Agent: Codable, Identifiable, Hashable {
     public var created: Date
     public var modified: Date
     
-    init(id: String = UUID().uuidString, modelID: String, name: String, tagline: String, picture: Media, system: String? = nil) {
+    init(id: String = UUID().uuidString, name: String, tagline: String, picture: Media, system: String? = nil) {
         self.id = id
-        self.modelID = modelID
         self.name = name
         self.tagline = tagline
         self.picture = picture
@@ -25,4 +23,8 @@ public struct Agent: Codable, Identifiable, Hashable {
         hasher.combine(id)
         hasher.combine(modified)
     }
+}
+
+extension Agent {
+    public static var empty: Agent = .init(name: "", tagline: "", picture: .none)
 }

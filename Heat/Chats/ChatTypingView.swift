@@ -87,12 +87,3 @@ struct ChatTypingDot: View {
             .onAppear { self.isVisible = true }
     }
 }
-
-#Preview {
-    VStack {
-        ChatTypingIndicatorView(.leading)
-        ChatTypingIndicatorView(.trailing)
-        ChatTypingIndicatorView(.trailing, foregroundColor: .accentColor, backgroundColor: .accentColor.opacity(0.1))
-    }
-    .padding(.horizontal)
-}

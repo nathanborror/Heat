@@ -3,9 +3,9 @@ import HeatKit
 
 struct ModelView: View {
     @Environment(Store.self) private var store
-    @Environment(\.dismiss) var dismiss
     
     let modelID: String
+    @State var router: MainRouter
     
     private let fontSize: CGFloat = 14
     
@@ -71,13 +71,6 @@ struct ModelView: View {
             }
         }
         .navigationTitle("Model")
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button(action: { dismiss() }) {
-                    Text("Done")
-                }
-            }
-        }
         .onAppear {
             Task { try await store.modelShow(modelID: modelID) }
         }

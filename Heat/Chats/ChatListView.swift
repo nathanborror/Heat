@@ -4,26 +4,39 @@ import HeatKit
 struct ChatListView: View {
     @Environment(Store.self) private var store
     
-    @Binding var selected: AgentChat?
+    @State var router: MainRouter
     
     var body: some View {
-        List(selection: $selected) {
-            ForEach(store.chats) { chat in
-                if let agent = store.get(agentID: chat.agentID) {
-                    NavigationLink(value: chat) {
-                        ChatRow(chat: chat, agent: agent)
-                    }
-                    .swipeActions {
-                        Button(role: .destructive, action: { handleDelete(chat) }) {
-                            Image(systemName: "trash")
+        RoutingView(router: router) {
+            List {
+                ForEach(store.chats) { chat in
+                    if let agent = store.get(agentID: chat.agentID) {
+                        Button(action: { router.presentChat(chat.id) }) {
+                            ChatRow(chat: chat, agent: agent)
+                        }
+                        .tint(.primary)
+                        .swipeActions {
+                            Button(role: .destructive, action: { handleDelete(chat) }) {
+                                Image(systemName: "trash")
+                            }
                         }
                     }
                 }
             }
-        }
-        .overlay {
-            if store.chats.isEmpty {
-                ContentUnavailableView("No Chats", systemImage: "bubble", description: Text("Chats you start will appear here."))
+            .listStyle(.plain)
+            .navigationTitle("Chats")
+            .overlay {
+                if store.chats.isEmpty {
+                    ContentUnavailableView("No Chats", systemImage: "bubble", description: Text("Chats you start will appear here."))
+                }
+            }
+            .toolbar {
+                Button(action: { router.presentAgents() }) {
+                    Image(systemName: "plus")
+                }
+                Button(action: { router.presentPreferences() }) {
+                    Image(systemName: "ellipsis")
+                }
             }
         }
     }
@@ -49,6 +62,8 @@ struct ChatRow: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+            Spacer()
+            Image.chevron
         }
     }
     

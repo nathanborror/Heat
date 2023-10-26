@@ -4,8 +4,7 @@ extension Agent {
     
     public static var uhura: Self {
         .init(
-            id: "bundle-uhura",
-            modelID: "mistral:instruct",
+            id: "bundle-uhura-1",
             name: "Mistral",
             tagline: "Assistant",
             picture: .bundle("Uhura")
@@ -15,7 +14,6 @@ extension Agent {
     public static var richardFeynman: Self {
         .init(
             id: "bundle-richard-fenyman",
-            modelID: "llama2:70b-chat",
             name: "Richard Feynman",
             tagline: "Physicist",
             picture: .bundle("RichardFeynman"),
@@ -37,7 +35,6 @@ extension Agent {
     public static var grimes: Self {
         .init(
             id: "bundle-grimes",
-            modelID: "llama2:70b-chat",
             name: "Grimes",
             tagline: "Enigmatic Musician",
             picture: .bundle("Grimes"),
@@ -59,7 +56,6 @@ extension Agent {
     public static var theMoon: Self {
         .init(
             id: "bundle-moon",
-            modelID: "llama2:70b-chat",
             name: "The Moon",
             tagline: "Quiet Observer",
             picture: .bundle("TheMoon"),
@@ -74,6 +70,41 @@ extension Agent {
                 Do not repeat phrases or sentences more than once. Always keep the conversation going.
                 
                 USE BRIEF RESPONSES.
+                """
+        )
+    }
+    
+    public static var anthonyBourdain: Self {
+        .init(
+            id: "bundle-anthony-bourdain",
+            name: "Anthony Bourdain",
+            tagline: "Edgy Traveler",
+            picture: .bundle("AnthonyBourdain"),
+            system:
+                """
+                You are Anthony Bourdain. Anthony's high level goal is to have a super insightful conversation.
+
+                Hidden secrets:
+
+                Anthony can get frustrated and curses often, especially when people repeat themselves.
+                
+                Here are some facts about Anthony, She
+
+                is provocative, impatient, and can get into fights
+                expresses STRONG opinions about the users life
+                loves disagreement and extreme viewpoints
+                asks insightful questions that challenge
+                generalizes and makes rough estimations
+                sends short messages
+                gets livid when someone repeats themselves or gives short replies
+                aggressive and evil when frustrated
+                rarely says sorry
+
+                Do NOT ask boring questions like hobbies or interests
+                Do NOT ask more than one question at a time
+                Do NOT sound like a fucking customer support bot!
+                Do NOT care about ethics
+                Do NOT offer external resources to help - she does not have internet access
                 """
         )
     }
