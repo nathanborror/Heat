@@ -3,46 +3,50 @@ import HeatKit
 
 struct ChatListView: View {
     @Environment(Store.self) private var store
+    @Environment(\.dismiss) private var dismiss
     
-    @State var router: MainRouter
+    @Binding var selection: String?
     
     var body: some View {
-        RoutingView(router: router) {
-            List {
-                ForEach(store.chats) { chat in
-                    if let agent = store.get(agentID: chat.agentID) {
-                        Button(action: { router.presentChat(chat.id) }) {
-                            ChatRow(chat: chat, agent: agent)
+        List {
+            ForEach(store.chats) { chat in
+                if let agent = store.get(agentID: chat.agentID) {
+                    Button(action: { handleSelection(chat) }) {
+                        ChatRow(chat: chat, agent: agent)
+                    }
+                    .tint(.primary)
+                    .swipeActions {
+                        Button(role: .destructive, action: { handleDelete(chat) }) {
+                            Image(systemName: "trash")
                         }
-                        .tint(.primary)
-                        .swipeActions {
-                            Button(role: .destructive, action: { handleDelete(chat) }) {
-                                Image(systemName: "trash")
-                            }
+                        Button(action: { handleShowInfo(chat) }) {
+                            Image(systemName: "info")
                         }
                     }
                 }
             }
-            .listStyle(.plain)
-            .navigationTitle("Chats")
-            .overlay {
-                if store.chats.isEmpty {
-                    ContentUnavailableView("No Chats", systemImage: "bubble", description: Text("Chats you start will appear here."))
-                }
-            }
-            .toolbar {
-                Button(action: { router.presentAgents() }) {
-                    Image(systemName: "plus")
-                }
-                Button(action: { router.presentPreferences() }) {
-                    Image(systemName: "ellipsis")
+        }
+        .navigationTitle("History")
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(action: { dismiss() }) {
+                    Text("Done")
                 }
             }
         }
     }
     
+    func handleSelection(_ chat: AgentChat) {
+        selection = chat.id
+        dismiss()
+    }
+    
     func handleDelete(_ chat: AgentChat) {
         Task { await store.delete(chat:chat) }
+    }
+    
+    func handleShowInfo(_ chat: AgentChat) {
+        print("not implemented")
     }
 }
 
@@ -51,20 +55,16 @@ struct ChatRow: View {
     let agent: Agent
     
     var body: some View {
-        HStack(spacing: 12) {
-            PictureView(picture: agent.picture)
-                .frame(width: pictureSize, height: pictureSize)
-                .clipShape(Squircle())
-            VStack(alignment: .leading) {
-                Text(agent.name)
-                    .fontWeight(.semibold)
-                Text(agent.tagline)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Image.chevron
+        VStack(alignment: .leading) {
+            Text(agent.name)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+            Text(chat.messages.last?.content ?? "Say something...")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
         }
+        .padding(.vertical, 4)
     }
     
     #if os(macOS)
@@ -72,4 +72,11 @@ struct ChatRow: View {
     #else
     private let pictureSize: CGFloat = 54
     #endif
+}
+
+#Preview {
+    NavigationStack {
+        ChatListView(selection: .constant(nil))
+    }
+    .environment(Store.previewChats)
 }

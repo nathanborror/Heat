@@ -4,101 +4,156 @@ import HeatKit
 struct ChatView: View {
     @Environment(Store.self) private var store
     
-    let chatID: String
-    @State var router: MainRouter
+    @State var chatID: String?
 
     @State private var composerText = ""
     @State private var composerState: ChatComposerView.ViewState = .init()
     @State private var generateTask: Task<(), Error>? = nil
+    @State private var modelID: String = ""
+    
+    @State private var isShowingInfo = false
+    @State private var isShowingHistory = false
+    @State private var isShowingSettings = false
     
     var body: some View {
-        ScrollView {
-            ScrollViewReader { proxy in
-                LazyVStack {
-                    if let model = model {
-                        Text(model.name)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .padding()
+        GeometryReader { geo in
+            ScrollViewReader { scrollViewProxy in
+                ScrollView {
+                    ScrollViewMarker(id: "scrollViewTop")
+                    if let chat = chat, let agent = agent {
+                        ChatHistoryView(chat: chat, agent: agent, messages: messages)
+                    } else {
+                        LazyVGrid(columns: columns, spacing: 16) {
+                            ForEach(store.agents) { agent in
+                                AgentTile(
+                                    agent: agent,
+                                    height: geo.size.width/heightDivisor,
+                                    selection: handleAgentSelection
+                                )
+                            }
+                        }
+                        .padding(.horizontal)
                     }
-                    
-                    ForEach(messages) { message in
-                        ChatMessageContainerView(agent: agent, message: message)
-                    }
-                    if chat?.state == .processing {
-                        ChatTypingIndicatorView(.leading, agent: agent)
-                    }
+                    ScrollViewMarker(id: "scrollViewBottom")
                 }
-                .padding()
+                .onChange(of: chat?.messages) { _, _ in
+                    scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
+                }
+                .onChange(of: chat) { _, newValue in
+                    modelID = chat?.modelID ?? modelID
+                    scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
+                }
+                .onChange(of: store.models) { oldValue, newValue in
+                    guard oldValue.isEmpty else { return }
+                    guard modelID.isEmpty else { return }
+                    guard let model = store.getDefaultModel() else { return }
+                    modelID = model.id
+                }
+                .onAppear{
+                    scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
+                }
             }
         }
-        .defaultScrollAnchor(.bottom)
+        .navigationBarTitleDisplayMode(.inline)
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom, alignment: .center) {
             ChatComposerView(
                 text: $composerText,
                 state: composerState,
-                submit: handleSubmitText,
-                stop: handleCancel
+                submit: handleSubmit,
+                stop: handleStop
             )
             .padding(.vertical, 8)
             .background(.background)
         }
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Button(action: { router.presentChatInfo(chatID) }) {
-                    HStack {
-                        Text(agent?.name ?? "Unknown")
+                Button(action: { isShowingInfo.toggle() }) {
+                    VStack(alignment: .center, spacing: 0) {
+                        Text(agent?.name ?? "New Chat")
                             .font(.headline)
-                        Image(systemName: "chevron.right.circle.fill")
-                            .symbolRenderingMode(.hierarchical)
-                            .imageScale(.small)
-                            .foregroundStyle(.secondary)
+                            .tint(.primary)
+                        Text(model?.name ?? "Choose Model")
+                            .font(.footnote)
+                            .tint(model == nil ? .accentColor : .secondary)
                     }
                 }
-                .tint(.primary)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: handleNewChat) {
+                    Label("New Chat", systemImage: "plus")
+                }.disabled(chatID == nil)
+            }
+            ToolbarItem(placement: .topBarLeading) {
+                Menu {
+                    Button(action: { isShowingHistory.toggle() }) {
+                        Label("History", systemImage: "archivebox")
+                    }
+                    Button(action: { isShowingSettings.toggle() }) {
+                        Label("Settings", systemImage: "slider.horizontal.3")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
             }
         }
-        .onAppear {
-            handleIntroduction()
+        .sheet(isPresented: $isShowingInfo) {
+            NavigationStack {
+                ChatInfoView(chatID: chatID, modelID: $modelID)
+            }.environment(store)
+        }
+        .sheet(isPresented: $isShowingHistory) {
+            NavigationStack {
+                ChatListView(selection: $chatID)
+            }.environment(store)
+        }
+        .sheet(isPresented: $isShowingSettings) {
+            NavigationStack {
+                PreferencesView()
+            }.environment(store)
         }
     }
     
     var agent: Agent? {
+        guard let chatID = chatID else { return nil }
         guard let chat = store.get(chatID: chatID) else { return nil }
         return store.get(agentID: chat.agentID)
     }
     
     var chat: AgentChat? {
-        store.get(chatID: chatID)
+        guard let chatID = chatID else { return nil }
+        return store.get(chatID: chatID)
     }
     
     var model: Model? {
-        guard let modelID = chat?.modelID else { return nil }
         return store.get(modelID: modelID)
     }
     
     var messages: [Message] {
-        guard let chat = store.get(chatID: chatID) else { return [] }
+        guard let chat = chat else { return [] }
         return chat.messages.filter { $0.kind != .instruction }
     }
     
-    func handleIntroduction() {
-        guard let chat = store.get(chatID: chatID) else { return }
-        guard chat.messages.isEmpty else { return }
-        
-        generateTask = Task {
-            let message = store.createMessage(kind: .instruction, role: .user, content: "Introduce yourself")
-            try await ChatManager(store: store, chat: chat)
-                .inject(message: message)
-                .generateStream()
+    var scrollToPosition: String {
+        if chatID != nil {
+            "scrollViewBottom"
+        } else {
+            "scrollViewTop"
         }
     }
     
-    func handleSubmitText(_ text: String) {
-        guard let chat = store.get(chatID: chatID) else { return }
+    func handleNewChat() {
+        chatID = nil
+        composerState.change(.resting)
+    }
+    
+    func handleSubmit(_ text: String) {
+        guard isModelPicked() else { return }
         
         generateTask = Task {
+            if chatID == nil { await handleCreateChat(agent: .assistant) }
+            guard let chat = chat else { return }
+            
             let message = store.createMessage(role: .user, content: text)
             try await ChatManager(store: store, chat: chat)
                 .inject(message: message)
@@ -106,7 +161,83 @@ struct ChatView: View {
         }
     }
     
-    func handleCancel() {
+    func handleStop() {
         generateTask?.cancel()
     }
+    
+    func handleAgentSelection(_ agent: Agent) {
+        guard isModelPicked() else { return }
+        
+        generateTask = Task {
+            await handleCreateChat(agent: agent)
+            guard let chat = chat else { return }
+            
+            DispatchQueue.main.async {
+                composerState.change(.focused)
+            }
+            
+            let message = store.createMessage(kind: .instruction, role: .user, content: agent.prompt)
+            try await ChatManager(store: store, chat: chat)
+                .inject(message: message)
+                .generateStream()
+        }
+    }
+    
+    func handleCreateChat(agent: Agent) async {
+        let chat = store.createChat(modelID: modelID, agentID: agent.id)
+        await store.upsert(chat: chat)
+        self.chatID = chat.id
+    }
+    
+    func isModelPicked() -> Bool {
+        if modelID.isEmpty {
+            isShowingInfo = true
+            return false
+        }
+        return true
+    }
+    
+    #if os(macOS)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 3)
+    private let heightDivisor: CGFloat = 3
+    #else
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
+    private let heightDivisor: CGFloat = 2.5
+    #endif
+}
+
+struct ChatHistoryView: View {
+    let chat: AgentChat
+    let agent: Agent
+    let messages: [Message]
+    
+    var body: some View {
+        LazyVStack {
+            ForEach(messages) { message in
+                ChatMessageContainerView(agent: agent, message: message)
+            }
+            if chat.state == .processing {
+                ChatTypingIndicatorView(.leading)
+            }
+        }
+        .padding()
+    }
+}
+
+struct ScrollViewMarker: View {
+    let id: String
+    
+    var body: some View {
+        Rectangle()
+            .fill(.clear)
+            .frame(height: 1)
+            .id(id)
+    }
+}
+
+#Preview {
+    NavigationStack {
+        ChatView()
+    }
+    .environment(Store.preview)
 }

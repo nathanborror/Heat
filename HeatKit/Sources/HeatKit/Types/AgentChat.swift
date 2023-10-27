@@ -4,7 +4,7 @@ public struct AgentChat: Codable, Identifiable, Hashable {
     public var id: String
     public var modelID: String
     public var agentID: String
-    public var system: String?
+    public var prompt: String?
     public var messages: [Message]
     public var context: [Int]
     public var state: State
@@ -17,11 +17,11 @@ public struct AgentChat: Codable, Identifiable, Hashable {
         case none
     }
     
-    init(id: String = UUID().uuidString, modelID: String, agentID: String, system: String? = nil) {
+    init(id: String = UUID().uuidString, modelID: String, agentID: String, prompt: String) {
         self.id = id
         self.agentID = agentID
         self.modelID = modelID
-        self.system = system
+        self.prompt = prompt
         self.messages = []
         self.context = []
         self.state = .none

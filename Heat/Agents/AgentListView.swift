@@ -3,49 +3,33 @@ import HeatKit
 
 struct AgentListView: View {
     @Environment(Store.self) private var store
-    
-    @State var router: MainRouter
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        RoutingView(router: router) {
+        ScrollView {
             GeometryReader { proxy in
-                ScrollView {
-                    Button(action: { router.presentAgentForm(nil) }) {
-                        HStack {
-                            Spacer()
-                            Text("Create Agent")
-                            Spacer()
-                        }
-                        .padding()
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(store.agents) { agent in
+                        AgentTile(
+                            agent: agent,
+                            height: proxy.size.width/heightDivisor,
+                            selection: handleSelection
+                        )
                     }
-                    .background(.tint.opacity(0.1))
-                    .clipShape(.rect(cornerRadius: 12))
-                    .padding(.horizontal)
-                    .padding(.top)
-                    
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(store.agents) { agent in
-                            AgentTile(
-                                agent: agent,
-                                height: proxy.size.width/heightDivisor,
-                                selection: handleSelection
-                            )
-                        }
-                    }
-                    .padding()
                 }
+                .padding()
             }
-            .navigationTitle("Agents")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done", action: { router.dismiss() })
-                }
+        }
+        .navigationTitle("Agents")
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done", action: { dismiss() })
             }
         }
     }
     
     func handleSelection(_ agent: Agent) {
-        router.presentingModelPicker(agent)
+        print("not implemented")
     }
     
     #if os(macOS)
@@ -74,7 +58,7 @@ struct AgentTile: View {
             .frame(height: height)
             .buttonStyle(.borderless)
             
-            AgentTileText(title: agent.name, subtitle: agent.tagline)
+            AgentTileText(title: agent.name)
         }
     }
 }
@@ -98,16 +82,18 @@ struct AgentTilePicture: View {
 
 struct AgentTileText: View {
     let title: String
-    let subtitle: String
     
     var body: some View {
         VStack(alignment: .leading) {
             Text(title)
                 .font(.caption.bold())
-            Text(subtitle)
-                .font(.caption)
-                .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
     }
+}
+
+#Preview {
+    NavigationStack {
+        AgentListView()
+    }.environment(Store.preview)
 }

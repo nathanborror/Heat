@@ -3,9 +3,9 @@ import HeatKit
 
 struct AgentForm: View {
     @Environment(Store.self) private var store
+    @Environment(\.dismiss) private var dismiss
     
     @State var agent: Agent
-    @State var router: MainRouter
     
     var body: some View {
         Form {
@@ -19,15 +19,9 @@ struct AgentForm: View {
             }
             
             Section {
-                TextField("Tagline", text: $agent.tagline)
+                TextField("Prompt", text: $agent.prompt, axis: .vertical)
             } header: {
-                Text("Tagline")
-            }
-            
-            Section {
-                TextField("System Prompt", text: $agent.system ?? "", axis: .vertical)
-            } header: {
-                Text("System Prompt")
+                Text("Prompt")
             }
         }
         .navigationTitle("Create Agent")
@@ -43,7 +37,7 @@ struct AgentForm: View {
     
     func handleDone() {
         Task { await store.upsert(agent: agent) }
-        router.dismiss()
+        dismiss()
     }
     
     func handleLoadModels() {

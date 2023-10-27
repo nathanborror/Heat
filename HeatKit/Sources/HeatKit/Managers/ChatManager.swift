@@ -28,7 +28,7 @@ public final class ChatManager {
         
         await store.set(state: .processing, chatID: chatID)
         
-        let resp = try await store.generate(model: model, prompt: message.content, system: chat.system, context: chat.context)
+        let resp = try await store.generate(model: model, prompt: message.content, system: chat.prompt, context: chat.context)
         let newAssistantMessage = Message(role: .assistant, content: resp.response, done: resp.done)
         
         await store.set(state: .none, chatID: chatID)
@@ -50,7 +50,7 @@ public final class ChatManager {
         
         let newAssistantMessageID = UUID().uuidString
         
-        try await store.generateStream(model: model, prompt: message.content, system: chat.system, context: chat.context) { resp in
+        try await store.generateStream(model: model, prompt: message.content, system: chat.prompt, context: chat.context) { resp in
             let newAssistantMessage = Message(id: newAssistantMessageID, role: .assistant, content: resp.response, done: resp.done)
             
             await store.set(state: .streaming, chatID: chatID)

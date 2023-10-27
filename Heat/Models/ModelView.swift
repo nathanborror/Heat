@@ -5,7 +5,6 @@ struct ModelView: View {
     @Environment(Store.self) private var store
     
     let modelID: String
-    @State var router: MainRouter
     
     private let fontSize: CGFloat = 14
     

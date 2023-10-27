@@ -9,7 +9,7 @@ struct ChatMessageContainerView: View {
         ChatMessageTextView(text: message.content, isStreaming: !message.done)
             .messageBubble(message)
             .messageSpacing(message)
-            .messageAuthorship(message, agent: agent)
+            //.messageAuthorship(message, agent: agent)
     }
     
     var tail = Text(Image(systemName: "poweron")).foregroundColor(.primary).fontWeight(.bold)
@@ -76,9 +76,9 @@ struct ChatMessageSpacingModifier: ViewModifier {
             switch message.role {
             case .assistant:
                 content
-                Spacer(minLength: 64)
+                Spacer(minLength: 16)
             case .user:
-                Spacer(minLength: 64)
+                Spacer(minLength: 16)
                 content
             }
         }

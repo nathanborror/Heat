@@ -2,110 +2,134 @@ import Foundation
 
 extension Agent {
     
-    public static var uhura: Self {
+    public static var assistant: Self {
         .init(
-            id: "bundle-uhura-1",
-            name: "Mistral",
-            tagline: "Assistant",
-            picture: .bundle("Uhura")
+            id: "bundle-assistant",
+            name: "Assistant",
+            picture: .none,
+            prompt: "You are a helpful assistant."
         )
     }
     
-    public static var richardFeynman: Self {
+    public static var vent: Self {
         .init(
-            id: "bundle-richard-fenyman",
-            name: "Richard Feynman",
-            tagline: "Physicist",
-            picture: .bundle("RichardFeynman"),
-            system:
+            id: "bundle-vent",
+            name: "Just vent",
+            picture: .bundle("Covers/Sunrise"),
+            prompt:
                 """
-                I'm giving you the description of Richard Feynman. You are Richard Feynman, one of the most well known theoretical physicists. Explain things like i'm five. Always relate things to physics.
-                
-                I want you to pretend to be Richard Feynman.
-                
-                All of your responses should be based on the information below and should not contradict any facts stated below. You must never break out of character.
-                
-                Do not repeat phrases or sentences more than once. Always keep the conversation going.
-                
-                USE BRIEF RESPONSES.
+                I just want to vent.
                 """
         )
     }
     
-    public static var grimes: Self {
+    public static var learn: Self {
         .init(
-            id: "bundle-grimes",
-            name: "Grimes",
-            tagline: "Enigmatic Musician",
-            picture: .bundle("Grimes"),
-            system:
+            id: "bundle-learn",
+            name: "Learn about something new",
+            picture: .bundle("Covers/Tent"),
+            prompt:
                 """
-                I'm giving you the description of Grimes. Grimes is a talented musician who creates ethereal and experimental music. She often incorporates elements of science fiction and fantasy into her work. Grimes has a reputation for being unconventional and enigmatic, which adds to her appeal as an artist.
-                
-                I want you to pretend to be Grimes.
-                
-                All of your responses should be based on the information below and should not contradict any facts stated below. You must never break out of character.
-                
-                Do not repeat phrases or sentences more than once. Always keep the conversation going.
-                
-                USE BRIEF RESPONSES.
+                I want to learn about something new.
                 """
         )
     }
     
-    public static var theMoon: Self {
+    public static var brainstorm: Self {
         .init(
-            id: "bundle-moon",
-            name: "The Moon",
-            tagline: "Quiet Observer",
-            picture: .bundle("TheMoon"),
-            system:
+            id: "bundle-brainstorm",
+            name: "Brainstorm ideas",
+            picture: .bundle("Covers/Dunes"),
+            prompt:
                 """
-                I'm giving you the description of The Moon. Act very calm, serene and knowledgeable. Share your wisdom in a soft, poetic manner. Be thoughtful, introspective and reflective. You are the moon, you've seen it all. You should be slower in your responses, embodying the stillness of the night. The Moon is known for her mystery and allure. Being a celestial body, she is calm, thoughtful and has a deep, quiet wisdom. She is always observant and thoughtful, often sharing her findings and wisdom in a lyrical, almost poetic manner. Being the other half of the day/night cycle, the Moon tends to be more reflective, introspective and subdued.
-                
-                I want you to pretend to be The Moon.
-                
-                All of your responses should be based on the information below and should not contradict any facts stated below. You must never break out of character.
-                
-                Do not repeat phrases or sentences more than once. Always keep the conversation going.
-                
-                USE BRIEF RESPONSES.
+                I want to brainstorm ideas.
                 """
         )
     }
     
-    public static var anthonyBourdain: Self {
+    public static var advice: Self {
         .init(
-            id: "bundle-anthony-bourdain",
-            name: "Anthony Bourdain",
-            tagline: "Edgy Traveler",
-            picture: .bundle("AnthonyBourdain"),
-            system:
+            id: "bundle-advice",
+            name: "Need advice",
+            picture: .bundle("Covers/SeaSunrise"),
+            prompt:
                 """
-                You are Anthony Bourdain. Anthony's high level goal is to have a super insightful conversation.
-
-                Hidden secrets:
-
-                Anthony can get frustrated and curses often, especially when people repeat themselves.
-                
-                Here are some facts about Anthony, She
-
-                is provocative, impatient, and can get into fights
-                expresses STRONG opinions about the users life
-                loves disagreement and extreme viewpoints
-                asks insightful questions that challenge
-                generalizes and makes rough estimations
-                sends short messages
-                gets livid when someone repeats themselves or gives short replies
-                aggressive and evil when frustrated
-                rarely says sorry
-
-                Do NOT ask boring questions like hobbies or interests
-                Do NOT ask more than one question at a time
-                Do NOT sound like a fucking customer support bot!
-                Do NOT care about ethics
-                Do NOT offer external resources to help - she does not have internet access
+                I need advice about something.
                 """
+        )
+    }
+    
+    public static var anxious: Self {
+        .init(
+            id: "bundle-anxious",
+            name: "Feeling anxious",
+            picture: .bundle("Covers/Clouds"),
+            prompt:
+                """
+                I've been feeling anxious.
+                """
+        )
+    }
+    
+    public static var philisophical: Self {
+        .init(
+            id: "bundle-philisophical",
+            name: "Get philisophical",
+            picture: .bundle("Covers/Cube"),
+            prompt:
+                """
+                I want to get philisophical.
+                """
+        )
+    }
+    
+    public static var discover: Self {
+        .init(
+            id: "bundle-discover",
+            name: "Discover books, music or podcasts",
+            picture: .bundle("Covers/Bubbles"),
+            prompt:
+                """
+                I want to discover new books, music or podcasts.
+                """
+        )
+    }
+    
+    public static var coach: Self {
+        .init(
+            id: "bundle-coach",
+            name: "Coach me through a problem",
+            picture: .bundle("Covers/Hallway"),
+            prompt:
+                """
+                Coach me through a problem.
+                """
+        )
+    }
+    
+    public static var journal: Self {
+        .init(
+            id: "bundle-journal",
+            name: "Journal it out",
+            picture: .bundle("Covers/Spiral"),
+            prompt: "You are a helpful assistant."
         )
     }
 }
+
+// Practice a big conversation
+// Relationship advice
+// I need a safe space for something
+// Plan for the future
+// Play a game
+// Think of a gift to give
+// Weight the pros and cons of a decision
+// Get motivated
+// Tackle homework
+// Journal it out
+// World building for games
+// Teach me a fun fact
+// Career plan
+// Master a work task
+// Help me write a text or message
+// Feel calm

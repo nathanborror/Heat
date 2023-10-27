@@ -54,11 +54,3 @@ extension Int64 {
         }
     }
 }
-
-extension Image {
-    
-    static var chevron: some View {
-        Image(systemName: "chevron.right")
-            .foregroundStyle(.secondary)
-    }
-}

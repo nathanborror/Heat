@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ChatComposerView: View {
+    
     class ViewState: ObservableObject {
         enum State: Equatable {
             case resting
@@ -49,6 +50,7 @@ struct ChatComposerView: View {
     }
     
     func handleSubmit() {
+        guard !text.isEmpty else { return }
         
         // Clear text before calling submit to prevent a race condition
         // where submit could lead to composer state changes (i.e. Stop / Cancel).
@@ -96,8 +98,6 @@ struct ComposerInput: View {
         .onChange(of: text) { _, newValue in
             if !newValue.isEmpty {
                 state.change(.drafting)
-            } else {
-                state.change(.resting)
             }
         }
         .onChange(of: focused) { _, newValue in
@@ -105,6 +105,16 @@ struct ComposerInput: View {
                 state.change(text.isEmpty ? .focused : .drafting)
             } else {
                 state.change(text.isEmpty ? .resting : .drafting)
+            }
+        }
+        .onChange(of: state.current) { _, newValue in
+            switch newValue {
+            case .resting:
+                focused = false
+            case .focused, .drafting:
+                focused = true
+            case .streaming:
+                break
             }
         }
     }

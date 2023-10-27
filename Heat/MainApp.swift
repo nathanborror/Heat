@@ -9,17 +9,18 @@ struct MainApp: App {
     @Environment(\.scenePhase) private var scenePhase
     
     @State private var store = Store.shared
-    @State private var router = MainRouter(isPresented: .constant(.chats))
     
     var body: some Scene {
         WindowGroup {
-            ChatListView(router: router)
-                .task {
-                    await handleRestore()
-                }
-                .onChange(of: scenePhase) { _, _ in
-                    handlePhaseChange()
-                }
+            NavigationStack {
+                ChatView(chatID: nil)
+            }
+            .task {
+                await handleRestore()
+            }
+            .onChange(of: scenePhase) { _, _ in
+                handlePhaseChange()
+            }
         }
         .environment(store)
     }

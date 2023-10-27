@@ -11,13 +11,16 @@ public final class Store {
     public private(set) var chats: [AgentChat] = []
     public private(set) var models: [Model] = []
     public var preferences: Preferences = .init()
-
+    
     private var client = OllamaClient()
     private var persistence: Persistence
     
     init(persistence: Persistence) {
         self.persistence = persistence
     }
+}
+
+extension Store {
     
     public func generate(model: Model, prompt: String, system: String?, context: [Int]) async throws -> GenerateResponse {
         let request = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
@@ -67,15 +70,15 @@ public final class Store {
 
 extension Store {
     
-    public func createAgent(name: String, tagline: String, picture: Media = .none, system: String) -> Agent {
-        .init(name: name, tagline: tagline, picture: picture, system: system)
+    public func createAgent(name: String, picture: Media = .none, prompt: String) -> Agent {
+        .init(name: name, picture: picture, prompt: prompt)
     }
     
     public func createChat(modelID: String, agentID: String) -> AgentChat {
         guard let agent = get(agentID: agentID) else {
             fatalError("Agent does not exist")
         }
-        return AgentChat(modelID: modelID, agentID: agent.id, system: agent.system)
+        return AgentChat(modelID: modelID, agentID: agent.id, prompt: agent.prompt)
     }
     
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
@@ -95,6 +98,14 @@ extension Store {
     
     public func get(chatID: String) -> AgentChat? {
         chats.first(where: { $0.id == chatID })
+    }
+    
+    public func getDefaultModel(_ prefixes: [String] = ["mistral", "mistral:instruct", "llama2:7b-chat"]) -> Model? {
+        for prefix in prefixes {
+            guard let model = models.first(where: { $0.id == prefix }) else { continue }
+            return model
+        }
+        return nil
     }
 }
 
@@ -191,15 +202,11 @@ extension Store {
             let preferences: Preferences? = try await persistence.load(object: "preferences.json")
             
             DispatchQueue.main.async {
-                self.agents = agents
+                self.agents = agents.isEmpty ? self.defaultAgents : agents
                 self.chats = chats
                 self.models = models
                 self.preferences = preferences ?? self.preferences
                 self.client = OllamaClient(host: self.preferences.host)
-                
-                if self.agents.isEmpty {
-                    self.agents = self.defaultAgents
-                }
             }
         } catch is DecodingError {
             try await deleteAll()
@@ -226,7 +233,7 @@ extension Store {
         self.chats = []
         self.models = []
         self.preferences = .init()
-        self.client = OllamaClient()
+        self.client = OllamaClient(host: preferences.host)
     }
     
     public func resetAgents() async throws {
@@ -235,11 +242,41 @@ extension Store {
     
     private var defaultAgents: [Agent] {
         [
-            .uhura,
-            .richardFeynman,
-            .theMoon,
-            .grimes,
-            .anthonyBourdain,
+            .vent,
+            .learn,
+            .brainstorm,
+            .advice,
+            .anxious,
+            .philisophical,
+            .discover,
+            .coach,
+            .journal,
+            .assistant,
         ]
+    }
+}
+
+extension Store {
+    
+    public static var preview: Store {
+        let store = Store.shared
+        store.resetAll()
+        return store
+    }
+    
+    public static var previewChats: Store {
+        let store = Store.shared
+        store.resetAll()
+        
+        let chat1 = store.createChat(modelID: "none", agentID: Agent.vent.id)
+        let chat2 = store.createChat(modelID: "none", agentID: Agent.learn.id)
+        let chat3 = store.createChat(modelID: "none", agentID: Agent.brainstorm.id)
+        
+        Task {
+            await store.upsert(chat: chat1)
+            await store.upsert(chat: chat2)
+            await store.upsert(chat: chat3)
+        }
+        return store
     }
 }
