@@ -16,10 +16,7 @@ extension Agent {
             id: "bundle-vent",
             name: "Just vent",
             picture: .bundle("Covers/Sunrise"),
-            prompt:
-                """
-                I just want to vent.
-                """
+            prompt: "I just want to vent."
         )
     }
     
@@ -28,10 +25,7 @@ extension Agent {
             id: "bundle-learn",
             name: "Learn about something new",
             picture: .bundle("Covers/Tent"),
-            prompt:
-                """
-                I want to learn about something new.
-                """
+            prompt: "I want to learn about something new."
         )
     }
     
@@ -40,10 +34,7 @@ extension Agent {
             id: "bundle-brainstorm",
             name: "Brainstorm ideas",
             picture: .bundle("Covers/Dunes"),
-            prompt:
-                """
-                I want to brainstorm ideas.
-                """
+            prompt: "I want to brainstorm ideas."
         )
     }
     
@@ -52,10 +43,7 @@ extension Agent {
             id: "bundle-advice",
             name: "Need advice",
             picture: .bundle("Covers/SeaSunrise"),
-            prompt:
-                """
-                I need advice about something.
-                """
+            prompt: "I need advice about something."
         )
     }
     
@@ -64,10 +52,7 @@ extension Agent {
             id: "bundle-anxious",
             name: "Feeling anxious",
             picture: .bundle("Covers/Clouds"),
-            prompt:
-                """
-                I've been feeling anxious.
-                """
+            prompt: "I've been feeling anxious."
         )
     }
     
@@ -76,10 +61,7 @@ extension Agent {
             id: "bundle-philisophical",
             name: "Get philisophical",
             picture: .bundle("Covers/Cube"),
-            prompt:
-                """
-                I want to get philisophical.
-                """
+            prompt: "I want to get philisophical."
         )
     }
     
@@ -88,10 +70,7 @@ extension Agent {
             id: "bundle-discover",
             name: "Discover books, music or podcasts",
             picture: .bundle("Covers/Bubbles"),
-            prompt:
-                """
-                I want to discover new books, music or podcasts.
-                """
+            prompt: "I want to discover new books, music or podcasts."
         )
     }
     
@@ -100,10 +79,7 @@ extension Agent {
             id: "bundle-coach",
             name: "Coach me through a problem",
             picture: .bundle("Covers/Hallway"),
-            prompt:
-                """
-                Coach me through a problem.
-                """
+            prompt: "Coach me through a problem."
         )
     }
     
