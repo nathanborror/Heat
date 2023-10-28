@@ -10,7 +10,7 @@ struct ChatInfoView: View {
     @Binding var modelID: String
 
     var body: some View {
-        List {
+        Form {
             Section {
                 ForEach(store.models) { model in
                     Button(action: { handleSelection(model) }) {
@@ -23,17 +23,25 @@ struct ChatInfoView: View {
                             }
                         }
                     }
+                    .buttonStyle(.plain)
                 }
             } header: {
                 Text("Models")
             }
         }
+        .formStyle(.grouped)
         .navigationTitle("Chat Info")
+        .frame(idealWidth: 400, idealHeight: 400)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") {
                     dismiss()
                 }
+            }
+        }
+        .onAppear {
+            Task {
+                try await store.loadModels()
             }
         }
     }

@@ -14,6 +14,7 @@ struct ChatListView: View {
                     Button(action: { handleSelection(chat) }) {
                         ChatRow(chat: chat, agent: agent)
                     }
+                    .buttonStyle(.plain)
                     .tint(.primary)
                     .swipeActions {
                         Button(role: .destructive, action: { handleDelete(chat) }) {
@@ -27,8 +28,9 @@ struct ChatListView: View {
             }
         }
         .navigationTitle("History")
+        .frame(idealWidth: 400, idealHeight: 400)
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
+            ToolbarItem {
                 Button(action: { dismiss() }) {
                     Text("Done")
                 }

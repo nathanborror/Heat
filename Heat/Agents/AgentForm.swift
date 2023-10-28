@@ -30,20 +30,10 @@ struct AgentForm: View {
                 Button("Done", action: handleDone)
             }
         }
-        .onAppear {
-            handleLoadModels()
-        }
     }
     
     func handleDone() {
         Task { await store.upsert(agent: agent) }
         dismiss()
-    }
-    
-    func handleLoadModels() {
-        Task {
-            try await store.loadModels()
-            try await store.loadModelDetails()
-        }
     }
 }

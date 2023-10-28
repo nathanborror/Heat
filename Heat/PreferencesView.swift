@@ -25,12 +25,16 @@ struct PreferencesView: View {
             Button(action: handleResetAgents) {
                 Text("Reset Agents")
             }
+            .buttonStyle(.plain)
+            
             Button(role: .destructive, action: handleDeleteAll) {
                 Text("Delete All Data")
             }
+            .buttonStyle(.plain)
         }
         .formStyle(.grouped)
         .navigationTitle("Settings")
+        .frame(idealWidth: 400, idealHeight: 400)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done", action: handleDismiss)

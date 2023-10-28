@@ -30,10 +30,10 @@ struct ModelPickerView: View {
             }
         }
         .navigationTitle("Pick Model")
+        .frame(idealWidth: 400, idealHeight: 400)
         .onAppear {
             Task {
                 try await store.loadModels()
-                try await store.loadModelDetails()
             }
         }
     }

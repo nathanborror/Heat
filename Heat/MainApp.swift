@@ -15,8 +15,8 @@ struct MainApp: App {
             NavigationStack {
                 ChatView(chatID: nil)
             }
-            .task {
-                await handleRestore()
+            .onAppear {
+                handleRestore()
             }
             .onChange(of: scenePhase) { _, _ in
                 handlePhaseChange()
@@ -25,13 +25,14 @@ struct MainApp: App {
         .environment(store)
     }
     
-    func handleRestore() async {
-        do {
-            try await store.restore()
-            try await store.loadModels()
-            try await store.loadModelDetails()
-        } catch {
-            logger.error("Persistence Restore: \(error, privacy: .public)")
+    func handleRestore() {
+        Task {
+            do {
+                try await store.restore()
+                try await store.loadModels()
+            } catch {
+                logger.error("Persistence Restore: \(error, privacy: .public)")
+            }
         }
     }
     

@@ -54,7 +54,13 @@ struct ChatView: View {
                 }
             }
         }
+        #if os(macOS)
+        .navigationTitle(agent?.name ?? "New Chat")
+        .navigationSubtitle(model?.name ?? "Choose Model")
+        .background(.background)
+        #else
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom, alignment: .center) {
             ChatComposerView(
@@ -63,11 +69,24 @@ struct ChatView: View {
                 submit: handleSubmit,
                 stop: handleStop
             )
-            .padding(.top, 16)
-            .padding(.bottom, 8)
+            .padding(.vertical, 8)
             .background(.background)
         }
         .toolbar {
+            #if os(macOS)
+            Button(action: { isShowingInfo.toggle() }) {
+                Label("Pick Model", systemImage: "cube")
+            }
+            Button(action: { isShowingSettings.toggle() }) {
+                Label("Settings", systemImage: "slider.horizontal.3")
+            }
+            Button(action: { isShowingHistory.toggle() }) {
+                Label("History", systemImage: "archivebox")
+            }
+            Button(action: handleNewChat) {
+                Label("New Chat", systemImage: "plus")
+            }.disabled(chatID == nil)
+            #else
             ToolbarItem(placement: .principal) {
                 Button(action: { isShowingInfo.toggle() }) {
                     VStack(alignment: .center, spacing: 0) {
@@ -80,12 +99,7 @@ struct ChatView: View {
                     }
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: handleNewChat) {
-                    Label("New Chat", systemImage: "plus")
-                }.disabled(chatID == nil)
-            }
-            ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem {
                 Menu {
                     Button(action: { isShowingHistory.toggle() }) {
                         Label("History", systemImage: "archivebox")
@@ -94,9 +108,15 @@ struct ChatView: View {
                         Label("Settings", systemImage: "slider.horizontal.3")
                     }
                 } label: {
-                    Image(systemName: "ellipsis")
+                    Label("More", systemImage: "ellipsis")
                 }
             }
+            ToolbarItem {
+                Button(action: handleNewChat) {
+                    Label("New Chat", systemImage: "plus")
+                }.disabled(chatID == nil)
+            }
+            #endif
         }
         .sheet(isPresented: $isShowingInfo) {
             NavigationStack {

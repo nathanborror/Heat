@@ -37,17 +37,8 @@ extension Store {
     
     public func loadModels() async throws {
         let resp = try await client.modelList()
-        self.models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
-        
-        for model in models {
-            await upsert(model: model)
-        }
-    }
-    
-    public func loadModelDetails() async throws {
-        for model in self.models {
-            try await modelShow(modelID: model.name)
-        }
+        let models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
+        await upsert(models: models)
     }
     
     public func modelShow(modelID: String) async throws {
@@ -111,6 +102,12 @@ extension Store {
 
 @MainActor
 extension Store {
+    
+    public func upsert(models: [Model]) {
+        for model in models {
+            upsert(model: model)
+        }
+    }
     
     public func upsert(model: Model) {
         if let index = models.firstIndex(where: { $0.id == model.name }) {
@@ -201,7 +198,7 @@ extension Store {
             let models: [Model] = try await persistence.load(objects: "models.json")
             let preferences: Preferences? = try await persistence.load(object: "preferences.json")
             
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.agents = agents.isEmpty ? self.defaultAgents : agents
                 self.chats = chats
                 self.models = models
