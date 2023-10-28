@@ -78,7 +78,7 @@ extension Store {
         guard let agent = get(agentID: agentID) else {
             fatalError("Agent does not exist")
         }
-        return AgentChat(modelID: modelID, agentID: agent.id, prompt: agent.prompt)
+        return AgentChat(modelID: modelID, agentID: agent.id, system: agent.system)
     }
     
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {

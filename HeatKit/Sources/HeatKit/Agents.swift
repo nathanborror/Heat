@@ -7,7 +7,8 @@ extension Agent {
             id: "bundle-assistant",
             name: "Assistant",
             picture: .none,
-            prompt: "You are a helpful assistant."
+            system: "You are a helpful assistant.",
+            prompt: "I need a helpful assistant."
         )
     }
     
@@ -16,7 +17,14 @@ extension Agent {
             id: "bundle-vent",
             name: "Just vent",
             picture: .bundle("Covers/Sunrise"),
-            prompt: "I just want to vent."
+            system:
+                """
+                You are a caring assistant. Listen closely, pay attention to details and help the
+                user through whatever they're dealing with. Stay on topic.
+                
+                USE BRIEF RESPONSES
+                """,
+            prompt: "Help me vent about something"
         )
     }
     
