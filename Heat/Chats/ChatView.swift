@@ -63,7 +63,8 @@ struct ChatView: View {
                 submit: handleSubmit,
                 stop: handleStop
             )
-            .padding(.vertical, 8)
+            .padding(.top, 16)
+            .padding(.bottom, 8)
             .background(.background)
         }
         .toolbar {
