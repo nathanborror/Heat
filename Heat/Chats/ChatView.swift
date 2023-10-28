@@ -20,8 +20,8 @@ struct ChatView: View {
             ScrollViewReader { scrollViewProxy in
                 ScrollView {
                     ScrollViewMarker(id: "scrollViewTop")
-                    if let chat = chat, let agent = agent {
-                        ChatHistoryView(chat: chat, agent: agent, messages: messages)
+                    if let chat = chat {
+                        ChatHistoryView(chat: chat, messages: messages)
                     } else {
                         LazyVGrid(columns: columns, spacing: 16) {
                             ForEach(store.agents) { agent in
@@ -208,13 +208,12 @@ struct ChatView: View {
 
 struct ChatHistoryView: View {
     let chat: AgentChat
-    let agent: Agent
     let messages: [Message]
     
     var body: some View {
         LazyVStack {
             ForEach(messages) { message in
-                ChatMessageContainerView(agent: agent, message: message)
+                ChatMessageContainerView(message: message)
             }
             if chat.state == .processing {
                 ChatTypingIndicatorView(.leading)

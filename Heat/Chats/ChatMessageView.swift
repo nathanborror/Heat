@@ -2,14 +2,22 @@ import SwiftUI
 import HeatKit
 
 struct ChatMessageContainerView: View {
-    let agent: Agent?
     let message: Message
+    let paragraphs: [String]
+    
+    init(message: Message) {
+        self.message = message
+        self.paragraphs = message.content.split(separator: "\n\n").map { String($0) }
+    }
     
     var body: some View {
-        ChatMessageTextView(text: message.content, isStreaming: !message.done)
-            .messageBubble(message)
-            .messageSpacing(message)
-            //.messageAuthorship(message, agent: agent)
+        VStack(spacing: 1) {
+            ForEach(paragraphs.indices, id: \.self) { index in
+                ChatMessageTextView(text: paragraphs[index], isStreaming: !message.done)
+                    .messageBubble(message)
+                    .messageSpacing(message)
+            }
+        }
     }
     
     var tail = Text(Image(systemName: "poweron")).foregroundColor(.primary).fontWeight(.bold)
@@ -85,24 +93,6 @@ struct ChatMessageSpacingModifier: ViewModifier {
     }
 }
 
-struct ChatMessageAuthorshipModifier: ViewModifier {
-    let agent: Agent?
-    let message: Message
-    
-    func body(content: Content) -> some View {
-        if message.role == .assistant, let agent = agent {
-            HStack(alignment: .bottom) {
-                PictureView(picture: agent.picture)
-                    .frame(width: 32, height: 32)
-                    .clipShape(Squircle())
-                content
-            }
-        } else {
-            content
-        }
-    }
-}
-
 extension View {
     
     func messageBubble(_ message: Message) -> some View {
@@ -111,9 +101,5 @@ extension View {
     
     func messageSpacing(_ message: Message) -> some View {
         self.modifier(ChatMessageSpacingModifier(message: message))
-    }
-    
-    func messageAuthorship(_ message: Message, agent: Agent?) -> some View {
-        self.modifier(ChatMessageAuthorshipModifier(agent: agent, message: message))
     }
 }
