@@ -1,6 +1,6 @@
 # Heat
 
-Heat is an [Ollama](https://ollama.ai) desktop and mobile client.
+More people need to experience open source LLMs. Heat is an [Ollama](https://ollama.ai) desktop and mobile client.
 
 [![image](https://github.com/nathanborror/Heat/blob/main/Screens/Screens.png?raw=true)](https://github.com/nathanborror/Heat/blob/main/Screens/Screens.png?raw=true)
 
