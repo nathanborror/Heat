@@ -62,6 +62,7 @@ struct AgentTile: View {
                         .font(.system(size: 14, weight: .medium))
                         .lineLimit(2)
                         .padding(.horizontal)
+                        .multilineTextAlignment(.center)
                     Spacer()
                 }
                 .frame(minHeight: 34)
