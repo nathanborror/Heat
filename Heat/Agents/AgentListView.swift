@@ -6,8 +6,8 @@ struct AgentListView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        ScrollView {
-            GeometryReader { proxy in
+        GeometryReader { proxy in
+            ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(store.agents) { agent in
                         AgentTile(
@@ -37,7 +37,7 @@ struct AgentListView: View {
     private let heightDivisor: CGFloat = 3
     #else
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
-    private let heightDivisor: CGFloat = 2
+    private let heightDivisor: CGFloat = 2.5
     #endif
 }
 
@@ -51,44 +51,33 @@ struct AgentTile: View {
     let selection: AgentCallback
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Button(action: { selection(agent) }) {
-                AgentTilePicture(picture: agent.picture, height: height, cornerRadius: 12)
+        Button(action: { selection(agent) }) {
+            VStack(spacing: 0) {
+                PictureView(picture: agent.picture)
+                    .frame(height: height)
+                    .clipped()
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text(agent.name)
+                            .font(.system(size: 14, weight: .medium))
+                            .lineLimit(2)
+                            .padding(.horizontal)
+                        Spacer()
+                    }
+                    .frame(minHeight: 34)
+                }
+                .padding(.vertical, 12)
+                .background(.thinMaterial)
+                .background {
+                    PictureView(picture: agent.picture)
+                        .clipped()
+                }
             }
-            .frame(height: height)
-            .buttonStyle(.borderless)
-            
-            AgentTileText(title: agent.name)
         }
-    }
-}
-
-struct AgentTilePicture: View {
-    let picture: Media
-    let height: CGFloat
-    let cornerRadius: Double
-    
-    var body: some View {
-        PictureView(picture: picture)
-            .frame(height: height)
-            .clipShape(.rect(cornerRadius: cornerRadius, style: .continuous))
-            .tint(.primary.opacity(0.1))
-            .overlay {
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .strokeBorder(Color.primary.opacity(0.2), lineWidth: 1)
-            }
-    }
-}
-
-struct AgentTileText: View {
-    let title: String
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(title)
-                .font(.caption.bold())
-                .lineLimit(1)
-        }
+        .tint(.primary)
+        .buttonStyle(.borderless)
+        .clipShape(.rect(cornerRadius: 12, style: .continuous))
     }
 }
 

@@ -220,10 +220,10 @@ struct ChatView: View {
     
     #if os(macOS)
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 3)
-    private let heightDivisor: CGFloat = 3
+    private let heightDivisor: CGFloat = 3.5
     #else
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
-    private let heightDivisor: CGFloat = 2.5
+    private let heightDivisor: CGFloat = 2.75
     #endif
 }
 
