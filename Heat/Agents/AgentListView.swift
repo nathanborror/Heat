@@ -51,35 +51,35 @@ struct AgentTile: View {
     let selection: AgentCallback
     
     var body: some View {
-        Button(action: { selection(agent) }) {
-            VStack(spacing: 0) {
+        VStack(spacing: 0) {
+            PictureView(picture: agent.picture)
+                .frame(height: height)
+                .clipped()
+            VStack {
+                HStack {
+                    Spacer()
+                    Text(agent.name)
+                        .font(.system(size: 14, weight: .medium))
+                        .lineLimit(2)
+                        .padding(.horizontal)
+                    Spacer()
+                }
+                .frame(minHeight: 34)
+            }
+            .padding(.vertical, 12)
+            .background(.thinMaterial)
+            .background {
                 PictureView(picture: agent.picture)
-                    .frame(height: height)
                     .clipped()
-                VStack {
-                    HStack {
-                        Spacer()
-                        Text(agent.name)
-                            .font(.system(size: 14, weight: .medium))
-                            .lineLimit(2)
-                            .padding(.horizontal)
-                        Spacer()
-                    }
-                    .frame(minHeight: 34)
-                }
-                .padding(.vertical, 12)
-                .background(.thinMaterial)
-                .background {
-                    PictureView(picture: agent.picture)
-                        .clipped()
-                }
             }
         }
-        .tint(.primary)
-        .buttonStyle(.borderless)
         .clipShape(.rect(cornerRadius: 12, style: .continuous))
+        .onTapGesture {
+            selection(agent)
+        }
     }
 }
+
 
 #Preview {
     NavigationStack {
