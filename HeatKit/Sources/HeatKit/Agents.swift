@@ -118,4 +118,17 @@ extension Agent {
             prompt: "You are a helpful assistant."
         )
     }
+    
+    public static var systemSuggestions: Self {
+        .init(
+            id: "system-suggestions",
+            name: "Suggested Replies",
+            picture: .none,
+            system: 
+                """
+                You are a helpful code assistant. Your task is to generate a valid JSON array of strings.
+                """,
+            prompt: "Return three responses the user could make. Format the response as a JSON string array."
+        )
+    }
 }

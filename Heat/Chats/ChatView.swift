@@ -200,7 +200,8 @@ struct ChatView: View {
             let message = store.createMessage(kind: .instruction, role: .user, content: agent.prompt)
             try await ChatManager(store: store, chat: chat)
                 .inject(message: message)
-                .generateStream()
+                .generate()
+                .suggestions()
         }
     }
     
