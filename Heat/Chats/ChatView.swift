@@ -99,7 +99,7 @@ struct ChatView: View {
                     }
                 }
             }
-            ToolbarItem {
+            ToolbarItem(placement: .topBarLeading) {
                 Menu {
                     Button(action: { isShowingHistory.toggle() }) {
                         Label("History", systemImage: "archivebox")
