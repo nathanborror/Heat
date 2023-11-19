@@ -1,4 +1,7 @@
 import Foundation
+import OSLog
+
+private let logger = Logger(subsystem: "ChatManager", category: "HeatKit")
 
 public final class ChatManager {
     let store: Store
@@ -80,12 +83,20 @@ public final class ChatManager {
             """
         
         let resp = try await store.generate(model: model, prompt: prompt, system: chat.system, context: chat.context)
-        if let data = resp.response.data(using: .utf8), var chat = store.get(chatID: chat.id) {
+        
+        let cleaned = cleanSuggestions(response: resp.response)
+        if let data = cleaned.data(using: .utf8), var chat = store.get(chatID: chat.id) {
             do {
                 let suggestions = try JSONDecoder().decode([String].self, from: data)
                 chat.suggestions = suggestions
             } catch {
-                print(error)
+                logger.error(
+                    """
+                    Suggestions Failed:
+                    - Response: \(resp.response)
+                    - Error: \(error, privacy: .public)
+                    """
+                )
             }
             chat.state = .none
             await store.upsert(chat: chat)
@@ -98,5 +109,19 @@ public final class ChatManager {
         chat.suggestions = nil
         await store.upsert(chat: chat)
         return self
+    }
+}
+
+extension ChatManager {
+    
+    private func cleanSuggestions(response: String) -> String {
+        var cleaned = response
+        if cleaned.hasPrefix("```json") {
+            cleaned.removeFirst("```json".count)
+        }
+        if cleaned.hasSuffix("```") {
+            cleaned.removeLast("```".count)
+        }
+        return cleaned
     }
 }
