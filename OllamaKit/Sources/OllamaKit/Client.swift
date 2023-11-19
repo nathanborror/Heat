@@ -132,6 +132,7 @@ final public class OllamaClient {
                     continuation.finish(throwing: error)
                     return
                 }
+                continuation.finish()
             }
             task.resume()
             
