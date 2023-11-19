@@ -177,17 +177,20 @@ struct ChatView: View {
 }
 
 struct ChatHistoryView: View {
+    @Environment(Store.self) private var store
     @Environment(ChatViewModel.self) private var chatViewModel
     
     var body: some View {
         LazyVStack {
             
             // System message
-            if let chat = chatViewModel.chat, let system = chat.system {
-                Text(system)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical)
+            if store.preferences.isDebug {
+                if let chat = chatViewModel.chat, let system = chat.system {
+                    Text(system)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical)
+                }
             }
             
             // Message list

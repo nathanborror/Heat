@@ -47,6 +47,8 @@ struct PreferencesView: View {
                 Text("Models")
             }
             
+            Toggle("Debug", isOn: $store.preferences.isDebug)
+            
             Section {
                 Button(action: handleResetAgents) {
                     Text("Reset Agents")
