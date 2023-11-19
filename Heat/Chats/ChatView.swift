@@ -229,9 +229,11 @@ struct SuggestionsView: View {
                     Button(action: { action(suggestions[index]) }) {
                         Text(suggestions[index])
                     }
+                    .buttonStyle(.plain)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
                     .background(.tint.opacity(0.1))
+                    .foregroundStyle(.tint)
                     .clipShape(.rect(cornerRadius: 20))
                 }
             }
