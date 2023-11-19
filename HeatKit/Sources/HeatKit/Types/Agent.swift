@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Agent: Codable, Identifiable, Hashable {
+public struct Agent: Codable, Identifiable {
     public var id: String
     public var name: String
     public var picture: Media
@@ -18,6 +18,9 @@ public struct Agent: Codable, Identifiable, Hashable {
         self.created = .now
         self.modified = .now
     }
+}
+
+extension Agent: Hashable {
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -26,5 +29,12 @@ public struct Agent: Codable, Identifiable, Hashable {
 }
 
 extension Agent {
-    public static var empty: Agent = .init(name: "", picture: .none, prompt: "")
+
+    public static var empty: Self {
+        .init(name: "", picture: .none, prompt: "")
+    }
+    
+    public static var preview: Self {
+        .vent
+    }
 }

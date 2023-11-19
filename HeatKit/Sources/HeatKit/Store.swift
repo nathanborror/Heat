@@ -258,6 +258,34 @@ extension Store {
     public static var preview: Store {
         let store = Store.shared
         store.resetAll()
+        
+        store.models = [
+            Model.preview,
+            .init(
+                name: "llama2:7b-chat", 
+                size: 0,
+                digest: "",
+                license: "",
+                modelfile: "",
+                parameters: "",
+                template: "",
+                system: ""
+            ),
+            .init(
+                name: "codellama:34b", 
+                size: 0,
+                digest: "",
+                license: "",
+                modelfile: "",
+                parameters: "",
+                template: "",
+                system: ""
+            ),
+        ]
+        
+        let chat = AgentChat.preview
+        store.chats = [chat]
+        
         return store
     }
     

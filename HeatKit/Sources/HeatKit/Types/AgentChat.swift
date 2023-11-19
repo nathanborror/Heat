@@ -1,6 +1,6 @@
 import Foundation
 
-public struct AgentChat: Codable, Identifiable, Hashable {
+public struct AgentChat: Codable, Identifiable {
     public var id: String
     public var modelID: String
     public var agentID: String
@@ -17,20 +17,36 @@ public struct AgentChat: Codable, Identifiable, Hashable {
         case none
     }
     
-    init(id: String = UUID().uuidString, modelID: String, agentID: String, system: String? = nil) {
+    init(id: String = UUID().uuidString, modelID: String, agentID: String, system: String? = nil, messages: [Message] = []) {
         self.id = id
         self.agentID = agentID
         self.modelID = modelID
         self.system = system
-        self.messages = []
+        self.messages = messages
         self.context = []
         self.state = .none
         self.created = .now
         self.modified = .now
     }
+}
+
+extension AgentChat: Hashable {
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(modified)
+    }
+}
+
+extension AgentChat {
+    
+    public static var preview: Self {
+        .init(modelID: Model.preview.id, agentID: Agent.preview.id, system: Agent.preview.system, messages: [
+            .init(role: .assistant, content: "Hello there", done: true),
+        ], suggestions: [
+            "I'm so frustrated",
+            "My friend always cancels on me",
+            "I'm feeling down today",
+        ])
     }
 }

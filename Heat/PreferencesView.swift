@@ -65,3 +65,9 @@ struct PreferencesView: View {
         handleDismiss()
     }
 }
+
+#Preview {
+    NavigationStack {
+        PreferencesView()
+    }.environment(Store.preview)
+}

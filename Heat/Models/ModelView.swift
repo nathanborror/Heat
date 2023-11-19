@@ -12,14 +12,6 @@ struct ModelView: View {
         List {
             if let model = store.get(modelID: modelID) {
                 Section {
-                    HStack {
-                        Text(model.name)
-                        Spacer()
-                        if model.supportsSystem {
-                            Image(systemName: "bubble.left.fill")
-                                .foregroundStyle(.indigo)
-                        }
-                    }
                     Text(model.size.toSizeString)
                 }
                 

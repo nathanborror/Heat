@@ -263,8 +263,11 @@ struct ScrollViewMarker: View {
 }
 
 #Preview {
-    NavigationStack {
-        ChatView()
+    let store = Store.preview
+    let chat = store.chats.first!
+    
+    return NavigationStack {
+        ChatView(chatID: chat.id)
     }
-    .environment(Store.preview)
+    .environment(store)
 }
