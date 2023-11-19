@@ -233,6 +233,13 @@ struct ChatHistoryView: View {
     
     var body: some View {
         LazyVStack {
+            if let system = chat.system {
+                Text(system)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical)
+            }
+            
             ForEach(messages) { message in
                 ChatMessageContainerView(message: message)
             }
