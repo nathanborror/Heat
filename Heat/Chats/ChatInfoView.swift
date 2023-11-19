@@ -38,7 +38,7 @@ struct ChatInfoView: View {
         }
         .onAppear {
             Task {
-                try await store.loadModels()
+                try await store.modelsLoad()
             }
         }
     }

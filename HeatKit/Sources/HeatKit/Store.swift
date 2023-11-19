@@ -35,7 +35,7 @@ extension Store {
         }
     }
     
-    public func loadModels() async throws {
+    public func modelsLoad() async throws {
         let resp = try await client.modelList()
         let models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
         await upsert(models: models)

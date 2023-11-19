@@ -31,7 +31,7 @@ struct MainApp: App {
         Task {
             do {
                 try await store.restore()
-                try await store.loadModels()
+                try await store.modelsLoad()
             } catch {
                 logger.error("Persistence Restore: \(error, privacy: .public)")
             }
