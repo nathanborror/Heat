@@ -63,4 +63,25 @@ public final class ChatManager {
         }
         return self
     }
+    
+    @discardableResult public func generateSuggestions() async throws -> Self {
+        try Task.checkCancellation()
+        
+        guard let chat = store.get(chatID: chatID) else { return self }
+        guard let model = store.get(modelID: chat.modelID) else { return self }
+        
+        let prompt =
+            """
+            Generate three suggested user replies in under 8 words each.
+            Respond with a JSON array of strings.
+            """
+        
+        let resp = try await store.generate(model: model, prompt: prompt, system: chat.system, context: chat.context)
+        if let data = resp.response.data(using: .utf8), var chat = store.get(chatID: chat.id) {
+            let suggestions = try JSONDecoder().decode([String].self, from: data)
+            chat.suggestions = suggestions
+            await store.upsert(chat: chat)
+        }
+        return self
+    }
 }

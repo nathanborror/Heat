@@ -179,6 +179,7 @@ struct ChatView: View {
             try await ChatManager(store: store, chat: chat)
                 .append(message)
                 .generateStream()
+                .generateSuggestions()
         }
     }
     
@@ -201,6 +202,7 @@ struct ChatView: View {
             try await ChatManager(store: store, chat: chat)
                 .append(message)
                 .generateStream()
+                .generateSuggestions()
         }
     }
     
@@ -246,8 +248,35 @@ struct ChatHistoryView: View {
             if chat.state == .processing {
                 ChatTypingIndicatorView(.leading)
             }
+            if let suggestions = chat.suggestions {
+                SuggestionsView(suggestions: suggestions) { suggestion in
+                    
+                }
+            }
         }
         .padding()
+    }
+}
+
+struct SuggestionsView: View {
+    let suggestions: [String]
+    let action: (String) -> Void
+    
+    var body: some View {
+        VStack(spacing: 2) {
+            ForEach(suggestions.indices, id: \.self) { index in
+                HStack {
+                    Spacer()
+                    Button(action: { action(suggestions[index]) }) {
+                        Text(suggestions[index])
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(.tint.opacity(0.1))
+                    .clipShape(.rect(cornerRadius: 20))
+                }
+            }
+        }
     }
 }
 

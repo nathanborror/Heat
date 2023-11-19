@@ -6,6 +6,7 @@ public struct AgentChat: Codable, Identifiable {
     public var agentID: String
     public var system: String?
     public var messages: [Message]
+    public var suggestions: [String]?
     public var context: [Int]
     public var state: State
     public var created: Date
@@ -17,12 +18,13 @@ public struct AgentChat: Codable, Identifiable {
         case none
     }
     
-    init(id: String = UUID().uuidString, modelID: String, agentID: String, system: String? = nil, messages: [Message] = []) {
+    init(id: String = UUID().uuidString, modelID: String, agentID: String, system: String? = nil, messages: [Message] = [], suggestions: [String]? = nil) {
         self.id = id
         self.agentID = agentID
         self.modelID = modelID
         self.system = system
         self.messages = messages
+        self.suggestions = suggestions
         self.context = []
         self.state = .none
         self.created = .now
