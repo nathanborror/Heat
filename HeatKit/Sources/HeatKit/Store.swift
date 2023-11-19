@@ -69,10 +69,10 @@ extension Store {
         guard let agent = get(agentID: agentID) else {
             fatalError("Agent does not exist")
         }
-        guard !preferences.preferredModelID.isEmpty else {
+        guard let model = getPreferredModel() else {
             fatalError("Missing model")
         }
-        return AgentChat(modelID: preferences.preferredModelID, agentID: agent.id, system: agent.system)
+        return AgentChat(modelID: model.id, agentID: agent.id, system: agent.system)
     }
     
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
@@ -94,7 +94,10 @@ extension Store {
         chats.first(where: { $0.id == chatID })
     }
     
-    public func getDefaultModel(_ prefixes: [String] = ["mistral", "mistral:instruct", "llama2:7b-chat"]) -> Model? {
+    public func getPreferredModel(_ prefixes: [String] = ["mistral", "mistral:instruct", "llama2:7b-chat"]) -> Model? {
+        if let model = get(modelID: preferences.preferredModelID) {
+            return model
+        }
         for prefix in prefixes {
             guard let model = models.first(where: { $0.id == prefix }) else { continue }
             return model
@@ -207,10 +210,6 @@ extension Store {
                 self.models = models
                 self.preferences = preferences ?? self.preferences
                 self.client = OllamaClient(host: self.preferences.host)
-                
-                if self.preferences.preferredModelID.isEmpty {
-                    self.preferences.preferredModelID = getDefaultModel()?.id ?? ""
-                }
             }
         } catch is DecodingError {
             try await deleteAll()
