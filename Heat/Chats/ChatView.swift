@@ -16,27 +16,19 @@ struct ChatView: View {
         GeometryReader { geo in
             ScrollViewReader { scrollViewProxy in
                 ScrollView {
-                    ScrollViewMarker(id: "scrollViewTop")
+                    ChatScrollViewMarker(id: "scrollViewTop")
                     if chatViewModel.chatID != nil {
                         ChatHistoryView()
                     } else {
-                        LazyVGrid(columns: columns, spacing: 16) {
-                            ForEach(store.agents) { agent in
-                                AgentTile(
-                                    agent: agent,
-                                    height: geo.size.width/heightDivisor,
-                                    selection: handleAgentSelection
-                                )
-                            }
-                        }
-                        .padding(.horizontal)
+                        ChatAgentList(size: geo.size, selection: handleAgentSelection)
                     }
-                    ScrollViewMarker(id: "scrollViewBottom")
+                    ChatScrollViewMarker(id: "scrollViewBottom")
                 }
-                .onChange(of: chatViewModel.messages) { _, _ in
+                .scrollIndicators(.hidden)
+                .onChange(of: chatViewModel.chatID) { _, _ in
                     scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
                 }
-                .onChange(of: chatViewModel.chatID) { _, _ in
+                .onChange(of: chatViewModel.chat) { _, _ in
                     scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
                 }
                 .onAppear {
@@ -166,6 +158,26 @@ struct ChatView: View {
     func handleSelectChat(_ chatID: String) {
         chatViewModel.chatID = chatID
     }
+}
+
+struct ChatAgentList: View {
+    @Environment(Store.self) private var store
+    
+    let size: CGSize
+    let selection: (Agent) -> Void
+    
+    var body: some View {
+        LazyVGrid(columns: columns, spacing: 16) {
+            ForEach(store.agents) { agent in
+                AgentTile(
+                    agent: agent,
+                    height: size.width/heightDivisor,
+                    selection: selection
+                )
+            }
+        }
+        .padding(.horizontal)
+    }
     
     #if os(macOS)
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 3)
@@ -206,8 +218,8 @@ struct ChatHistoryView: View {
                 if chat.state == .suggesting {
                     ChatTypingIndicatorView(.trailing)
                 }
-                if let suggestions = chat.suggestions {
-                    SuggestionsView(suggestions: suggestions) { suggestion in
+                if chatViewModel.suggestions.count > 0 {
+                    ChatSuggestionsView(suggestions: chatViewModel.suggestions) { suggestion in
                         chatViewModel.generateResponse(suggestion)
                     }
                 }
@@ -217,7 +229,7 @@ struct ChatHistoryView: View {
     }
 }
 
-struct SuggestionsView: View {
+struct ChatSuggestionsView: View {
     let suggestions: [String]
     let action: (String) -> Void
     
@@ -241,7 +253,7 @@ struct SuggestionsView: View {
     }
 }
 
-struct ScrollViewMarker: View {
+struct ChatScrollViewMarker: View {
     let id: String
     
     var body: some View {

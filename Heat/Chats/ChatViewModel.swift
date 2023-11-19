@@ -35,6 +35,10 @@ final class ChatViewModel {
         return chat.messages.filter { $0.kind != .instruction }
     }
     
+    var suggestions: [String] {
+        chat?.suggestions ?? []
+    }
+    
     func change(model: Model) {
         Task {
             guard var chat = chat else { return }
