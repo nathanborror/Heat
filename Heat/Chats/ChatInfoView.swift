@@ -3,11 +3,8 @@ import HeatKit
 
 struct ChatInfoView: View {
     @Environment(Store.self) private var store
+    @Environment(ChatViewModel.self) private var chatViewModel
     @Environment(\.dismiss) private var dismiss
-    
-    let chatID: String?
-    
-    @Binding var modelID: String
 
     var body: some View {
         Form {
@@ -18,7 +15,7 @@ struct ChatInfoView: View {
                             Text(model.name)
                                 .tint(.primary)
                             Spacer()
-                            if model.id == modelID {
+                            if model.id == chatViewModel.chat?.modelID {
                                 Image(systemName: "checkmark")
                             }
                         }
@@ -46,24 +43,8 @@ struct ChatInfoView: View {
         }
     }
     
-    var agent: Agent? {
-        guard let chatID = chatID else { return nil }
-        guard let chat = store.get(chatID: chatID) else { return nil }
-        return store.get(agentID: chat.agentID)
-    }
-    
-    var chat: AgentChat? {
-        guard let chatID = chatID else { return nil }
-        return store.get(chatID: chatID)
-    }
-    
-    var model: Model? {
-        guard let modelID = chat?.modelID else { return nil }
-        return store.get(modelID: modelID)
-    }
-    
     func handleSelection(_ model: Model) {
-        modelID = model.id
+        chatViewModel.change(model: model)
         dismiss()
     }
 }

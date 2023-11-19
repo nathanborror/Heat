@@ -67,8 +67,11 @@ public final class ChatManager {
     @discardableResult public func generateSuggestions() async throws -> Self {
         try Task.checkCancellation()
         
-        guard let chat = store.get(chatID: chatID) else { return self }
+        guard var chat = store.get(chatID: chatID) else { return self }
         guard let model = store.get(modelID: chat.modelID) else { return self }
+        
+        chat.state = .suggesting
+        await store.upsert(chat: chat)
         
         let prompt =
             """
@@ -78,10 +81,22 @@ public final class ChatManager {
         
         let resp = try await store.generate(model: model, prompt: prompt, system: chat.system, context: chat.context)
         if let data = resp.response.data(using: .utf8), var chat = store.get(chatID: chat.id) {
-            let suggestions = try JSONDecoder().decode([String].self, from: data)
-            chat.suggestions = suggestions
+            do {
+                let suggestions = try JSONDecoder().decode([String].self, from: data)
+                chat.suggestions = suggestions
+            } catch {
+                print(error)
+            }
+            chat.state = .none
             await store.upsert(chat: chat)
         }
+        return self
+    }
+    
+    @discardableResult public func clearSuggestions() async throws -> Self {
+        guard var chat = store.get(chatID: chatID) else { return self }
+        chat.suggestions = nil
+        await store.upsert(chat: chat)
         return self
     }
 }

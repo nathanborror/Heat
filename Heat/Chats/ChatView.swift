@@ -3,13 +3,10 @@ import HeatKit
 
 struct ChatView: View {
     @Environment(Store.self) private var store
-    
-    @State var chatID: String?
+    @Environment(ChatViewModel.self) private var chatViewModel
 
     @State private var composerText = ""
     @State private var composerState: ChatComposerView.ViewState = .init()
-    @State private var generateTask: Task<(), Error>? = nil
-    @State private var modelID: String = ""
     
     @State private var isShowingInfo = false
     @State private var isShowingHistory = false
@@ -20,8 +17,8 @@ struct ChatView: View {
             ScrollViewReader { scrollViewProxy in
                 ScrollView {
                     ScrollViewMarker(id: "scrollViewTop")
-                    if let chat = chat {
-                        ChatHistoryView(chat: chat, messages: messages)
+                    if chatViewModel.chatID != nil {
+                        ChatHistoryView()
                     } else {
                         LazyVGrid(columns: columns, spacing: 16) {
                             ForEach(store.agents) { agent in
@@ -36,27 +33,20 @@ struct ChatView: View {
                     }
                     ScrollViewMarker(id: "scrollViewBottom")
                 }
-                .onChange(of: chat?.messages) { _, _ in
+                .onChange(of: chatViewModel.messages) { _, _ in
                     scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
                 }
-                .onChange(of: chat) { _, newValue in
-                    modelID = chat?.modelID ?? modelID
+                .onChange(of: chatViewModel.chatID) { _, _ in
                     scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
                 }
-                .onChange(of: store.models) { oldValue, newValue in
-                    guard oldValue.isEmpty else { return }
-                    guard modelID.isEmpty else { return }
-                    guard let model = store.getDefaultModel() else { return }
-                    modelID = model.id
-                }
-                .onAppear{
+                .onAppear {
                     scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
                 }
             }
         }
         #if os(macOS)
-        .navigationTitle(agent?.name ?? "New Chat")
-        .navigationSubtitle(model?.name ?? "Choose Model")
+        .navigationTitle(chatViewModel.agent?.name ?? "New Chat")
+        .navigationSubtitle(chatViewModel.model?.name ?? "Choose Model")
         .background(.background)
         #else
         .navigationBarTitleDisplayMode(.inline)
@@ -66,8 +56,8 @@ struct ChatView: View {
             ChatComposerView(
                 text: $composerText,
                 state: composerState,
-                submit: handleSubmit,
-                stop: handleStop
+                submit: chatViewModel.generateResponse,
+                stop: chatViewModel.cancel
             )
             .padding(.vertical, 8)
             .background(.background)
@@ -90,12 +80,9 @@ struct ChatView: View {
             ToolbarItem(placement: .principal) {
                 Button(action: { isShowingInfo.toggle() }) {
                     VStack(alignment: .center, spacing: 0) {
-                        Text(agent?.name ?? "New Chat")
+                        Text(chatViewModel.agent?.name ?? "New Chat")
                             .font(.headline)
                             .tint(.primary)
-                        Text(model?.name ?? "Choose Model")
-                            .font(.footnote)
-                            .tint(model == nil ? .accentColor : .secondary)
                     }
                 }
             }
@@ -114,49 +101,34 @@ struct ChatView: View {
             ToolbarItem {
                 Button(action: handleNewChat) {
                     Label("New Chat", systemImage: "plus")
-                }.disabled(chatID == nil)
+                }.disabled(chatViewModel.chatID == nil)
             }
             #endif
         }
         .sheet(isPresented: $isShowingInfo) {
             NavigationStack {
-                ChatInfoView(chatID: chatID, modelID: $modelID)
-            }.environment(store)
+                ChatInfoView()
+            }
+            .environment(store)
+            .environment(chatViewModel)
         }
         .sheet(isPresented: $isShowingHistory) {
             NavigationStack {
-                ChatListView(selection: $chatID)
-            }.environment(store)
+                ChatListView(selection: handleSelectChat)
+            }
+            .environment(store)
+            .environment(chatViewModel)
         }
         .sheet(isPresented: $isShowingSettings) {
             NavigationStack {
                 PreferencesView()
-            }.environment(store)
+            }
+            .environment(store)
         }
     }
     
-    var agent: Agent? {
-        guard let chatID = chatID else { return nil }
-        guard let chat = store.get(chatID: chatID) else { return nil }
-        return store.get(agentID: chat.agentID)
-    }
-    
-    var chat: AgentChat? {
-        guard let chatID = chatID else { return nil }
-        return store.get(chatID: chatID)
-    }
-    
-    var model: Model? {
-        return store.get(modelID: modelID)
-    }
-    
-    var messages: [Message] {
-        guard let chat = chat else { return [] }
-        return chat.messages.filter { $0.kind != .instruction }
-    }
-    
     var scrollToPosition: String {
-        if chatID != nil {
+        if chatViewModel.chatID != nil {
             "scrollViewBottom"
         } else {
             "scrollViewTop"
@@ -164,35 +136,14 @@ struct ChatView: View {
     }
     
     func handleNewChat() {
-        chatID = nil
+        chatViewModel.chatID = nil
         composerState.change(.resting)
     }
     
-    func handleSubmit(_ text: String) {
-        guard isModelPicked() else { return }
-        
-        generateTask = Task {
-            if chatID == nil { await handleCreateChat(agent: .assistant) }
-            guard let chat = chat else { return }
-            
-            let message = store.createMessage(role: .user, content: text)
-            try await ChatManager(store: store, chat: chat)
-                .append(message)
-                .generateStream()
-                .generateSuggestions()
-        }
-    }
-    
-    func handleStop() {
-        generateTask?.cancel()
-    }
-    
     func handleAgentSelection(_ agent: Agent) {
-        guard isModelPicked() else { return }
-        
-        generateTask = Task {
+        Task {
             await handleCreateChat(agent: agent)
-            guard let chat = chat else { return }
+            guard let chat = chatViewModel.chat else { return }
             
             DispatchQueue.main.async {
                 composerState.change(.focused)
@@ -207,17 +158,13 @@ struct ChatView: View {
     }
     
     func handleCreateChat(agent: Agent) async {
-        let chat = store.createChat(modelID: modelID, agentID: agent.id)
+        let chat = store.createChat(agentID: agent.id)
         await store.upsert(chat: chat)
-        self.chatID = chat.id
+        chatViewModel.chatID = chat.id
     }
     
-    func isModelPicked() -> Bool {
-        if modelID.isEmpty {
-            isShowingInfo = true
-            return false
-        }
-        return true
+    func handleSelectChat(_ chatID: String) {
+        chatViewModel.chatID = chatID
     }
     
     #if os(macOS)
@@ -230,27 +177,36 @@ struct ChatView: View {
 }
 
 struct ChatHistoryView: View {
-    let chat: AgentChat
-    let messages: [Message]
+    @Environment(ChatViewModel.self) private var chatViewModel
     
     var body: some View {
         LazyVStack {
-            if let system = chat.system {
+            
+            // System message
+            if let chat = chatViewModel.chat, let system = chat.system {
                 Text(system)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .padding(.vertical)
             }
             
-            ForEach(messages) { message in
+            // Message list
+            ForEach(chatViewModel.messages) { message in
                 ChatMessageContainerView(message: message)
             }
-            if chat.state == .processing {
-                ChatTypingIndicatorView(.leading)
-            }
-            if let suggestions = chat.suggestions {
-                SuggestionsView(suggestions: suggestions) { suggestion in
-                    
+            
+            // Indicators and suggestions
+            if let chat = chatViewModel.chat {
+                if chat.state == .processing {
+                    ChatTypingIndicatorView(.leading)
+                }
+                if chat.state == .suggesting {
+                    ChatTypingIndicatorView(.trailing)
+                }
+                if let suggestions = chat.suggestions {
+                    SuggestionsView(suggestions: suggestions) { suggestion in
+                        chatViewModel.generateResponse(suggestion)
+                    }
                 }
             }
         }
@@ -293,10 +249,14 @@ struct ScrollViewMarker: View {
 
 #Preview {
     let store = Store.preview
+    let chatViewModel = ChatViewModel(store: store)
+    
     let chat = store.chats.first!
+    chatViewModel.chatID = chat.id
     
     return NavigationStack {
-        ChatView(chatID: chat.id)
+        ChatView()
     }
     .environment(store)
+    .environment(chatViewModel)
 }

@@ -9,20 +9,22 @@ struct MainApp: App {
     @Environment(\.scenePhase) private var scenePhase
     
     @State private var store = Store.shared
+    @State private var chatViewModel = ChatViewModel(store: Store.shared)
     
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ChatView(chatID: nil)
-            }
-            .onAppear {
-                handleRestore()
+                ChatView()
             }
             .onChange(of: scenePhase) { _, _ in
                 handlePhaseChange()
             }
+            .onAppear {
+                handleRestore()
+            }
         }
         .environment(store)
+        .environment(chatViewModel)
     }
     
     func handleRestore() {

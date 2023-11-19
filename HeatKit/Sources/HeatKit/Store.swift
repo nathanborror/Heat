@@ -65,11 +65,14 @@ extension Store {
         .init(name: name, picture: picture, prompt: prompt)
     }
     
-    public func createChat(modelID: String, agentID: String) -> AgentChat {
+    public func createChat(agentID: String) -> AgentChat {
         guard let agent = get(agentID: agentID) else {
             fatalError("Agent does not exist")
         }
-        return AgentChat(modelID: modelID, agentID: agent.id, system: agent.system)
+        guard !preferences.preferredModelID.isEmpty else {
+            fatalError("Missing model")
+        }
+        return AgentChat(modelID: preferences.preferredModelID, agentID: agent.id, system: agent.system)
     }
     
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
@@ -204,6 +207,10 @@ extension Store {
                 self.models = models
                 self.preferences = preferences ?? self.preferences
                 self.client = OllamaClient(host: self.preferences.host)
+                
+                if self.preferences.preferredModelID.isEmpty {
+                    self.preferences.preferredModelID = getDefaultModel()?.id ?? ""
+                }
             }
         } catch is DecodingError {
             try await deleteAll()
@@ -286,22 +293,6 @@ extension Store {
         let chat = AgentChat.preview
         store.chats = [chat]
         
-        return store
-    }
-    
-    public static var previewChats: Store {
-        let store = Store.shared
-        store.resetAll()
-        
-        let chat1 = store.createChat(modelID: "none", agentID: Agent.vent.id)
-        let chat2 = store.createChat(modelID: "none", agentID: Agent.learn.id)
-        let chat3 = store.createChat(modelID: "none", agentID: Agent.brainstorm.id)
-        
-        Task {
-            await store.upsert(chat: chat1)
-            await store.upsert(chat: chat2)
-            await store.upsert(chat: chat3)
-        }
         return store
     }
 }

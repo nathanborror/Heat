@@ -5,7 +5,7 @@ struct ChatListView: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
-    @Binding var selection: String?
+    let selection: (String) -> Void
     
     var body: some View {
         List {
@@ -39,7 +39,7 @@ struct ChatListView: View {
     }
     
     func handleSelection(_ chat: AgentChat) {
-        selection = chat.id
+        selection(chat.id)
         dismiss()
     }
     
@@ -77,8 +77,9 @@ struct ChatRow: View {
 }
 
 #Preview {
-    NavigationStack {
-        ChatListView(selection: .constant(nil))
+    let store = Store.preview
+    return NavigationStack {
+        ChatListView(selection: {_ in})
     }
-    .environment(Store.previewChats)
+    .environment(store)
 }

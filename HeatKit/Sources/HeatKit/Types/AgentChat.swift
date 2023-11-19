@@ -15,6 +15,7 @@ public struct AgentChat: Codable, Identifiable {
     public enum State: Codable {
         case processing
         case streaming
+        case suggesting
         case none
     }
     

@@ -4,6 +4,8 @@ import HeatKit
 struct PreferencesView: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
+
+    @FocusState private var isFocused: Bool
     
     var body: some View {
         @Bindable var store = store
@@ -11,6 +13,7 @@ struct PreferencesView: View {
         Form {
             Section {
                 TextField("Host Address", text: $store.preferences.host)
+                    .focused($isFocused)
                     .autocorrectionDisabled()
                     .textContentType(.URL)
                     #if os(iOS)
@@ -22,15 +25,36 @@ struct PreferencesView: View {
                 Text("Example: 127.0.0.1:8080")
             }
             
-            Button(action: handleResetAgents) {
-                Text("Reset Agents")
+            Section {
+                Picker("Model", selection: $store.preferences.preferredModelID) {
+                    ForEach(store.models) { model in
+                        Text(model.name).tag(model.id)
+                    }
+                }
+            } header: {
+                Text("Preferred Model")
             }
-            .buttonStyle(.plain)
             
-            Button(role: .destructive, action: handleDeleteAll) {
-                Text("Delete All Data")
+            Section {
+                ForEach(store.models) { model in
+                    NavigationLink {
+                        ModelView(modelID: model.id)
+                    } label: {
+                        Text(model.name)
+                    }
+                }
+            } header: {
+                Text("Models")
             }
-            .buttonStyle(.plain)
+            
+            Section {
+                Button(action: handleResetAgents) {
+                    Text("Reset Agents")
+                }
+                Button(role: .destructive, action: handleDeleteAll) {
+                    Text("Delete All Data")
+                }
+            }
         }
         .formStyle(.grouped)
         .navigationTitle("Settings")
@@ -41,6 +65,14 @@ struct PreferencesView: View {
             }
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel", action: handleDismiss)
+            }
+        }
+        .onChange(of: isFocused) { _, newValue in
+            print("change: \(newValue)")
+        }
+        .onAppear {
+            Task {
+                try await store.loadModels()
             }
         }
     }
