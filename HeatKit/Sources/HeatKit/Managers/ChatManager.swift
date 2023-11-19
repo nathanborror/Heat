@@ -11,7 +11,7 @@ public final class ChatManager {
         self.chatID = chat.id
     }
     
-    @discardableResult public func inject(message: Message) async throws -> Self {
+    @discardableResult public func append(_ message: Message) async throws -> Self {
         try Task.checkCancellation()
         
         await store.upsert(message: message, chatID: chatID)

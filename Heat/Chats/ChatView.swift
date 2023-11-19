@@ -177,7 +177,7 @@ struct ChatView: View {
             
             let message = store.createMessage(role: .user, content: text)
             try await ChatManager(store: store, chat: chat)
-                .inject(message: message)
+                .append(message)
                 .generateStream()
         }
     }
@@ -199,7 +199,7 @@ struct ChatView: View {
             
             let message = store.createMessage(kind: .instruction, role: .user, content: agent.prompt)
             try await ChatManager(store: store, chat: chat)
-                .inject(message: message)
+                .append(message)
                 .generateStream()
         }
     }
