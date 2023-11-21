@@ -139,10 +139,13 @@ struct ChatView: View {
             }
             
             let message = store.createMessage(kind: .instruction, role: .user, content: agent.prompt)
-            try await ChatManager(store: store, chat: chat)
+            let manager = try await ChatManager(store: store, chat: chat)
                 .append(message)
                 .generateStream()
-                .generateSuggestions()
+            if store.preferences.isSuggesting {
+                try await manager
+                    .generateSuggestions()
+            }
         }
     }
     

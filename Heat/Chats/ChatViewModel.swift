@@ -52,11 +52,15 @@ final class ChatViewModel {
         let message = store.createMessage(role: .user, content: text)
         
         generateTask = Task {
-            try await ChatManager(store: store, chat: chat)
+            let manager = try await ChatManager(store: store, chat: chat)
                 .clearSuggestions()
                 .append(message)
                 .generateStream()
-                .generateSuggestions()
+            
+            if store.preferences.isSuggesting {
+                try await manager
+                    .generateSuggestions()
+            }
         }
     }
     

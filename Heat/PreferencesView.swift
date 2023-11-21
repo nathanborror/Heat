@@ -47,7 +47,10 @@ struct PreferencesView: View {
                 Text("Models")
             }
             
-            Toggle("Debug", isOn: $store.preferences.isDebug)
+            Section {
+                Toggle("Debug Mode", isOn: $store.preferences.isDebug)
+                Toggle("Show Suggestions", isOn: $store.preferences.isSuggesting)
+            }
             
             Section {
                 Button(action: handleResetAgents) {
