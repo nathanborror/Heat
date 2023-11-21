@@ -56,9 +56,6 @@ struct ChatView: View {
         }
         .toolbar {
             #if os(macOS)
-            Button(action: { isShowingInfo.toggle() }) {
-                Label("Pick Model", systemImage: "cube")
-            }
             Button(action: { isShowingSettings.toggle() }) {
                 Label("Settings", systemImage: "slider.horizontal.3")
             }
