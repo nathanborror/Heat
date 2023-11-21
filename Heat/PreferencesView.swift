@@ -72,9 +72,6 @@ struct PreferencesView: View {
                 Button("Cancel", action: handleDismiss)
             }
         }
-        .onChange(of: isFocused) { _, newValue in
-            print("change: \(newValue)")
-        }
         .onAppear {
             Task {
                 try await store.modelsLoad()
