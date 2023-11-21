@@ -27,6 +27,7 @@ struct PreferencesView: View {
             
             Section {
                 Picker("Model", selection: $store.preferences.preferredModelID) {
+                    Text("None").tag("")
                     ForEach(store.models) { model in
                         Text(model.name).tag(model.id)
                     }
