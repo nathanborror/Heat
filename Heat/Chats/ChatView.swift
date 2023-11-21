@@ -67,7 +67,7 @@ struct ChatView: View {
             }
             Button(action: handleNewChat) {
                 Label("New Chat", systemImage: "plus")
-            }.disabled(chatID == nil)
+            }.disabled(chatViewModel.chatID == nil)
             #else
             ToolbarItem(placement: .principal) {
                 Button(action: { isShowingInfo.toggle() }) {
