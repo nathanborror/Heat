@@ -69,14 +69,6 @@ struct ChatView: View {
                 Label("New Chat", systemImage: "plus")
             }
             .disabled(chatViewModel.chatID == nil)
-            .alert(isPresented: $isShowingError, error: storeError) { _ in
-                Button("Dismiss") {
-                    self.isShowingError = false
-                    self.storeError = nil
-                }
-            } message: { _ in
-                Text("Check that your Ollama server is running on port 8080 and make sure you've pulled some models.")
-            }
             #else
             ToolbarItem(placement: .principal) {
                 Button(action: { isShowingInfo.toggle() }) {
@@ -125,6 +117,14 @@ struct ChatView: View {
                 PreferencesView()
             }
             .environment(store)
+        }
+        .alert(isPresented: $isShowingError, error: storeError) { _ in
+            Button("Dismiss") {
+                self.isShowingError = false
+                self.storeError = nil
+            }
+        } message: { _ in
+            Text("Check that your Ollama server is running on port 8080 and make sure you've pulled some models.")
         }
     }
     
