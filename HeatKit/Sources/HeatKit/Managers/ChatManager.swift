@@ -76,9 +76,8 @@ public final class ChatManager {
         chat.state = .suggesting
         await store.upsert(chat: chat)
         
-        let prompt =
-            """
-            Generate three suggested user replies in under 8 words each.
+        let prompt = """
+            Generate three suggested user replies in under 8 words each. \
             Respond with a JSON array of strings.
             """
         
@@ -90,8 +89,7 @@ public final class ChatManager {
                 let suggestions = try JSONDecoder().decode([String].self, from: data)
                 chat.suggestions = suggestions
             } catch {
-                logger.error(
-                    """
+                logger.error("""
                     Suggestions Failed:
                     - Response: \(resp.response)
                     - Error: \(error, privacy: .public)
