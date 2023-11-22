@@ -248,6 +248,10 @@ extension Store {
         self.agents = defaultAgents
     }
     
+    public func resetClients() {
+        self.client = OllamaClient(host: preferences.host)
+    }
+    
     private var defaultAgents: [Agent] {
         [
             .vent,

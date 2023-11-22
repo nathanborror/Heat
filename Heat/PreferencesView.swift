@@ -44,6 +44,9 @@ struct PreferencesView: View {
                         Text(model.name)
                     }
                 }
+                Button("Reload Models") {
+                    handelLoadModels()
+                }
             } header: {
                 Text("Models")
             }
@@ -63,6 +66,7 @@ struct PreferencesView: View {
             }
         }
         .formStyle(.grouped)
+        .scrollDismissesKeyboard(.immediately)
         .navigationTitle("Settings")
         .frame(idealWidth: 400, idealHeight: 400)
         .toolbar {
@@ -73,10 +77,11 @@ struct PreferencesView: View {
                 Button("Cancel", action: handleDismiss)
             }
         }
+        .onChange(of: store.preferences.host) { _, _ in
+            store.resetClients()
+        }
         .onAppear {
-            Task {
-                try await store.modelsLoad()
-            }
+            handelLoadModels()
         }
     }
     
@@ -98,6 +103,12 @@ struct PreferencesView: View {
             try await store.saveAll()
         }
         handleDismiss()
+    }
+    
+    func handelLoadModels() {
+        Task {
+            try await store.modelsLoad()
+        }
     }
 }
 
