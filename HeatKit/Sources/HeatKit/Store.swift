@@ -2,6 +2,11 @@ import Foundation
 import Observation
 import OllamaKit
 
+public enum StoreError: LocalizedError {
+    case missingAgent
+    case missingModel
+}
+
 @Observable
 public final class Store {
     
@@ -65,12 +70,12 @@ extension Store {
         .init(name: name, picture: picture, prompt: prompt)
     }
     
-    public func createChat(agentID: String) -> AgentChat {
+    public func createChat(agentID: String) throws -> AgentChat {
         guard let agent = get(agentID: agentID) else {
-            fatalError("Agent does not exist")
+            throw StoreError.missingAgent
         }
         guard let model = getPreferredModel() else {
-            fatalError("Missing model")
+            throw StoreError.missingModel
         }
         return AgentChat(modelID: model.id, agentID: agent.id, system: agent.system)
     }

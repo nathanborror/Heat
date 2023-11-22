@@ -11,6 +11,9 @@ struct ChatView: View {
     @State private var isShowingInfo = false
     @State private var isShowingHistory = false
     @State private var isShowingSettings = false
+    @State private var isShowingError = false
+    
+    @State private var storeError: StoreError? = nil
     
     var body: some View {
         GeometryReader { geo in
@@ -64,7 +67,16 @@ struct ChatView: View {
             }
             Button(action: handleNewChat) {
                 Label("New Chat", systemImage: "plus")
-            }.disabled(chatViewModel.chatID == nil)
+            }
+            .disabled(chatViewModel.chatID == nil)
+            .alert(isPresented: $isShowingError, error: storeError) { _ in
+                Button("Dismiss") {
+                    self.isShowingError = false
+                    self.storeError = nil
+                }
+            } message: { _ in
+                Text("Check that your Ollama server is running on port 8080 and make sure you've pulled some models.")
+            }
             #else
             ToolbarItem(placement: .principal) {
                 Button(action: { isShowingInfo.toggle() }) {
@@ -150,9 +162,16 @@ struct ChatView: View {
     }
     
     func handleCreateChat(agent: Agent) async {
-        let chat = store.createChat(agentID: agent.id)
-        await store.upsert(chat: chat)
-        chatViewModel.chatID = chat.id
+        do {
+            let chat = try store.createChat(agentID: agent.id)
+            await store.upsert(chat: chat)
+            chatViewModel.chatID = chat.id
+        } catch let error as StoreError {
+            isShowingError = true
+            self.storeError = error
+        } catch {
+            print(error)
+        }
     }
     
     func handleSelectChat(_ chatID: String) {
