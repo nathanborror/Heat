@@ -41,7 +41,7 @@ struct ConversationView: View {
             }
         }
         #if os(macOS)
-        .navigationTitle(viewModel.agent?.name ?? "New Chat")
+        .navigationTitle("Conversation")
         .navigationSubtitle(viewModel.model?.name ?? "Choose Model")
         .background(.background)
         #else
@@ -60,10 +60,10 @@ struct ConversationView: View {
         }
         .toolbar {
             #if os(macOS)
-            Button(action: { isShowingSettings.toggle() }) {
+            Button(action: { sheet = .preferences }) {
                 Label("Settings", systemImage: "slider.horizontal.3")
             }
-            Button(action: { isShowingHistory.toggle() }) {
+            Button(action: { sheet = .history }) {
                 Label("History", systemImage: "archivebox")
             }
             Button(action: handleNewConversation) {
