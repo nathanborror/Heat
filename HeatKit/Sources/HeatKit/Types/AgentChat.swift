@@ -4,7 +4,6 @@ public struct AgentChat: Codable, Identifiable {
     public var id: String
     public var modelID: String
     public var agentID: String
-    public var system: String?
     public var messages: [Message]
     public var suggestions: [String]?
     public var context: [Int]
@@ -19,11 +18,10 @@ public struct AgentChat: Codable, Identifiable {
         case none
     }
     
-    init(id: String = UUID().uuidString, modelID: String, agentID: String, system: String? = nil, messages: [Message] = [], suggestions: [String]? = nil) {
+    init(id: String = UUID().uuidString, modelID: String, agentID: String, messages: [Message] = [], suggestions: [String]? = nil) {
         self.id = id
         self.agentID = agentID
         self.modelID = modelID
-        self.system = system
         self.messages = messages
         self.suggestions = suggestions
         self.context = []
@@ -44,8 +42,9 @@ extension AgentChat: Hashable {
 extension AgentChat {
     
     public static var preview: Self {
-        .init(modelID: Model.preview.id, agentID: Agent.preview.id, system: Agent.preview.system, messages: [
-            .init(role: .assistant, content: "Hello there", done: true),
+        .init(modelID: Model.preview.id, agentID: Agent.preview.id, messages: [
+            .init(role: .system, content: Agent.preview.system ?? ""),
+            .init(role: .assistant, content: "Hello there"),
         ], suggestions: [
             "I'm so frustrated",
             "My friend always cancels on me",

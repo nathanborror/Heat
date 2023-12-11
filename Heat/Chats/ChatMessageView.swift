@@ -11,7 +11,7 @@ struct ChatMessageContainerView: View {
     }
     
     var body: some View {
-        VStack(spacing: 1) {
+        VStack(alignment: .leading, spacing: 1) {
             ForEach(paragraphs.indices, id: \.self) { index in
                 ChatMessageTextView(text: paragraphs[index], isStreaming: !message.done)
                     .messageBubble(message)
@@ -43,12 +43,20 @@ struct ChatMessageBubbleModifier: ViewModifier {
     let message: Message
     
     func body(content: Content) -> some View {
-        content
-            .padding(.horizontal, paddingHorizontal)
-            .padding(.vertical, paddingVertical)
-            .foregroundStyle(foregroundColor)
-            .background(backgroundColor)
-            .clipShape(.rect(cornerRadius: cornerRadius))
+        switch message.role {
+        case .system:
+            content
+                .padding(.vertical, paddingVertical)
+                .foregroundStyle(foregroundColor)
+                .font(.footnote)
+        case .assistant, .user:
+            content
+                .padding(.horizontal, paddingHorizontal)
+                .padding(.vertical, paddingVertical)
+                .foregroundStyle(foregroundColor)
+                .background(backgroundColor)
+                .clipShape(.rect(cornerRadius: cornerRadius))
+        }
     }
     
     var backgroundColor: Color {

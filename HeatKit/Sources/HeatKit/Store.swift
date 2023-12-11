@@ -90,7 +90,7 @@ extension Store {
         guard let model = getPreferredModel() else {
             throw StoreError.missingModel
         }
-        return AgentChat(modelID: model.id, agentID: agent.id, system: agent.system)
+        return AgentChat(modelID: model.id, agentID: agent.id, messages: [.init(role: .system, content: agent.system ?? "")])
     }
     
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {

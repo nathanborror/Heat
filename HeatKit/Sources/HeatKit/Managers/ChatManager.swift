@@ -80,10 +80,12 @@ public final class ChatManager {
             Generate three suggested user replies in under 8 words each. \
             Respond with a JSON array of strings.
             """
+        var messages = chat.messages
+        messages.append(.init(role: .user, content: prompt))
         
-        let resp = try await store.generate(model: model, prompt: prompt, system: chat.system, context: chat.context)
+        let resp = try await store.chat(model: model, messages: messages)
         
-        let cleaned = cleanSuggestions(response: resp.response)
+        let cleaned = cleanSuggestions(response: resp)
         if let data = cleaned.data(using: .utf8), var chat = store.get(chatID: chat.id) {
             do {
                 let suggestions = try JSONDecoder().decode([String].self, from: data)
@@ -91,7 +93,7 @@ public final class ChatManager {
             } catch {
                 logger.error("""
                     Suggestions Failed:
-                    - Response: \(resp.response)
+                    - Response: \(resp.message?.content ?? "")
                     - Error: \(error, privacy: .public)
                     """
                 )
@@ -112,15 +114,15 @@ public final class ChatManager {
 
 extension ChatManager {
     
-    private func cleanSuggestions(response: String) -> String {
-        var cleaned = response
-        if cleaned.hasPrefix("```json") {
-            cleaned.removeFirst("```json".count)
+    private func cleanSuggestions(response: ChatResponse) -> String {
+        guard var content = response.message?.content else { return "" }
+        if content.hasPrefix("```json") {
+            content.removeFirst("```json".count)
         }
-        if cleaned.hasSuffix("```") {
-            cleaned.removeLast("```".count)
+        if content.hasSuffix("```") {
+            content.removeLast("```".count)
         }
-        return cleaned
+        return content
     }
     
     private func decode(response: ChatResponse) -> Message? {
