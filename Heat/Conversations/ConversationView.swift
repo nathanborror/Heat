@@ -7,14 +7,14 @@ struct ConversationView: View {
 
     @State private var composerText = ""
     @State private var composerState: ConversationComposerView.ViewState = .init()
-    
-    @State private var isShowingInfo = false
-    @State private var isShowingAgentForm = false
-    @State private var isShowingHistory = false
-    @State private var isShowingSettings = false
+    @State private var sheet: Sheet? = nil
     @State private var isShowingError = false
-    
     @State private var storeError: StoreError? = nil
+    
+    enum Sheet: String, Identifiable {
+        case info, history, preferences, agentForm
+        var id: String { rawValue }
+    }
     
     var body: some View {
         GeometryReader { geo in
@@ -72,7 +72,7 @@ struct ConversationView: View {
             .disabled(viewModel.conversationID == nil)
             #else
             ToolbarItem(placement: .principal) {
-                Button(action: { isShowingInfo.toggle() }) {
+                Button(action: { sheet = .info }) {
                     Text("Conversation")
                         .font(.headline)
                         .tint(.primary)
@@ -80,13 +80,13 @@ struct ConversationView: View {
             }
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
-                    Button(action: { isShowingAgentForm.toggle() }) {
+                    Button(action: { sheet = .agentForm }) {
                         Label("New Agent", systemImage: "plus")
                     }
-                    Button(action: { isShowingHistory.toggle() }) {
+                    Button(action: { sheet = .history }) {
                         Label("History", systemImage: "archivebox")
                     }
-                    Button(action: { isShowingSettings.toggle() }) {
+                    Button(action: { sheet = .preferences }) {
                         Label("Settings", systemImage: "slider.horizontal.3")
                     }
                 } label: {
@@ -100,31 +100,21 @@ struct ConversationView: View {
             }
             #endif
         }
-        .sheet(isPresented: $isShowingInfo) {
+        .sheet(item: $sheet) { sheet in
             NavigationStack {
-                ConversationInfoView()
+                switch sheet {
+                case .info:
+                    ConversationInfoView()
+                case .history:
+                    ConversationListView(selection: handleSelect)
+                case .preferences:
+                    PreferencesView()
+                case .agentForm:
+                    AgentForm(agent: .empty)
+                }
             }
             .environment(store)
             .environment(viewModel)
-        }
-        .sheet(isPresented: $isShowingAgentForm) {
-            NavigationStack {
-                AgentForm(agent: .empty)
-            }
-            .environment(store)
-        }
-        .sheet(isPresented: $isShowingHistory) {
-            NavigationStack {
-                ConversationListView(selection: handleSelect)
-            }
-            .environment(store)
-            .environment(viewModel)
-        }
-        .sheet(isPresented: $isShowingSettings) {
-            NavigationStack {
-                PreferencesView()
-            }
-            .environment(store)
         }
         .alert(isPresented: $isShowingError, error: storeError) { _ in
             Button("Dismiss") {
