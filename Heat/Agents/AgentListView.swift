@@ -8,6 +8,7 @@ struct AgentListView: View {
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
+                NavigationLink(destination: { Text("Foo") }, label: { Text("Create Agent") })
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(store.agents) { agent in
                         AgentTile(
@@ -37,7 +38,7 @@ struct AgentListView: View {
     private let heightDivisor: CGFloat = 3
     #else
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
-    private let heightDivisor: CGFloat = 2.5
+    private let heightDivisor: CGFloat = 3
     #endif
 }
 
@@ -51,36 +52,23 @@ struct AgentTile: View {
     let selection: AgentCallback
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 8) {
             PictureView(picture: agent.picture)
                 .frame(height: height)
-                .clipped()
-            VStack {
-                HStack {
-                    Spacer()
-                    Text(agent.name)
-                        .font(.system(size: 14, weight: .medium))
-                        .lineLimit(2)
-                        .padding(.horizontal)
-                        .multilineTextAlignment(.center)
-                    Spacer()
-                }
-                .frame(minHeight: 34)
-            }
-            .padding(.vertical, 12)
-            .background(.thinMaterial)
-            .background {
-                PictureView(picture: agent.picture)
-                    .clipped()
+                .clipShape(.rect(cornerRadius: 8, style: .continuous))
+            VStack(alignment: .leading) {
+                Text(agent.name)
+                    .font(.system(size: 13, weight: .medium))
+                Text(agent.tagline)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
             }
         }
-        .clipShape(.rect(cornerRadius: 12, style: .continuous))
         .onTapGesture {
             selection(agent)
         }
     }
 }
-
 
 #Preview {
     NavigationStack {

@@ -3,18 +3,18 @@ import Foundation
 public struct Agent: Codable, Identifiable {
     public var id: String
     public var name: String
+    public var tagline: String
     public var picture: Media
-    public var system: String?
-    public var prompt: String
+    public var messages: [Message]
     public var created: Date
     public var modified: Date
     
-    init(id: String = UUID().uuidString, name: String, picture: Media, system: String? = nil, prompt: String) {
+    init(id: String = UUID().uuidString, name: String, tagline: String, picture: Media, messages: [Message]) {
         self.id = id
         self.name = name
+        self.tagline = tagline
         self.picture = picture
-        self.system = system
-        self.prompt = prompt
+        self.messages = messages
         self.created = .now
         self.modified = .now
     }
@@ -31,7 +31,7 @@ extension Agent: Hashable {
 extension Agent {
 
     public static var empty: Self {
-        .init(name: "", picture: .none, prompt: "")
+        .init(name: "", tagline: "", picture: .none, messages: [])
     }
     
     public static var preview: Self {

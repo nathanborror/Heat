@@ -14,20 +14,34 @@ struct AgentForm: View {
                     #if os(iOS)
                     .textInputAutocapitalization(.words)
                     #endif
-            } header: {
-                Text("Name")
+                TextField("Tagline", text: $agent.tagline)
+            }
+            
+            ForEach($agent.messages) { message in
+                Section {
+                    Picker("Role", selection: message.role) {
+                        Text("System").tag(Message.Role.system)
+                        Text("Assistant").tag(Message.Role.assistant)
+                        Text("User").tag(Message.Role.user)
+                    }
+                    TextField("Content", text: message.content, axis: .vertical)
+                }
             }
             
             Section {
-                TextField("Prompt", text: $agent.prompt, axis: .vertical)
-            } header: {
-                Text("Prompt")
+                Button("Add Message", action: handleAddMessage)
             }
         }
         .navigationTitle("Create Agent")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done", action: handleDone)
+            }
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel", action: dismiss.callAsFunction)
             }
         }
     }
@@ -36,4 +50,26 @@ struct AgentForm: View {
         Task { await store.upsert(agent: agent) }
         dismiss()
     }
+    
+    func handleAddMessage() {
+        var message: Message!
+        if let lastMessage = agent.messages.last {
+            switch lastMessage.role {
+            case .system:
+                message = Message(kind: .instruction, role: .assistant)
+            case .assistant:
+                message = Message(kind: .instruction, role: .user)
+            case .user:
+                message = Message(kind: .instruction, role: .assistant)
+            }
+        } else {
+            message = Message(kind: .instruction, role: .system)
+        }
+        agent.messages.append(message)
+    }
+}
+
+#Preview {
+    AgentForm(agent: .empty)
+        .environment(Store.preview)
 }

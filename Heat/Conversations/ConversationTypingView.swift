@@ -1,7 +1,7 @@
 import SwiftUI
 import HeatKit
 
-struct ChatTypingIndicatorView: View {
+struct ConversationTypingIndicatorView: View {
     
     let alignment: Alignment
     let foregroundColor: Color
@@ -22,24 +22,24 @@ struct ChatTypingIndicatorView: View {
         HStack(alignment: .bottom) {
             switch alignment {
             case .leading:
-                ChatTypingEllipsis(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
+                ConversationTypingEllipsis(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
                 Spacer()
             case .trailing:
                 Spacer()
-                ChatTypingEllipsis(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
+                ConversationTypingEllipsis(foregroundColor: foregroundColor, backgroundColor: backgroundColor)
             }
         }
     }
 }
 
-struct ChatTypingEllipsis: View {
+struct ConversationTypingEllipsis: View {
     let foregroundColor: Color
     let backgroundColor: Color
     
     var body: some View {
         HStack(spacing: dotSpacing) {
             ForEach(0..<3, id: \.self) { index in
-                ChatTypingDot(color: foregroundColor, size: dotSize, delay: Double(index)*0.2)
+                ConversationTypingDot(color: foregroundColor, size: dotSize, delay: Double(index)*0.2)
             }
         }
         .padding(.horizontal, paddingHorizontal)
@@ -63,7 +63,7 @@ struct ChatTypingEllipsis: View {
     #endif
 }
 
-struct ChatTypingDot: View {
+struct ConversationTypingDot: View {
     let color: Color
     let size: CGFloat
     let delay: TimeInterval

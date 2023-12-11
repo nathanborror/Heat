@@ -17,7 +17,7 @@ public struct Message: Codable, Identifiable, Hashable {
         case none, instruction
     }
     
-    init(id: String = UUID().uuidString, kind: Kind = .none, role: Role, content: String, done: Bool = true) {
+    public init(id: String = UUID().uuidString, kind: Kind = .none, role: Role, content: String = "", done: Bool = true) {
         self.id = id
         self.kind = kind
         self.role = role
@@ -32,3 +32,4 @@ public struct Message: Codable, Identifiable, Hashable {
         hasher.combine(modified)
     }
 }
+

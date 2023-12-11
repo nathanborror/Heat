@@ -1,14 +1,15 @@
 import SwiftUI
 import HeatKit
 
-struct ChatView: View {
+struct ConversationView: View {
     @Environment(Store.self) private var store
-    @Environment(ChatViewModel.self) private var chatViewModel
+    @Environment(ConversationViewModel.self) private var viewModel
 
     @State private var composerText = ""
-    @State private var composerState: ChatComposerView.ViewState = .init()
+    @State private var composerState: ConversationComposerView.ViewState = .init()
     
     @State private var isShowingInfo = false
+    @State private var isShowingAgentForm = false
     @State private var isShowingHistory = false
     @State private var isShowingSettings = false
     @State private var isShowingError = false
@@ -19,19 +20,19 @@ struct ChatView: View {
         GeometryReader { geo in
             ScrollViewReader { scrollViewProxy in
                 ScrollView {
-                    ChatScrollViewMarker(id: "scrollViewTop")
-                    if chatViewModel.chatID != nil {
+                    ConversationScrollViewMarker(id: "scrollViewTop")
+                    if viewModel.conversationID != nil {
                         ChatHistoryView()
                     } else {
-                        ChatAgentList(size: geo.size, selection: handleAgentSelection)
+                        ChatAgentList(size: geo.size, selection: handleSelect)
                     }
-                    ChatScrollViewMarker(id: "scrollViewBottom")
+                    ConversationScrollViewMarker(id: "scrollViewBottom")
                 }
                 .scrollIndicators(.hidden)
-                .onChange(of: chatViewModel.chatID) { _, _ in
+                .onChange(of: viewModel.conversationID) { _, _ in
                     scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
                 }
-                .onChange(of: chatViewModel.chat) { _, _ in
+                .onChange(of: viewModel.conversation) { _, _ in
                     scrollViewProxy.scrollTo(scrollToPosition, anchor: .bottom)
                 }
                 .onAppear {
@@ -40,19 +41,19 @@ struct ChatView: View {
             }
         }
         #if os(macOS)
-        .navigationTitle(chatViewModel.agent?.name ?? "New Chat")
-        .navigationSubtitle(chatViewModel.model?.name ?? "Choose Model")
+        .navigationTitle(viewModel.agent?.name ?? "New Chat")
+        .navigationSubtitle(viewModel.model?.name ?? "Choose Model")
         .background(.background)
         #else
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom, alignment: .center) {
-            ChatComposerView(
+            ConversationComposerView(
                 text: $composerText,
                 state: composerState,
-                submit: chatViewModel.generateResponse,
-                stop: chatViewModel.cancel
+                submit: viewModel.generateResponse,
+                stop: viewModel.cancel
             )
             .padding(.vertical, 8)
             .background(.background)
@@ -65,22 +66,23 @@ struct ChatView: View {
             Button(action: { isShowingHistory.toggle() }) {
                 Label("History", systemImage: "archivebox")
             }
-            Button(action: handleNewChat) {
+            Button(action: handleNewConversation) {
                 Label("New Chat", systemImage: "plus")
             }
-            .disabled(chatViewModel.chatID == nil)
+            .disabled(viewModel.conversationID == nil)
             #else
             ToolbarItem(placement: .principal) {
                 Button(action: { isShowingInfo.toggle() }) {
-                    VStack(alignment: .center, spacing: 0) {
-                        Text(chatViewModel.agent?.name ?? "New Chat")
-                            .font(.headline)
-                            .tint(.primary)
-                    }
+                    Text("Conversation")
+                        .font(.headline)
+                        .tint(.primary)
                 }
             }
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
+                    Button(action: { isShowingAgentForm.toggle() }) {
+                        Label("New Agent", systemImage: "plus")
+                    }
                     Button(action: { isShowingHistory.toggle() }) {
                         Label("History", systemImage: "archivebox")
                     }
@@ -92,25 +94,31 @@ struct ChatView: View {
                 }
             }
             ToolbarItem {
-                Button(action: handleNewChat) {
-                    Label("New Chat", systemImage: "plus")
-                }.disabled(chatViewModel.chatID == nil)
+                Button(action: handleNewConversation) {
+                    Label("New Conversation", systemImage: "plus")
+                }.disabled(viewModel.conversationID == nil)
             }
             #endif
         }
         .sheet(isPresented: $isShowingInfo) {
             NavigationStack {
-                ChatInfoView()
+                ConversationInfoView()
             }
             .environment(store)
-            .environment(chatViewModel)
+            .environment(viewModel)
+        }
+        .sheet(isPresented: $isShowingAgentForm) {
+            NavigationStack {
+                AgentForm(agent: .empty)
+            }
+            .environment(store)
         }
         .sheet(isPresented: $isShowingHistory) {
             NavigationStack {
-                ChatListView(selection: handleSelectChat)
+                ConversationListView(selection: handleSelect)
             }
             .environment(store)
-            .environment(chatViewModel)
+            .environment(viewModel)
         }
         .sheet(isPresented: $isShowingSettings) {
             NavigationStack {
@@ -129,31 +137,30 @@ struct ChatView: View {
     }
     
     var scrollToPosition: String {
-        if chatViewModel.chatID != nil {
+        if viewModel.conversationID != nil {
             "scrollViewBottom"
         } else {
             "scrollViewTop"
         }
     }
     
-    func handleNewChat() {
-        chatViewModel.chatID = nil
+    func handleNewConversation() {
+        viewModel.conversationID = nil
         composerState.change(.resting)
     }
     
-    func handleAgentSelection(_ agent: Agent) {
+    func handleSelect(agent: Agent) {
         Task {
-            await handleCreateChat(agent: agent)
-            guard let chat = chatViewModel.chat else { return }
-            
             DispatchQueue.main.async {
                 composerState.change(.focused)
             }
             
-            let message = store.createMessage(kind: .instruction, role: .user, content: agent.prompt)
-            let manager = try await ChatManager(store: store, chat: chat)
-                .append(message)
+            let manager = try await ConversationManager(store: store)
+                .initialize(agentID: agent.id) { conversationID in
+                    viewModel.conversationID = conversationID
+                }
                 .generateStream()
+            
             if store.preferences.isSuggesting {
                 try await manager
                     .generateSuggestions()
@@ -161,21 +168,8 @@ struct ChatView: View {
         }
     }
     
-    func handleCreateChat(agent: Agent) async {
-        do {
-            let chat = try store.createChat(agentID: agent.id)
-            await store.upsert(chat: chat)
-            chatViewModel.chatID = chat.id
-        } catch let error as StoreError {
-            isShowingError = true
-            self.storeError = error
-        } catch {
-            print(error)
-        }
-    }
-    
-    func handleSelectChat(_ chatID: String) {
-        chatViewModel.chatID = chatID
+    func handleSelect(conversationID: String) {
+        viewModel.conversationID = conversationID
     }
 }
 
@@ -203,33 +197,33 @@ struct ChatAgentList: View {
     private let heightDivisor: CGFloat = 3.5
     #else
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
-    private let heightDivisor: CGFloat = 2.75
+    private let heightDivisor: CGFloat = 3
     #endif
 }
 
 struct ChatHistoryView: View {
     @Environment(Store.self) private var store
-    @Environment(ChatViewModel.self) private var chatViewModel
+    @Environment(ConversationViewModel.self) private var viewModel
     
     var body: some View {
         LazyVStack {
             
             // Message list
-            ForEach(chatViewModel.messages) { message in
-                ChatMessageContainerView(message: message)
+            ForEach(viewModel.messages) { message in
+                ConversationMessageContainerView(message: message)
             }
             
             // Indicators and suggestions
-            if let chat = chatViewModel.chat {
-                if chat.state == .processing {
-                    ChatTypingIndicatorView(.leading)
+            if let conversation = viewModel.conversation {
+                if conversation.state == .processing {
+                    ConversationTypingIndicatorView(.leading)
                 }
-                if chat.state == .suggesting {
-                    ChatTypingIndicatorView(.trailing)
+                if conversation.state == .suggesting {
+                    ConversationTypingIndicatorView(.trailing)
                 }
-                if chatViewModel.suggestions.count > 0 {
-                    ChatSuggestionsView(suggestions: chatViewModel.suggestions) { suggestion in
-                        chatViewModel.generateResponse(suggestion)
+                if viewModel.suggestions.count > 0 {
+                    ConversationSuggestionsView(suggestions: viewModel.suggestions) { suggestion in
+                        viewModel.generateResponse(suggestion)
                     }
                 }
             }
@@ -238,7 +232,7 @@ struct ChatHistoryView: View {
     }
 }
 
-struct ChatSuggestionsView: View {
+struct ConversationSuggestionsView: View {
     let suggestions: [String]
     let action: (String) -> Void
     
@@ -262,7 +256,7 @@ struct ChatSuggestionsView: View {
     }
 }
 
-struct ChatScrollViewMarker: View {
+struct ConversationScrollViewMarker: View {
     let id: String
     
     var body: some View {
@@ -275,14 +269,14 @@ struct ChatScrollViewMarker: View {
 
 #Preview {
     let store = Store.preview
-    let chatViewModel = ChatViewModel(store: store)
+    let viewModel = ConversationViewModel(store: store)
     
-    let chat = store.chats.first!
-    chatViewModel.chatID = chat.id
+    //let conversation = store.conversations.first!
+    //viewModel.conversationID = conversation.id
     
     return NavigationStack {
-        ChatView()
+        ConversationView()
     }
     .environment(store)
-    .environment(chatViewModel)
+    .environment(viewModel)
 }

@@ -1,7 +1,7 @@
 import SwiftUI
 import HeatKit
 
-struct ChatMessageContainerView: View {
+struct ConversationMessageContainerView: View {
     let message: Message
     let paragraphs: [String]
     
@@ -13,7 +13,7 @@ struct ChatMessageContainerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 1) {
             ForEach(paragraphs.indices, id: \.self) { index in
-                ChatMessageTextView(text: paragraphs[index], isStreaming: !message.done)
+                ConversationMessageTextView(text: paragraphs[index], isStreaming: !message.done)
                     .messageBubble(message)
                     .messageSpacing(message)
             }
@@ -23,7 +23,7 @@ struct ChatMessageContainerView: View {
     var tail = Text(Image(systemName: "poweron")).foregroundColor(.primary).fontWeight(.bold)
 }
 
-struct ChatMessageTextView: View {
+struct ConversationMessageTextView: View {
     let text: String?
     let isStreaming: Bool
     
@@ -39,7 +39,7 @@ struct ChatMessageTextView: View {
 
 // Modifiers
 
-struct ChatMessageBubbleModifier: ViewModifier {
+struct ConversationMessageBubbleModifier: ViewModifier {
     let message: Message
     
     func body(content: Content) -> some View {
@@ -86,7 +86,7 @@ struct ChatMessageBubbleModifier: ViewModifier {
     #endif
 }
 
-struct ChatMessageSpacingModifier: ViewModifier {
+struct ConversationMessageSpacingModifier: ViewModifier {
     let message: Message
         
     func body(content: Content) -> some View {
@@ -108,10 +108,10 @@ struct ChatMessageSpacingModifier: ViewModifier {
 extension View {
     
     func messageBubble(_ message: Message) -> some View {
-        self.modifier(ChatMessageBubbleModifier(message: message))
+        self.modifier(ConversationMessageBubbleModifier(message: message))
     }
     
     func messageSpacing(_ message: Message) -> some View {
-        self.modifier(ChatMessageSpacingModifier(message: message))
+        self.modifier(ConversationMessageSpacingModifier(message: message))
     }
 }

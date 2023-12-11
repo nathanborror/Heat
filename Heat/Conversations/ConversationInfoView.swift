@@ -1,9 +1,9 @@
 import SwiftUI
 import HeatKit
 
-struct ChatInfoView: View {
+struct ConversationInfoView: View {
     @Environment(Store.self) private var store
-    @Environment(ChatViewModel.self) private var chatViewModel
+    @Environment(ConversationViewModel.self) private var viewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -15,7 +15,7 @@ struct ChatInfoView: View {
                             Text(model.name)
                                 .tint(.primary)
                             Spacer()
-                            if model.id == chatViewModel.chat?.modelID {
+                            if model.id == viewModel.conversation?.modelID {
                                 Image(systemName: "checkmark")
                             }
                         }
@@ -44,7 +44,7 @@ struct ChatInfoView: View {
     }
     
     func handleSelection(_ model: Model) {
-        chatViewModel.change(model: model)
+        viewModel.change(model: model)
         dismiss()
     }
 }

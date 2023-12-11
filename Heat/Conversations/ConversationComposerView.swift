@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ChatComposerView: View {
+struct ConversationComposerView: View {
     
     class ViewState: ObservableObject {
         enum State: Equatable {
@@ -75,7 +75,7 @@ struct ChatComposerView: View {
 }
 
 struct ComposerInput: View {
-    @ObservedObject var state: ChatComposerView.ViewState
+    @ObservedObject var state: ConversationComposerView.ViewState
     @Binding var text: String
     
     @FocusState var focused: Bool
@@ -127,7 +127,7 @@ struct ComposerInput: View {
 }
 
 struct SubmitButton: View {
-    @ObservedObject var state: ChatComposerView.ViewState
+    @ObservedObject var state: ConversationComposerView.ViewState
     var action: () -> Void
     
     var body: some View {
@@ -142,7 +142,7 @@ struct SubmitButton: View {
 }
 
 struct StopButton: View {
-    @ObservedObject var state: ChatComposerView.ViewState
+    @ObservedObject var state: ConversationComposerView.ViewState
     var action: () -> Void
     
     var body: some View {

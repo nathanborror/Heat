@@ -71,10 +71,7 @@ struct PreferencesView: View {
         .frame(idealWidth: 400, idealHeight: 400)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Done", action: handleDismiss)
-            }
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel", action: handleDismiss)
+                Button("Done", action: dismiss.callAsFunction)
             }
         }
         .onChange(of: store.preferences.host) { _, _ in
@@ -85,16 +82,12 @@ struct PreferencesView: View {
         }
     }
     
-    func handleDismiss() {
-        dismiss()
-    }
-    
     func handleDeleteAll() {
         Task {
             try await store.deleteAll()
             try await store.saveAll()
         }
-        handleDismiss()
+        dismiss()
     }
     
     func handleResetAgents() {
@@ -102,7 +95,7 @@ struct PreferencesView: View {
             try await store.resetAgents()
             try await store.saveAll()
         }
-        handleDismiss()
+        dismiss()
     }
     
     func handelLoadModels() {
