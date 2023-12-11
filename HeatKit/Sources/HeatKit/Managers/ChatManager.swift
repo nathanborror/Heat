@@ -1,4 +1,5 @@
 import Foundation
+import OllamaKit
 import OSLog
 
 private let logger = Logger(subsystem: "ChatManager", category: "HeatKit")
@@ -26,17 +27,18 @@ public final class ChatManager {
         
         guard let chat = store.get(chatID: chatID) else { return self }
         guard let model = store.get(modelID: chat.modelID) else { return self }
-        guard let message = chat.messages.last else { return self }
-        guard message.role == .user else { return self }
         
         await store.set(state: .processing, chatID: chatID)
         
-        let resp = try await store.generate(model: model, prompt: message.content, system: chat.system, context: chat.context)
-        let newAssistantMessage = Message(role: .assistant, content: resp.response, done: resp.done)
+        let resp = try await store.chat(model: model, messages: chat.messages)
+        
+        guard let message = decode(response: resp) else {
+            logger.error("missing response message")
+            return self
+        }
         
         await store.set(state: .none, chatID: chatID)
-        await store.upsert(message: newAssistantMessage, chatID: chatID)
-        await store.set(context: resp.context, chatID: chatID)
+        await store.upsert(message: message, chatID: chatID)
         
         return self
     }
@@ -46,24 +48,22 @@ public final class ChatManager {
         
         guard let chat = store.get(chatID: chatID) else { return self }
         guard let model = store.get(modelID: chat.modelID) else { return self }
-        guard let message = chat.messages.last else { return self }
-        guard message.role == .user else { return self }
+        let messageID = UUID().uuidString
         
         await store.set(state: .processing, chatID: chatID)
         
-        let newAssistantMessageID = UUID().uuidString
-        
-        try await store.generateStream(model: model, prompt: message.content, system: chat.system, context: chat.context) { resp in
-            let newAssistantMessage = Message(id: newAssistantMessageID, role: .assistant, content: resp.response, done: resp.done)
-            
-            await store.set(state: .streaming, chatID: chatID)
-            await store.upsert(message: newAssistantMessage, chatID: chatID)
-            
-            if resp.done {
-                await store.set(context: resp.context, chatID: chatID)
-                await store.set(state: .none, chatID: chatID)
+        try await store.chatStream(model: model, messages: chat.messages) { resp in
+            guard var message = decode(response: resp) else {
+                logger.error("missing response message")
+                return
             }
+            message.id = messageID
+            message.done = resp.done ?? message.done
+            await store.upsert(message: message, chatID: chat.id)
         }
+        
+        await store.set(state: .none, chatID: chat.id)
+        
         return self
     }
     
@@ -121,5 +121,20 @@ extension ChatManager {
             cleaned.removeLast("```".count)
         }
         return cleaned
+    }
+    
+    private func decode(response: ChatResponse) -> Message? {
+        guard let message = response.message else {
+            return .init(role: .assistant, content: "")
+        }
+        return .init(role: decode(role: message.role), content: message.content)
+    }
+    
+    private func decode(role: OllamaKit.Message.Role) -> Message.Role {
+        switch role {
+        case .system: .system
+        case .assistant: .assistant
+        case .user: .user
+        }
     }
 }

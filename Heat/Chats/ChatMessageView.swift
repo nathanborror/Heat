@@ -53,6 +53,7 @@ struct ChatMessageBubbleModifier: ViewModifier {
     
     var backgroundColor: Color {
         switch message.role {
+        case .system: return .clear
         case .assistant: return .primary.opacity(0.07)
         case .user: return .accentColor
         }
@@ -60,6 +61,7 @@ struct ChatMessageBubbleModifier: ViewModifier {
     
     var foregroundColor: Color {
         switch message.role {
+        case .system: return .secondary
         case .assistant: return .primary
         case .user: return .white
         }
@@ -82,6 +84,8 @@ struct ChatMessageSpacingModifier: ViewModifier {
     func body(content: Content) -> some View {
         HStack {
             switch message.role {
+            case .system:
+                content
             case .assistant:
                 content
                 Spacer(minLength: 16)

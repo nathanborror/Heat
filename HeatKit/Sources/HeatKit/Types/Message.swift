@@ -10,14 +10,14 @@ public struct Message: Codable, Identifiable, Hashable {
     public var modified: Date
     
     public enum Role: Codable {
-        case assistant, user
+        case system, assistant, user
     }
     
     public enum Kind: Codable {
         case none, instruction
     }
     
-    init(id: String = UUID().uuidString, kind: Kind = .none, role: Role, content: String, done: Bool) {
+    init(id: String = UUID().uuidString, kind: Kind = .none, role: Role, content: String, done: Bool = true) {
         self.id = id
         self.kind = kind
         self.role = role

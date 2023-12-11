@@ -28,14 +28,27 @@ public final class Store {
 extension Store {
     
     public func generate(model: Model, prompt: String, system: String?, context: [Int]) async throws -> GenerateResponse {
-        let request = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
-        let response = try await client.generate(request: request)
+        let payload = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
+        let response = try await client.generate(payload)
         return response
     }
     
     public func generateStream(model: Model, prompt: String, system: String?, context: [Int], callback: (GenerateResponse) async -> Void) async throws {
-        let request = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
-        for try await response in client.generateStream(request: request) {
+        let payload = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
+        for try await response in client.generateStream(payload) {
+            await callback(response)
+        }
+    }
+    
+    public func chat(model: Model, messages: [Message], format: String? = nil) async throws -> ChatResponse {
+        let payload = ChatRequest(model: model.name, messages: encode(messages: messages), format: format)
+        let response = try await client.chat(payload)
+        return response
+    }
+    
+    public func chatStream(model: Model, messages: [Message], format: String? = nil, callback: (ChatResponse) async -> Void) async throws {
+        let payload = ChatRequest(model: model.name, messages: encode(messages: messages), stream: true, format: format)
+        for try await response in client.chatStream(payload) {
             await callback(response)
         }
     }
@@ -47,9 +60,9 @@ extension Store {
     }
     
     public func modelShow(modelID: String) async throws {
-        let request = ModelShowRequest(name: modelID)
+        let payload = ModelShowRequest(name: modelID)
         do {
-            let modelDetails = try await client.modelShow(request: request)
+            let modelDetails = try await client.modelShow(payload)
             await upsert(modelDetails: modelDetails, modelID: modelID)
         } catch {
             print(error)
@@ -57,8 +70,8 @@ extension Store {
     }
     
     public func modelPull(name: String, callback: (ProgressResponse) async -> Void) async throws {
-        let request = ModelPullRequest(name: name)
-        for try await response in client.modelPull(request: request) {
+        let payload = ModelPullRequest(name: name)
+        for try await response in client.modelPull(payload) {
             await callback(response)
         }
     }
@@ -265,6 +278,26 @@ extension Store {
             .journal,
             .assistant,
         ]
+    }
+}
+
+extension Store {
+    
+    private func encode(messages: [Message]) -> [OllamaKit.Message] {
+        messages.map {
+            OllamaKit.Message(role: encode(role: $0.role), content: $0.content)
+        }
+    }
+    
+    private func encode(role: Message.Role) -> OllamaKit.Message.Role {
+        switch role {
+        case .system:
+            return .system
+        case .assistant:
+            return .assistant
+        case .user:
+            return .user
+        }
     }
 }
 

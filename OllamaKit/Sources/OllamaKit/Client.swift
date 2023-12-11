@@ -10,12 +10,9 @@ final public class OllamaClient {
     
     // Generate
     
-    public func generate(request: GenerateRequest) async throws -> GenerateResponse {
+    public func generate(_ payload: GenerateRequest) async throws -> GenerateResponse {
         var req = makeRequest(path: "generate", method: "POST")
-        
-        var body = request
-        body.stream = false
-        req.httpBody = try JSONEncoder().encode(body)
+        req.httpBody = try JSONEncoder().encode(payload)
         
         let (data, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
@@ -24,10 +21,29 @@ final public class OllamaClient {
         return try decoder.decode(GenerateResponse.self, from: data)
     }
     
-    public func generateStream(request: GenerateRequest) -> AsyncThrowingStream<GenerateResponse, Error> {
-        var body = request
+    public func generateStream(_ payload: GenerateRequest) -> AsyncThrowingStream<GenerateResponse, Error> {
+        var body = payload
         body.stream = true
         return makeAsyncRequest(path: "generate", method: "POST", body: body)
+    }
+    
+    // Chats
+    
+    public func chat(_ payload: ChatRequest) async throws -> ChatResponse {
+        var req = makeRequest(path: "chat", method: "POST")
+        req.httpBody = try JSONEncoder().encode(payload)
+        
+        let (data, resp) = try await URLSession.shared.data(for: req)
+        if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
+            throw URLError(.badServerResponse)
+        }
+        return try decoder.decode(ChatResponse.self, from: data)
+    }
+    
+    public func chatStream(_ payload: ChatRequest) -> AsyncThrowingStream<ChatResponse, Error> {
+        var body = payload
+        body.stream = true
+        return makeAsyncRequest(path: "chat", method: "POST", body: body)
     }
     
     // Models
@@ -41,9 +57,9 @@ final public class OllamaClient {
         return try decoder.decode(ModelListResponse.self, from: data)
     }
     
-    public func modelShow(request: ModelShowRequest) async throws -> ModelShowResponse {
+    public func modelShow(_ payload: ModelShowRequest) async throws -> ModelShowResponse {
         var req = makeRequest(path: "show", method: "POST")
-        req.httpBody = try JSONEncoder().encode(request)
+        req.httpBody = try JSONEncoder().encode(payload)
         
         let (data, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
@@ -52,9 +68,9 @@ final public class OllamaClient {
         return try decoder.decode(ModelShowResponse.self, from: data)
     }
     
-    public func modelCopy(request: ModelCopyRequest) async throws {
+    public func modelCopy(_ payload: ModelCopyRequest) async throws {
         var req = makeRequest(path: "copy", method: "POST")
-        req.httpBody = try JSONEncoder().encode(request)
+        req.httpBody = try JSONEncoder().encode(payload)
         
         let (_, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
@@ -63,9 +79,9 @@ final public class OllamaClient {
         return
     }
     
-    public func modelDelete(request: ModelDeleteRequest) async throws {
+    public func modelDelete(_ payload: ModelDeleteRequest) async throws {
         var req = makeRequest(path: "delete", method: "DELETE")
-        req.httpBody = try JSONEncoder().encode(request)
+        req.httpBody = try JSONEncoder().encode(payload)
         
         let (_, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
@@ -74,22 +90,24 @@ final public class OllamaClient {
         return
     }
     
-    public func modelPull(request: ModelPullRequest) -> AsyncThrowingStream<ProgressResponse, Error> {
-        var body = request
+    public func modelPull(_ payload: ModelPullRequest) -> AsyncThrowingStream<ProgressResponse, Error> {
+        var body = payload
         body.stream = true
         return makeAsyncRequest(path: "pull", method: "POST", body: body)
     }
     
-    public func modelPush(request: ModelPushRequest) -> AsyncThrowingStream<ProgressResponse, Error> {
-        var body = request
+    public func modelPush(_ payload: ModelPushRequest) -> AsyncThrowingStream<ProgressResponse, Error> {
+        var body = payload
         body.stream = true
         return makeAsyncRequest(path: "push", method: "POST", body: body)
     }
     
     // Embeddings
     
-    public func embeddings(request: EmbeddingRequest) async throws -> EmbeddingResponse {
-        let req = makeRequest(path: "embeddings", method: "POST")
+    public func embeddings(_ payload: EmbeddingRequest) async throws -> EmbeddingResponse {
+        var req = makeRequest(path: "embeddings", method: "POST")
+        req.httpBody = try JSONEncoder().encode(payload)
+        
         let (data, resp) = try await URLSession.shared.data(for: req)
         if let httpResponse = resp as? HTTPURLResponse, httpResponse.statusCode != 200 {
             throw URLError(.badServerResponse)
