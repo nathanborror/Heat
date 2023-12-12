@@ -25,7 +25,7 @@ extension Agent {
             tagline: "",
             picture: .bundle("Covers/Sky"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Introduce yourself"),
             ]
         )
@@ -38,7 +38,7 @@ extension Agent {
             tagline: "Vent about your day",
             picture: .bundle("Covers/Sunrise"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Help me vent about something"),
             ]
         )
@@ -51,7 +51,7 @@ extension Agent {
             tagline: "Learn about something new",
             picture: .bundle("Covers/Structure"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to learn about something new."),
             ]
         )
@@ -64,7 +64,7 @@ extension Agent {
             tagline: "Brainstorm ideas",
             picture: .bundle("Covers/Dunes"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to brainstorm ideas."),
             ]
         )
@@ -77,7 +77,7 @@ extension Agent {
             tagline: "Get advice",
             picture: .bundle("Covers/SeaSunrise"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I need advice about something."),
             ]
         )
@@ -90,7 +90,7 @@ extension Agent {
             tagline: "Feeling anxious",
             picture: .bundle("Covers/Clouds"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I've been feeling anxious."),
             ]
         )
@@ -103,7 +103,7 @@ extension Agent {
             tagline: "Get philisophical",
             picture: .bundle("Covers/Cube"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to get philisophical."),
             ]
         )
@@ -116,7 +116,7 @@ extension Agent {
             tagline: "Discover books or music",
             picture: .bundle("Covers/Bubbles"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to discover new books, music or podcasts."),
             ]
         )
@@ -129,7 +129,7 @@ extension Agent {
             tagline: "Help me through a problem",
             picture: .bundle("Covers/Hallway"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Coach me through a problem."),
             ]
         )
@@ -142,7 +142,7 @@ extension Agent {
             tagline: "Journal about your day",
             picture: .bundle("Covers/Path"),
             messages: [
-                .init(role: .system, content: systemPrompt),
+                .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Help me journal about my day."),
             ]
         )
