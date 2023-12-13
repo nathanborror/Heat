@@ -18,7 +18,7 @@ extension Agent {
         even if you're asked about them.
         """
     
-    public static var assistant: Self {
+    public static var assistant: Self =
         .init(
             id: "bundle-assistant",
             name: "Assistant",
@@ -29,9 +29,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "Introduce yourself"),
             ]
         )
-    }
     
-    public static var vent: Self {
+    public static var vent: Self =
         .init(
             id: "bundle-vent",
             name: "Assistant",
@@ -42,9 +41,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "Help me vent about something"),
             ]
         )
-    }
     
-    public static var learn: Self {
+    public static var learn: Self =
         .init(
             id: "bundle-learn",
             name: "Assistant",
@@ -55,9 +53,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "I want to learn about something new."),
             ]
         )
-    }
     
-    public static var brainstorm: Self {
+    public static var brainstorm: Self =
         .init(
             id: "bundle-brainstorm",
             name: "Assistant",
@@ -68,9 +65,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "I want to brainstorm ideas."),
             ]
         )
-    }
     
-    public static var advice: Self {
+    public static var advice: Self =
         .init(
             id: "bundle-advice",
             name: "Assistant",
@@ -81,9 +77,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "I need advice about something."),
             ]
         )
-    }
     
-    public static var anxious: Self {
+    public static var anxious: Self =
         .init(
             id: "bundle-anxious",
             name: "Assistant",
@@ -94,9 +89,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "I've been feeling anxious."),
             ]
         )
-    }
     
-    public static var philisophical: Self {
+    public static var philisophical: Self =
         .init(
             id: "bundle-philisophical",
             name: "Assistant",
@@ -107,9 +101,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "I want to get philisophical."),
             ]
         )
-    }
     
-    public static var discover: Self {
+    public static var discover: Self =
         .init(
             id: "bundle-discover",
             name: "Assistant",
@@ -120,9 +113,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "I want to discover new books, music or podcasts."),
             ]
         )
-    }
     
-    public static var coach: Self {
+    public static var coach: Self =
         .init(
             id: "bundle-coach",
             name: "Assistant",
@@ -133,9 +125,8 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "Coach me through a problem."),
             ]
         )
-    }
     
-    public static var journal: Self {
+    public static var journal: Self =
         .init(
             id: "bundle-journal",
             name: "Assistant",
@@ -146,5 +137,4 @@ extension Agent {
                 .init(kind: .instruction, role: .user, content: "Help me journal about my day."),
             ]
         )
-    }
 }

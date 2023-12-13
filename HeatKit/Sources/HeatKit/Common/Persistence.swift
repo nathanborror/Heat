@@ -38,10 +38,6 @@ final class DiskPersistence: Persistence {
     
     private init() {}
     
-    var documents: URL? {
-        try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-    }
-    
     func load<T: Codable>(objects filename: String) async throws -> [T] {
         guard let url = documents?.appending(path: filename, directoryHint: .notDirectory) else {
             return []
@@ -108,3 +104,6 @@ final class DiskPersistence: Persistence {
         }
     }
 }
+
+private let documents: URL? =
+    try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)

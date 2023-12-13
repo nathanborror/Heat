@@ -23,9 +23,8 @@ public final class Store {
     init(persistence: Persistence) {
         self.persistence = persistence
     }
-}
 
-extension Store {
+    // API
     
     public func generate(model: Model, prompt: String, system: String?, context: [Int]) async throws -> GenerateResponse {
         let payload = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
@@ -75,9 +74,8 @@ extension Store {
             await callback(response)
         }
     }
-}
 
-extension Store {
+    // Creators
     
     public func createAgent(name: String, tagline: String, picture: Media = .none, messages: [Message]) -> Agent {
         .init(name: name, tagline: tagline, picture: picture, messages: messages)
@@ -97,9 +95,8 @@ extension Store {
     public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
         return .init(kind: kind, role: role, content: content, done: done)
     }
-}
 
-extension Store {
+    // Getters
     
     public func get(modelID: String) -> Model? {
         models.first(where: { $0.id == modelID })
@@ -123,18 +120,16 @@ extension Store {
         }
         return nil
     }
-}
 
-@MainActor
-extension Store {
-    
-    public func upsert(models: [Model]) {
+    // Uperts
+
+    @MainActor public func upsert(models: [Model]) {
         for model in models {
             upsert(model: model)
         }
     }
     
-    public func upsert(model: Model) {
+    @MainActor public func upsert(model: Model) {
         if let index = models.firstIndex(where: { $0.id == model.name }) {
             let existing = models[index]
             models[index] = existing
@@ -143,7 +138,7 @@ extension Store {
         }
     }
     
-    public func upsert(modelDetails: ModelShowResponse, modelID: String) {
+    @MainActor public func upsert(modelDetails: ModelShowResponse, modelID: String) {
         if let index = models.firstIndex(where: { $0.id == modelID }) {
             var existing = models[index]
             existing.license = modelDetails.license
@@ -155,7 +150,7 @@ extension Store {
         }
     }
     
-    public func upsert(agent: Agent) {
+    @MainActor public func upsert(agent: Agent) {
         if let index = agents.firstIndex(where: { $0.id == agent.id }) {
             var agent = agent
             agent.modified = .now
@@ -165,7 +160,7 @@ extension Store {
         }
     }
     
-    public func upsert(conversation: Conversation) {
+    @MainActor public func upsert(conversation: Conversation) {
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
             var conversation = conversation
             conversation.modified = .now
@@ -175,7 +170,7 @@ extension Store {
         }
     }
     
-    public func upsert(message: Message, conversationID: String) {
+    @MainActor public func upsert(message: Message, conversationID: String) {
         guard var conversation = get(conversationID: conversationID) else { return }
         if let index = conversation.messages.firstIndex(where: { $0.id == message.id }) {
             var existing = conversation.messages[index]
@@ -189,25 +184,24 @@ extension Store {
         upsert(conversation: conversation)
     }
     
-    public func upsert(preferences: Preferences) {
+    @MainActor public func upsert(preferences: Preferences) {
         var preferences = preferences
         preferences.modified = .now
         self.preferences = preferences
         self.client = OllamaClient(host: self.preferences.host)
     }
     
-    public func set(state: Conversation.State, conversationID: String) {
+    @MainActor public func set(state: Conversation.State, conversationID: String) {
         guard var conversation = get(conversationID: conversationID) else { return }
         conversation.state = state
         upsert(conversation: conversation)
     }
     
-    public func delete(conversation: Conversation) {
+    @MainActor public func delete(conversation: Conversation) {
         conversations.removeAll(where: { $0.id == conversation.id })
     }
-}
 
-extension Store {
+    // Persistence
     
     static private var agentsJSON = "agents.json"
     static private var conversationsJSON = "conversations.json"
@@ -264,7 +258,7 @@ extension Store {
         self.client = OllamaClient(host: preferences.host)
     }
     
-    private var defaultAgents: [Agent] {
+    private var defaultAgents: [Agent] =
         [
             .assistant,
             .vent,
@@ -277,10 +271,8 @@ extension Store {
             .coach,
             .journal,
         ]
-    }
-}
 
-extension Store {
+    // Encoders
     
     private func encode(messages: [Message]) -> [OllamaKit.Message] {
         messages.map {
@@ -298,11 +290,10 @@ extension Store {
             return .user
         }
     }
-}
 
-extension Store {
+    // Previews
     
-    public static var preview: Store {
+    public static var preview: Store = {
         let store = Store.shared
         store.resetAll()
         
@@ -333,5 +324,5 @@ extension Store {
         let conversation = Conversation.preview
         store.conversations = [conversation]
         return store
-    }
+    }()
 }

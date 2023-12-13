@@ -34,7 +34,5 @@ extension Agent {
         .init(name: "", tagline: "", picture: .none, messages: [])
     }
     
-    public static var preview: Self {
-        .vent
-    }
+    public static var preview: Self = .vent
 }

@@ -29,7 +29,7 @@ public struct Model: Codable, Identifiable, Hashable {
 
 extension Model {
     
-    public static var preview: Self {
+    public static var preview: Self =
         .init(
             name: "mistral:instruct",
             size: 0,
@@ -57,5 +57,4 @@ extension Model {
             template: "[INST] {{ .System }} {{ .Prompt }} [/INST]\n",
             system: ""
         )
-    }
 }

@@ -8,9 +8,9 @@ public enum Filename {
     public var url: URL? {
         switch self {
         case .document(let filename):
-            return try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent(filename)
+            return documents?.appendingPathComponent(filename)
         case .cache(let filename):
-            return try? FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent(filename)
+            return caches?.appendingPathComponent(filename)
         case .bundle(let filename):
             let (name, ext) = splitFilename(filename)
             return Bundle.main.url(forResource: name, withExtension: ext)
@@ -35,3 +35,9 @@ public enum Filename {
         return (name, ext)
     }
 }
+
+private let documents: URL? =
+    try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+
+private let caches: URL? =
+    try? FileManager.default.url(for: .cachesDirectory, in: .userDomainMask, appropriateFor: nil, create: false)

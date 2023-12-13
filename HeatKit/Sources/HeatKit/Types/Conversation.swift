@@ -37,7 +37,7 @@ extension Conversation: Hashable {
 
 extension Conversation {
     
-    public static var preview: Self {
+    public static var preview: Self =
         .init(
             modelID: Model.preview.id,
             messages: Agent.preview.messages,
@@ -47,5 +47,4 @@ extension Conversation {
                 "I'm feeling down today",
             ]
         )
-    }
 }
