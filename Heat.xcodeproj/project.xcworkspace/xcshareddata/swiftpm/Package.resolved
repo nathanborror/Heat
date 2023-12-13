@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "ollamakit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/OllamaKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "6da0e5fa38ed1e569b5f9da187fa0143af680051"
+      }
+    }
+  ],
+  "version" : 2
+}

@@ -34,7 +34,6 @@
 		D41E19242AE45C9C002516C1 /* Heat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Heat.entitlements; sourceTree = "<group>"; };
 		D41E19262AE45C9C002516C1 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D41E192D2AE45CE2002516C1 /* HeatKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HeatKit; sourceTree = "<group>"; };
-		D41E192F2AE4623A002516C1 /* OllamaKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = OllamaKit; sourceTree = "<group>"; };
 		D41E19332AE46D60002516C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D41E19342AE4C665002516C1 /* AgentForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentForm.swift; sourceTree = "<group>"; };
 		D41E19382AE4C754002516C1 /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
@@ -71,7 +70,6 @@
 			children = (
 				D41E191D2AE45C9B002516C1 /* Heat */,
 				D41E192D2AE45CE2002516C1 /* HeatKit */,
-				D41E192F2AE4623A002516C1 /* OllamaKit */,
 				D4AA90D02AEAD6090010D714 /* Heat.app */,
 			);
 			sourceTree = "<group>";

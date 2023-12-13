@@ -15,7 +15,7 @@ let package = Package(
         .library(name: "HeatKit", targets: ["HeatKit"]),
     ],
     dependencies: [
-        .package(name: "OllamaKit", path: "../OllamaKit"),
+        .package(url: "https://github.com/nathanborror/OllamaKit", branch: "main"),
     ],
     targets: [
         .target(name: "HeatKit", dependencies: [
