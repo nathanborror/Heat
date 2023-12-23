@@ -7,7 +7,7 @@ public struct Preferences: Codable, Hashable {
     public var isSuggesting: Bool
     public var modified: Date
     
-    init(host: String = "127.0.0.1:8080") {
+    init(host: String = "http://127.0.0.1:8080") {
         self.host = host
         self.preferredModelID = ""
         self.isDebug = true

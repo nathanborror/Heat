@@ -22,7 +22,7 @@ struct PreferencesView: View {
             } header: {
                 Text("Host")
             } footer: {
-                Text("Example: 127.0.0.1:8080")
+                Text("Example: http://127.0.0.1:8080")
             }
             
             Section {
