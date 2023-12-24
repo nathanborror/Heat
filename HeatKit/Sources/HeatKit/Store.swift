@@ -5,6 +5,18 @@ import OllamaKit
 public enum StoreError: LocalizedError {
     case missingAgent
     case missingModel
+    case missingHost
+    
+    public var errorDescription: String? {
+        switch self {
+        case .missingAgent:
+            "Missing agent"
+        case .missingModel:
+            "Missing model"
+        case .missingHost:
+            "Missing host"
+        }
+    }
 }
 
 @Observable

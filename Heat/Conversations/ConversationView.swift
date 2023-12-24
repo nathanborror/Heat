@@ -8,7 +8,7 @@ struct ConversationView: View {
     @State private var composerText = ""
     @State private var composerState: ConversationComposerView.ViewState = .init()
     @State private var sheet: Sheet? = nil
-    @State private var isShowingError = false
+    @State private var isShowingServerAlert = false
     @State private var storeError: StoreError? = nil
     
     enum Sheet: String, Identifiable {
@@ -116,9 +116,9 @@ struct ConversationView: View {
             .environment(store)
             .environment(viewModel)
         }
-        .alert(isPresented: $isShowingError, error: storeError) { _ in
+        .alert(isPresented: $isShowingServerAlert, error: storeError) { _ in
             Button("Dismiss") {
-                self.isShowingError = false
+                self.isShowingServerAlert = false
                 self.storeError = nil
             }
         } message: { _ in
@@ -140,6 +140,16 @@ struct ConversationView: View {
     }
     
     func handleSelect(agent: Agent) {
+        guard store.preferences.host != nil else {
+            storeError = .missingHost
+            isShowingServerAlert = true
+            return
+        }
+        guard store.getPreferredModel() != nil else {
+            storeError = .missingModel
+            isShowingServerAlert = true
+            return
+        }
         Task {
             DispatchQueue.main.async {
                 composerState.change(.focused)
