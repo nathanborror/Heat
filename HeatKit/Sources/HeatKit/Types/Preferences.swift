@@ -1,14 +1,14 @@
 import Foundation
 
 public struct Preferences: Codable, Hashable {
-    public var host: String
+    public var host: URL?
     public var preferredModelID: String
     public var isDebug: Bool
     public var isSuggesting: Bool
     public var modified: Date
     
-    init(host: String = "http://127.0.0.1:8080") {
-        self.host = host
+    init() {
+        self.host = nil
         self.preferredModelID = ""
         self.isDebug = true
         self.isSuggesting = false

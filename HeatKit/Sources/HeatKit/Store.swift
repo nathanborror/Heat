@@ -12,15 +12,23 @@ public final class Store {
     
     public static let shared = Store(persistence: DiskPersistence.shared)
     
-    public private(set) var agents: [Agent] = []
-    public private(set) var conversations: [Conversation] = []
-    public private(set) var models: [Model] = []
-    public var preferences: Preferences = .init()
+    public private(set) var agents: [Agent]
+    public private(set) var conversations: [Conversation]
+    public private(set) var models: [Model]
+    public var preferences: Preferences
     
-    private var client = OllamaClient()
+    private var client: OllamaClient
     private var persistence: Persistence
     
     init(persistence: Persistence) {
+        self.agents = []
+        self.conversations = []
+        self.models = []
+        
+        let prefs = Preferences()
+        self.preferences = prefs
+        self.client = OllamaClient(url: prefs.host ?? .localhost)
+        
         self.persistence = persistence
     }
 
@@ -188,7 +196,7 @@ public final class Store {
         var preferences = preferences
         preferences.modified = .now
         self.preferences = preferences
-        self.client = OllamaClient(host: self.preferences.host)
+        self.resetClients()
     }
     
     @MainActor public func set(state: Conversation.State, conversationID: String) {
@@ -220,10 +228,10 @@ public final class Store {
                 self.conversations = conversations
                 self.models = models
                 self.preferences = preferences ?? self.preferences
-                self.client = OllamaClient(host: self.preferences.host)
+                self.resetClients()
             }
         } catch is DecodingError {
-            try await deleteAll()
+            try deleteAll()
         }
     }
     
@@ -234,7 +242,7 @@ public final class Store {
         try await persistence.save(filename: Self.preferencesJSON, object: preferences)
     }
     
-    public func deleteAll() async throws {
+    public func deleteAll() throws {
         try persistence.delete(filename: Self.agentsJSON)
         try persistence.delete(filename: Self.conversationsJSON)
         try persistence.delete(filename: Self.modelsJSON)
@@ -243,19 +251,20 @@ public final class Store {
     }
     
     public func resetAll() {
-        self.agents = defaultAgents
         self.conversations = []
         self.models = []
         self.preferences = .init()
-        self.client = OllamaClient(host: preferences.host)
+        
+        self.resetAgents()
+        self.resetClients()
     }
     
-    public func resetAgents() async throws {
+    public func resetAgents() {
         self.agents = defaultAgents
     }
     
     public func resetClients() {
-        self.client = OllamaClient(host: preferences.host)
+        self.client = OllamaClient(url: preferences.host ?? .localhost)
     }
     
     private var defaultAgents: [Agent] =

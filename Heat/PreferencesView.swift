@@ -7,12 +7,23 @@ struct PreferencesView: View {
 
     @FocusState private var isFocused: Bool
     
+    var bindingForHost: Binding<String> {
+        Binding<String>(
+            get: {
+                store.preferences.host?.absoluteString ?? ""
+            },
+            set: {
+                store.preferences.host = URL(string: $0)
+            }
+        )
+    }
+    
     var body: some View {
         @Bindable var store = store
         
         Form {
             Section {
-                TextField("Host Address", text: $store.preferences.host)
+                TextField("Host Address", text: bindingForHost)
                     .focused($isFocused)
                     .autocorrectionDisabled()
                     .textContentType(.URL)
@@ -22,33 +33,19 @@ struct PreferencesView: View {
             } header: {
                 Text("Host")
             } footer: {
-                Text("Example: http://127.0.0.1:8080")
+                Text(verbatim: "Example: http://localhost:8080")
             }
             
             Section {
-                Picker("Model", selection: $store.preferences.preferredModelID) {
+                Picker("Current Model", selection: $store.preferences.preferredModelID) {
                     Text("None").tag("")
                     ForEach(store.models) { model in
                         Text(model.name).tag(model.id)
                     }
                 }
-            } header: {
-                Text("Preferred Model")
-            }
-            
-            Section {
-                ForEach(store.models) { model in
-                    NavigationLink {
-                        ModelView(modelID: model.id)
-                    } label: {
-                        Text(model.name)
-                    }
+                NavigationLink("Models") {
+                    ModelList()
                 }
-                Button("Reload Models") {
-                    handelLoadModels()
-                }
-            } header: {
-                Text("Models")
             }
             
             Section {
@@ -71,20 +68,28 @@ struct PreferencesView: View {
         .frame(idealWidth: 400, idealHeight: 400)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Done", action: dismiss.callAsFunction)
+                Button("Done", action: handleDone)
             }
+        }
+        .refreshable {
+            handleLoadModels()
         }
         .onChange(of: store.preferences.host) { _, _ in
             store.resetClients()
         }
         .onAppear {
-            handelLoadModels()
+            handleLoadModels()
         }
+    }
+    
+    func handleDone() {
+        handleLoadModels()
+        dismiss()
     }
     
     func handleDeleteAll() {
         Task {
-            try await store.deleteAll()
+            try store.deleteAll()
             try await store.saveAll()
         }
         dismiss()
@@ -92,16 +97,14 @@ struct PreferencesView: View {
     
     func handleResetAgents() {
         Task {
-            try await store.resetAgents()
+            store.resetAgents()
             try await store.saveAll()
         }
         dismiss()
     }
     
-    func handelLoadModels() {
-        Task {
-            try await store.modelsLoad()
-        }
+    func handleLoadModels() {
+        Task { try await store.modelsLoad() }
     }
 }
 
