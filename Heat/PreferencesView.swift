@@ -1,5 +1,8 @@
 import SwiftUI
+import OSLog
 import HeatKit
+
+private let logger = Logger(subsystem: "PreferencesView", category: "Heat")
 
 struct PreferencesView: View {
     @Environment(Store.self) private var store
@@ -11,6 +14,24 @@ struct PreferencesView: View {
         @Bindable var store = store
         
         Form {
+            Section {
+                TextField("Host Address", text: Binding<String>(
+                        get: { store.preferences.host?.absoluteString ?? "" },
+                        set: { store.preferences.host = URL(string: $0) }
+                    )
+                )
+                .focused($isFocused)
+                .autocorrectionDisabled()
+                .textContentType(.URL)
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                #endif
+            } header: {
+                Text("Host")
+            } footer: {
+                Text(verbatim: "Example: http://localhost:8080")
+            }
+
             Section {
                 Picker("Current Model", selection: $store.preferences.preferredModelID) {
                     Text("None").tag("")
@@ -76,10 +97,8 @@ struct PreferencesView: View {
     }
     
     func handleLoadModels() {
-        guard let host = Bundle.main.infoDictionary?["OllamaHost"] as? String else {
-            return
-        }
-        guard let url = URL(string: host) else {
+        guard let url = store.preferences.host else {
+            logger.warning("missing ollama host url")
             return
         }
         Task {

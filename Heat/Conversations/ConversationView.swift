@@ -1,6 +1,9 @@
 import SwiftUI
+import OSLog
 import GenKit
 import HeatKit
+
+private let logger = Logger(subsystem: "ConversationView", category: "Heat")
 
 struct ConversationView: View {
     @Environment(Store.self) private var store
@@ -142,6 +145,11 @@ struct ConversationView: View {
     }
     
     func handleSelect(agent: Agent) {
+        guard let url = store.preferences.host else {
+            storeError = .missingHost
+            isShowingServerAlert = true
+            return
+        }
         guard let model = store.getPreferredModel() else {
             storeError = .missingModel
             isShowingServerAlert = true
@@ -159,7 +167,7 @@ struct ConversationView: View {
             }
             
             await MessageManager(messages: conversation.messages)
-                .generate(service: OllamaService.shared, model: conversation.modelID)
+                .generate(service: OllamaService(url: url), model: conversation.modelID)
                 .sink {
                     store.upsert(messages: $0, conversationID: conversation.id)
                     store.set(state: .none, conversationID: conversation.id)

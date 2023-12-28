@@ -1,6 +1,9 @@
 import SwiftUI
+import OSLog
 import HeatKit
 import GenKit
+
+private let logger = Logger(subsystem: "ConversationView", category: "Heat")
 
 @Observable
 final class ConversationViewModel {
@@ -36,13 +39,19 @@ final class ConversationViewModel {
     
     func generateResponse(content: String) {
         guard let conversationID = conversationID else { return }
+        guard let url = store.preferences.host else {
+            logger.warning("missing ollama host url")
+            return
+        }
         guard let model = model else { return }
         let message = Message(role: .user, content: content)
         
         generateTask = Task {
-            let manager = await MessageManager(messages: messages)
+            await MessageManager(messages: messages)
                 .append(message: message)
-                .generate(service: OllamaService.shared, model: model.name)
+                .sink { store.upsert(messages: $0, conversationID: conversationID) }
+                .generate(service: OllamaService(url: url), model: model.name)
+                .sink { store.upsert(messages: $0, conversationID: conversationID) }
         }
     }
     

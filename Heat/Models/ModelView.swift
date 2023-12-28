@@ -1,5 +1,8 @@
 import SwiftUI
+import OSLog
 import HeatKit
+
+private let logger = Logger(subsystem: "ModelView", category: "Heat")
 
 struct ModelView: View {
     @Environment(Store.self) private var store
@@ -68,10 +71,8 @@ struct ModelView: View {
     }
     
     func handleDetails(modelID: String) {
-        guard let host = Bundle.main.infoDictionary?["OllamaHost"] as? String else {
-            return
-        }
-        guard let url = URL(string: host) else {
+        guard let url = store.preferences.host else {
+            logger.warning("missing ollama host url")
             return
         }
         Task {

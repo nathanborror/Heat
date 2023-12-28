@@ -49,10 +49,8 @@ struct MainApp: App {
     }
     
     func handleModels() {
-        guard let host = Bundle.main.infoDictionary?["OllamaHost"] as? String else {
-            return
-        }
-        guard let url = URL(string: host) else {
+        guard let url = store.preferences.host else {
+            logger.warning("missing ollama host url")
             return
         }
         Task {
