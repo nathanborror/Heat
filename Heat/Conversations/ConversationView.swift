@@ -156,21 +156,15 @@ struct ConversationView: View {
             return
         }
         
-        let conversation = Conversation(modelID: model.id, messages: agent.messages, state: .processing)
+        let conversation = Conversation(modelID: model.id, messages: agent.messages)
         store.upsert(conversation: conversation)
-        
         viewModel.conversationID = conversation.id
+        messageInputState.change(.focused)
         
         Task {
-            DispatchQueue.main.async {
-                messageInputState.change(.focused)
-            }
-            
             await MessageManager(messages: conversation.messages)
-                .generate(service: OllamaService(url: url), model: conversation.modelID)
-                .sink {
-                    store.upsert(messages: $0, conversationID: conversation.id)
-                    store.set(state: .none, conversationID: conversation.id)
+                .generateStream(service: OllamaService(url: url), model: model.name) { messages in
+                    store.upsert(messages: messages, conversationID: conversation.id)
                 }
         }
     }

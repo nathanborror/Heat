@@ -50,8 +50,9 @@ final class ConversationViewModel {
             await MessageManager(messages: messages)
                 .append(message: message)
                 .sink { store.upsert(messages: $0, conversationID: conversationID) }
-                .generate(service: OllamaService(url: url), model: model.name)
-                .sink { store.upsert(messages: $0, conversationID: conversationID) }
+                .generateStream(service: OllamaService(url: url), model: model.name) { messages in
+                    store.upsert(messages: messages, conversationID: conversationID)
+                }
         }
     }
     
