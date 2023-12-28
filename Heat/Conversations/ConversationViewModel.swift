@@ -1,5 +1,6 @@
 import SwiftUI
 import HeatKit
+import GenKit
 
 @Observable
 final class ConversationViewModel {
@@ -7,8 +8,6 @@ final class ConversationViewModel {
     
     var conversationID: String?
 
-    private var generateTask: Task<(), Error>? = nil
-    
     init(store: Store, chatID: String? = nil) {
         self.store = store
         self.conversationID = conversationID
@@ -29,36 +28,27 @@ final class ConversationViewModel {
         return conversation.messages.filter { $0.kind != .instruction }
     }
     
-    var suggestions: [String] {
-        conversation?.suggestions ?? []
-    }
-    
     func change(model: Model) {
-        Task {
-            guard var conversation = conversation else { return }
-            conversation.modelID = model.id
-            await store.upsert(conversation: conversation)
-        }
+        guard var conversation = conversation else { return }
+        conversation.modelID = model.id
+        store.upsert(conversation: conversation)
     }
     
-    func generateResponse(_ text: String) {
+    func generateResponse(content: String) {
         guard let conversationID = conversationID else { return }
-        let message = store.createMessage(role: .user, content: text)
+        guard let model = model else { return }
+        let message = Message(role: .user, content: content)
         
         generateTask = Task {
-            let manager = try await ConversationManager(store: store, conversationID: conversationID)
-                .clearSuggestions()
-                .append(message)
-                .generateStream()
-            
-            if store.preferences.isSuggesting {
-                try await manager
-                    .generateSuggestions()
-            }
+            let manager = await MessageManager(messages: messages)
+                .append(message: message)
+                .generate(service: OllamaService.shared, model: model.name)
         }
     }
     
     func cancel() {
         generateTask?.cancel()
     }
+    
+    private var generateTask: Task<(), Error>? = nil
 }

@@ -1,4 +1,6 @@
 import Foundation
+import SharedKit
+import GenKit
 
 public struct Agent: Codable, Identifiable {
     public var id: String
@@ -9,7 +11,7 @@ public struct Agent: Codable, Identifiable {
     public var created: Date
     public var modified: Date
     
-    init(id: String = UUID().uuidString, name: String, tagline: String, picture: Media, messages: [Message]) {
+    public init(id: String = .id, name: String, tagline: String, picture: Media, messages: [Message] = []) {
         self.id = id
         self.name = name
         self.tagline = tagline
@@ -31,7 +33,7 @@ extension Agent: Hashable {
 extension Agent {
 
     public static var empty: Self {
-        .init(name: "", tagline: "", picture: .none, messages: [])
+        .init(name: "", tagline: "", picture: .none)
     }
     
     public static var preview: Self = .vent

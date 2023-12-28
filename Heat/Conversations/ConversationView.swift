@@ -1,12 +1,14 @@
 import SwiftUI
+import GenKit
 import HeatKit
 
 struct ConversationView: View {
     @Environment(Store.self) private var store
     @Environment(ConversationViewModel.self) private var viewModel
 
-    @State private var composerText = ""
-    @State private var composerState: ConversationComposerView.ViewState = .init()
+    @State private var messageInputText = ""
+    @State private var messageInputState: MessageInputViewState = .init()
+    
     @State private var sheet: Sheet? = nil
     @State private var isShowingServerAlert = false
     @State private var storeError: StoreError? = nil
@@ -49,12 +51,12 @@ struct ConversationView: View {
         #endif
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom, alignment: .center) {
-            ConversationComposerView(
-                text: $composerText,
-                state: composerState,
+            MessageInput(
+                text: $messageInputText,
                 submit: viewModel.generateResponse,
                 stop: viewModel.cancel
             )
+            .environment(messageInputState)
             .padding(.vertical, 8)
             .background(.background)
         }
@@ -136,35 +138,32 @@ struct ConversationView: View {
     
     func handleNewConversation() {
         viewModel.conversationID = nil
-        composerState.change(.resting)
+        messageInputState.change(.resting)
     }
     
     func handleSelect(agent: Agent) {
-        guard store.preferences.host != nil else {
-            storeError = .missingHost
-            isShowingServerAlert = true
-            return
-        }
-        guard store.getPreferredModel() != nil else {
+        guard let model = store.getPreferredModel() else {
             storeError = .missingModel
             isShowingServerAlert = true
             return
         }
+        
+        let conversation = Conversation(modelID: model.id, messages: agent.messages, state: .processing)
+        store.upsert(conversation: conversation)
+        
+        viewModel.conversationID = conversation.id
+        
         Task {
             DispatchQueue.main.async {
-                composerState.change(.focused)
+                messageInputState.change(.focused)
             }
             
-            let manager = try await ConversationManager(store: store)
-                .initialize(agentID: agent.id) { conversationID in
-                    viewModel.conversationID = conversationID
+            await MessageManager(messages: conversation.messages)
+                .generate(service: OllamaService.shared, model: conversation.modelID)
+                .sink {
+                    store.upsert(messages: $0, conversationID: conversation.id)
+                    store.set(state: .none, conversationID: conversation.id)
                 }
-                .generateStream()
-            
-            if store.preferences.isSuggesting {
-                try await manager
-                    .generateSuggestions()
-            }
         }
     }
     
@@ -210,21 +209,13 @@ struct ChatHistoryView: View {
             
             // Message list
             ForEach(viewModel.messages) { message in
-                ConversationMessageContainerView(message: message)
+                MessageBubble(message: message)
             }
             
             // Indicators and suggestions
             if let conversation = viewModel.conversation {
                 if conversation.state == .processing {
-                    ConversationTypingIndicatorView(.leading)
-                }
-                if conversation.state == .suggesting {
-                    ConversationTypingIndicatorView(.trailing)
-                }
-                if viewModel.suggestions.count > 0 {
-                    ConversationSuggestionsView(suggestions: viewModel.suggestions) { suggestion in
-                        viewModel.generateResponse(suggestion)
-                    }
+                    TypingIndicator(.leading)
                 }
             }
         }

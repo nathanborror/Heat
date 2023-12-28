@@ -1,12 +1,39 @@
 {
   "pins" : [
     {
+      "identity" : "genkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/GenKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "d1a747668101226afeacdd46e0cc42a06dc6d69b"
+      }
+    },
+    {
       "identity" : "ollamakit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/OllamaKit",
       "state" : {
         "branch" : "main",
         "revision" : "425999a794c453af4b53121d903c8894e0f167ab"
+      }
+    },
+    {
+      "identity" : "openai",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/OpenAI",
+      "state" : {
+        "branch" : "main",
+        "revision" : "5c6d5556b79e670c027c27b3b071ae0baa780906"
+      }
+    },
+    {
+      "identity" : "sharedkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/SharedKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b8fcd93637acfe9ce6b46dcefebdba2f15dade07"
       }
     }
   ],

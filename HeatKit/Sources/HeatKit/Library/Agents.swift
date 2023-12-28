@@ -23,7 +23,7 @@ extension Agent {
             id: "bundle-assistant",
             name: "Assistant",
             tagline: "",
-            picture: .bundle("Covers/Sky"),
+            picture: .bundle(.image("Covers/Sky")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Introduce yourself"),
@@ -35,7 +35,7 @@ extension Agent {
             id: "bundle-vent",
             name: "Assistant",
             tagline: "Vent about your day",
-            picture: .bundle("Covers/Sunrise"),
+            picture: .bundle(.image("Covers/Sunrise")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Help me vent about something"),
@@ -47,7 +47,7 @@ extension Agent {
             id: "bundle-learn",
             name: "Assistant",
             tagline: "Learn about something new",
-            picture: .bundle("Covers/Structure"),
+            picture: .bundle(.image("Covers/Structure")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to learn about something new."),
@@ -59,7 +59,7 @@ extension Agent {
             id: "bundle-brainstorm",
             name: "Assistant",
             tagline: "Brainstorm ideas",
-            picture: .bundle("Covers/Dunes"),
+            picture: .bundle(.image("Covers/Dunes")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to brainstorm ideas."),
@@ -71,7 +71,7 @@ extension Agent {
             id: "bundle-advice",
             name: "Assistant",
             tagline: "Get advice",
-            picture: .bundle("Covers/SeaSunrise"),
+            picture: .bundle(.image("Covers/SeaSunrise")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I need advice about something."),
@@ -83,7 +83,7 @@ extension Agent {
             id: "bundle-anxious",
             name: "Assistant",
             tagline: "Feeling anxious",
-            picture: .bundle("Covers/Clouds"),
+            picture: .bundle(.image("Covers/Clouds")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I've been feeling anxious."),
@@ -95,7 +95,7 @@ extension Agent {
             id: "bundle-philisophical",
             name: "Assistant",
             tagline: "Get philisophical",
-            picture: .bundle("Covers/Cube"),
+            picture: .bundle(.image("Covers/Cube")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to get philisophical."),
@@ -107,7 +107,7 @@ extension Agent {
             id: "bundle-discover",
             name: "Assistant",
             tagline: "Discover books or music",
-            picture: .bundle("Covers/Bubbles"),
+            picture: .bundle(.image("Covers/Bubbles")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to discover new books, music or podcasts."),
@@ -119,7 +119,7 @@ extension Agent {
             id: "bundle-coach",
             name: "Assistant",
             tagline: "Help me through a problem",
-            picture: .bundle("Covers/Hallway"),
+            picture: .bundle(.image("Covers/Hallway")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Coach me through a problem."),
@@ -131,7 +131,7 @@ extension Agent {
             id: "bundle-journal",
             name: "Assistant",
             tagline: "Journal about your day",
-            picture: .bundle("Covers/Path"),
+            picture: .bundle(.image("Covers/Path")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Help me journal about my day."),

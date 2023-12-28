@@ -13,7 +13,7 @@ public struct Model: Codable, Identifiable, Hashable {
     public var template: String?
     public var system: String?
     
-    init(name: String, size: Int64, digest: String,
+    public init(name: String, size: Int64, digest: String,
          license: String? = nil, modelfile: String? = nil, parameters: String? = nil, template: String? = nil, system: String? = nil) {
         self.name = name
         self.size = size

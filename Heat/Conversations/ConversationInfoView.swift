@@ -36,11 +36,6 @@ struct ConversationInfoView: View {
                 }
             }
         }
-        .onAppear {
-            Task {
-                try await store.modelsLoad()
-            }
-        }
     }
     
     func handleSelection(_ model: Model) {

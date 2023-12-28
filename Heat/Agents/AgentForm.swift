@@ -1,4 +1,5 @@
 import SwiftUI
+import GenKit
 import HeatKit
 
 struct AgentForm: View {
@@ -17,14 +18,19 @@ struct AgentForm: View {
                 TextField("Tagline", text: $agent.tagline)
             }
             
-            ForEach($agent.messages) { message in
+            ForEach($agent.messages.indices, id: \.self) { index in
                 Section {
-                    Picker("Role", selection: message.role) {
+                    Picker("Role", selection: $agent.messages[index].role) {
                         Text("System").tag(Message.Role.system)
                         Text("Assistant").tag(Message.Role.assistant)
                         Text("User").tag(Message.Role.user)
                     }
-                    TextField("Content", text: message.content, axis: .vertical)
+
+                    // Custom binding for handling optional string
+                    TextField("Content", text: Binding<String>(
+                        get: { self.agent.messages[index].content ?? "" },
+                        set: { self.agent.messages[index].content = $0.isEmpty ? nil : $0 }
+                    ), axis: .vertical)
                 }
             }
             
@@ -47,7 +53,7 @@ struct AgentForm: View {
     }
     
     func handleDone() {
-        Task { await store.upsert(agent: agent) }
+        store.upsert(agent: agent)
         dismiss()
     }
     
@@ -57,7 +63,7 @@ struct AgentForm: View {
             switch lastMessage.role {
             case .system:
                 message = Message(kind: .instruction, role: .assistant)
-            case .assistant:
+            case .assistant, .tool:
                 message = Message(kind: .instruction, role: .user)
             case .user:
                 message = Message(kind: .instruction, role: .assistant)

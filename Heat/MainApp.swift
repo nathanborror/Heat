@@ -31,7 +31,7 @@ struct MainApp: App {
         Task {
             do {
                 try await store.restore()
-                try await store.modelsLoad()
+                handleModels()
             } catch {
                 logger.error("Persistence Restore: \(error, privacy: .public)")
             }
@@ -46,5 +46,19 @@ struct MainApp: App {
     func handlePhaseChange() {
         guard scenePhase == .background else { return }
         Task { await handleSave() }
+    }
+    
+    func handleModels() {
+        guard let host = Bundle.main.infoDictionary?["OllamaHost"] as? String else {
+            return
+        }
+        guard let url = URL(string: host) else {
+            return
+        }
+        Task {
+            await ModelManager(url: url, models: store.models)
+                .refresh()
+                .sink { store.upsert(models: $0) }
+        }
     }
 }

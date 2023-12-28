@@ -15,11 +15,13 @@ let package = Package(
         .library(name: "HeatKit", targets: ["HeatKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/nathanborror/OllamaKit", branch: "main"),
+        .package(url: "https://github.com/nathanborror/SharedKit", branch: "main"),
+        .package(url: "https://github.com/nathanborror/GenKit", branch: "main"),
     ],
     targets: [
         .target(name: "HeatKit", dependencies: [
-            .product(name: "OllamaKit", package: "OllamaKit"),
+            .product(name: "SharedKit", package: "SharedKit"),
+            .product(name: "GenKit", package: "GenKit"),
         ]),
         .testTarget(name: "HeatKitTests", dependencies: ["HeatKit"]),
     ]

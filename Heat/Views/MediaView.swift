@@ -1,41 +1,46 @@
 import SwiftUI
-import HeatKit
+import GenKit
+import SharedKit
 
-struct PictureView: View {
-    @Environment(Store.self) private var store
-    
-    var picture: Media
-    
-    @State var scale: Double = 1.0
-    @State var offsetX: Double = 0.0
-    @State var offsetY: Double = 0.0
-    
+struct MediaView: View {
+    let media: Media
+        
     var body: some View {
         GeometryReader { geo in
-            switch picture {
-            case .bundle(let name):
-                Image(name)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: geo.size.width, height: geo.size.height)
-                    .scaleEffect(scale, anchor: .top)
-                    .offset(x: offsetX, y: offsetY)
-            case .video(let name):
-                VideoView(name: name)
-                    .frame(width: geo.size.width, height: geo.size.height)
-                    .scaleEffect(scale, anchor: .top)
-                    .offset(x: offsetX, y: offsetY)
-            case .filesystem(let name):
-                AsyncImage(url: Filename.document(name).url!, content: { image in
-                    image
+            switch media {
+            case .document(let mediaType):
+                switch mediaType {
+                case .image(let name):
+                    AsyncImage(url: Resource.document(name).url!, content: { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geo.size.width, height: geo.size.height)
+                    }, placeholder: {
+                        Rectangle()
+                            .frame(width: geo.size.width, height: geo.size.height)
+                    })
+                case .video(let name):
+                    VideoView(name: name)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                case .audio:
+                    EmptyView()
+                }
+            case .bundle(let mediaType):
+                switch mediaType {
+                case .image(let name):
+                    Image(name)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: geo.size.width, height: geo.size.height)
-                }, placeholder: {
-                    Rectangle()
+                case .video(let name):
+                    VideoView(name: name)
                         .frame(width: geo.size.width, height: geo.size.height)
-                })
-            case .color(let hex):
+                case .audio:
+                    EmptyView()
+                }
+
+            case .color(let colorHexValue):
                 ZStack {
                     Image("sparkle")
                         .resizable()
@@ -43,17 +48,8 @@ struct PictureView: View {
                         .frame(width: geo.size.width/2, height: geo.size.width/2)
                 }
                 .frame(width: geo.size.width, height: geo.size.height)
-                .background(Color(hex: hex))
-            case .systemIcon(let systemName, let hex):
-                ZStack {
-                    Image(systemName: systemName)
-                        .resizable()
-                        .foregroundStyle(.white)
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geo.size.width/2.5, height: geo.size.width/2.5)
-                }
-                .frame(width: geo.size.width, height: geo.size.height)
-                .background(Color(hex: hex))
+                .background(Color(hex: colorHexValue))
+
             case .data(let data):
                 #if os(macOS)
                 if let image = NSImage(data: data) {
@@ -78,6 +74,18 @@ struct PictureView: View {
                         .frame(width: geo.size.width, height: geo.size.height)
                 }
                 #endif
+
+            case .symbol(let symbolSystemName, let colorHexValue):
+                ZStack {
+                    Image(systemName: symbolSystemName)
+                        .resizable()
+                        .foregroundStyle(.white)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: geo.size.width/2.5, height: geo.size.width/2.5)
+                }
+                .frame(width: geo.size.width, height: geo.size.height)
+                .background(Color(hex: colorHexValue))
+                
             case .none:
                 Rectangle()
                     .fill(.secondary)

@@ -1,4 +1,6 @@
 import Foundation
+import SharedKit
+import GenKit
 
 public struct Conversation: Codable, Identifiable {
     public var id: String
@@ -16,11 +18,13 @@ public struct Conversation: Codable, Identifiable {
         case none
     }
     
-    init(id: String = UUID().uuidString, modelID: String, messages: [Message] = [], suggestions: [String]? = nil) {
+    public init(id: String = .id, modelID: String, messages: [Message] = [], suggestions: [String]? = nil, 
+                state: State = .none) {
         self.id = id
         self.modelID = modelID
         self.messages = messages
         self.suggestions = suggestions
+        self.state = state
         self.state = .none
         self.created = .now
         self.modified = .now

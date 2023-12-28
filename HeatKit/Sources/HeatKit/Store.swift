@@ -1,23 +1,10 @@
 import Foundation
+import OSLog
 import Observation
-import OllamaKit
+import GenKit
+import SharedKit
 
-public enum StoreError: LocalizedError {
-    case missingAgent
-    case missingModel
-    case missingHost
-    
-    public var errorDescription: String? {
-        switch self {
-        case .missingAgent:
-            "Missing agent"
-        case .missingModel:
-            "Missing model"
-        case .missingHost:
-            "Missing host"
-        }
-    }
-}
+private let logger = Logger(subsystem: "Store", category: "HeatKit")
 
 @Observable
 public final class Store {
@@ -29,7 +16,6 @@ public final class Store {
     public private(set) var models: [Model]
     public var preferences: Preferences
     
-    private var client: OllamaClient
     private var persistence: Persistence
     
     init(persistence: Persistence) {
@@ -39,81 +25,8 @@ public final class Store {
         
         let prefs = Preferences()
         self.preferences = prefs
-        self.client = OllamaClient(url: prefs.host ?? .localhost)
         
         self.persistence = persistence
-    }
-
-    // API
-    
-    public func generate(model: Model, prompt: String, system: String?, context: [Int]) async throws -> GenerateResponse {
-        let payload = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
-        let response = try await client.generate(payload)
-        return response
-    }
-    
-    public func generateStream(model: Model, prompt: String, system: String?, context: [Int], callback: (GenerateResponse) async -> Void) async throws {
-        let payload = GenerateRequest(model: model.name, prompt: prompt, system: system, context: context)
-        for try await response in client.generateStream(payload) {
-            await callback(response)
-        }
-    }
-    
-    public func chat(model: Model, messages: [Message], format: String? = nil) async throws -> ChatResponse {
-        let payload = ChatRequest(model: model.name, messages: encode(messages: messages), format: format)
-        let response = try await client.chat(payload)
-        return response
-    }
-    
-    public func chatStream(model: Model, messages: [Message], format: String? = nil, callback: (ChatResponse) async throws -> Void) async throws {
-        let payload = ChatRequest(model: model.name, messages: encode(messages: messages), stream: true, format: format)
-        for try await response in client.chatStream(payload) {
-            try await callback(response)
-        }
-    }
-    
-    public func modelsLoad() async throws {
-        let resp = try await client.modelList()
-        let models = resp.models.map { Model(name: $0.name, size: $0.size, digest: $0.digest) }
-        await upsert(models: models)
-    }
-    
-    public func modelShow(modelID: String) async throws {
-        let payload = ModelShowRequest(name: modelID)
-        do {
-            let modelDetails = try await client.modelShow(payload)
-            await upsert(modelDetails: modelDetails, modelID: modelID)
-        } catch {
-            print(error)
-        }
-    }
-    
-    public func modelPull(name: String, callback: (ProgressResponse) async -> Void) async throws {
-        let payload = ModelPullRequest(name: name)
-        for try await response in client.modelPull(payload) {
-            await callback(response)
-        }
-    }
-
-    // Creators
-    
-    public func createAgent(name: String, tagline: String, picture: Media = .none, messages: [Message]) -> Agent {
-        .init(name: name, tagline: tagline, picture: picture, messages: messages)
-    }
-    
-    public func createConversation(agentID: String? = nil) throws -> Conversation {
-        var messages: [Message] = []
-        if let agentID = agentID, let agent = get(agentID: agentID) {
-            messages = agent.messages
-        }
-        guard let model = getPreferredModel() else {
-            throw StoreError.missingModel
-        }
-        return Conversation(modelID: model.id, messages: messages)
-    }
-    
-    public func createMessage(kind: Message.Kind = .none, role: Message.Role, content: String, done: Bool = true) -> Message {
-        return .init(kind: kind, role: role, content: content, done: done)
     }
 
     // Getters
@@ -142,35 +55,12 @@ public final class Store {
     }
 
     // Uperts
-
-    @MainActor public func upsert(models: [Model]) {
-        for model in models {
-            upsert(model: model)
-        }
+    
+    public func upsert(models: [Model]) {
+        self.models = models
     }
     
-    @MainActor public func upsert(model: Model) {
-        if let index = models.firstIndex(where: { $0.id == model.name }) {
-            let existing = models[index]
-            models[index] = existing
-        } else {
-            models.append(model)
-        }
-    }
-    
-    @MainActor public func upsert(modelDetails: ModelShowResponse, modelID: String) {
-        if let index = models.firstIndex(where: { $0.id == modelID }) {
-            var existing = models[index]
-            existing.license = modelDetails.license
-            existing.modelfile = modelDetails.modelfile
-            existing.parameters = modelDetails.parameters
-            existing.template = modelDetails.template
-            existing.system = modelDetails.system
-            models[index] = existing
-        }
-    }
-    
-    @MainActor public func upsert(agent: Agent) {
+    public func upsert(agent: Agent) {
         if let index = agents.firstIndex(where: { $0.id == agent.id }) {
             var agent = agent
             agent.modified = .now
@@ -180,23 +70,34 @@ public final class Store {
         }
     }
     
-    @MainActor public func upsert(conversation: Conversation) {
+    public func upsert(conversation: Conversation) {
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
-            var conversation = conversation
-            conversation.modified = .now
-            conversations[index] = conversation
+            var existing = conversations[index]
+            existing.messages = conversation.messages
+            existing.state = conversation.state
+            existing.modified = .now
+            conversations[index] = existing
         } else {
             conversations.insert(conversation, at: 0)
         }
     }
     
-    @MainActor public func upsert(message: Message, conversationID: String) {
-        guard var conversation = get(conversationID: conversationID) else { return }
+    public func upsert(messages: [Message], conversationID: String) {
+        guard var conversation = get(conversationID: conversationID) else {
+            logger.warning("missing conversation")
+            return
+        }
+        conversation.messages = messages
+        upsert(conversation: conversation)
+    }
+    
+    public func upsert(message: Message, conversationID: String) {
+        guard var conversation = get(conversationID: conversationID) else {
+            logger.warning("missing conversation")
+            return
+        }
         if let index = conversation.messages.firstIndex(where: { $0.id == message.id }) {
-            var existing = conversation.messages[index]
-            existing.content += message.content
-            existing.done = message.done
-            existing.modified = .now
+            let existing = conversation.messages[index].apply(message)
             conversation.messages[index] = existing
         } else {
             conversation.messages.append(message)
@@ -204,20 +105,19 @@ public final class Store {
         upsert(conversation: conversation)
     }
     
-    @MainActor public func upsert(preferences: Preferences) {
+    public func upsert(preferences: Preferences) {
         var preferences = preferences
         preferences.modified = .now
         self.preferences = preferences
-        self.resetClients()
     }
     
-    @MainActor public func set(state: Conversation.State, conversationID: String) {
+    public func set(state: Conversation.State, conversationID: String) {
         guard var conversation = get(conversationID: conversationID) else { return }
         conversation.state = state
         upsert(conversation: conversation)
     }
     
-    @MainActor public func delete(conversation: Conversation) {
+    public func delete(conversation: Conversation) {
         conversations.removeAll(where: { $0.id == conversation.id })
     }
 
@@ -240,7 +140,6 @@ public final class Store {
                 self.conversations = conversations
                 self.models = models
                 self.preferences = preferences ?? self.preferences
-                self.resetClients()
             }
         } catch is DecodingError {
             try deleteAll()
@@ -266,17 +165,11 @@ public final class Store {
         self.conversations = []
         self.models = []
         self.preferences = .init()
-        
         self.resetAgents()
-        self.resetClients()
     }
     
     public func resetAgents() {
         self.agents = defaultAgents
-    }
-    
-    public func resetClients() {
-        self.client = OllamaClient(url: preferences.host ?? .localhost)
     }
     
     private var defaultAgents: [Agent] =
@@ -292,25 +185,6 @@ public final class Store {
             .coach,
             .journal,
         ]
-
-    // Encoders
-    
-    private func encode(messages: [Message]) -> [OllamaKit.Message] {
-        messages.map {
-            OllamaKit.Message(role: encode(role: $0.role), content: $0.content)
-        }
-    }
-    
-    private func encode(role: Message.Role) -> OllamaKit.Message.Role {
-        switch role {
-        case .system:
-            return .system
-        case .assistant:
-            return .assistant
-        case .user:
-            return .user
-        }
-    }
 
     // Previews
     
@@ -346,4 +220,21 @@ public final class Store {
         store.conversations = [conversation]
         return store
     }()
+}
+
+public enum StoreError: LocalizedError {
+    case missingAgent
+    case missingModel
+    case missingHost
+    
+    public var errorDescription: String? {
+        switch self {
+        case .missingAgent:
+            "Missing agent"
+        case .missingModel:
+            "Missing model"
+        case .missingHost:
+            "Missing host"
+        }
+    }
 }

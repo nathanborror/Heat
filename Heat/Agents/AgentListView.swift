@@ -53,7 +53,7 @@ struct AgentTile: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            PictureView(picture: agent.picture)
+            MediaView(media: agent.picture)
                 .frame(height: height)
                 .clipShape(.rect(cornerRadius: 8, style: .continuous))
             VStack(alignment: .leading) {

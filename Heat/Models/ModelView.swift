@@ -63,7 +63,22 @@ struct ModelView: View {
         }
         .navigationTitle("Model")
         .onAppear {
-            Task { try await store.modelShow(modelID: modelID) }
+            handleDetails(modelID: modelID)
+        }
+    }
+    
+    func handleDetails(modelID: String) {
+        guard let host = Bundle.main.infoDictionary?["OllamaHost"] as? String else {
+            return
+        }
+        guard let url = URL(string: host) else {
+            return
+        }
+        Task {
+            await ModelManager(url: url, models: store.models)
+                .refresh()
+                .details(for: modelID)
+                .sink { store.upsert(models: $0) }
         }
     }
 }

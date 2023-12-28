@@ -7,35 +7,10 @@ struct PreferencesView: View {
 
     @FocusState private var isFocused: Bool
     
-    var bindingForHost: Binding<String> {
-        Binding<String>(
-            get: {
-                store.preferences.host?.absoluteString ?? ""
-            },
-            set: {
-                store.preferences.host = URL(string: $0)
-            }
-        )
-    }
-    
     var body: some View {
         @Bindable var store = store
         
         Form {
-            Section {
-                TextField("Host Address", text: bindingForHost)
-                    .focused($isFocused)
-                    .autocorrectionDisabled()
-                    .textContentType(.URL)
-                    #if os(iOS)
-                    .textInputAutocapitalization(.never)
-                    #endif
-            } header: {
-                Text("Host")
-            } footer: {
-                Text(verbatim: "Example: http://localhost:8080")
-            }
-            
             Section {
                 Picker("Current Model", selection: $store.preferences.preferredModelID) {
                     Text("None").tag("")
@@ -74,9 +49,6 @@ struct PreferencesView: View {
         .refreshable {
             handleLoadModels()
         }
-        .onChange(of: store.preferences.host) { _, _ in
-            store.resetClients()
-        }
         .onAppear {
             handleLoadModels()
         }
@@ -104,7 +76,17 @@ struct PreferencesView: View {
     }
     
     func handleLoadModels() {
-        Task { try await store.modelsLoad() }
+        guard let host = Bundle.main.infoDictionary?["OllamaHost"] as? String else {
+            return
+        }
+        guard let url = URL(string: host) else {
+            return
+        }
+        Task {
+            await ModelManager(url: url, models: store.models)
+                .refresh()
+                .sink { store.upsert(models: $0) }
+        }
     }
 }
 

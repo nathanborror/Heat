@@ -1,51 +1,52 @@
 import SwiftUI
 
-struct ConversationComposerView: View {
-    
-    class ViewState: ObservableObject {
-        enum State: Equatable {
-            case resting
-            case focused
-            case drafting
-            case streaming
-        }
-        
-        @Published private(set) var current: State = .resting
-        @Published private(set) var previous: State? = nil
-        
-        func change(_ state: State) {
-            guard state != current else { return }
-            previous = current
-            current = state
-        }
-        
-        func back() {
-            current = previous ?? .resting
-            previous = nil
-        }
+@Observable
+final class MessageInputViewState {
+    enum State: Equatable {
+        case resting
+        case focused
+        case drafting
+        case streaming
     }
     
-    @Binding var text: String
+    private(set) var current: State = .resting
+    private(set) var previous: State? = nil
     
-    @ObservedObject var state: ViewState
+    func change(_ state: State) {
+        guard state != current else { return }
+        previous = current
+        current = state
+    }
+    
+    func back() {
+        current = previous ?? .resting
+        previous = nil
+    }
+}
+
+struct MessageInput: View {
+    @Environment(MessageInputViewState.self) var viewState
+    
+    @Binding var text: String
     
     var submit: (String) -> Void
     var stop: () -> Void
     
     var body: some View {
         HStack {
-            ComposerInput(state: state, text: $text)
+            MessageField(text: $text)
                 .onSubmit(handleSubmitFromKeyboard)
             
-            switch state.current {
+            switch viewState.current {
             case .drafting:
-                SubmitButton(state: state, action: handleSubmit)
+                MessageSubmitButton(action: handleSubmit)
             case .streaming:
-                StopButton(state: state, action: handleStop)
+                MessageStopButton(action: handleStop)
             default:
                 EmptyView()
             }
         }
+        .environment(viewState)
         .padding(.horizontal)
     }
     
@@ -74,8 +75,11 @@ struct ConversationComposerView: View {
     }
 }
 
-struct ComposerInput: View {
-    @ObservedObject var state: ConversationComposerView.ViewState
+// MARK: Private
+
+private struct MessageField: View {
+    @Environment(MessageInputViewState.self) var viewState
+    
     @Binding var text: String
     
     @FocusState var focused: Bool
@@ -97,17 +101,17 @@ struct ComposerInput: View {
         }
         .onChange(of: text) { _, newValue in
             if !newValue.isEmpty {
-                state.change(.drafting)
+                viewState.change(.drafting)
             }
         }
         .onChange(of: focused) { _, newValue in
             if newValue {
-                state.change(text.isEmpty ? .focused : .drafting)
+                viewState.change(text.isEmpty ? .focused : .drafting)
             } else {
-                state.change(text.isEmpty ? .resting : .drafting)
+                viewState.change(text.isEmpty ? .resting : .drafting)
             }
         }
-        .onChange(of: state.current) { _, newValue in
+        .onChange(of: viewState.current) { _, newValue in
             switch newValue {
             case .resting:
                 focused = false
@@ -126,12 +130,13 @@ struct ComposerInput: View {
     #endif
 }
 
-struct SubmitButton: View {
-    @ObservedObject var state: ConversationComposerView.ViewState
+private struct MessageSubmitButton: View {
+    @Environment(MessageInputViewState.self) var viewState
+    
     var action: () -> Void
     
     var body: some View {
-        ComposerActionButton(symbol: "arrow.up", action: action)
+        MessageActionButton(symbol: "arrow.up", action: action)
             .fontWeight(.bold)
             .tint(.secondary)
             .background(.tint)
@@ -141,12 +146,13 @@ struct SubmitButton: View {
     }
 }
 
-struct StopButton: View {
-    @ObservedObject var state: ConversationComposerView.ViewState
+private struct MessageStopButton: View {
+    @Environment(MessageInputViewState.self) var viewState
+    
     var action: () -> Void
     
     var body: some View {
-        ComposerActionButton(symbol: "stop.fill", action: action)
+        MessageActionButton(symbol: "stop.fill", action: action)
             .fontWeight(.bold)
             .background(.tint.opacity(0.2))
             .foregroundStyle(.tint)
@@ -155,7 +161,7 @@ struct StopButton: View {
     }
 }
 
-struct ComposerActionButton: View {
+private struct MessageActionButton: View {
     let symbol: String
     let action: () -> Void
     
