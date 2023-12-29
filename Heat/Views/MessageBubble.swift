@@ -42,7 +42,10 @@ struct MessageBubbleStyle: ViewModifier {
                 .padding(.vertical, paddingVertical)
                 .foregroundStyle(foregroundColor)
                 .font(.footnote)
-        case .assistant, .user:
+        case .assistant:
+            content
+                .padding(.vertical, paddingVertical)
+        case .user:
             content
                 .padding(.horizontal, paddingHorizontal)
                 .padding(.vertical, paddingVertical)
