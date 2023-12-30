@@ -70,7 +70,7 @@ public final class MessageManager {
     }
     
     private func apply(error: Error?) {
-        if let error = error {
+        if let error {
             logger.error("MessageManager Error: \(error, privacy: .public)")
             self.error = error
         }

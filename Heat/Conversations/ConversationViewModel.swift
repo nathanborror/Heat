@@ -17,33 +17,33 @@ final class ConversationViewModel {
     }
     
     var conversation: Conversation? {
-        guard let conversationID = conversationID else { return nil }
+        guard let conversationID else { return nil }
         return store.get(conversationID: conversationID)
     }
     
     var model: Model? {
-        guard let conversation = conversation else { return nil }
+        guard let conversation else { return nil }
         return store.get(modelID: conversation.modelID)
     }
     
     var messages: [Message] {
-        guard let conversation = conversation else { return [] }
+        guard let conversation else { return [] }
         return conversation.messages.filter { $0.kind != .instruction }
     }
     
     func change(model: Model) {
-        guard var conversation = conversation else { return }
+        guard var conversation else { return }
         conversation.modelID = model.id
         store.upsert(conversation: conversation)
     }
     
     func generateResponse(content: String) {
-        guard let conversationID = conversationID else { return }
+        guard let conversationID else { return }
         guard let url = store.preferences.host else {
             logger.warning("missing ollama host url")
             return
         }
-        guard let model = model else { return }
+        guard let model else { return }
         let message = Message(role: .user, content: content)
         
         generateTask = Task {
