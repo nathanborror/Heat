@@ -4,9 +4,7 @@ import GenKit
 
 public struct Conversation: Codable, Identifiable {
     public var id: String
-    public var modelID: String
     public var messages: [Message]
-    public var suggestions: [String]?
     public var state: State
     public var created: Date
     public var modified: Date
@@ -14,16 +12,12 @@ public struct Conversation: Codable, Identifiable {
     public enum State: Codable {
         case processing
         case streaming
-        case suggesting
         case none
     }
     
-    public init(id: String = .id, modelID: String, messages: [Message] = [], suggestions: [String]? = nil, 
-                state: State = .none) {
+    public init(id: String = .id, messages: [Message] = [], state: State = .none) {
         self.id = id
-        self.modelID = modelID
         self.messages = messages
-        self.suggestions = suggestions
         self.state = state
         self.state = .none
         self.created = .now
@@ -37,18 +31,14 @@ extension Conversation: Hashable {
         hasher.combine(id)
         hasher.combine(modified)
     }
+    
+    public static func == (lhs: Conversation, rhs: Conversation) -> Bool {
+        lhs.hashValue == rhs.hashValue
+    }
 }
 
 extension Conversation {
     
     public static var preview: Self =
-        .init(
-            modelID: Model.preview.id,
-            messages: Agent.preview.messages,
-            suggestions: [
-                "I'm so frustrated",
-                "My friend always cancels on me",
-                "I'm feeling down today",
-            ]
-        )
+        .init(messages: Agent.preview.messages)
 }

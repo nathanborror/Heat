@@ -6,7 +6,7 @@
       "location" : "https://github.com/nathanborror/GenKit",
       "state" : {
         "branch" : "main",
-        "revision" : "d97728a637a47f5d9e6cb00f01ceebfccbb37dd2"
+        "revision" : "96a837a0e45e15c5ec2d414db77e8577f97eb250"
       }
     },
     {
@@ -15,7 +15,7 @@
       "location" : "https://github.com/nathanborror/OllamaKit",
       "state" : {
         "branch" : "main",
-        "revision" : "1303db0269740b6014c70453bd29a870e3ecb4c1"
+        "revision" : "e0a20742f88f803d7b8b77437293893aedc696f1"
       }
     },
     {
@@ -33,7 +33,7 @@
       "location" : "https://github.com/nathanborror/SharedKit",
       "state" : {
         "branch" : "main",
-        "revision" : "b8fcd93637acfe9ce6b46dcefebdba2f15dade07"
+        "revision" : "8b99dc006d9ddbe868266d3cc4d263291b80a659"
       }
     }
   ],

@@ -13,11 +13,12 @@ struct ConversationView: View {
     @State private var messageInputState: MessageInputViewState = .init()
     
     @State private var sheet: Sheet? = nil
-    @State private var isShowingServerAlert = false
-    @State private var storeError: StoreError? = nil
+    
+    @State private var isShowingError = false
+    @State private var error: AppError? = nil
     
     enum Sheet: String, Identifiable {
-        case info, history, preferences, agentForm
+        case history, preferences, agentForm
         var id: String { rawValue }
     }
     
@@ -56,7 +57,7 @@ struct ConversationView: View {
         .safeAreaInset(edge: .bottom, alignment: .center) {
             MessageInput(
                 text: $messageInputText,
-                submit: viewModel.generateResponse,
+                submit: handleGenerateResponse,
                 stop: viewModel.cancel
             )
             .environment(messageInputState)
@@ -66,7 +67,7 @@ struct ConversationView: View {
         .toolbar {
             #if os(macOS)
             Button(action: { sheet = .preferences }) {
-                Label("Settings", systemImage: "slider.horizontal.3")
+                Label("Preferences", systemImage: "slider.horizontal.3")
             }
             Button(action: { sheet = .history }) {
                 Label("History", systemImage: "archivebox")
@@ -76,13 +77,6 @@ struct ConversationView: View {
             }
             .disabled(viewModel.conversationID == nil)
             #else
-            ToolbarItem(placement: .principal) {
-                Button(action: { sheet = .info }) {
-                    Text("Conversation")
-                        .font(.headline)
-                        .tint(.primary)
-                }
-            }
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
                     Button(action: { sheet = .agentForm }) {
@@ -92,14 +86,14 @@ struct ConversationView: View {
                         Label("History", systemImage: "archivebox")
                     }
                     Button(action: { sheet = .preferences }) {
-                        Label("Settings", systemImage: "slider.horizontal.3")
+                        Label("Preferences", systemImage: "slider.horizontal.3")
                     }
                 } label: {
                     Label("More", systemImage: "ellipsis")
                 }
             }
             ToolbarItem {
-                Button(action: handleNewConversation) {
+                Button(action: handleClear) {
                     Label("New Conversation", systemImage: "plus")
                 }.disabled(viewModel.conversationID == nil)
             }
@@ -108,12 +102,10 @@ struct ConversationView: View {
         .sheet(item: $sheet) { sheet in
             NavigationStack {
                 switch sheet {
-                case .info:
-                    ConversationInfoView()
                 case .history:
                     ConversationListView(selection: handleSelect)
                 case .preferences:
-                    PreferencesView()
+                    PreferencesForm(preferences: store.preferences)
                 case .agentForm:
                     AgentForm(agent: .empty)
                 }
@@ -121,13 +113,18 @@ struct ConversationView: View {
             .environment(store)
             .environment(viewModel)
         }
-        .alert(isPresented: $isShowingServerAlert, error: storeError) { _ in
-            Button("Dismiss") {
-                self.isShowingServerAlert = false
-                self.storeError = nil
+        .alert(isPresented: $isShowingError, error: error) { _ in
+            Button("Dismiss", role: .cancel) {
+                isShowingError = false
+                error = nil
             }
-        } message: { _ in
-            Text("Check that your Ollama server is running on port 8080 and make sure you've pulled some models.")
+            Button("Preferences") {
+                sheet = .preferences
+                isShowingError = false
+                error = nil
+            }
+        } message: { error in
+            Text(error.explanation)
         }
     }
     
@@ -139,38 +136,68 @@ struct ConversationView: View {
         }
     }
     
-    func handleNewConversation() {
+    func handleClear() {
         viewModel.conversationID = nil
         messageInputState.change(.resting)
     }
     
     func handleSelect(agent: Agent) {
-        guard let url = store.preferences.host else {
-            storeError = .missingHost
-            isShowingServerAlert = true
-            return
-        }
-        guard let model = store.getPreferredModel() else {
-            storeError = .missingModel
-            isShowingServerAlert = true
-            return
-        }
+        guard handleReadinessCheck() else { return }
         
-        let conversation = Conversation(modelID: model.id, messages: agent.messages)
+        let conversation = Conversation(messages: agent.messages)
         store.upsert(conversation: conversation)
-        viewModel.conversationID = conversation.id
-        messageInputState.change(.focused)
+
+        // Switch conversation
+        handleSelect(conversationID: conversation.id)
         
-        Task {
-            await MessageManager(messages: conversation.messages)
-                .generateStream(service: OllamaService(url: url), model: model.name) { messages in
-                    store.upsert(messages: messages, conversationID: conversation.id)
-                }
-        }
+        // Genrate an introduction
+        viewModel.generateResponse()
+        
+        // Show keyboard
+        messageInputState.change(.focused)
     }
     
     func handleSelect(conversationID: String) {
         viewModel.conversationID = conversationID
+    }
+    
+    func handleGenerateResponse(content: String) {
+        guard handleReadinessCheck() else { return }
+        if viewModel.conversationID == nil {
+            let conversation = Conversation(messages: Agent.assistant.messages)
+            store.upsert(conversation: conversation)
+            handleSelect(conversationID: conversation.id)
+        }
+        viewModel.generateResponse(content: content)
+    }
+    
+    func handleReadinessCheck() -> Bool {
+        
+        // Ensure service can be used
+        switch store.preferences.service {
+        case .ollama:
+            guard store.preferences.host != nil else {
+                error = .missingHost
+                isShowingError = true
+                return false
+            }
+        case .openai:
+            guard store.preferences.token != nil else {
+                error = .missingToken
+                isShowingError = true
+                return false
+            }
+        }
+        
+        // Ensure model is selected
+        guard store.preferences.model != nil else {
+            error = .missingModel
+            isShowingError = true
+            return false
+        }
+        
+        // Good to go
+        return true
     }
 }
 
@@ -208,13 +235,9 @@ struct ChatHistoryView: View {
     
     var body: some View {
         LazyVStack {
-            
-            // Message list
             ForEach(viewModel.messages) { message in
                 MessageBubble(message: message)
             }
-            
-            // Indicators and suggestions
             if let conversation = viewModel.conversation {
                 if conversation.state == .processing {
                     TypingIndicator(.leading)
@@ -222,30 +245,6 @@ struct ChatHistoryView: View {
             }
         }
         .padding()
-    }
-}
-
-struct ConversationSuggestionsView: View {
-    let suggestions: [String]
-    let action: (String) -> Void
-    
-    var body: some View {
-        VStack(spacing: 2) {
-            ForEach(suggestions.indices, id: \.self) { index in
-                HStack {
-                    Spacer()
-                    Button(action: { action(suggestions[index]) }) {
-                        Text(suggestions[index])
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background(.tint.opacity(0.1))
-                    .foregroundStyle(.tint)
-                    .clipShape(.rect(cornerRadius: 20))
-                }
-            }
-        }
     }
 }
 

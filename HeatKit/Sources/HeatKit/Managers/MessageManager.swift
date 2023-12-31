@@ -21,6 +21,10 @@ public final class MessageManager {
     
     @discardableResult
     public func append(message: Message) -> Self {
+        
+        // Ignore empty messages
+        guard message.content != nil else { return self }
+        
         messages.append(message)
         return self
     }

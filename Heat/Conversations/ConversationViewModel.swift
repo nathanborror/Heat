@@ -21,43 +21,44 @@ final class ConversationViewModel {
         return store.get(conversationID: conversationID)
     }
     
-    var model: Model? {
-        guard let conversation else { return nil }
-        return store.get(modelID: conversation.modelID)
-    }
-    
     var messages: [Message] {
         guard let conversation else { return [] }
         return conversation.messages.filter { $0.kind != .instruction }
     }
     
-    func change(model: Model) {
-        guard var conversation else { return }
-        conversation.modelID = model.id
-        store.upsert(conversation: conversation)
-    }
-    
-    func generateResponse(content: String) {
-        guard let conversationID else { return }
-        guard let url = store.preferences.host else {
-            logger.warning("missing ollama host url")
-            return
-        }
-        guard let model else { return }
-        let message = Message(role: .user, content: content)
+    func generateResponse(content: String? = nil) {
+        guard let conversation else { return }
+        guard let model = store.preferences.model else { return }
         
         generateTask = Task {
-            await MessageManager(messages: messages)
-                .append(message: message)
-                .sink { store.upsert(messages: $0, conversationID: conversationID) }
-                .generateStream(service: OllamaService(url: url), model: model.name) { messages in
-                    store.upsert(messages: messages, conversationID: conversationID)
+            await MessageManager(messages: conversation.messages)
+                .append(message: .init(role: .user, content: content))
+                .sink {
+                    store.upsert(messages: $0, conversationID: conversation.id)
+                }
+                .generateStream(service: try chatService(), model: model) {
+                    store.upsert(messages: $0, conversationID: conversation.id)
                 }
         }
     }
     
     func cancel() {
         generateTask?.cancel()
+    }
+    
+    private func chatService() throws -> ChatService {
+        switch store.preferences.service {
+        case .openai:
+            guard let token = store.preferences.token else {
+                throw AppError.missingToken
+            }
+            return OpenAIService(token: token)
+        case .ollama:
+            guard let host = store.preferences.host else {
+                throw AppError.missingHost
+            }
+            return OllamaService(url: host)
+        }
     }
     
     private var generateTask: Task<(), Error>? = nil

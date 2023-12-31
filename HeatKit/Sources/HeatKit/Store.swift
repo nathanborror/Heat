@@ -29,7 +29,7 @@ public final class Store {
         self.persistence = persistence
     }
 
-    // Getters
+    // MARK: - Getters
     
     public func get(modelID: String) -> Model? {
         models.first(where: { $0.id == modelID })
@@ -42,19 +42,8 @@ public final class Store {
     public func get(conversationID: String) -> Conversation? {
         conversations.first(where: { $0.id == conversationID })
     }
-    
-    public func getPreferredModel(_ prefixes: [String] = ["mistral", "mistral:instruct", "llama2:7b-chat"]) -> Model? {
-        if let model = get(modelID: preferences.preferredModelID) {
-            return model
-        }
-        for prefix in prefixes {
-            guard let model = models.first(where: { $0.id == prefix }) else { continue }
-            return model
-        }
-        return nil
-    }
 
-    // Uperts
+    // MARK: - Upserts
     
     public func upsert(models: [Model]) {
         self.models = models
@@ -105,12 +94,6 @@ public final class Store {
         upsert(conversation: conversation)
     }
     
-    public func upsert(preferences: Preferences) {
-        var preferences = preferences
-        preferences.modified = .now
-        self.preferences = preferences
-    }
-    
     public func set(state: Conversation.State, conversationID: String) {
         guard var conversation = get(conversationID: conversationID) else { return }
         conversation.state = state
@@ -121,7 +104,7 @@ public final class Store {
         conversations.removeAll(where: { $0.id == conversation.id })
     }
 
-    // Persistence
+    // MARK: - Persistence
     
     static private var agentsJSON = "agents.json"
     static private var conversationsJSON = "conversations.json"
@@ -186,55 +169,19 @@ public final class Store {
             .journal,
         ]
 
-    // Previews
+    // MARK: - Previews
     
     public static var preview: Store = {
         let store = Store.shared
         store.resetAll()
         
         store.models = [
-            Model.preview,
-            .init(
-                name: "llama2:7b-chat", 
-                size: 0,
-                digest: "",
-                license: "",
-                modelfile: "",
-                parameters: "",
-                template: "",
-                system: ""
-            ),
-            .init(
-                name: "codellama:34b", 
-                size: 0,
-                digest: "",
-                license: "",
-                modelfile: "",
-                parameters: "",
-                template: "",
-                system: ""
-            ),
+            .init(id: "llama2:7b-chat", owner: ""),
+            .init(id: "mixtral:latest", owner: ""),
         ]
         
         let conversation = Conversation.preview
         store.conversations = [conversation]
         return store
     }()
-}
-
-public enum StoreError: LocalizedError {
-    case missingAgent
-    case missingModel
-    case missingHost
-    
-    public var errorDescription: String? {
-        switch self {
-        case .missingAgent:
-            "Missing agent"
-        case .missingModel:
-            "Missing model"
-        case .missingHost:
-            "Missing host"
-        }
-    }
 }

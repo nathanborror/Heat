@@ -1,4 +1,5 @@
 import SwiftUI
+import GenKit
 import HeatKit
 
 struct ModelList: View {
@@ -8,17 +9,12 @@ struct ModelList: View {
         List {
             ForEach(store.models) { model in
                 NavigationLink {
-                    ModelView(modelID: model.id)
+                    ModelView(model: model)
                 } label: {
-                    Text(model.name)
+                    Text(model.id)
                 }
             }
         }
-        .refreshable(action: handleLoadModels)
-    }
-    
-    func handleLoadModels() {
-        
     }
 }
 

@@ -31,7 +31,6 @@ struct MainApp: App {
         Task {
             do {
                 try await store.restore()
-                handleModels()
             } catch {
                 logger.error("Persistence Restore: \(error, privacy: .public)")
             }
@@ -47,16 +46,32 @@ struct MainApp: App {
         guard scenePhase == .background else { return }
         Task { await handleSave() }
     }
+}
+
+enum AppError: LocalizedError {
+    case missingToken
+    case missingHost
+    case missingModel
     
-    func handleModels() {
-        guard let url = store.preferences.host else {
-            logger.warning("missing ollama host url")
-            return
+    public var errorDescription: String? {
+        switch self {
+        case .missingToken:
+            "Missing auth token"
+        case .missingHost:
+            "Missing host URL"
+        case .missingModel:
+            "Missing model"
         }
-        Task {
-            await ModelManager(url: url, models: store.models)
-                .refresh()
-                .sink { store.upsert(models: $0) }
+    }
+    
+    var explanation: String {
+        switch self {
+        case .missingToken:
+            "Check that your OpenAI token has been added to Preferences."
+        case .missingHost:
+            "Check that your Ollama host URL has been added to Preferences."
+        case .missingModel:
+            "Check that you've selected a model in Preferences."
         }
     }
 }

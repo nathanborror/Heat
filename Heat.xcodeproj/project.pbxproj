@@ -17,9 +17,8 @@
 		D41E193E2AE4CD20002516C1 /* MediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E193D2AE4CD20002516C1 /* MediaView.swift */; };
 		D41E19402AE4CD4F002516C1 /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E193F2AE4CD4F002516C1 /* VideoView.swift */; };
 		D41E19422AE4CDAC002516C1 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E19412AE4CDAC002516C1 /* Extensions.swift */; };
-		D41E194C2AE591EA002516C1 /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E194B2AE591EA002516C1 /* PreferencesView.swift */; };
+		D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E194B2AE591EA002516C1 /* PreferencesForm.swift */; };
 		D4713D702AEAB9670005597E /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4713D6F2AEAB9670005597E /* Operators.swift */; };
-		D4AA90DD2AEAE14F0010D714 /* ConversationInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AA90DC2AEAE14F0010D714 /* ConversationInfoView.swift */; };
 		D4B6CF5E2AE843500083D241 /* ModelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B6CF5D2AE843500083D241 /* ModelView.swift */; };
 		D818326C2B38814500A62D50 /* ModelList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D818326B2B38814500A62D50 /* ModelList.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
@@ -42,10 +41,9 @@
 		D41E193D2AE4CD20002516C1 /* MediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaView.swift; sourceTree = "<group>"; };
 		D41E193F2AE4CD4F002516C1 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		D41E19412AE4CDAC002516C1 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = Heat/Shared/Extensions.swift; sourceTree = SOURCE_ROOT; };
-		D41E194B2AE591EA002516C1 /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
+		D41E194B2AE591EA002516C1 /* PreferencesForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesForm.swift; sourceTree = "<group>"; };
 		D4713D6F2AEAB9670005597E /* Operators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
 		D4AA90D02AEAD6090010D714 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heat.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4AA90DC2AEAE14F0010D714 /* ConversationInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationInfoView.swift; sourceTree = "<group>"; };
 		D4B6CF5D2AE843500083D241 /* ModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelView.swift; sourceTree = "<group>"; };
 		D818326B2B38814500A62D50 /* ModelList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelList.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
@@ -80,7 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				D41E191E2AE45C9B002516C1 /* MainApp.swift */,
-				D41E194B2AE591EA002516C1 /* PreferencesView.swift */,
+				D41E194B2AE591EA002516C1 /* PreferencesForm.swift */,
 				D4B6CF5F2AE8438E0083D241 /* Models */,
 				D41E19492AE58D1B002516C1 /* Agents */,
 				D41E194A2AE58D29002516C1 /* Conversations */,
@@ -134,7 +132,6 @@
 				D41E19382AE4C754002516C1 /* ConversationListView.swift */,
 				D41E193A2AE4C759002516C1 /* ConversationView.swift */,
 				D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */,
-				D4AA90DC2AEAE14F0010D714 /* ConversationInfoView.swift */,
 			);
 			path = Conversations;
 			sourceTree = "<group>";
@@ -191,7 +188,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1510;
 				TargetAttributes = {
 					D41E191A2AE45C9B002516C1 = {
 						CreatedOnToolsVersion = 15.0.1;
@@ -248,8 +245,7 @@
 				D41E19352AE4C665002516C1 /* AgentForm.swift in Sources */,
 				D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */,
 				D818326C2B38814500A62D50 /* ModelList.swift in Sources */,
-				D4AA90DD2AEAE14F0010D714 /* ConversationInfoView.swift in Sources */,
-				D41E194C2AE591EA002516C1 /* PreferencesView.swift in Sources */,
+				D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +286,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -351,6 +348,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -378,6 +376,7 @@
 				CODE_SIGN_ENTITLEMENTS = Heat/Resources/Heat.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Heat/Preview Content\"";
 				DEVELOPMENT_TEAM = 294VZ3T33E;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -417,6 +416,7 @@
 				CODE_SIGN_ENTITLEMENTS = Heat/Resources/Heat.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Heat/Preview Content\"";
 				DEVELOPMENT_TEAM = 294VZ3T33E;
 				ENABLE_HARDENED_RUNTIME = YES;

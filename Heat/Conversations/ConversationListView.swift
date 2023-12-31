@@ -42,7 +42,7 @@ struct ConversationListView: View {
     }
     
     func handleDelete(_ conversation: Conversation) {
-        Task { await store.delete(conversation: conversation) }
+        store.delete(conversation: conversation)
     }
     
     func handleShowInfo(_ conversation: Conversation) {
