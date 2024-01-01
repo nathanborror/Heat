@@ -46,11 +46,9 @@ struct ConversationView: View {
                 }
             }
         }
-        #if os(macOS)
         .navigationTitle("Conversation")
-        .navigationSubtitle(viewModel.model?.name ?? "Choose Model")
         .background(.background)
-        #else
+        #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .scrollDismissesKeyboard(.interactively)
@@ -72,7 +70,7 @@ struct ConversationView: View {
             Button(action: { sheet = .history }) {
                 Label("History", systemImage: "archivebox")
             }
-            Button(action: handleNewConversation) {
+            Button(action: handleClear) {
                 Label("New Chat", systemImage: "plus")
             }
             .disabled(viewModel.conversationID == nil)

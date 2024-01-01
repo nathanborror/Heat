@@ -79,9 +79,13 @@ struct PreferencesForm: View {
                 }
             }
         }
+        .formStyle(.grouped)
         .navigationTitle("Preferences")
+        #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
         .interactiveDismissDisabled()
+        .frame(idealWidth: 400, idealHeight: 400)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done", action: handleDone)

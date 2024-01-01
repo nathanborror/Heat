@@ -39,7 +39,7 @@ struct AgentForm: View {
             }
         }
         .navigationTitle("Create Agent")
-        #if os(iOS)
+        #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar {
