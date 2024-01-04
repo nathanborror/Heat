@@ -8,6 +8,7 @@ struct PreferencesForm: View {
     
     @State var preferences: Preferences
     @State private var models: [Model] = []
+    @State private var isLoadingModels = false
     
     var body: some View {
         Form {
@@ -58,6 +59,15 @@ struct PreferencesForm: View {
                 }
             } header: {
                 Text("Service Provider")
+            }
+            
+            if isLoadingModels {
+                Section {
+                    Text("Loading Models...")
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("Default Model")
+                }
             }
             
             if !models.isEmpty {
@@ -117,19 +127,22 @@ struct PreferencesForm: View {
     }
     
     private func handleLoadModels() {
+        let service: ModelService
         switch preferences.service {
         case .openai:
             guard let token = preferences.token else { return }
-            let service = OpenAIService(token: token)
-            Task { self.models = try await service.models() }
+            service = OpenAIService(token: token)
         case .ollama:
             guard let url = preferences.host else { return }
-            let service = OllamaService(url: url)
-            Task { self.models = try await service.models() }
+            service = OllamaService(url: url)
         case .mistral:
             guard let token = preferences.token else { return }
-            let service = MistralService(token: token)
-            Task { self.models = try await service.models() }
+            service = MistralService(token: token)
+        }
+        Task {
+            isLoadingModels = true
+            self.models = try await service.models()
+            isLoadingModels = false
         }
     }
     
