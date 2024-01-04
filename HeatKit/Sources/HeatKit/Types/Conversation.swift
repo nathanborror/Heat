@@ -42,7 +42,7 @@ extension Conversation: Hashable {
 extension Conversation {
     
     public static var preview: Self = {
-        var messages = Agent.preview.messages
+        var messages = Template.preview.messages
         messages += [
             .init(role: .assistant, content: """
                 I'm here to help you vent, go ahead and share what's on your mind. Is there a specific situation or \

@@ -1,18 +1,18 @@
 import SwiftUI
 import HeatKit
 
-struct AgentListView: View {
+struct TemplateListView: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
-                NavigationLink(destination: { Text("Foo") }, label: { Text("Create Agent") })
+                NavigationLink(destination: { Text("Foo") }, label: { Text("New Template") })
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(store.agents) { agent in
-                        AgentTile(
-                            agent: agent,
+                    ForEach(store.templates) { template in
+                        TemplateTile(
+                            template: template,
                             height: proxy.size.width/heightDivisor,
                             selection: handleSelection
                         )
@@ -21,7 +21,7 @@ struct AgentListView: View {
                 .padding()
             }
         }
-        .navigationTitle("Agents")
+        .navigationTitle("Templates")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done", action: { dismiss() })
@@ -29,7 +29,7 @@ struct AgentListView: View {
         }
     }
     
-    func handleSelection(_ agent: Agent) {
+    func handleSelection(_ template: Template) {
         print("not implemented")
     }
     
@@ -42,38 +42,39 @@ struct AgentListView: View {
     #endif
 }
 
-struct AgentTile: View {
+struct TemplateTile: View {
     @Environment(\.colorScheme) var colorScheme
     
-    typealias AgentCallback = (Agent) -> Void
+    typealias Callback = (Template) -> Void
     
-    let agent: Agent
+    let template: Template
     let height: CGFloat
-    let selection: AgentCallback
+    let selection: Callback
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            MediaView(media: agent.picture)
+            MediaView(media: template.picture)
                 .frame(height: height)
                 .clipShape(.rect(cornerRadius: 8, style: .continuous))
             VStack(alignment: .leading) {
-                Text(agent.name)
+                Text(template.title)
                     .font(.system(size: 13, weight: .medium))
-                if let tagline = agent.tagline {
-                    Text(tagline)
+                if let subtitle = template.subtitle {
+                    Text(subtitle)
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                 }
+                Spacer()
             }
         }
         .onTapGesture {
-            selection(agent)
+            selection(template)
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        AgentListView()
+        TemplateListView()
     }.environment(Store.preview)
 }

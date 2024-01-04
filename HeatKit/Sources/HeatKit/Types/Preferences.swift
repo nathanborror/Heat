@@ -8,7 +8,7 @@ public struct Preferences: Codable {
     public var host: URL?
     public var token: String?
     public var model: String?
-    public var defaultAgentID: String?
+    public var defaultTemplateID: String?
     
     public enum Service: String, Codable, Identifiable, CaseIterable {
         case openai
@@ -26,11 +26,11 @@ public struct Preferences: Codable {
     }
     
     public init(service: Service = .ollama, host: URL? = nil, token: String? = nil, model: String? = nil,
-                defaultAgentID: String? = nil) {
+                defaultTemplateID: String? = nil) {
         self.service = service
         self.host = host
         self.token = token
         self.model = model
-        self.defaultAgentID = defaultAgentID
+        self.defaultTemplateID = defaultTemplateID
     }
 }

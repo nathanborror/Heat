@@ -1,6 +1,6 @@
 import Foundation
 
-extension Agent {
+extension Template {
     
     public static var systemPrompt = """
         You are a helpful assistant.
@@ -21,7 +21,7 @@ extension Agent {
     public static var assistant: Self =
         .init(
             id: "bundle-assistant",
-            name: "Assistant",
+            title: "Assistant",
             picture: .bundle(.image("Covers/Sky")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -32,8 +32,8 @@ extension Agent {
     public static var vent: Self =
         .init(
             id: "bundle-vent",
-            name: "Assistant",
-            tagline: "Vent about your day",
+            title: "Assistant",
+            subtitle: "Vent about your day",
             picture: .bundle(.image("Covers/Sunrise")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -44,8 +44,8 @@ extension Agent {
     public static var learn: Self =
         .init(
             id: "bundle-learn",
-            name: "Assistant",
-            tagline: "Learn about something new",
+            title: "Assistant",
+            subtitle: "Learn about something new",
             picture: .bundle(.image("Covers/Structure")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -56,8 +56,8 @@ extension Agent {
     public static var brainstorm: Self =
         .init(
             id: "bundle-brainstorm",
-            name: "Assistant",
-            tagline: "Brainstorm ideas",
+            title: "Assistant",
+            subtitle: "Brainstorm ideas",
             picture: .bundle(.image("Covers/Dunes")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -68,8 +68,8 @@ extension Agent {
     public static var advice: Self =
         .init(
             id: "bundle-advice",
-            name: "Assistant",
-            tagline: "Get advice",
+            title: "Assistant",
+            subtitle: "Get advice",
             picture: .bundle(.image("Covers/SeaSunrise")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -80,8 +80,8 @@ extension Agent {
     public static var anxious: Self =
         .init(
             id: "bundle-anxious",
-            name: "Assistant",
-            tagline: "Feeling anxious",
+            title: "Assistant",
+            subtitle: "Feeling anxious",
             picture: .bundle(.image("Covers/Clouds")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -92,8 +92,8 @@ extension Agent {
     public static var philisophical: Self =
         .init(
             id: "bundle-philisophical",
-            name: "Assistant",
-            tagline: "Get philisophical",
+            title: "Assistant",
+            subtitle: "Get philisophical",
             picture: .bundle(.image("Covers/Cube")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -104,8 +104,8 @@ extension Agent {
     public static var discover: Self =
         .init(
             id: "bundle-discover",
-            name: "Assistant",
-            tagline: "Discover books or music",
+            title: "Assistant",
+            subtitle: "Discover books or music",
             picture: .bundle(.image("Covers/Bubbles")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -116,8 +116,8 @@ extension Agent {
     public static var coach: Self =
         .init(
             id: "bundle-coach",
-            name: "Assistant",
-            tagline: "Help me through a problem",
+            title: "Assistant",
+            subtitle: "Help me through a problem",
             picture: .bundle(.image("Covers/Hallway")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
@@ -128,8 +128,8 @@ extension Agent {
     public static var journal: Self =
         .init(
             id: "bundle-journal",
-            name: "Assistant",
-            tagline: "Journal about your day",
+            title: "Assistant",
+            subtitle: "Journal about your day",
             picture: .bundle(.image("Covers/Path")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),

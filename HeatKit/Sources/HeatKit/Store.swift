@@ -11,7 +11,7 @@ public final class Store {
     
     public static let shared = Store(persistence: DiskPersistence.shared)
     
-    public private(set) var agents: [Agent]
+    public private(set) var templates: [Template]
     public private(set) var conversations: [Conversation]
     public private(set) var models: [Model]
     public var preferences: Preferences
@@ -19,7 +19,7 @@ public final class Store {
     private var persistence: Persistence
     
     init(persistence: Persistence) {
-        self.agents = []
+        self.templates = []
         self.conversations = []
         self.models = []
         
@@ -35,8 +35,8 @@ public final class Store {
         models.first(where: { $0.id == modelID })
     }
     
-    public func get(agentID: String) -> Agent? {
-        agents.first(where: { $0.id == agentID })
+    public func get(templateID: String) -> Template? {
+        templates.first(where: { $0.id == templateID })
     }
     
     public func get(conversationID: String) -> Conversation? {
@@ -49,13 +49,13 @@ public final class Store {
         self.models = models
     }
     
-    public func upsert(agent: Agent) {
-        if let index = agents.firstIndex(where: { $0.id == agent.id }) {
-            var agent = agent
-            agent.modified = .now
-            agents[index] = agent
+    public func upsert(template: Template) {
+        if let index = templates.firstIndex(where: { $0.id == template.id }) {
+            var template = template
+            template.modified = .now
+            templates[index] = template
         } else {
-            agents.insert(agent, at: 0)
+            templates.insert(template, at: 0)
         }
     }
     
@@ -100,26 +100,30 @@ public final class Store {
         upsert(conversation: conversation)
     }
     
+    public func delete(template: Template) {
+        templates.removeAll(where: { $0.id == template.id })
+    }
+    
     public func delete(conversation: Conversation) {
         conversations.removeAll(where: { $0.id == conversation.id })
     }
 
     // MARK: - Persistence
     
-    static private var agentsJSON = "agents.json"
+    static private var templatesJSON = "templates.json"
     static private var conversationsJSON = "conversations.json"
     static private var modelsJSON = "models.json"
     static private var preferencesJSON = "preferences.json"
     
     public func restore() async throws {
         do {
-            let agents: [Agent] = try await persistence.load(objects: Self.agentsJSON)
+            let templates: [Template] = try await persistence.load(objects: Self.templatesJSON)
             let conversations: [Conversation] = try await persistence.load(objects: Self.conversationsJSON)
             let models: [Model] = try await persistence.load(objects: Self.modelsJSON)
             let preferences: Preferences? = try await persistence.load(object: Self.preferencesJSON)
             
             await MainActor.run {
-                self.agents = agents.isEmpty ? self.defaultAgents : agents
+                self.templates = templates.isEmpty ? self.defaultTemplates : templates
                 self.conversations = conversations
                 self.models = models
                 self.preferences = preferences ?? self.preferences
@@ -130,14 +134,14 @@ public final class Store {
     }
     
     public func saveAll() async throws {
-        try await persistence.save(filename: Self.agentsJSON, objects: agents)
+        try await persistence.save(filename: Self.templatesJSON, objects: templates)
         try await persistence.save(filename: Self.conversationsJSON, objects: conversations)
         try await persistence.save(filename: Self.modelsJSON, objects: models)
         try await persistence.save(filename: Self.preferencesJSON, object: preferences)
     }
     
     public func deleteAll() throws {
-        try persistence.delete(filename: Self.agentsJSON)
+        try persistence.delete(filename: Self.templatesJSON)
         try persistence.delete(filename: Self.conversationsJSON)
         try persistence.delete(filename: Self.modelsJSON)
         try persistence.delete(filename: Self.preferencesJSON)
@@ -148,14 +152,14 @@ public final class Store {
         self.conversations = []
         self.models = []
         self.preferences = .init()
-        self.resetAgents()
+        self.resetTemplates()
     }
     
-    public func resetAgents() {
-        self.agents = defaultAgents
+    public func resetTemplates() {
+        self.templates = defaultTemplates
     }
     
-    private var defaultAgents: [Agent] =
+    private var defaultTemplates: [Template] =
         [
             .assistant,
             .vent,

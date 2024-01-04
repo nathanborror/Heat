@@ -2,23 +2,23 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct AgentForm: View {
+struct TemplateForm: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
-    @State var agent: Agent = .empty
-    @State var messages: [(String, String)] = []
+    @State var template: Template = .empty
+    @State var messages: [(String, String)] = [("system", "")]
     
     var body: some View {
         Form {
             Section {
-                TextField("Name", text: $agent.name)
+                TextField("Title", text: $template.title)
                     #if os(iOS)
                     .textInputAutocapitalization(.words)
                     #endif
-                TextField("Tagline", text: Binding<String>(
-                    get: { agent.tagline ?? "" },
-                    set: { agent.tagline = $0.isEmpty ? nil : $0 }
+                TextField("Subtitle", text: Binding<String>(
+                    get: { template.subtitle ?? "" },
+                    set: { template.subtitle = $0.isEmpty ? nil : $0 }
                 ))
             }
             
@@ -37,7 +37,7 @@ struct AgentForm: View {
                 Button("Add Message", action: handleAddMessage)
             }
         }
-        .navigationTitle("Create Agent")
+        .navigationTitle("New Template")
         #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -50,21 +50,23 @@ struct AgentForm: View {
             }
         }
         .onAppear {
-            messages = agent.messages.map { ($0.role.rawValue, $0.content ?? "") }
+            messages = template.messages.map { ($0.role.rawValue, $0.content ?? "") }
+            if messages.isEmpty { messages = [("system", "")] }
         }
     }
     
     func handleDone() {
-        agent.messages = messages.map {
-            .init(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
-        }
-        store.upsert(agent: agent)
+        template.messages = messages.map {
+            guard !$0.1.isEmpty else { return nil }
+            return Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
+        }.compactMap { $0 }
+        store.upsert(template: template)
         dismiss()
     }
     
     func handleAddMessage() {
         var message: (String, String)
-        if let lastMessage = agent.messages.last {
+        if let lastMessage = template.messages.last {
             switch lastMessage.role {
             case .system:
                 message = (Message.Role.assistant.rawValue, "")
@@ -81,6 +83,6 @@ struct AgentForm: View {
 }
 
 #Preview {
-    AgentForm(agent: .empty)
+    TemplateForm(template: .empty)
         .environment(Store.preview)
 }

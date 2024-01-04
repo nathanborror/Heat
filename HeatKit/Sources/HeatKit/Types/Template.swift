@@ -2,20 +2,20 @@ import Foundation
 import SharedKit
 import GenKit
 
-public struct Agent: Codable, Identifiable {
+public struct Template: Codable, Identifiable {
     public var id: String
-    public var name: String
-    public var tagline: String?
+    public var title: String
+    public var subtitle: String?
     public var picture: Media
     public var messages: [Message]
     public var created: Date
     public var modified: Date
     
-    public init(id: String = .id, name: String, tagline: String? = nil, picture: Media = .none,
+    public init(id: String = .id, title: String, subtitle: String? = nil, picture: Media = .none,
                 messages: [Message] = []) {
         self.id = id
-        self.name = name
-        self.tagline = tagline
+        self.title = title
+        self.subtitle = subtitle
         self.picture = picture
         self.messages = messages
         self.created = .now
@@ -23,7 +23,7 @@ public struct Agent: Codable, Identifiable {
     }
 }
 
-extension Agent: Hashable {
+extension Template: Hashable {
     
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -31,10 +31,10 @@ extension Agent: Hashable {
     }
 }
 
-extension Agent {
+extension Template {
 
     public static var empty: Self {
-        .init(name: "")
+        .init(title: "")
     }
     
     public static var preview: Self = .vent

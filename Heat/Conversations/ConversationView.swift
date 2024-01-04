@@ -17,9 +17,18 @@ struct ConversationView: View {
     @State private var isShowingError = false
     @State private var error: AppError? = nil
     
-    enum Sheet: String, Identifiable {
-        case history, preferences, agentForm
-        var id: String { rawValue }
+    struct Sheet: Identifiable, Equatable {
+        var id: String
+        var template: Template?
+        
+        static let history = Sheet(id: "history")
+        static let preferences = Sheet(id: "preferences")
+        static let templateNew = Sheet(id: "templateNew")
+        static let templateEdit = Sheet(id: "templateEdit")
+        
+        public static func == (lhs: Sheet, rhs: Sheet) -> Bool {
+            lhs.id == rhs.id
+        }
     }
     
     var body: some View {
@@ -30,7 +39,12 @@ struct ConversationView: View {
                     if viewModel.conversationID != nil {
                         ChatHistoryView()
                     } else {
-                        ChatAgentList(size: geo.size, selection: handleSelect)
+                        ChatTemplateList(
+                            size: geo.size,
+                            select: handleSelect,
+                            edit: handleEdit,
+                            delete: handleDelete
+                        )
                     }
                     ConversationScrollViewMarker(id: "scrollViewBottom")
                 }
@@ -77,8 +91,8 @@ struct ConversationView: View {
             #else
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
-                    Button(action: { sheet = .agentForm }) {
-                        Label("New Agent", systemImage: "plus")
+                    Button(action: { sheet = .templateNew }) {
+                        Label("New Template", systemImage: "plus")
                     }
                     Button(action: { sheet = .history }) {
                         Label("History", systemImage: "archivebox")
@@ -100,12 +114,16 @@ struct ConversationView: View {
         .sheet(item: $sheet) { sheet in
             NavigationStack {
                 switch sheet {
-                case .history:
+                case Sheet.history:
                     ConversationListView(selection: handleSelect)
-                case .preferences:
+                case Sheet.preferences:
                     PreferencesForm(preferences: store.preferences)
-                case .agentForm:
-                    AgentForm(agent: .empty)
+                case Sheet.templateNew:
+                    TemplateForm(template: .empty)
+                case Sheet.templateEdit:
+                    TemplateForm(template: sheet.template ?? .empty)
+                default:
+                    EmptyView()
                 }
             }
             .environment(store)
@@ -139,10 +157,10 @@ struct ConversationView: View {
         messageInputState.change(.resting)
     }
     
-    func handleSelect(agent: Agent) {
+    func handleSelect(template: Template) {
         guard handleReadinessCheck() else { return }
         
-        let conversation = Conversation(messages: agent.messages)
+        let conversation = Conversation(messages: template.messages)
         store.upsert(conversation: conversation)
 
         // Switch conversation
@@ -155,6 +173,16 @@ struct ConversationView: View {
         messageInputState.change(.focused)
     }
     
+    func handleEdit(template: Template) {
+        var sheet = Sheet.templateEdit
+        sheet.template = template
+        self.sheet = sheet
+    }
+    
+    func handleDelete(template: Template) {
+        store.delete(template: template)
+    }
+    
     func handleSelect(conversationID: String) {
         viewModel.conversationID = conversationID
     }
@@ -162,7 +190,7 @@ struct ConversationView: View {
     func handleGenerateResponse(content: String) {
         guard handleReadinessCheck() else { return }
         if viewModel.conversationID == nil {
-            let conversation = Conversation(messages: Agent.assistant.messages)
+            let conversation = Conversation(messages: Template.assistant.messages)
             store.upsert(conversation: conversation)
             handleSelect(conversationID: conversation.id)
         }
@@ -205,20 +233,32 @@ struct ConversationView: View {
     }
 }
 
-struct ChatAgentList: View {
+struct ChatTemplateList: View {
     @Environment(Store.self) private var store
     
+    typealias Callback = (Template) -> Void
+    
     let size: CGSize
-    let selection: (Agent) -> Void
+    let select: Callback
+    let edit: Callback
+    let delete: Callback
     
     var body: some View {
         LazyVGrid(columns: columns, spacing: 16) {
-            ForEach(store.agents) { agent in
-                AgentTile(
-                    agent: agent,
+            ForEach(store.templates) { template in
+                TemplateTile(
+                    template: template,
                     height: size.width/heightDivisor,
-                    selection: selection
+                    selection: select
                 )
+                .contextMenu {
+                    Button(action: { edit(template) }) {
+                        Label("Edit", systemImage: "pencil")
+                    }
+                    Button(role: .destructive, action: { delete(template) }) {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
             }
         }
         .padding(.horizontal)
@@ -265,7 +305,7 @@ struct ConversationScrollViewMarker: View {
 
 // MARK: - Previews
 
-#Preview("Agent Picker") {
+#Preview("Template Picker") {
     let store = Store.preview
     let viewModel = ConversationViewModel(store: store)
     
