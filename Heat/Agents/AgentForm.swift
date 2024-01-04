@@ -6,7 +6,8 @@ struct AgentForm: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
-    @State var agent: Agent
+    @State var agent: Agent = .empty
+    @State var messages: [(String, String)] = []
     
     var body: some View {
         Form {
@@ -21,19 +22,14 @@ struct AgentForm: View {
                 ))
             }
             
-            ForEach($agent.messages.indices, id: \.self) { index in
+            ForEach($messages.indices, id: \.self) { index in
                 Section {
-                    Picker("Role", selection: $agent.messages[index].role) {
+                    Picker("Role", selection: $messages[index].0) {
                         Text("System").tag(Message.Role.system)
                         Text("Assistant").tag(Message.Role.assistant)
                         Text("User").tag(Message.Role.user)
                     }
-
-                    // Custom binding for handling optional string
-                    TextField("Content", text: Binding<String>(
-                        get: { self.agent.messages[index].content ?? "" },
-                        set: { self.agent.messages[index].content = $0.isEmpty ? nil : $0 }
-                    ), axis: .vertical)
+                    TextField("Content", text: $messages[index].1, axis: .vertical)
                 }
             }
             
@@ -53,28 +49,34 @@ struct AgentForm: View {
                 Button("Cancel", action: dismiss.callAsFunction)
             }
         }
+        .onAppear {
+            messages = agent.messages.map { ($0.role.rawValue, $0.content ?? "") }
+        }
     }
     
     func handleDone() {
+        agent.messages = messages.map {
+            .init(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
+        }
         store.upsert(agent: agent)
         dismiss()
     }
     
     func handleAddMessage() {
-        var message: Message!
+        var message: (String, String)
         if let lastMessage = agent.messages.last {
             switch lastMessage.role {
             case .system:
-                message = Message(kind: .instruction, role: .assistant)
+                message = (Message.Role.assistant.rawValue, "")
             case .assistant, .tool:
-                message = Message(kind: .instruction, role: .user)
+                message = (Message.Role.user.rawValue, "")
             case .user:
-                message = Message(kind: .instruction, role: .assistant)
+                message = (Message.Role.assistant.rawValue, "")
             }
         } else {
-            message = Message(kind: .instruction, role: .system)
+            message = (Message.Role.system.rawValue, "")
         }
-        agent.messages.append(message)
+        messages.append(message)
     }
 }
 
