@@ -185,6 +185,12 @@ struct ConversationView: View {
                 isShowingError = true
                 return false
             }
+        case .mistral:
+            guard store.preferences.token != nil else {
+                error = .missingToken
+                isShowingError = true
+                return false
+            }
         }
         
         // Ensure model is selected

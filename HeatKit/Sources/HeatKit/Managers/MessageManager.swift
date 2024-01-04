@@ -67,7 +67,8 @@ public final class MessageManager {
     
     private func apply(delta message: Message) {
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
-            messages[index] = messages[index].apply(message)
+            let newMessage = messages[index].apply(message)
+            messages[index] = newMessage
         } else {
             messages.append(message)
         }

@@ -62,6 +62,11 @@ final class ConversationViewModel {
                 throw AppError.missingHost
             }
             return OllamaService(url: host)
+        case .mistral:
+            guard let token = store.preferences.token else {
+                throw AppError.missingToken
+            }
+            return MistralService(token: token)
         }
     }
     

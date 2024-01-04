@@ -6,7 +6,16 @@
       "location" : "https://github.com/nathanborror/GenKit",
       "state" : {
         "branch" : "main",
-        "revision" : "96a837a0e45e15c5ec2d414db77e8577f97eb250"
+        "revision" : "0d1877348becb294bcd0ca3a25f1b248e9702664"
+      }
+    },
+    {
+      "identity" : "mistralkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/MistralKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f852e7f2a1969edb6a3bd11be6aa4860b4844058"
       }
     },
     {
@@ -15,7 +24,7 @@
       "location" : "https://github.com/nathanborror/OllamaKit",
       "state" : {
         "branch" : "main",
-        "revision" : "e0a20742f88f803d7b8b77437293893aedc696f1"
+        "revision" : "1130b9603d908bec86140091052219604790a20d"
       }
     },
     {

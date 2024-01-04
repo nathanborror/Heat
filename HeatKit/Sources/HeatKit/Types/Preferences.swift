@@ -13,12 +13,14 @@ public struct Preferences: Codable {
     public enum Service: String, Codable, Identifiable, CaseIterable {
         case openai
         case ollama
+        case mistral
         
         public var id: String { rawValue }
         public var title: String {
             switch self {
             case .ollama: "Ollama"
             case .openai: "OpenAI"
+            case .mistral: "Mistral"
             }
         }
     }

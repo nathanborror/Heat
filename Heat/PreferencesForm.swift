@@ -46,6 +46,15 @@ struct PreferencesForm: View {
                     .onSubmit {
                         handleLoadModels()
                     }
+                case .mistral:
+                    TextField("Mistral Token", text: Binding<String>(
+                            get: { preferences.token ?? "" },
+                            set: { preferences.token = $0 }
+                        )
+                    )
+                    .onSubmit {
+                        handleLoadModels()
+                    }
                 }
             } header: {
                 Text("Service Provider")
@@ -116,6 +125,10 @@ struct PreferencesForm: View {
         case .ollama:
             guard let url = preferences.host else { return }
             let service = OllamaService(url: url)
+            Task { self.models = try await service.models() }
+        case .mistral:
+            guard let token = preferences.token else { return }
+            let service = MistralService(token: token)
             Task { self.models = try await service.models() }
         }
     }
