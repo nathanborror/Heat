@@ -5,13 +5,14 @@ import GenKit
 public struct Agent: Codable, Identifiable {
     public var id: String
     public var name: String
-    public var tagline: String
+    public var tagline: String?
     public var picture: Media
     public var messages: [Message]
     public var created: Date
     public var modified: Date
     
-    public init(id: String = .id, name: String, tagline: String, picture: Media, messages: [Message] = []) {
+    public init(id: String = .id, name: String, tagline: String? = nil, picture: Media = .none,
+                messages: [Message] = []) {
         self.id = id
         self.name = name
         self.tagline = tagline
@@ -33,7 +34,7 @@ extension Agent: Hashable {
 extension Agent {
 
     public static var empty: Self {
-        .init(name: "", tagline: "", picture: .none)
+        .init(name: "")
     }
     
     public static var preview: Self = .vent

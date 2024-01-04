@@ -15,7 +15,10 @@ struct AgentForm: View {
                     #if os(iOS)
                     .textInputAutocapitalization(.words)
                     #endif
-                TextField("Tagline", text: $agent.tagline)
+                TextField("Tagline", text: Binding<String>(
+                    get: { agent.tagline ?? "" },
+                    set: { agent.tagline = $0.isEmpty ? nil : $0 }
+                ))
             }
             
             ForEach($agent.messages.indices, id: \.self) { index in

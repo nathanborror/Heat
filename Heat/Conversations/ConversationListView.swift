@@ -55,6 +55,7 @@ struct ConversationRow: View {
     
     var body: some View {
         VStack(alignment: .leading) {
+            Text("New Conversation")
             Text(conversation.messages.last?.content ?? "Say something...")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)

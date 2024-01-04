@@ -46,7 +46,7 @@ struct ConversationView: View {
                 }
             }
         }
-        .navigationTitle("Conversation")
+        .navigationTitle(viewModel.title)
         .background(.background)
         #if !os(macOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -257,12 +257,25 @@ struct ConversationScrollViewMarker: View {
     }
 }
 
-#Preview {
+// MARK: - Previews
+
+#Preview("Agent Picker") {
     let store = Store.preview
     let viewModel = ConversationViewModel(store: store)
     
-    //let conversation = store.conversations.first!
-    //viewModel.conversationID = conversation.id
+    return NavigationStack {
+        ConversationView()
+    }
+    .environment(store)
+    .environment(viewModel)
+}
+
+#Preview("Conversation") {
+    let store = Store.preview
+    let viewModel = ConversationViewModel(store: store)
+    
+    let conversation = store.conversations.first!
+    viewModel.conversationID = conversation.id
     
     return NavigationStack {
         ConversationView()

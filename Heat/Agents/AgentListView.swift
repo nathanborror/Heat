@@ -59,9 +59,11 @@ struct AgentTile: View {
             VStack(alignment: .leading) {
                 Text(agent.name)
                     .font(.system(size: 13, weight: .medium))
-                Text(agent.tagline)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                if let tagline = agent.tagline {
+                    Text(tagline)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .onTapGesture {

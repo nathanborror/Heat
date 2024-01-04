@@ -22,7 +22,6 @@ extension Agent {
         .init(
             id: "bundle-assistant",
             name: "Assistant",
-            tagline: "",
             picture: .bundle(.image("Covers/Sky")),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),

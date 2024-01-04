@@ -21,6 +21,10 @@ final class ConversationViewModel {
         return store.get(conversationID: conversationID)
     }
     
+    var title: String {
+        conversation?.title ?? "Choose Conversation"
+    }
+    
     var messages: [Message] {
         guard let conversation else { return [] }
         return conversation.messages.filter { $0.kind != .instruction }
