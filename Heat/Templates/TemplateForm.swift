@@ -25,9 +25,9 @@ struct TemplateForm: View {
             ForEach($messages.indices, id: \.self) { index in
                 Section {
                     Picker("Role", selection: $messages[index].0) {
-                        Text("System").tag(Message.Role.system)
-                        Text("Assistant").tag(Message.Role.assistant)
-                        Text("User").tag(Message.Role.user)
+                        Text("System").tag(Message.Role.system.rawValue)
+                        Text("Assistant").tag(Message.Role.assistant.rawValue)
+                        Text("User").tag(Message.Role.user.rawValue)
                     }
                     TextField("Content", text: $messages[index].1, axis: .vertical)
                 }
