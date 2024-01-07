@@ -6,7 +6,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "72a4675c57892c76040696e787e9f2ac82a2e407"
+        "revision" : "70a2678ab6f02766f98f9d527e33f8d80eac78d5"
       }
     },
     {
@@ -19,12 +19,12 @@
       }
     },
     {
-      "identity" : "swift-gen-kit",
+      "identity" : "swift-genkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/nathanborror/swift-gen-kit",
+      "location" : "https://github.com/nathanborror/swift-genkit",
       "state" : {
         "branch" : "main",
-        "revision" : "afd6287941db91a7009cd826d5f59f871b1e3f0b"
+        "revision" : "363e0da9f145f2bd5a01dda149f1a7b923515e4c"
       }
     },
     {
@@ -33,7 +33,7 @@
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
-        "revision" : "2414c07af7ed398e3cbe672b11a1cb1f6ba03ea3"
+        "revision" : "0e804924cf64cacf06cd6ba9039f403a197164aa"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "6fb071d726ef01b6773b6944cdcf80dc1cdea012"
+        "revision" : "b55c01380f253f8ee83e61f5e4d73a6232cd4fb9"
       }
     },
     {
@@ -51,7 +51,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "92f15c9ed0324063262b27bc78ad516df9f97779"
+        "revision" : "9816d58d54eeac2af9fe1de2dcd8928a79b02cbb"
       }
     },
     {
@@ -60,16 +60,16 @@
       "location" : "https://github.com/nathanborror/swift-perplexity",
       "state" : {
         "branch" : "main",
-        "revision" : "178c5b4279404bd30f220b9d76894d5aa1a29229"
+        "revision" : "080a99cdb33c91b7dbbff70d84d4be27668d1707"
       }
     },
     {
-      "identity" : "swift-shared-kit",
+      "identity" : "swift-sharedkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/nathanborror/swift-shared-kit",
+      "location" : "https://github.com/nathanborror/swift-sharedkit",
       "state" : {
         "branch" : "main",
-        "revision" : "a8faf6f7e3c15f8aa9d80c56be6c7aa7fdb9b681"
+        "revision" : "f5ec85538e8c04430b6755c5cf9ea984ae885892"
       }
     }
   ],
