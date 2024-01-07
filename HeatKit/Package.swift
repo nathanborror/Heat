@@ -15,13 +15,13 @@ let package = Package(
         .library(name: "HeatKit", targets: ["HeatKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/nathanborror/SharedKit", branch: "main"),
-        .package(url: "https://github.com/nathanborror/GenKit", branch: "main"),
+        .package(url: "https://github.com/nathanborror/swift-shared-kit", branch: "main"),
+        .package(url: "https://github.com/nathanborror/swift-gen-kit", branch: "main"),
     ],
     targets: [
         .target(name: "HeatKit", dependencies: [
-            .product(name: "SharedKit", package: "SharedKit"),
-            .product(name: "GenKit", package: "GenKit"),
+            .product(name: "SharedKit", package: "swift-shared-kit"),
+            .product(name: "GenKit", package: "swift-gen-kit"),
         ]),
         .testTarget(name: "HeatKitTests", dependencies: ["HeatKit"]),
     ]
