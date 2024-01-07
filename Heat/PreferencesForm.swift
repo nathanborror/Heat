@@ -56,6 +56,15 @@ struct PreferencesForm: View {
                     .onSubmit {
                         handleLoadModels()
                     }
+                case .perplexity:
+                    TextField("Perplexity Token", text: Binding<String>(
+                            get: { preferences.token ?? "" },
+                            set: { preferences.token = $0 }
+                        )
+                    )
+                    .onSubmit {
+                        handleLoadModels()
+                    }
                 }
             } header: {
                 Text("Service Provider")
@@ -138,6 +147,9 @@ struct PreferencesForm: View {
         case .mistral:
             guard let token = preferences.token else { return }
             service = MistralService(token: token)
+        case .perplexity:
+            guard let token = preferences.token else { return }
+            service = PerplexityService(token: token)
         }
         Task {
             isLoadingModels = true

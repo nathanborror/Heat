@@ -6,12 +6,12 @@ public struct Template: Codable, Identifiable {
     public var id: String
     public var title: String
     public var subtitle: String?
-    public var picture: Media
+    public var picture: Asset?
     public var messages: [Message]
     public var created: Date
     public var modified: Date
     
-    public init(id: String = .id, title: String, subtitle: String? = nil, picture: Media = .none,
+    public init(id: String = .id, title: String, subtitle: String? = nil, picture: Asset? = nil,
                 messages: [Message] = []) {
         self.id = id
         self.title = title

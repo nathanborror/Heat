@@ -14,6 +14,7 @@ public struct Preferences: Codable {
         case openai
         case ollama
         case mistral
+        case perplexity
         
         public var id: String { rawValue }
         public var title: String {
@@ -21,6 +22,7 @@ public struct Preferences: Codable {
             case .ollama: "Ollama"
             case .openai: "OpenAI"
             case .mistral: "Mistral"
+            case .perplexity: "Perplexity"
             }
         }
     }

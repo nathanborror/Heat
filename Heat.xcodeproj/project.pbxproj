@@ -14,7 +14,7 @@
 		D41E19352AE4C665002516C1 /* TemplateForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E19342AE4C665002516C1 /* TemplateForm.swift */; };
 		D41E19392AE4C754002516C1 /* ConversationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E19382AE4C754002516C1 /* ConversationListView.swift */; };
 		D41E193B2AE4C759002516C1 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E193A2AE4C759002516C1 /* ConversationView.swift */; };
-		D41E193E2AE4CD20002516C1 /* MediaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E193D2AE4CD20002516C1 /* MediaView.swift */; };
+		D41E193E2AE4CD20002516C1 /* PictureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E193D2AE4CD20002516C1 /* PictureView.swift */; };
 		D41E19402AE4CD4F002516C1 /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E193F2AE4CD4F002516C1 /* VideoView.swift */; };
 		D41E19422AE4CDAC002516C1 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E19412AE4CDAC002516C1 /* Extensions.swift */; };
 		D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E194B2AE591EA002516C1 /* PreferencesForm.swift */; };
@@ -38,7 +38,7 @@
 		D41E19342AE4C665002516C1 /* TemplateForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateForm.swift; sourceTree = "<group>"; };
 		D41E19382AE4C754002516C1 /* ConversationListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListView.swift; sourceTree = "<group>"; };
 		D41E193A2AE4C759002516C1 /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
-		D41E193D2AE4CD20002516C1 /* MediaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaView.swift; sourceTree = "<group>"; };
+		D41E193D2AE4CD20002516C1 /* PictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureView.swift; sourceTree = "<group>"; };
 		D41E193F2AE4CD4F002516C1 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		D41E19412AE4CDAC002516C1 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = Heat/Shared/Extensions.swift; sourceTree = SOURCE_ROOT; };
 		D41E194B2AE591EA002516C1 /* PreferencesForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesForm.swift; sourceTree = "<group>"; };
@@ -148,7 +148,7 @@
 		D88D23072B3CFB2C00CCCC61 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D41E193D2AE4CD20002516C1 /* MediaView.swift */,
+				D41E193D2AE4CD20002516C1 /* PictureView.swift */,
 				D41E193F2AE4CD4F002516C1 /* VideoView.swift */,
 				D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */,
 				D88D230A2B3CFB5700CCCC61 /* MessageInput.swift */,
@@ -239,7 +239,7 @@
 				D4B6CF5E2AE843500083D241 /* ModelView.swift in Sources */,
 				D88D230B2B3CFB5700CCCC61 /* MessageInput.swift in Sources */,
 				D4713D702AEAB9670005597E /* Operators.swift in Sources */,
-				D41E193E2AE4CD20002516C1 /* MediaView.swift in Sources */,
+				D41E193E2AE4CD20002516C1 /* PictureView.swift in Sources */,
 				D41E193B2AE4C759002516C1 /* ConversationView.swift in Sources */,
 				D88D23092B3CFB5100CCCC61 /* MessageBubble.swift in Sources */,
 				D41E19352AE4C665002516C1 /* TemplateForm.swift in Sources */,

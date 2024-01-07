@@ -67,6 +67,11 @@ final class ConversationViewModel {
                 throw AppError.missingToken
             }
             return MistralService(token: token)
+        case .perplexity:
+            guard let token = store.preferences.token else {
+                throw AppError.missingToken
+            }
+            return PerplexityService(token: token)
         }
     }
     

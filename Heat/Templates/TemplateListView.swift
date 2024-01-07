@@ -53,9 +53,11 @@ struct TemplateTile: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            MediaView(media: template.picture)
-                .frame(height: height)
-                .clipShape(.rect(cornerRadius: 8, style: .continuous))
+            if let picture = template.picture {
+                PictureView(asset: picture)
+                    .frame(height: height)
+                    .clipShape(.rect(cornerRadius: 8, style: .continuous))
+            }
             VStack(alignment: .leading) {
                 Text(template.title)
                     .font(.system(size: 13, weight: .medium))

@@ -22,7 +22,7 @@ extension Template {
         .init(
             id: "bundle-assistant",
             title: "Assistant",
-            picture: .bundle(.image("Covers/Sky")),
+            picture: .init(name: "Covers/Sky", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Introduce yourself"),
@@ -34,7 +34,7 @@ extension Template {
             id: "bundle-vent",
             title: "Assistant",
             subtitle: "Vent about your day",
-            picture: .bundle(.image("Covers/Sunrise")),
+            picture: .init(name: "Covers/Sunrise", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Help me vent about something"),
@@ -46,7 +46,7 @@ extension Template {
             id: "bundle-learn",
             title: "Assistant",
             subtitle: "Learn about something new",
-            picture: .bundle(.image("Covers/Structure")),
+            picture: .init(name: "Covers/Structure", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to learn about something new."),
@@ -58,7 +58,7 @@ extension Template {
             id: "bundle-brainstorm",
             title: "Assistant",
             subtitle: "Brainstorm ideas",
-            picture: .bundle(.image("Covers/Dunes")),
+            picture: .init(name: "Covers/Dunes", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to brainstorm ideas."),
@@ -70,7 +70,7 @@ extension Template {
             id: "bundle-advice",
             title: "Assistant",
             subtitle: "Get advice",
-            picture: .bundle(.image("Covers/SeaSunrise")),
+            picture: .init(name: "Covers/SeaSunrise", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I need advice about something."),
@@ -82,7 +82,7 @@ extension Template {
             id: "bundle-anxious",
             title: "Assistant",
             subtitle: "Feeling anxious",
-            picture: .bundle(.image("Covers/Clouds")),
+            picture: .init(name: "Covers/Clouds", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I've been feeling anxious."),
@@ -94,7 +94,7 @@ extension Template {
             id: "bundle-philisophical",
             title: "Assistant",
             subtitle: "Get philisophical",
-            picture: .bundle(.image("Covers/Cube")),
+            picture: .init(name: "Covers/Cube", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to get philisophical."),
@@ -106,7 +106,7 @@ extension Template {
             id: "bundle-discover",
             title: "Assistant",
             subtitle: "Discover books or music",
-            picture: .bundle(.image("Covers/Bubbles")),
+            picture: .init(name: "Covers/Bubbles", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "I want to discover new books, music or podcasts."),
@@ -118,7 +118,7 @@ extension Template {
             id: "bundle-coach",
             title: "Assistant",
             subtitle: "Help me through a problem",
-            picture: .bundle(.image("Covers/Hallway")),
+            picture: .init(name: "Covers/Hallway", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Coach me through a problem."),
@@ -130,7 +130,7 @@ extension Template {
             id: "bundle-journal",
             title: "Assistant",
             subtitle: "Journal about your day",
-            picture: .bundle(.image("Covers/Path")),
+            picture: .init(name: "Covers/Path", kind: .image, location: .bundle),
             messages: [
                 .init(kind: .instruction, role: .system, content: systemPrompt),
                 .init(kind: .instruction, role: .user, content: "Help me journal about my day."),

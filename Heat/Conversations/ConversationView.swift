@@ -207,13 +207,7 @@ struct ConversationView: View {
                 isShowingError = true
                 return false
             }
-        case .openai:
-            guard store.preferences.token != nil else {
-                error = .missingToken
-                isShowingError = true
-                return false
-            }
-        case .mistral:
+        case .openai, .mistral, .perplexity:
             guard store.preferences.token != nil else {
                 error = .missingToken
                 isShowingError = true

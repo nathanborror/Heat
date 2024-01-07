@@ -6,7 +6,7 @@
       "location" : "https://github.com/nathanborror/GenKit",
       "state" : {
         "branch" : "main",
-        "revision" : "0d1877348becb294bcd0ca3a25f1b248e9702664"
+        "revision" : "314151548ca1a6df340d4179231e76f987f30279"
       }
     },
     {
@@ -15,7 +15,7 @@
       "location" : "https://github.com/nathanborror/MistralKit",
       "state" : {
         "branch" : "main",
-        "revision" : "f852e7f2a1969edb6a3bd11be6aa4860b4844058"
+        "revision" : "0bae158c4e19efb347f6355d0e92967a67fbfd4a"
       }
     },
     {
@@ -24,7 +24,7 @@
       "location" : "https://github.com/nathanborror/OllamaKit",
       "state" : {
         "branch" : "main",
-        "revision" : "1130b9603d908bec86140091052219604790a20d"
+        "revision" : "0be5e50d5f1f39095004199b1188e3b92bd70200"
       }
     },
     {
@@ -33,7 +33,16 @@
       "location" : "https://github.com/nathanborror/OpenAI",
       "state" : {
         "branch" : "main",
-        "revision" : "5c6d5556b79e670c027c27b3b071ae0baa780906"
+        "revision" : "9f0137b4598f22fd35542fa3277aad0082be9ead"
+      }
+    },
+    {
+      "identity" : "perplexitykit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/PerplexityKit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "90206292584097b202313639a2c5ecfe3f3c5ce2"
       }
     },
     {
@@ -42,7 +51,7 @@
       "location" : "https://github.com/nathanborror/SharedKit",
       "state" : {
         "branch" : "main",
-        "revision" : "38dcb9d455722352dc47bce7ddc4efecc11fca83"
+        "revision" : "65a295118f6e60f82f7a15832133f9acba8eccc1"
       }
     }
   ],
