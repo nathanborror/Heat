@@ -5,18 +5,17 @@ import SharedKit
 public struct Preferences: Codable {
     
     public var service: Service
-    public var host: URL?
-    public var token: String?
     public var model: String?
     public var defaultTemplateID: String?
     
-    public enum Service: String, Codable, Identifiable, CaseIterable {
-        case openai
-        case ollama
-        case mistral
-        case perplexity
+    public enum Service: Codable, Identifiable {
+        case openai(String?)
+        case ollama(URL?)
+        case mistral(String?)
+        case perplexity(String?)
         
-        public var id: String { rawValue }
+        public var id: String { title.lowercased() }
+        
         public var title: String {
             switch self {
             case .ollama: "Ollama"
@@ -27,11 +26,8 @@ public struct Preferences: Codable {
         }
     }
     
-    public init(service: Service = .ollama, host: URL? = nil, token: String? = nil, model: String? = nil,
-                defaultTemplateID: String? = nil) {
+    public init(service: Service, model: String? = nil, defaultTemplateID: String? = nil) {
         self.service = service
-        self.host = host
-        self.token = token
         self.model = model
         self.defaultTemplateID = defaultTemplateID
     }
