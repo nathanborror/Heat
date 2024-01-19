@@ -15,7 +15,7 @@ struct ConversationView: View {
     @State private var sheet: Sheet? = nil
     
     @State private var isShowingError = false
-    @State private var error: AppError? = nil
+    @State private var error: ConversationViewModelError? = nil
     
     struct Sheet: Identifiable, Equatable {
         var id: String
@@ -117,7 +117,7 @@ struct ConversationView: View {
                 case Sheet.history:
                     ConversationListView(selection: handleSelect)
                 case Sheet.preferences:
-                    PreferencesForm(preferences: store.preferences)
+                    PreferencesForm()
                 case Sheet.templateNew:
                     TemplateForm(template: .empty)
                 case Sheet.templateEdit:
@@ -140,7 +140,7 @@ struct ConversationView: View {
                 error = nil
             }
         } message: { error in
-            Text(error.explanation)
+            Text(error.recoverySuggestion)
         }
     }
     
@@ -158,8 +158,6 @@ struct ConversationView: View {
     }
     
     func handleSelect(template: Template) {
-        guard handleReadinessCheck() else { return }
-        
         let conversation = Conversation(messages: template.messages)
         store.upsert(conversation: conversation)
 
@@ -167,7 +165,14 @@ struct ConversationView: View {
         handleSelect(conversationID: conversation.id)
         
         // Genrate an introduction
-        viewModel.generateResponse()
+        do {
+            try viewModel.generateResponse()
+        } catch let error as ConversationViewModelError {
+            self.error = error
+            isShowingError = true
+        } catch {
+            logger.error("failed to generate introduction: \(error)")
+        }
         
         // Show keyboard
         messageInputState.change(.focused)
@@ -188,42 +193,19 @@ struct ConversationView: View {
     }
     
     func handleGenerateResponse(content: String) {
-        guard handleReadinessCheck() else { return }
         if viewModel.conversationID == nil {
             let conversation = Conversation(messages: Template.assistant.messages)
             store.upsert(conversation: conversation)
             handleSelect(conversationID: conversation.id)
         }
-        viewModel.generateResponse(content: content)
-    }
-    
-    func handleReadinessCheck() -> Bool {
-        
-        // Ensure service can be used
-        switch store.preferences.service {
-        case .ollama:
-            guard store.preferences.host != nil else {
-                error = .missingHost
-                isShowingError = true
-                return false
-            }
-        case .openai, .mistral, .perplexity:
-            guard store.preferences.token != nil else {
-                error = .missingToken
-                isShowingError = true
-                return false
-            }
-        }
-        
-        // Ensure model is selected
-        guard store.preferences.model != nil else {
-            error = .missingModel
+        do {
+            try viewModel.generateResponse(content: content)
+        } catch let error as ConversationViewModelError {
+            self.error = error
             isShowingError = true
-            return false
+        } catch {
+            logger.error("failed to generate response: \(error)")
         }
-        
-        // Good to go
-        return true
     }
 }
 

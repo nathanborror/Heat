@@ -42,6 +42,7 @@
 		D41E193F2AE4CD4F002516C1 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		D41E19412AE4CDAC002516C1 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = Heat/Shared/Extensions.swift; sourceTree = SOURCE_ROOT; };
 		D41E194B2AE591EA002516C1 /* PreferencesForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesForm.swift; sourceTree = "<group>"; };
+		D45DF37E2B5A07F400177467 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Heat.app; path = /Users/nborror/Work/Prototypes/Heat/build/Debug/Heat.app; sourceTree = "<absolute>"; };
 		D4713D6F2AEAB9670005597E /* Operators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
 		D4B6CF5D2AE843500083D241 /* ModelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelView.swift; sourceTree = "<group>"; };
 		D818326B2B38814500A62D50 /* ModelList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelList.swift; sourceTree = "<group>"; };
@@ -49,7 +50,6 @@
 		D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
 		D88D230A2B3CFB5700CCCC61 /* MessageInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageInput.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
-		D8CF71542B46586A00483926 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Heat.app; path = /Users/nathan/Work/Projects/Heat/build/Debug/Heat.app; sourceTree = "<absolute>"; };
 		D8FBB20C2AEDB60700783E9B /* TemplateListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TemplateListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -176,7 +176,7 @@
 				D41E19312AE467F5002516C1 /* HeatKit */,
 			);
 			productName = Heat;
-			productReference = D8CF71542B46586A00483926 /* Heat.app */;
+			productReference = D45DF37E2B5A07F400177467 /* Heat.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

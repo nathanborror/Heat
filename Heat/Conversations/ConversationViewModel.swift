@@ -30,9 +30,15 @@ final class ConversationViewModel {
         return conversation.messages.filter { $0.kind != .instruction }
     }
     
-    func generateResponse(content: String? = nil) {
+    func generateResponse(content: String? = nil) throws {
         guard let conversation else { return }
-        guard let model = store.preferences.model else { return }
+        
+        guard let chatService = store.preferredChatService() else {
+            throw ConversationViewModelError.missingService
+        }
+        guard let chatModel = store.preferredChatModel() else {
+            throw ConversationViewModelError.missingModel
+        }
         
         generateTask = Task {
             await MessageManager(messages: conversation.messages)
@@ -40,7 +46,7 @@ final class ConversationViewModel {
                 .sink {
                     store.upsert(messages: $0, conversationID: conversation.id)
                 }
-                .generateStream(service: try chatService(), model: model) {
+                .generateStream(service: chatService, model: chatModel) {
                     store.upsert(messages: $0, conversationID: conversation.id)
                 }
         }
@@ -50,30 +56,24 @@ final class ConversationViewModel {
         generateTask?.cancel()
     }
     
-    private func chatService() throws -> ChatService {
-        switch store.preferences.service {
-        case .openai:
-            guard let token = store.preferences.token else {
-                throw AppError.missingToken
-            }
-            return OpenAIService(token: token)
-        case .ollama:
-            guard let host = store.preferences.host else {
-                throw AppError.missingHost
-            }
-            return OllamaService(url: host)
-        case .mistral:
-            guard let token = store.preferences.token else {
-                throw AppError.missingToken
-            }
-            return MistralService(token: token)
-        case .perplexity:
-            guard let token = store.preferences.token else {
-                throw AppError.missingToken
-            }
-            return PerplexityService(token: token)
+    private var generateTask: Task<(), Error>? = nil
+}
+
+enum ConversationViewModelError: LocalizedError {
+    case missingService
+    case missingModel
+    
+    var errorDescription: String? {
+        switch self {
+        case .missingService: "Missing service"
+        case .missingModel: "Missing model"
         }
     }
     
-    private var generateTask: Task<(), Error>? = nil
+    var recoverySuggestion: String {
+        switch self {
+        case .missingService: "Open Preferences and configure a service."
+        case .missingModel: "Open Preferences and pick a preferred model for the service you are using."
+        }
+    }
 }

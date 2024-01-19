@@ -6,7 +6,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "70a2678ab6f02766f98f9d527e33f8d80eac78d5"
+        "revision" : "f0a3aeae3713807efca37d803fa2c4b32480a43c"
       }
     },
     {
@@ -24,7 +24,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "9a255a5e0cc9aaf0b85b36562794bee848016b28"
+        "revision" : "642c8a15f5061962d6cae8baae0f7f96aaf372e6"
       }
     },
     {
@@ -33,7 +33,7 @@
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
-        "revision" : "0e804924cf64cacf06cd6ba9039f403a197164aa"
+        "revision" : "8fdc60b12246316b911da86156c0f1d780fc79a7"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "8c255c94a136ea2d636b166dff20b85e5f0ff2e6"
+        "revision" : "fba98d8783776f3d8882f04bb5ae4dcb52f193c6"
       }
     },
     {
@@ -51,7 +51,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "9816d58d54eeac2af9fe1de2dcd8928a79b02cbb"
+        "revision" : "c257ccff14ca2dd4263b7da1621382e71aadb339"
       }
     },
     {
@@ -60,7 +60,7 @@
       "location" : "https://github.com/nathanborror/swift-perplexity",
       "state" : {
         "branch" : "main",
-        "revision" : "080a99cdb33c91b7dbbff70d84d4be27668d1707"
+        "revision" : "c438668862497373dd7d718ba09cae7fe8e15216"
       }
     },
     {

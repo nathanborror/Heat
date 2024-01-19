@@ -42,6 +42,18 @@ public final class Store {
     public func get(conversationID: String) -> Conversation? {
         conversations.first(where: { $0.id == conversationID })
     }
+    
+    public func get(serviceID: String?) -> Service? {
+        preferences.services.first(where: { $0.id == serviceID })
+    }
+    
+    // MARK: - Setters
+    
+    public func set(state: Conversation.State, conversationID: String) {
+        guard var conversation = get(conversationID: conversationID) else { return }
+        conversation.state = state
+        upsert(conversation: conversation)
+    }
 
     // MARK: - Upserts
     
@@ -94,11 +106,19 @@ public final class Store {
         upsert(conversation: conversation)
     }
     
-    public func set(state: Conversation.State, conversationID: String) {
-        guard var conversation = get(conversationID: conversationID) else { return }
-        conversation.state = state
-        upsert(conversation: conversation)
+    public func upsert(preferences: Preferences) {
+        self.preferences = preferences
     }
+    
+    public func upsert(service: Service) {
+        if let index = preferences.services.firstIndex(where: { $0.id == service.id }) {
+            preferences.services[index] = service
+        } else {
+            preferences.services.append(service)
+        }
+    }
+    
+    // MARK: - Deletion
     
     public func delete(template: Template) {
         templates.removeAll(where: { $0.id == template.id })
@@ -106,6 +126,51 @@ public final class Store {
     
     public func delete(conversation: Conversation) {
         conversations.removeAll(where: { $0.id == conversation.id })
+    }
+    
+    // MARK: - Service Preferences
+    
+    public func preferredChatService() -> ChatService? {
+        guard let service = get(serviceID: preferences.preferredChatServiceID) else { return nil }
+        switch service.id {
+        case "openai":
+            guard let token = service.token else { return nil }
+            return OpenAIService(configuration: .init(token: token))
+        case "mistral":
+            guard let token = service.token else { return nil }
+            return MistralService(configuration: .init(token: token))
+        case "perplexity":
+            guard let token = service.token else { return nil }
+            return PerplexityService(configuration: .init(token: token))
+        case "ollama":
+            guard let host = service.host else { return nil }
+            return OllamaService(configuration: .init(host: host))
+        default:
+            return nil
+        }
+    }
+    
+    public func preferredImageService() -> ImageService? {
+        guard let service = get(serviceID: preferences.preferredImageServiceID) else { return nil }
+        switch service.id {
+        case "openai":
+            guard let token = service.token else { return nil }
+            return OpenAIService(configuration: .init(token: token))
+        default:
+            return nil
+        }
+    }
+    
+    // MARK: - Model Preferences
+    
+    public func preferredChatModel() -> String? {
+        guard let service = get(serviceID: preferences.preferredChatServiceID) else { return nil }
+        return service.preferredChatModel
+    }
+    
+    public func preferredImageModel() -> String? {
+        guard let service = get(serviceID: preferences.preferredImageServiceID) else { return nil }
+        return service.preferredImageModel
     }
 
     // MARK: - Persistence
