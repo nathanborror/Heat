@@ -1,5 +1,6 @@
 import SwiftUI
 import GenKit
+import HeatKit
 
 struct MessageBubble: View {
     let message: Message
@@ -39,14 +40,16 @@ struct MessageBubbleStyle: ViewModifier {
         switch message.role {
         case .system, .tool:
             content
+                .font(.footnote)
                 .padding(.vertical, paddingVertical)
                 .foregroundStyle(foregroundColor)
-                .font(.footnote)
         case .assistant:
             content
+                .font(.system(size: 16))
                 .padding(.vertical, paddingVertical)
         case .user:
             content
+                .font(.system(size: 16))
                 .padding(.horizontal, paddingHorizontal)
                 .padding(.vertical, paddingVertical)
                 .foregroundStyle(foregroundColor)
@@ -55,7 +58,7 @@ struct MessageBubbleStyle: ViewModifier {
         }
     }
     
-    var backgroundColor: Color {
+    var backgroundColor: SwiftUI.Color {
         switch message.role {
         case .system, .tool: return .clear
         case .assistant: return .primary.opacity(0.07)
@@ -63,7 +66,7 @@ struct MessageBubbleStyle: ViewModifier {
         }
     }
     
-    var foregroundColor: Color {
+    var foregroundColor: SwiftUI.Color {
         switch message.role {
         case .system, .tool: return .secondary
         case .assistant: return .primary
@@ -73,8 +76,8 @@ struct MessageBubbleStyle: ViewModifier {
     
     #if os(macOS)
     private let paddingHorizontal: CGFloat = 12
-    private let paddingVertical: CGFloat = 8
-    private let cornerRadius: CGFloat = 16
+    private let paddingVertical: CGFloat = 6
+    private let cornerRadius: CGFloat = 10
     #else
     private let paddingHorizontal: CGFloat = 16
     private let paddingVertical: CGFloat = 10
@@ -112,3 +115,14 @@ extension View {
     }
 }
 
+#Preview {
+    let store = Store.preview
+    let viewModel = ConversationViewModel(store: store)
+    viewModel.conversationID = store.conversations.first?.id
+    
+    return NavigationStack {
+        ConversationView()
+    }
+    .environment(store)
+    .environment(viewModel)
+}

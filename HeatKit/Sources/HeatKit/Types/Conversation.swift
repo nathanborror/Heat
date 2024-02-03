@@ -1,10 +1,15 @@
+// A conversation is an interaction between the user and a large language model (LLM). It has a title that helps
+// set context for what the conversation is generally about and it has a history or messages.
+
 import Foundation
-import SharedKit
 import GenKit
+import SharedKit
 
 public struct Conversation: Codable, Identifiable {
     public var id: String
     public var title: String
+    public var subtitle: String?
+    public var picture: Asset?
     public var messages: [Message]
     public var state: State
     public var created: Date
@@ -16,15 +21,29 @@ public struct Conversation: Codable, Identifiable {
         case none
     }
     
-    public init(id: String = .id, title: String = "New Conversation", messages: [Message] = [], state: State = .none) {
+    public init(id: String = .id, title: String = Self.titlePlaceholder, subtitle: String? = nil, picture: Asset? = nil,
+                messages: [Message] = [], state: State = .none) {
         self.id = id
         self.title = title
+        self.subtitle = subtitle
+        self.picture = picture
         self.messages = messages
         self.state = state
-        self.state = .none
         self.created = .now
         self.modified = .now
     }
+    
+    mutating func apply(conversation: Conversation) {
+        self.title = conversation.title
+        self.subtitle = conversation.subtitle
+        self.picture = conversation.picture
+        self.messages = conversation.messages
+        self.state = conversation.state
+        self.modified = .now
+    }
+    
+    public static var empty: Self { .init() }
+    public static var titlePlaceholder = "New Conversation"
 }
 
 extension Conversation: Hashable {
@@ -33,33 +52,23 @@ extension Conversation: Hashable {
         hasher.combine(id)
         hasher.combine(modified)
     }
-    
-    public static func == (lhs: Conversation, rhs: Conversation) -> Bool {
-        lhs.hashValue == rhs.hashValue
-    }
 }
 
 extension Conversation {
     
-    public static var preview: Self = {
-        var messages = Template.preview.messages
-        messages += [
+    public static var preview: Conversation = {
+        .init(messages: Agent.preview.instructions + [
+            .init(role: .assistant, content: "What can I help you with today?"),
+            .init(role: .user, content: "Explain thermodynamics like I'm five"),
             .init(role: .assistant, content: """
-                I'm here to help you vent, go ahead and share what's on your mind. Is there a specific situation or \
-                thing that's been bothering you? I'm here to listen.
-                """),
-            .init(role: .user, content: """
-                It's been an intense year
-                """),
-            .init(role: .assistant, content: """
-                I can imagine it has been a challenging year for many people, with everything that's been happening. \
-                If you want to talk about your experiences or things that have been particularly difficult for you, \
-                please feel free to share. I'm here to listen.
-                """),
-            .init(role: .user, content: """
-                Just trying to keep up!
-                """),
-        ]
-        return .init(messages: messages)
+                Thermodynamics is like a set of rules that explain how heat, energy, and things that move around \
+                work. It helps us understand why things can get hot or cold, and why some things can move while \
+                others stay still.
+
+                Think of all the things around you, like a toy car or a glass of water. Thermodynamics helps us \
+                understand how these things behave when they interact with heat or energy. It's like a special \
+                language that scientists use to talk about how things work together.
+                """)
+        ])
     }()
 }

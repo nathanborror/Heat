@@ -1,4 +1,5 @@
 import SwiftUI
+import SharedKit
 import GenKit
 import HeatKit
 
@@ -10,7 +11,16 @@ struct PreferencesForm: View {
     @State private var isShowingDeleteConfirmation = false
     
     var body: some View {
+        @Bindable var store = store
         Form {
+            Section {
+                TextField("Describe yourself", text: $store.preferences.instructions ?? "", axis: .vertical)
+            } header: {
+                Text("Instructions")
+            } footer: {
+                Text("Personalize your experience by describing who you are.")
+            }
+            
             Section {
                 Picker("Chats", selection: Binding<String>(
                     get: { store.preferences.preferredChatServiceID ?? "" },
@@ -66,35 +76,42 @@ struct PreferencesForm: View {
                 Text("Only services with preferred models selected to support the behavior will show up in the picker.")
             }
             
+            #if !os(macOS)
             Section {
                 NavigationLink("Services") {
-                    ServiceList(services: store.preferences.services)
+                    ServiceList()
                 }
             } footer: {
                 Text("Manage service configurations like preferred models, authentication tokens and API endpoints.")
             }
+            #endif
             
             Section {
+                Button("Reset Agents", action: handleAgentReset)
                 Button("Delete All Data", role: .destructive, action: { isShowingDeleteConfirmation = true })
             }
         }
+        .formStyle(.grouped)
         .navigationTitle("Preferences")
-        .interactiveDismissDisabled()
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Done", action: handleDone)
-            }
-        }
         .alert("Are you sure?", isPresented: $isShowingDeleteConfirmation) {
-            Button("Delete", role: .destructive, action: { try? store.deleteAll() })
+            Button("Delete", role: .destructive, action: handleDeleteAll)
         } message: {
             Text("This will delete all app data and preferences.")
         }
-
     }
     
-    func handleDone() {
-        Task { try await store.saveAll() }
+    func handleAgentReset() {
+        do {
+            try store.resetAgents()
+            Task { try await store.saveAll() }
+            dismiss()
+        } catch {
+            print(error)
+        }
+    }
+    
+    func handleDeleteAll() {
+        store.deleteAll()
         dismiss()
     }
 }
@@ -102,35 +119,34 @@ struct PreferencesForm: View {
 struct ServiceList: View {
     @Environment(Store.self) private var store
     
-    let services: [Service]
-    
     @State private var service: Service? = nil
     
     var body: some View {
-        List {
-            ForEach(services) { service in
-                Section {
-                    VStack(alignment: .leading) {
-                        Text(service.name)
-                        if let text = supportText(for: service) {
-                            Text(text)
-                                .lineLimit(1)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
+        Form {
+            ForEach(store.preferences.services) { service in
+                NavigationLink {
+                    ServiceForm(service: service)
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(service.name)
+                            if let text = supportText(for: service) {
+                                Text(text)
+                                    .lineLimit(1)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                            if service.missingHost {
+                                Text("Host missing")
+                                    .font(.footnote)
+                                    .foregroundStyle(.red)
+                            }
+                            if service.missingToken {
+                                Text("Token missing")
+                                    .font(.footnote)
+                                    .foregroundStyle(.red)
+                            }
                         }
-                        if service.missingHost {
-                            Text("Host missing")
-                                .font(.footnote)
-                                .foregroundStyle(.red)
-                        }
-                        if service.missingToken {
-                            Text("Token missing")
-                                .font(.footnote)
-                                .foregroundStyle(.red)
-                        }
-                    }
-                    Button(action: { self.service = service }) {
-                        Text("Edit")
                     }
                 }
             }
@@ -138,6 +154,7 @@ struct ServiceList: View {
                 Button("Add Service", action: { self.service = .init(id: "", name: "") })
             }
         }
+        .formStyle(.grouped)
         .navigationTitle("Services")
         .sheet(item: $service) { service in
             NavigationStack {
@@ -243,6 +260,7 @@ struct ServiceForm: View {
                 }
             }
         }
+        .formStyle(.grouped)
         .navigationTitle("Service")
         .alert(isPresented: $isShowingAlert, error: error) { _ in
             Button("Dismiss", role: .cancel) {
@@ -251,16 +269,11 @@ struct ServiceForm: View {
         } message: { error in
             Text(error.recoverySuggestion)
         }
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Save", action: handleSave)
-            }
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel", action: handleCancel)
-            }
-        }
         .onAppear {
             handleLoadModels()
+        }
+        .onDisappear {
+            handleSave()
         }
     }
     
@@ -276,11 +289,6 @@ struct ServiceForm: View {
             return
         }
         store.upsert(service: service)
-        dismiss()
-    }
-    
-    func handleCancel() {
-        dismiss()
     }
     
     func handleLoadModels() {
@@ -347,6 +355,25 @@ struct BalancedLabelStyle: LabeledContentStyle {
     }
 }
 
+struct PreferencesDesktopForm: View {
+    @Environment(Store.self) private var store
+    
+    var body: some View {
+        TabView {
+            PreferencesForm()
+                .tabItem {
+                    Label("General", systemImage: "gear")
+                }
+                .tag("general")
+            ServiceList()
+                .tabItem {
+                    Label("Services", systemImage: "gear")
+                }
+                .tag("services")
+        }
+    }
+}
+
 #Preview("Preferences") {
     let store = Store.preview
     return NavigationStack {
@@ -357,7 +384,7 @@ struct BalancedLabelStyle: LabeledContentStyle {
 #Preview("Services") {
     let store = Store.preview
     return NavigationStack {
-        ServiceList(services: Constants.defaultServices)
+        ServiceList()
     }.environment(store)
 }
 

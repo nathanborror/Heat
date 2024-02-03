@@ -4,27 +4,18 @@ import GenKit
 
 private let logger = Logger(subsystem: "MessageManager", category: "HeatKit")
 
-enum ConversationManagerError: Error {
-    case missingConversation
-    case missingResponseMessage
-}
-
 public final class MessageManager {
     
     private var messages: [Message]
     private var error: Error?
     
-    public init(messages: [Message]) {
+    public init(messages: [Message] = []) {
         self.messages = messages
         self.error = nil
     }
     
     @discardableResult
     public func append(message: Message) -> Self {
-        
-        // Ignore empty messages
-        guard message.content != nil else { return self }
-        
         messages.append(message)
         return self
     }
@@ -57,7 +48,6 @@ public final class MessageManager {
         return self
     }
     
-    @discardableResult
     public func sink(callback: ([Message]) -> Void) async -> Self {
         await MainActor.run { callback(messages) }
         return self
@@ -67,15 +57,14 @@ public final class MessageManager {
     
     private func apply(delta message: Message) {
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
-            let newMessage = messages[index].apply(message)
-            messages[index] = newMessage
+            messages[index] = messages[index].apply(message)
         } else {
             messages.append(message)
         }
     }
     
     private func apply(error: Error?) {
-        if let error {
+        if let error = error {
             logger.error("MessageManager Error: \(error, privacy: .public)")
             self.error = error
         }

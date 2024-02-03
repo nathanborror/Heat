@@ -6,17 +6,29 @@ struct VideoView: UIViewRepresentable {
     let name: String
     
     func makeUIView(context: Context) -> UIView {
-        return VideoUIView(frame: .zero, name: name)
+        let view = VideoUIView(frame: .zero)
+        view.setup(name: name)
+        return view
     }
     
-    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<VideoView>) {}
+    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<VideoView>) {
+        if let view = uiView as? VideoUIView {
+            view.setup(name: name)
+        }
+    }
 }
 
 class VideoUIView: UIView {
     private let playerLayer = AVPlayerLayer()
     
-    init(frame: CGRect, name: String) {
+    override init(frame: CGRect) {
         super.init(frame: frame)
+        layer.addSublayer(playerLayer)
+    }
+    
+    func setup(name: String) {
+        playerLayer.player?.pause()
+        NotificationCenter.default.removeObserver(self)
         
         let player = AVPlayer(url: Bundle.main.url(forResource: name, withExtension: "mp4")!)
         player.actionAtItemEnd = .none
@@ -26,8 +38,6 @@ class VideoUIView: UIView {
         playerLayer.videoGravity = .resizeAspectFill
         
         NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
-
-        layer.addSublayer(playerLayer)
     }
     
     @objc func playerItemDidReachEnd(notification: Notification) {

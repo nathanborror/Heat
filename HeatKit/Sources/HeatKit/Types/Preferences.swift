@@ -4,8 +4,9 @@ import GenKit
 public struct Preferences: Codable {
     
     public var services: [Service]
+    public var instructions: String?
     
-    public var defaultTemplateID: String?
+    public var defaultAgentID: String?
     
     public var preferredChatServiceID: String?
     public var preferredImageServiceID: String?
@@ -14,9 +15,15 @@ public struct Preferences: Codable {
     
     public init() {
         self.services = []
+        self.instructions = nil
         
-        self.defaultTemplateID = nil
+        self.defaultAgentID = nil
 
+        self.preferredChatServiceID = Constants.defaultChatServiceID
+        self.preferredImageServiceID = Constants.defaultImageServiceID
+        self.preferredEmbeddingServiceID = Constants.defaultTranscriptionServiceID
+        self.preferredTranscriptionServiceID = Constants.defaultTranscriptionServiceID
+        
         self.services = Constants.defaultServices
     }
 }

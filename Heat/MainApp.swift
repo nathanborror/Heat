@@ -1,3 +1,13 @@
+/*
+ ___   ___   ______   ________   _________
+/__/\ /__/\ /_____/\ /_______/\ /________/\
+\::\ \\  \ \\::::_\/_\::: _  \ \\__.::.__\/
+ \::\/_\ .\ \\:\/___/\\::(_)  \ \  \::\ \
+  \:: ___::\ \\::___\/_\:: __  \ \  \::\ \
+   \: \ \\::\ \\:\____/\\:.\ \  \ \  \::\ \
+    \__\/ \::\/ \_____\/ \__\/\__\/   \__\/
+ */
+
 import SwiftUI
 import OSLog
 import HeatKit
@@ -6,25 +16,59 @@ private let logger = Logger(subsystem: "MainApp", category: "Heat")
 
 @main
 struct MainApp: App {
-    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.scenePhase) var scenePhase
     
     @State private var store = Store.shared
     @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
     
     var body: some Scene {
+        #if os(macOS)
         WindowGroup {
             NavigationStack {
                 ConversationView()
             }
+            .environment(store)
+            .environment(conversationViewModel)
             .onChange(of: scenePhase) { _, _ in
                 handlePhaseChange()
             }
             .onAppear {
                 handleRestore()
+                NSWindow.allowsAutomaticWindowTabbing = false
             }
         }
-        .environment(store)
-        .environment(conversationViewModel)
+        .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 450, height: 500)
+        
+        Settings {
+            NavigationStack {
+                PreferencesDesktopForm()
+            }
+            .frame(width: 400, height: 600)
+            .environment(store)
+        }
+        #else
+        WindowGroup {
+            MainCompactView()
+                .environment(store)
+                .environment(conversationViewModel)
+                .onChange(of: scenePhase) { _, _ in
+                    handlePhaseChange()
+                }
+                .onAppear {
+                    handleRestore()
+                }
+        }
+        #endif
+    }
+    
+    func handlePhaseChange() {
+        #if os(macOS)
+        guard scenePhase == .inactive else { return }
+        #else
+        guard scenePhase == .background else { return }
+        #endif
+        handleSave()
     }
     
     func handleRestore() {
@@ -32,46 +76,12 @@ struct MainApp: App {
             do {
                 try await store.restore()
             } catch {
-                logger.error("Persistence Restore: \(error, privacy: .public)")
+                logger.warning("failed to restore: \(error)")
             }
         }
     }
     
-    func handleSave() async {
-        do { try await store.saveAll() }
-        catch { logger.error("Persistence Save: \(error, privacy: .public)") }
-    }
-    
-    func handlePhaseChange() {
-        guard scenePhase == .background else { return }
-        Task { await handleSave() }
-    }
-}
-
-enum AppError: LocalizedError {
-    case missingToken
-    case missingHost
-    case missingModel
-    
-    public var errorDescription: String? {
-        switch self {
-        case .missingToken:
-            "Missing auth token"
-        case .missingHost:
-            "Missing host URL"
-        case .missingModel:
-            "Missing model"
-        }
-    }
-    
-    var explanation: String {
-        switch self {
-        case .missingToken:
-            "Check that your OpenAI token has been added to Preferences."
-        case .missingHost:
-            "Check that your Ollama host URL has been added to Preferences."
-        case .missingModel:
-            "Check that you've selected a model in Preferences."
-        }
+    func handleSave() {
+        Task { try await store.saveAll() }
     }
 }
