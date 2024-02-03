@@ -22,6 +22,19 @@ struct PreferencesForm: View {
             }
             
             Section {
+                NavigationLink("Agents") {
+                    AgentList()
+                }
+                Picker("Default Agent", selection: $store.preferences.defaultAgentID ?? "") {
+                    ForEach(store.agents) { agent in
+                        Text(agent.name).tag(agent.id)
+                    }
+                }
+            } header: {
+                Text("Agents")
+            }
+            
+            Section {
                 Picker("Chats", selection: Binding<String>(
                     get: { store.preferences.preferredChatServiceID ?? "" },
                     set: { store.preferences.preferredChatServiceID = $0 }

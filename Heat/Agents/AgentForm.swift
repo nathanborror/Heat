@@ -7,7 +7,8 @@ struct AgentForm: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
-    @Binding var agent: Agent
+    @State var agent: Agent
+    @State var instructions: [(String, String)] = []
     
     var body: some View {
         Form {
@@ -20,27 +21,24 @@ struct AgentForm: View {
                 TextField("Name", text: $agent.name)
             }
             
-            ForEach($agent.instructions.indices, id: \.self) { index in
+            ForEach($instructions.indices, id: \.self) { index in
                 Section {
-                    Picker("Role", selection: $agent.instructions[index].role) {
-                        Text("System").tag(Message.Role.system)
-                        Text("Assistant").tag(Message.Role.assistant)
-                        Text("User").tag(Message.Role.user)
+                    Picker("Role", selection: $instructions[index].0) {
+                        Text("System").tag("system")
+                        Text("Assistant").tag("assistant")
+                        Text("User").tag("user")
                     }
-                    TextField("Content", text: Binding<String>(
-                        get: { agent.instructions[index].content ?? "" },
-                        set: { agent.instructions[index].content = $0.isEmpty ? nil : $0 }
-                    ), axis: .vertical)
+                    TextField("Content", text: $instructions[index].1, axis: .vertical)
                 }
                 .swipeActions {
-                    Button(role: .destructive, action: { handleDeleteMessage(agent.instructions[index]) }) {
+                    Button(role: .destructive, action: { handleDeleteInstruction(index) }) {
                         Label("Delete", systemImage: "trash")
                     }
                 }
             }
             
             Section {
-                Button("Add Message", action: handleAddMessage)
+                Button("Add Instruction", action: handleAddInstruction)
             }
         }
         .navigationTitle("Agent")
@@ -52,34 +50,39 @@ struct AgentForm: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done", action: handleDone)
             }
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel", action: dismiss.callAsFunction)
-            }
+        }
+        .onAppear {
+            instructions = agent.instructions.map { ($0.role.rawValue, $0.content ?? "") }
         }
     }
     
     private func handleDone() {
+        agent.instructions = instructions
+            .filter({ !$0.1.isEmpty })
+            .map {
+                Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
+            }
         store.upsert(agent: agent)
         dismiss()
     }
     
-    private func handleAddMessage() {
-        var message: Message!
-        if let lastMessage = agent.instructions.last {
-            switch lastMessage.role {
-            case .system, .user, .tool:
-                message = Message(kind: .instruction, role: .assistant)
-            case .assistant:
-                message = Message(kind: .instruction, role: .user)
+    private func handleAddInstruction() {
+        if let last = instructions.last {
+            switch last.0 {
+            case "system", "user":
+                instructions.append(("assistant", ""))
+            case "assistant":
+                instructions.append(("user", ""))
+            default:
+                instructions.append(("system", ""))
             }
         } else {
-            message = Message(kind: .instruction, role: .system)
+            instructions.append(("system", ""))
         }
-        agent.instructions.append(message)
     }
     
-    private func handleDeleteMessage(_ message: Message) {
-        agent.instructions.removeAll(where: { $0.id == message.id })
+    private func handleDeleteInstruction(_ index: Int) {
+        instructions.remove(at: index)
     }
 }
 
@@ -115,7 +118,7 @@ struct AgentPictureButton: View {
 
 #Preview("Create Agent") {
     NavigationStack {
-        AgentForm(agent: .constant(.empty))
+        AgentForm(agent: .empty)
     }.environment(Store.preview)
 }
 
@@ -124,6 +127,6 @@ struct AgentPictureButton: View {
     let agent = Agent.preview
     
     return NavigationStack {
-        AgentForm(agent: .constant(agent))
+        AgentForm(agent: agent)
     }.environment(store)
 }
