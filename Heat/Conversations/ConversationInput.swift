@@ -122,8 +122,8 @@ struct ConversationButtonModifier: ViewModifier {
     private var width: CGFloat = 32
     private var height: CGFloat = 32
     #else
-    private var width: CGFloat = 44
-    private var height: CGFloat = 44
+    private var width: CGFloat = 40
+    private var height: CGFloat = 40
     #endif
 }
 

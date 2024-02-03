@@ -3,7 +3,7 @@ import GenKit
 
 public struct Constants {
     
-    public static var defaultAgentID = "default-assistant"
+    public static var defaultAgentID = "bundle-assistant"
     public static var defaultAgents: [Agent] = [
         .init(
             id: defaultAgentID,
