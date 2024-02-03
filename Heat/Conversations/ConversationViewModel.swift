@@ -19,8 +19,12 @@ final class ConversationViewModel {
         store.get(conversationID: conversationID)
     }
     
-    var messages: [Message] {
+    var humanVisibleMessages: [Message] {
         conversation?.messages.filter { $0.kind != .instruction } ?? []
+    }
+    
+    var messages: [Message] {
+        conversation?.messages ?? []
     }
     
     var title: String {

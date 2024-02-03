@@ -12,7 +12,7 @@ struct ConversationView: View {
         ScrollView {
             ScrollViewReader { proxy in
                 LazyVStack(spacing: 4) {
-                    ForEach(viewModel.messages) { message in
+                    ForEach(viewModel.humanVisibleMessages) { message in
                         MessageBubble(message: message)
                     }
                     ScrollMarker(id: "bottom")
