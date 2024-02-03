@@ -28,7 +28,8 @@ final class ConversationViewModel {
     }
     
     func newConversation() {
-        guard let agent = store.get(agentID: "bundle-assistant") else { return }
+        guard let agentID = store.preferences.defaultAgentID else { return }
+        guard let agent = store.get(agentID: agentID) else { return }
         let conversation = store.createConversation(agent: agent)
         store.upsert(conversation: conversation)
         conversationID = conversation.id

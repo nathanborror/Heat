@@ -215,13 +215,14 @@ public final class Store {
     }
     
     public func resetAll() throws {
-        try self.resetAgents()
         self.conversations = []
         self.preferences = .init()
+        try self.resetAgents()
     }
     
     public func resetAgents() throws {
         self.agents = Constants.defaultAgents
+        self.preferences.defaultAgentID = Constants.defaultAgentID
     }
     
     // MARK: - Preview

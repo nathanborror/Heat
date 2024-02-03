@@ -3,9 +3,10 @@ import GenKit
 
 public struct Constants {
     
+    public static var defaultAgentID = "default-assistant"
     public static var defaultAgents: [Agent] = [
         .init(
-            id: "default-assistant",
+            id: defaultAgentID,
             name: "Assistant",
             instructions: [
                 .init(kind: .instruction, role: .system, content: "You are a helpful assistant."),
