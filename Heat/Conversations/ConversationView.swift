@@ -6,7 +6,6 @@ struct ConversationView: View {
     @Environment(ConversationViewModel.self) private var viewModel
     
     @State private var isShowingError = false
-    @State private var error: ConversationViewModelError? = nil
     
     var body: some View {
         ScrollView {
@@ -39,13 +38,17 @@ struct ConversationView: View {
                 .padding()
                 .background(.background)
         }
-        .alert(isPresented: $isShowingError, error: error) { _ in
+        .alert(isPresented: $isShowingError, error: viewModel.error) { _ in
             Button("Dismiss", role: .cancel) {
                 isShowingError = false
-                error = nil
+                viewModel.error = nil
             }
         } message: {
             Text($0.recoverySuggestion)
+        }
+        .onChange(of: viewModel.error) { _, newValue in
+            guard newValue != nil else { return }
+            isShowingError = true
         }
     }
 }

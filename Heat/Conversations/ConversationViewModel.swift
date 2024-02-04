@@ -9,10 +9,12 @@ private let logger = Logger(subsystem: "ConversationViewModel", category: "Heat"
 final class ConversationViewModel {
     var store: Store
     var conversationID: String?
+    var error: HeatKitError?
     
     init(store: Store, conversationID: String? = nil) {
         self.store = store
         self.conversationID = conversationID
+        self.error = nil
     }
     
     var conversation: Conversation? {
@@ -42,16 +44,13 @@ final class ConversationViewModel {
     func generate(_ content: String) throws {
         guard !content.isEmpty else { return }
         
-        guard let conversation else {
-            throw ConversationViewModelError.missingConversation
-        }
-        guard let chatService = store.preferredChatService() else {
-            throw ConversationViewModelError.missingService
-        }
-        guard let chatModel = store.preferredChatModel() else {
-            throw ConversationViewModelError.missingModel
-        }
+        let chatService = try store.preferredChatService()
+        let chatModel = try store.preferredChatModel()
         
+        guard let conversation else {
+            logger.warning("missing conversation")
+            return
+        }
         Task {
             await MessageManager(messages: messages)
                 .append(message: .init(role: .user, content: content))
@@ -61,7 +60,6 @@ final class ConversationViewModel {
                 .generateStream(service: chatService, model: chatModel) { messages in
                     store.upsert(messages: messages, conversationID: conversation.id)
                 }
-            
             if title == Conversation.titlePlaceholder {
                 try generateTitle()
             }
@@ -69,16 +67,13 @@ final class ConversationViewModel {
     }
     
     func generateTitle() throws {
-        guard let conversation else {
-            throw ConversationViewModelError.missingConversation
-        }
-        guard let chatService = store.preferredChatService() else {
-            throw ConversationViewModelError.missingService
-        }
-        guard let chatModel = store.preferredChatModel() else {
-            throw ConversationViewModelError.missingModel
-        }
+        let chatService = try store.preferredChatService()
+        let chatModel = try store.preferredChatModel()
         
+        guard let conversation else {
+            logger.warning("missing conversation")
+            return
+        }
         Task {
             await MessageManager(messages: messages)
                 .append(message: .init(role: .user, content: "Only return a title for this conversation if there's a clear subject. If a clear subject is not present return NONE. Keep it under 4 words."))
@@ -98,32 +93,3 @@ final class ConversationViewModel {
     }
 }
 
-enum ConversationViewModelError: LocalizedError {
-    case missingService
-    case missingModel
-    case missingConversation
-    
-    var errorDescription: String? {
-        switch self {
-        case .missingService: "Missing service"
-        case .missingModel: "Missing model"
-        case .missingConversation: "Missing conversation"
-        }
-    }
-    
-    var failureReason: String? {
-        "Failure reason"
-    }
-    
-    var helpAnchor: String? {
-        "Halp!"
-    }
-    
-    var recoverySuggestion: String {
-        switch self {
-        case .missingService: "Open Preferences and configure a service."
-        case .missingModel: "Open Preferences and pick a preferred model for the service you are using."
-        case .missingConversation: "Not sure how to recover from this."
-        }
-    }
-}

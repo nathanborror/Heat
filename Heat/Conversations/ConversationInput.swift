@@ -77,10 +77,10 @@ struct ConversationInput: View {
         }
         do {
             try conversationViewModel.generate(content)
-        } catch let error as ConversationViewModelError {
-            print(error)
+        } catch let error as HeatKitError {
+            conversationViewModel.error = error
         } catch {
-            print(error)
+            logger.warning("failed to submit: \(error)")
         }
         content = ""
     }

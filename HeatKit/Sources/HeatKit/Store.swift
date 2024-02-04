@@ -127,47 +127,67 @@ public final class Store {
     
     // MARK: - Service Preferences
     
-    public func preferredChatService() -> ChatService? {
-        guard let service = get(serviceID: preferences.preferredChatServiceID) else { return nil }
+    public func preferredChatService() throws -> ChatService {
+        guard let service = get(serviceID: preferences.preferredChatServiceID) else {
+            throw HeatKitError.missingService
+        }
         switch service.id {
         case "openai":
-            guard let token = service.token else { return nil }
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
             return OpenAIService(configuration: .init(token: token))
         case "mistral":
-            guard let token = service.token else { return nil }
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
             return MistralService(configuration: .init(token: token))
         case "perplexity":
-            guard let token = service.token else { return nil }
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
             return PerplexityService(configuration: .init(token: token))
         case "ollama":
-            guard let host = service.host else { return nil }
+            guard let host = service.host else {
+                throw HeatKitError.missingServiceHost
+            }
             return OllamaService(configuration: .init(host: host))
         default:
-            return nil
+            throw HeatKitError.missingService
         }
     }
     
-    public func preferredImageService() -> ImageService? {
-        guard let service = get(serviceID: preferences.preferredImageServiceID) else { return nil }
+    public func preferredImageService() throws -> ImageService {
+        guard let service = get(serviceID: preferences.preferredImageServiceID) else {
+            throw HeatKitError.missingService
+        }
         switch service.id {
         case "openai":
-            guard let token = service.token else { return nil }
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
             return OpenAIService(configuration: .init(token: token))
         default:
-            return nil
+            throw HeatKitError.missingService
         }
     }
     
     // MARK: - Model Preferences
     
-    public func preferredChatModel() -> String? {
-        guard let service = get(serviceID: preferences.preferredChatServiceID) else { return nil }
-        return service.preferredChatModel
+    public func preferredChatModel() throws -> String {
+        guard let service = get(serviceID: preferences.preferredChatServiceID),
+              let model = service.preferredChatModel else {
+            throw HeatKitError.missingServiceModel
+        }
+        return model
     }
     
-    public func preferredImageModel() -> String? {
-        guard let service = get(serviceID: preferences.preferredImageServiceID) else { return nil }
-        return service.preferredImageModel
+    public func preferredImageModel() throws -> String {
+        guard let service = get(serviceID: preferences.preferredImageServiceID),
+              let model = service.preferredImageModel else {
+            throw HeatKitError.missingServiceModel
+        }
+        return model
     }
     
     // MARK: - Persistence
@@ -233,13 +253,4 @@ public final class Store {
         store.conversations = [.preview]
         return store
     }()
-}
-
-public enum StoreError: Error {
-    case generateResponseFailed(Error?)
-    case generateSuggestionsFailed(Error?)
-    case generateAgentFailed(Error?)
-    case toolDecodingFailed(Error?)
-    case unknown(Error?)
-    case missingResource
 }
