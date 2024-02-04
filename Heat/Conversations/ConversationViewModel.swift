@@ -30,7 +30,7 @@ final class ConversationViewModel {
     }
     
     private var messages: [Message] {
-        conversation?.messages.filter { $0.kind == .error } ?? []
+        conversation?.messages ?? []
     }
     
     func newConversation() {

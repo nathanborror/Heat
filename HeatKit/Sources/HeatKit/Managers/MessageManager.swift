@@ -9,6 +9,10 @@ public final class MessageManager {
     private var messages: [Message]
     private var error: Error?
     
+    private var filteredMessages: [Message] {
+        messages.filter { $0.kind != .error }
+    }
+    
     public init(messages: [Message] = []) {
         self.messages = messages
         self.error = nil
@@ -24,7 +28,7 @@ public final class MessageManager {
     public func generate(service: ChatService, model: String) async -> Self {
         do {
             try Task.checkCancellation()
-            let req = ChatServiceRequest(model: model, messages: messages)
+            let req = ChatServiceRequest(model: model, messages: filteredMessages)
             let message = try await service.completion(request: req)
             return append(message: message)
         } catch {
@@ -37,7 +41,7 @@ public final class MessageManager {
     public func generateStream(service: ChatService, model: String, sink: ([Message]) -> Void) async -> Self {
         do {
             try Task.checkCancellation()
-            let req = ChatServiceRequest(model: model, messages: messages)
+            let req = ChatServiceRequest(model: model, messages: filteredMessages)
             try await service.completionStream(request: req) { message in
                 apply(delta: message)
                 await MainActor.run { sink(messages) }
