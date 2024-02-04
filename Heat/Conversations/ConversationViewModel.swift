@@ -25,12 +25,12 @@ final class ConversationViewModel {
         conversation?.messages.filter { $0.kind != .instruction } ?? []
     }
     
-    var messages: [Message] {
-        conversation?.messages ?? []
-    }
-    
     var title: String {
         conversation?.title ?? Conversation.titlePlaceholder
+    }
+    
+    private var messages: [Message] {
+        conversation?.messages.filter { $0.kind == .error } ?? []
     }
     
     func newConversation() {
@@ -60,6 +60,11 @@ final class ConversationViewModel {
                 .generateStream(service: chatService, model: chatModel) { messages in
                     store.upsert(messages: messages, conversationID: conversation.id)
                 }
+                .sinkError { error in
+                    guard let error else { return }
+                    let message = Message(kind: .error, role: .system, content: error.localizedDescription)
+                    store.upsert(message: message, conversationID: conversation.id)
+                }
             if title == Conversation.titlePlaceholder {
                 try generateTitle()
             }
@@ -84,6 +89,11 @@ final class ConversationViewModel {
                     var conversation = conversation
                     conversation.title = title
                     store.upsert(conversation: conversation)
+                }
+                .sinkError { error in
+                    guard let error else { return }
+                    let message = Message(kind: .error, role: .system, content: error.localizedDescription)
+                    store.upsert(message: message, conversationID: conversation.id)
                 }
         }
     }

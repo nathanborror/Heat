@@ -48,8 +48,15 @@ public final class MessageManager {
         return self
     }
     
+    @discardableResult
     public func sink(callback: ([Message]) -> Void) async -> Self {
         await MainActor.run { callback(messages) }
+        return self
+    }
+    
+    @discardableResult
+    public func sinkError(callback: (Error?) -> Void) async -> Self {
+        await MainActor.run { callback(error) }
         return self
     }
 

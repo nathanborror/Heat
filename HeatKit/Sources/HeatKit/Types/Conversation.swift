@@ -68,7 +68,8 @@ extension Conversation {
                 Think of all the things around you, like a toy car or a glass of water. Thermodynamics helps us \
                 understand how these things behave when they interact with heat or energy. It's like a special \
                 language that scientists use to talk about how things work together.
-                """)
+                """),
+            .init(kind: .error, role: .system, content: "Failed to reach host."),
         ])
     }()
 }
