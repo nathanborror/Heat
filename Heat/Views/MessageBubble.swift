@@ -46,6 +46,7 @@ struct MessageBubbleStyle: ViewModifier {
         case .assistant:
             content
                 .font(.system(size: 16))
+                .lineSpacing(2)
                 .padding(.vertical, paddingVertical)
         case .user:
             content
