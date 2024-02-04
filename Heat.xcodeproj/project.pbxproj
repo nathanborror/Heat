@@ -27,6 +27,7 @@
 		D88D23092B3CFB5100CCCC61 /* MessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
 		D8E1FC0C2B6FFCF3006C9366 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC0B2B6FFCF3006C9366 /* ImagePicker.swift */; };
+		D8E1FC0E2B700D62006C9366 /* NSImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC0D2B700D62006C9366 /* NSImage+.swift */; };
 		D8FBB20D2AEDB60700783E9B /* AgentList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBB20C2AEDB60700783E9B /* AgentList.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +55,7 @@
 		D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
 		D8E1FC0B2B6FFCF3006C9366 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		D8E1FC0D2B700D62006C9366 /* NSImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+.swift"; sourceTree = "<group>"; };
 		D8FBB20C2AEDB60700783E9B /* AgentList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -74,6 +76,7 @@
 			children = (
 				D4017C8F2B6EEFB5001CE137 /* Asset+.swift */,
 				D4017C912B6EEFBE001CE137 /* Color+.swift */,
+				D8E1FC0D2B700D62006C9366 /* NSImage+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -245,6 +248,7 @@
 				D41E19402AE4CD4F002516C1 /* VideoView.swift in Sources */,
 				D4B2D2692B6563DB0017FB52 /* ConversationInput.swift in Sources */,
 				D4713D702AEAB9670005597E /* Operators.swift in Sources */,
+				D8E1FC0E2B700D62006C9366 /* NSImage+.swift in Sources */,
 				D41E193E2AE4CD20002516C1 /* PictureView.swift in Sources */,
 				D41E193B2AE4C759002516C1 /* ConversationView.swift in Sources */,
 				D88D23092B3CFB5100CCCC61 /* MessageBubble.swift in Sources */,
