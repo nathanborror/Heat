@@ -22,9 +22,11 @@ struct PreferencesForm: View {
             }
             
             Section {
+                #if !os(macOS)
                 NavigationLink("Agents") {
                     AgentList()
                 }
+                #endif
                 Picker("Default Agent", selection: $store.preferences.defaultAgentID ?? "") {
                     ForEach(store.agents) { agent in
                         Text(agent.name).tag(agent.id)
@@ -375,14 +377,19 @@ struct PreferencesDesktopForm: View {
         TabView {
             PreferencesForm()
                 .tabItem {
-                    Label("General", systemImage: "gear")
+                    Label("General", systemImage: "gearshape")
                 }
                 .tag("general")
             ServiceList()
                 .tabItem {
-                    Label("Services", systemImage: "gear")
+                    Label("Services", systemImage: "cloud")
                 }
                 .tag("services")
+            AgentList()
+                .tabItem {
+                    Label("Agents", systemImage: "person.crop.rectangle.stack")
+                }
+                .tag("agents")
         }
     }
 }

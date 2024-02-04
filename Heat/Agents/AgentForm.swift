@@ -52,6 +52,7 @@ struct AgentForm: View {
                 Button("Add Instruction", action: handleAddInstruction)
             }
         }
+        .formStyle(.grouped)
         .navigationTitle("Agent")
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

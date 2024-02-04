@@ -5,15 +5,24 @@ struct AgentList: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
+    @State private var selectedAgent: Agent = .empty
     @State private var isShowingAgentForm = false
     
     var body: some View {
-        List {
+        Form {
+            Section {
+                Button("Create Agent") {
+                    selectedAgent = .empty
+                    isShowingAgentForm = true
+                }
+            }
             Section {
                 ForEach(store.agents) { agent in
-                    NavigationLink(agent.name) {
-                        AgentForm(agent: agent)
+                    Button(agent.name) {
+                        selectedAgent = agent
+                        isShowingAgentForm = true
                     }
+                    .buttonStyle(.plain)
                     .swipeActions {
                         Button(role: .destructive, action: { handleDeleteAgent(agent) }) {
                             Label("Delete", systemImage: "trash")
@@ -22,23 +31,19 @@ struct AgentList: View {
                 }
             }
         }
+        .formStyle(.grouped)
         .navigationTitle("Agents")
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button(action: { isShowingAgentForm = true }) {
-                    Label("Add", systemImage: "plus")
-                }
-            }
-        }
         .sheet(isPresented: $isShowingAgentForm) {
             NavigationStack {
-                AgentForm(agent: .empty)
+                AgentForm(agent: selectedAgent)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Cancel") { isShowingAgentForm = false }
                         }
                     }
-            }.environment(store)
+            }
+            .environment(store)
+            .frame(width: 400, height: 400)
         }
     }
     
