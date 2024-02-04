@@ -1,7 +1,11 @@
 import SwiftUI
+import OSLog
 import PhotosUI
+import SharedKit
 import GenKit
 import HeatKit
+
+private let logger = Logger(subsystem: "AgentForm", category: "Heat")
 
 struct AgentForm: View {
     @Environment(Store.self) private var store
@@ -9,11 +13,18 @@ struct AgentForm: View {
     
     @State var agent: Agent
     @State var instructions: [(String, String)] = []
+    @State var viewModel = ImagePickerViewModel()
+    
+    @State private var isShowingAlert = false
+    @State private var error: ImagePickerError? = nil
     
     var body: some View {
         Form {
             Section {
-                AgentPictureButton(picture: agent.picture)
+                PhotosPicker(selection: $viewModel.imageSelection, matching: .images, photoLibrary: .shared()) {
+                    AgentPicture(picture: agent.picture)
+                        .environment(viewModel)
+                }
             }
             .listRowBackground(Color.clear)
             
@@ -51,19 +62,48 @@ struct AgentForm: View {
                 Button("Done", action: handleDone)
             }
         }
+        .alert(isPresented: $isShowingAlert, error: error) { _ in
+            Button("Dismiss", role: .cancel) {
+                error = nil
+            }
+        } message: { error in
+            Text(error.recoverySuggestion)
+        }
         .onAppear {
             instructions = agent.instructions.map { ($0.role.rawValue, $0.content ?? "") }
         }
     }
     
     private func handleDone() {
-        agent.instructions = instructions
-            .filter({ !$0.1.isEmpty })
-            .map {
-                Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
+        do {
+            switch viewModel.imageState {
+            case .empty:
+                break
+            case .loading:
+                self.error = .transferInProgress
+                isShowingAlert = true
+                return
+            case .success:
+                let filename = try viewModel.write()
+                agent.picture = .init(name: filename, kind: .image, location: .filesystem)
+            case .failure(let error):
+                self.error = error
+                isShowingAlert = true
+                return
             }
-        store.upsert(agent: agent)
-        dismiss()
+            agent.instructions = instructions
+                .filter({ !$0.1.isEmpty })
+                .map {
+                    Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
+                }
+            store.upsert(agent: agent)
+            dismiss()
+        } catch let error as ImagePickerError {
+            self.error = error
+            isShowingAlert = true
+        } catch {
+            logger.error("failed to save image: \(error)")
+        }
     }
     
     private func handleAddInstruction() {
@@ -86,7 +126,9 @@ struct AgentForm: View {
     }
 }
 
-struct AgentPictureButton: View {
+struct AgentPicture: View {
+    @Environment(ImagePickerViewModel.self) private var viewModel
+    
     let picture: Asset?
     
     var body: some View {
@@ -94,14 +136,28 @@ struct AgentPictureButton: View {
             Spacer()
             ZStack(alignment: .bottomTrailing) {
                 Group {
-                    if let picture {
-                        PictureView(asset: picture)
-                    } else {
+                    switch viewModel.imageState {
+                    case .empty:
+                        if let picture {
+                            PictureView(asset: picture)
+                        } else {
+                            Rectangle()
+                        }
+                    case .loading:
+                        Rectangle()
+                    case .success(let image):
+                        #if os(macOS)
+                        Image(nsImage: image).resizable()
+                        #else
+                        Image(uiImage: image).resizable()
+                        #endif
+                    case .failure:
                         Rectangle()
                     }
                 }
                 .frame(width: 100, height: 100)
                 .clipShape(Squircle())
+                .tint(.primary)
                 
                 Image(systemName: "pencil")
                     .font(.system(size: 17, weight: .semibold))
