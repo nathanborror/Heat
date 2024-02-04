@@ -81,8 +81,14 @@ final class ConversationViewModel {
         }
         Task {
             await MessageManager(messages: messages)
-                .append(message: .init(role: .user, content: "Only return a title for this conversation if there's a clear subject. If a clear subject is not present return NONE. Keep it under 4 words."))
-                .generateStream(service: chatService, model: chatModel) { messages in
+                .append(message: .init(role: .user, content: """
+                    Return a title for this conversation if there is a clear subject.
+                    Keep the title under 4 words.
+                    Return NONE if there is no clear subject.
+                    Do not return anything else.
+                    """))
+                .generate(service: chatService, model: chatModel)
+                .sink { messages in
                     guard let title = messages.last?.content else { return }
                     guard !title.isEmpty else { return }
                     guard title != "NONE" else { return }
