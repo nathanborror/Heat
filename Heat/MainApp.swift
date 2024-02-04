@@ -39,12 +39,26 @@ struct MainApp: App {
         }
         .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 450, height: 500)
+        .commands {
+            CommandGroup(replacing: .newItem) {
+                Button("New Conversation") {
+                    print("not implemented")
+                }
+                .keyboardShortcut("n", modifiers: .command)
+            }
+            CommandGroup(before: .windowList) {
+                Button("Show History") {
+                    print("not implemented")
+                }
+                .keyboardShortcut("h", modifiers: [.shift, .command])
+            }
+        }
         
         Settings {
             NavigationStack {
-                PreferencesDesktopForm()
+                PreferencesWindow()
             }
-            .frame(width: 400, height: 600)
+            .frame(width: 600)
             .environment(store)
         }
         #else

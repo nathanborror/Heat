@@ -18,11 +18,21 @@ struct AgentList: View {
             }
             Section {
                 ForEach(store.agents) { agent in
-                    Button(agent.name) {
-                        selectedAgent = agent
-                        isShowingAgentForm = true
+                    HStack {
+                        Text(agent.name)
+                        Spacer()
+                        Button("Edit") {
+                            selectedAgent = agent
+                            isShowingAgentForm = true
+                        }
+                        #if os(macOS)
+                        Button(action: { handleDeleteAgent(agent) }) {
+                            Image(systemName: "trash")
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                        #endif
                     }
-                    .buttonStyle(.plain)
                     .swipeActions {
                         Button(role: .destructive, action: { handleDeleteAgent(agent) }) {
                             Label("Delete", systemImage: "trash")
@@ -31,19 +41,12 @@ struct AgentList: View {
                 }
             }
         }
-        .formStyle(.grouped)
         .navigationTitle("Agents")
         .sheet(isPresented: $isShowingAgentForm) {
             NavigationStack {
                 AgentForm(agent: selectedAgent)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Cancel") { isShowingAgentForm = false }
-                        }
-                    }
             }
             .environment(store)
-            .frame(width: 400, height: 400)
         }
     }
     

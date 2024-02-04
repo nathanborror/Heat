@@ -5,7 +5,7 @@ import SharedKit
 import GenKit
 import HeatKit
 
-private let logger = Logger(subsystem: "AgentForm", category: "Heat")
+private let logger = Logger(subsystem: "AgentForm", category: "Mate")
 
 struct AgentForm: View {
     @Environment(Store.self) private var store
@@ -52,15 +52,19 @@ struct AgentForm: View {
                 Button("Add Instruction", action: handleAddInstruction)
             }
         }
+        #if os(macOS)
         .formStyle(.grouped)
-        .navigationTitle("Agent")
-        #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+        .frame(width: 400)
+        .frame(minHeight: 450)
         #endif
+        .navigationTitle("Agent")
         .interactiveDismissDisabled()
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done", action: handleDone)
+            }
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel", action: dismiss.callAsFunction)
             }
         }
         .alert(isPresented: $isShowingAlert, error: error) { _ in
