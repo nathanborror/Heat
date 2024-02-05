@@ -48,8 +48,7 @@ final class ConversationViewModel {
         let chatModel = try store.preferredChatModel()
         
         guard let conversation else {
-            logger.warning("missing conversation")
-            return
+            throw HeatKitError.missingConversation
         }
         Task {
             await MessageManager(messages: messages)
@@ -76,8 +75,7 @@ final class ConversationViewModel {
         let chatModel = try store.preferredChatModel()
         
         guard let conversation else {
-            logger.warning("missing conversation")
-            return
+            throw HeatKitError.missingConversation
         }
         Task {
             await MessageManager(messages: messages)

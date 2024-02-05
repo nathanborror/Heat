@@ -8,6 +8,7 @@ public enum HeatKitError: LocalizedError, Equatable {
     case missingServiceModel
     case missingServiceToken
     case missingServiceHost
+    case missingConversation
     case unknown
     
     public var errorDescription: String? {
@@ -26,6 +27,8 @@ public enum HeatKitError: LocalizedError, Equatable {
             "Missing service token"
         case .missingServiceHost:
             "Missing service host"
+        case .missingConversation:
+            "Missing conversation"
         case .unknown:
             "Unknown"
         }
@@ -47,6 +50,8 @@ public enum HeatKitError: LocalizedError, Equatable {
             "The service requires a token to operate."
         case .missingServiceHost:
             "The service requires a host URL to operate."
+        case .missingConversation:
+            "Try again"
         case .unknown:
             "Try again"
         }

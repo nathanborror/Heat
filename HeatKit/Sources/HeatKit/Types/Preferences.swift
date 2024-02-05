@@ -19,10 +19,10 @@ public struct Preferences: Codable {
         
         self.defaultAgentID = nil
 
-        self.preferredChatServiceID = nil //Constants.defaultChatServiceID
-        self.preferredImageServiceID = nil //Constants.defaultImageServiceID
-        self.preferredEmbeddingServiceID = nil //Constants.defaultTranscriptionServiceID
-        self.preferredTranscriptionServiceID = nil //Constants.defaultTranscriptionServiceID
+        self.preferredChatServiceID = nil
+        self.preferredImageServiceID = nil
+        self.preferredEmbeddingServiceID = nil
+        self.preferredTranscriptionServiceID = nil
         
         self.services = Constants.defaultServices
     }
