@@ -19,7 +19,7 @@ public struct Constants {
     public static var defaultImageServiceID = ollama
     public static var defaultEmbeddingServiceID = ollama
     public static var defaultTranscriptionServiceID = ollama
-    public static var defaultVisionServiceID = "openai"
+    public static var defaultVisionServiceID = ollama
     
     public static var defaultServices: [Service] = [
         .init(
