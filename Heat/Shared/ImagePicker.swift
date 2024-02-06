@@ -62,11 +62,22 @@ final class ImagePickerViewModel {
         return image.pngData()
     }
     
-    var image: Image? {
-        guard let data else { return nil }
-        guard let uiImage = UIImage(data: data) else { return nil }
-        return Image(uiImage: uiImage)
+    var megabytes: Double {
+        guard let data else { return 0 }
+        return Double(data.count) / Double(1024 * 1024)
     }
+    
+    #if os(macOS)
+    var image: NSImage? {
+        guard let data else { return nil }
+        return NSImage(data: data)
+    }
+    #else
+    var image: UIImage? {
+        guard let data else { return nil }
+        return UIImage(data: data)
+    }
+    #endif
     
     func write() throws -> String {
         guard let data else {
@@ -81,6 +92,27 @@ final class ImagePickerViewModel {
         try data.write(to: url)
         return filename
     }
+    
+    func resizeImage(_ targetSize: CGSize) -> Data? {
+        guard megabytes > 15 else { return data }
+        guard let image else { return nil }
+        
+        let size = image.size
+        let widthRatio  = targetSize.width  / size.width
+        let heightRatio = targetSize.height / size.height
+        let scaleFactor = min(widthRatio, heightRatio)
+        let scaledImageSize = CGSize(
+            width: size.width * scaleFactor,
+            height: size.height * scaleFactor
+        )
+        let renderer = UIGraphicsImageRenderer(size: scaledImageSize)
+        let scaledImage = renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: scaledImageSize))
+        }
+        return scaledImage.pngData()
+    }
+    
+    
     
     private func handleLoadTransferable(from imageSelection: PhotosPickerItem) -> Progress {
         return imageSelection.loadTransferable(type: ImageTransfer.self) { result in

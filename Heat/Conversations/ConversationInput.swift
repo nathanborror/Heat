@@ -25,14 +25,26 @@ struct ConversationInput: View {
                     .buttonStyle(.plain)
                 }
                 
+                // TODO: Clean this up
                 VStack(alignment: .leading, spacing: 4) {
                     if let image = imagePickerViewModel.image {
-                        image
+                        #if os(macOS)
+                        Image(nsImage: image)
                             .resizable()
-                            .frame(width: 100, height: 80)
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 100, height: 100)
                             .clipShape(.rect(cornerRadius: 10))
                             .padding(.top)
                             .padding(.leading, showInputPadding ? 16 : 0)
+                        #else
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 100, height: 100)
+                            .clipShape(.rect(cornerRadius: 10))
+                            .padding(.top)
+                            .padding(.leading, showInputPadding ? 16 : 0)
+                        #endif
                     }
                     TextField("Message", text: $content, axis: .vertical)
                         .textFieldStyle(.plain)
@@ -102,7 +114,7 @@ struct ConversationInput: View {
         
         do {
             if isVisionRequest {
-                if let data = imagePickerViewModel.data {
+                if let data = imagePickerViewModel.resizeImage(.init(width: 512, height: 512)) {
                     try conversationViewModel.generate(content, images: [data])
                 } else {
                     try conversationViewModel.generate(content, images: [])
