@@ -28,23 +28,10 @@ struct ConversationInput: View {
                 // TODO: Clean this up
                 VStack(alignment: .leading, spacing: 4) {
                     if let image = imagePickerViewModel.image {
-                        #if os(macOS)
-                        Image(nsImage: image)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 100, height: 100)
-                            .clipShape(.rect(cornerRadius: 10))
+                        ConversationInputImage(image: image)
+                            .environment(imagePickerViewModel)
                             .padding(.top)
                             .padding(.leading, showInputPadding ? 16 : 0)
-                        #else
-                        Image(uiImage: image)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 100, height: 100)
-                            .clipShape(.rect(cornerRadius: 10))
-                            .padding(.top)
-                            .padding(.leading, showInputPadding ? 16 : 0)
-                        #endif
                     }
                     TextField("Message", text: $content, axis: .vertical)
                         .textFieldStyle(.plain)
@@ -187,6 +174,44 @@ struct ConversationInlineButtonModifier: ViewModifier {
     private var width: CGFloat = 44
     private var height: CGFloat = 44
     #endif
+}
+
+struct ConversationInputImage: View {
+    @Environment(ImagePickerViewModel.self) var imagePickerViewModel
+    
+    #if os(macOS)
+    let image: NSImage
+    #else
+    let image: UIImage
+    #endif
+    
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            imageView
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 100, height: 100)
+                .clipShape(.rect(cornerRadius: 10))
+         
+            Button {
+                imagePickerViewModel.imageSelection = nil
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .imageScale(.medium)
+                    .padding(4)
+            }
+            .foregroundStyle(.regularMaterial)
+            .shadow(color: .primary.opacity(0.25), radius: 5)
+        }
+    }
+    
+    private var imageView: Image {
+        #if os(macOS)
+        Image(nsImage: image)
+        #else
+        Image(uiImage: image)
+        #endif
+    }
 }
 
 #Preview {
