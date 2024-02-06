@@ -8,4 +8,9 @@ extension Asset {
         guard let hex = background else { return nil }
         return Color(hex: hex)
     }
+    
+    var foregroundColor: Color? {
+        guard let hex = foreground else { return nil }
+        return Color(hex: hex)
+    }
 }
