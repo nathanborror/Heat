@@ -51,9 +51,7 @@ struct MainCompactView: View {
                     PreferencesForm()
                         .toolbar {
                             ToolbarItem(placement: .confirmationAction) {
-                                Button(action: { self.sheet = nil }) {
-                                    Text("Done")
-                                }
+                                Button("Done") { self.sheet = nil }
                             }
                         }
                 }
