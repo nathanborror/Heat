@@ -110,7 +110,8 @@ struct ConversationInput: View {
             }
             return attachment != nil
         })
-        let isVisionRequest = message != nil || imagePickerViewModel.data != nil
+        
+        let isVisionRequest = message != nil || imagePickerViewModel.image != nil
         
         do {
             if isVisionRequest {

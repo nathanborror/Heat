@@ -57,30 +57,20 @@ final class ImagePickerViewModel {
         }
     }
     
-    var data: Data? {
-        guard case .success(let image) = imageState else { return nil }
-        return image.pngData()
-    }
-    
-    var megabytes: Double {
-        guard let data else { return 0 }
-        return Double(data.count) / Double(1024 * 1024)
-    }
-    
     #if os(macOS)
     var image: NSImage? {
-        guard let data else { return nil }
-        return NSImage(data: data)
+        guard case .success(let image) = imageState else { return nil }
+        return image
     }
     #else
     var image: UIImage? {
-        guard let data else { return nil }
-        return UIImage(data: data)
+        guard case .success(let image) = imageState else { return nil }
+        return image
     }
     #endif
     
     func write() throws -> String {
-        guard let data else {
+        guard let data = image?.pngData() else {
             throw ImagePickerError.missingImage
         }
         let filename = "\(String.id).png"
