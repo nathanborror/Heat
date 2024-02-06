@@ -103,6 +103,15 @@ struct PreferencesForm: View {
                         }
                     }
                 }
+                Picker("Vision", selection: $store.preferences.preferredVisionServiceID ?? "") {
+                    Text("None").tag("")
+                    Divider()
+                    ForEach(store.preferences.services) { service in
+                        if service.supportsVision {
+                            Text(service.name).tag(service.id)
+                        }
+                    }
+                }
             } footer: {
                 Text("Only services with preferred models selected to support the behavior will show up in the picker.")
             }

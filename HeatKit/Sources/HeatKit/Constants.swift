@@ -19,6 +19,7 @@ public struct Constants {
     public static var defaultImageServiceID = ollama
     public static var defaultEmbeddingServiceID = ollama
     public static var defaultTranscriptionServiceID = ollama
+    public static var defaultVisionServiceID = "openai"
     
     public static var defaultServices: [Service] = [
         .init(
@@ -29,6 +30,7 @@ public struct Constants {
             preferredImageModel: "dall-e-3",
             preferredEmbeddingModel: "text-embedding-ada-002",
             preferredTranscriptionModel: "whisper-1",
+            preferredVisionModel: "gpt-4-vision-preview",
             requiresToken: true
         ),
         .init(

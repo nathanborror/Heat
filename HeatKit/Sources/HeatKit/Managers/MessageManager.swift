@@ -53,6 +53,34 @@ public final class MessageManager {
     }
     
     @discardableResult
+    public func generate(service: VisionService, model: String) async -> Self {
+        do {
+            try Task.checkCancellation()
+            let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
+            let message = try await service.completion(request: req)
+            return append(message: message)
+        } catch {
+            apply(error: error)
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func generateStream(service: VisionService, model: String, sink: ([Message]) -> Void) async -> Self {
+        do {
+            try Task.checkCancellation()
+            let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
+            try await service.completionStream(request: req) { message in
+                apply(delta: message)
+                await MainActor.run { sink(messages) }
+            }
+        } catch {
+            apply(error: error)
+        }
+        return self
+    }
+    
+    @discardableResult
     public func sink(callback: ([Message]) -> Void) async -> Self {
         await MainActor.run { callback(messages) }
         return self

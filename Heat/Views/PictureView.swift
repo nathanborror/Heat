@@ -11,32 +11,6 @@ struct PictureView: View {
 
     var body: some View {
         GeometryReader { geo in
-            if let data = asset.data, asset.kind != .audio {
-                #if os(macOS)
-                if let image = NSImage(data: data) {
-                    Image(nsImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geo.size.width, height: geo.size.height)
-                } else {
-                    Rectangle()
-                        .fill(.secondary)
-                        .frame(width: geo.size.width, height: geo.size.height)
-                }
-                #else
-                if let image = UIImage(data: data) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geo.size.width, height: geo.size.height)
-                } else {
-                    Rectangle()
-                        .fill(.secondary)
-                        .frame(width: geo.size.width, height: geo.size.height)
-                }
-                #endif
-            }
-            
             switch asset.kind {
             case .image:
                 switch asset.location {
@@ -62,7 +36,33 @@ struct PictureView: View {
                         .scaleEffect(scale, anchor: .top)
                         .offset(offset)
                 case .none:
-                    empty(size: geo.size)
+                    if let data = asset.data {
+                        #if os(macOS)
+                        if let image = NSImage(data: data) {
+                            Image(nsImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: geo.size.width, height: geo.size.height)
+                        } else {
+                            Rectangle()
+                                .fill(.secondary)
+                                .frame(width: geo.size.width, height: geo.size.height)
+                        }
+                        #else
+                        if let image = UIImage(data: data) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: geo.size.width, height: geo.size.height)
+                        } else {
+                            Rectangle()
+                                .fill(.secondary)
+                                .frame(width: geo.size.width, height: geo.size.height)
+                        }
+                        #endif
+                    } else {
+                        empty(size: geo.size)
+                    }
                 }
             
             case .video:

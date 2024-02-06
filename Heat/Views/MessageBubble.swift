@@ -9,6 +9,7 @@ struct MessageBubble: View {
         MessageBubbleText(text: message.content, finishReason: message.finishReason)
             .messageBubbleStyle(message)
             .messageBubbleSpacing(message)
+            .messageBubbleAttachments(message)
     }
 }
 
@@ -105,6 +106,30 @@ struct MessageBubbleSpacing: ViewModifier {
     }
 }
 
+struct MessageBubbleAttachments: ViewModifier {
+    let message: Message
+        
+    func body(content: Content) -> some View {
+        VStack {
+            HStack {
+                if message.role == .user { Spacer() }
+                ForEach(message.attachments.indices, id: \.self) { index in
+                    switch message.attachments[index] {
+                    case .agent(let agentID):
+                        Text(agentID)
+                    case .asset(let asset):
+                        PictureView(asset: asset)
+                            .frame(width: 200, height: 200)
+                            .clipShape(.rect(cornerRadius: 10))
+                    }
+                }
+                if message.role == .assistant { Spacer() }
+            }
+            content
+        }
+    }
+}
+
 extension View {
     
     func messageBubbleStyle(_ message: Message) -> some View {
@@ -113,6 +138,10 @@ extension View {
     
     func messageBubbleSpacing(_ message: Message) -> some View {
         self.modifier(MessageBubbleSpacing(message: message))
+    }
+    
+    func messageBubbleAttachments(_ message: Message) -> some View {
+        self.modifier(MessageBubbleAttachments(message: message))
     }
 }
 

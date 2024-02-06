@@ -70,6 +70,38 @@ final class ConversationViewModel {
         }
     }
     
+    func generate(_ content: String, images: [Data]) throws {
+        guard !content.isEmpty else { return }
+        
+        let visionService = try store.preferredVisionService()
+        let visionModel = try store.preferredVisionModel()
+        
+        guard let conversation else {
+            throw HeatKitError.missingConversation
+        }
+        let message = Message(role: .user, content: content, attachments: images.map {
+            .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
+        })
+        Task {
+            await MessageManager(messages: messages)
+                .append(message: message)
+                .sink { messages in
+                    store.upsert(messages: messages, conversationID: conversation.id)
+                }
+                .generateStream(service: visionService, model: visionModel) { messages in
+                    store.upsert(messages: messages, conversationID: conversation.id)
+                }
+                .sinkError { error in
+                    guard let error else { return }
+                    let message = Message(kind: .error, role: .system, content: error.localizedDescription)
+                    store.upsert(message: message, conversationID: conversation.id)
+                }
+            if title == Conversation.titlePlaceholder {
+                try generateTitle()
+            }
+        }
+    }
+    
     func generateTitle() throws {
         let chatService = try store.preferredChatService()
         let chatModel = try store.preferredChatModel()

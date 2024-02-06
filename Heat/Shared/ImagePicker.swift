@@ -62,6 +62,12 @@ final class ImagePickerViewModel {
         return image.pngData()
     }
     
+    var image: Image? {
+        guard let data else { return nil }
+        guard let uiImage = UIImage(data: data) else { return nil }
+        return Image(uiImage: uiImage)
+    }
+    
     func write() throws -> String {
         guard let data else {
             throw ImagePickerError.missingImage

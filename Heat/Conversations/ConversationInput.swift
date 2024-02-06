@@ -1,5 +1,6 @@
 import SwiftUI
 import OSLog
+import PhotosUI
 import GenKit
 import HeatKit
 
@@ -8,29 +9,41 @@ private let logger = Logger(subsystem: "ConversationInput", category: "Heat")
 struct ConversationInput: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
 
+    @State var imagePickerViewModel = ImagePickerViewModel()
     @State var content = ""
+    
     @FocusState var isFocused: Bool
     
     var body: some View {
         HStack(alignment: .bottom) {
             HStack(alignment: .bottom, spacing: 0) {
                 if showInlineControls {
-                    Button(action: handlePlus) {
+                    PhotosPicker(selection: $imagePickerViewModel.imageSelection, matching: .images, photoLibrary: .shared()) {
                         Image(systemName: "plus")
                             .modifier(ConversationInlineButtonModifier())
                     }
                     .buttonStyle(.plain)
                 }
                 
-                TextField("Message", text: $content, axis: .vertical)
-                    .textFieldStyle(.plain)
-                    .padding(.vertical, verticalPadding)
-                    .padding(.horizontal, showInputPadding ? 16 : 0)
-                    .frame(minHeight: minHeight)
-                    .focused($isFocused)
-                    #if os(macOS)
-                    .onSubmit(handleSubmit)
-                    #endif
+                VStack(alignment: .leading, spacing: 4) {
+                    if let image = imagePickerViewModel.image {
+                        image
+                            .resizable()
+                            .frame(width: 100, height: 80)
+                            .clipShape(.rect(cornerRadius: 10))
+                            .padding(.top)
+                            .padding(.leading, showInputPadding ? 16 : 0)
+                    }
+                    TextField("Message", text: $content, axis: .vertical)
+                        .textFieldStyle(.plain)
+                        .padding(.vertical, verticalPadding)
+                        .padding(.horizontal, showInputPadding ? 16 : 0)
+                        .frame(minHeight: minHeight)
+                        .focused($isFocused)
+                        #if os(macOS)
+                        .onSubmit(handleSubmit)
+                        #endif
+                }
                 
                 if showInlineControls {
                     Button(action: handleSpeak) {
@@ -75,17 +88,36 @@ struct ConversationInput: View {
         if conversationViewModel.conversationID == nil {
             conversationViewModel.newConversation()
         }
+        
+        let message = conversationViewModel.humanVisibleMessages.first(where: { message in
+            let attachment = message.attachments.first { attachment in
+                switch attachment {
+                case .agent: return false
+                case .asset(let asset): return asset.noop == false
+                }
+            }
+            return attachment != nil
+        })
+        let isVisionRequest = message != nil || imagePickerViewModel.data != nil
+        
         do {
-            try conversationViewModel.generate(content)
+            if isVisionRequest {
+                if let data = imagePickerViewModel.data {
+                    try conversationViewModel.generate(content, images: [data])
+                } else {
+                    try conversationViewModel.generate(content, images: [])
+                }
+            } else {
+                try conversationViewModel.generate(content)
+            }
         } catch let error as HeatKitError {
             conversationViewModel.error = error
         } catch {
             logger.warning("failed to submit: \(error)")
         }
         content = ""
+        imagePickerViewModel.imageSelection = nil
     }
-    
-    func handlePlus() {}
     
     func handleStop() {
         conversationViewModel.generateStop()

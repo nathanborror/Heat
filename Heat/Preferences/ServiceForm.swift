@@ -26,12 +26,16 @@ struct ServiceForm: View {
             Section {
                 TextField("Identifier", text: $service.id)
                 TextField("Name", text: $service.name)
-                TextField("Host", text: $service.host ?? URL(string: "http://localhost:8080/api")!)
-                    .autocorrectionDisabled()
-                    .textContentType(.URL)
-                    #if os(iOS)
-                    .textInputAutocapitalization(.never)
-                    #endif
+                TextField("Host", text: Binding<String>(
+                    get: { service.host?.absoluteString ?? "" },
+                    set: { service.host = ($0.isEmpty) ? nil : URL(string: $0) }
+                ))
+                .autocorrectionDisabled()
+                .textContentType(.URL)
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                #endif
+                
                 TextField("Token", text: $service.token ?? "")
             }
             
@@ -46,6 +50,9 @@ struct ServiceForm: View {
                     servicePickerModels
                 }
                 Picker("Transcriptions", selection: $service.preferredTranscriptionModel ?? "") {
+                    servicePickerModels
+                }
+                Picker("Vision", selection: $service.preferredVisionModel ?? "") {
                     servicePickerModels
                 }
             } footer: {
