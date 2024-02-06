@@ -172,6 +172,46 @@ public final class Store {
         }
     }
     
+    public func preferredEmbeddingService() throws -> EmbeddingService {
+        guard let service = get(serviceID: preferences.preferredEmbeddingServiceID) else {
+            throw HeatKitError.missingService
+        }
+        switch service.id {
+        case "openai":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
+            return OpenAIService(configuration: .init(token: token))
+        case "mistral":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
+            return MistralService(configuration: .init(token: token))
+        case "ollama":
+            guard let host = service.host else {
+                throw HeatKitError.missingServiceHost
+            }
+            return OllamaService(configuration: .init(host: host))
+        default:
+            throw HeatKitError.missingService
+        }
+    }
+    
+    public func preferredTranscriptionService() throws -> TranscriptionService {
+        guard let service = get(serviceID: preferences.preferredTranscriptionServiceID) else {
+            throw HeatKitError.missingService
+        }
+        switch service.id {
+        case "openai":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
+            return OpenAIService(configuration: .init(token: token))
+        default:
+            throw HeatKitError.missingService
+        }
+    }
+    
     // MARK: - Model Preferences
     
     public func preferredChatModel() throws -> String {
@@ -185,6 +225,22 @@ public final class Store {
     public func preferredImageModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredImageServiceID),
               let model = service.preferredImageModel else {
+            throw HeatKitError.missingServiceModel
+        }
+        return model
+    }
+    
+    public func preferredEmbeddingModel() throws -> String {
+        guard let service = get(serviceID: preferences.preferredEmbeddingServiceID),
+              let model = service.preferredEmbeddingModel else {
+            throw HeatKitError.missingServiceModel
+        }
+        return model
+    }
+    
+    public func preferredTranscriptionModel() throws -> String {
+        guard let service = get(serviceID: preferences.preferredTranscriptionServiceID),
+              let model = service.preferredTranscriptionModel else {
             throw HeatKitError.missingServiceModel
         }
         return model
