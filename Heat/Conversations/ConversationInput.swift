@@ -69,7 +69,7 @@ struct ConversationInput: View {
                 .buttonStyle(.plain)
             }
         }
-        #if os(iOS)
+        #if !os(macOS)
         .background(.background)
         #endif
         .onOpenURL { url in

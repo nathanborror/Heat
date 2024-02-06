@@ -32,7 +32,7 @@ struct ServiceForm: View {
                 ))
                 .autocorrectionDisabled()
                 .textContentType(.URL)
-                #if os(iOS)
+                #if !os(macOS)
                 .textInputAutocapitalization(.never)
                 #endif
                 

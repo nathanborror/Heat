@@ -117,13 +117,13 @@ struct ImageTransfer: Transferable {
     
     static var transferRepresentation: some TransferRepresentation {
         DataRepresentation(importedContentType: .image) { data in
-            #if os(iOS)
-            guard let image = UIImage(data: data) else {
+            #if os(macOS)
+            guard let image = NSImage(data: data) else {
                 throw TransferError.importFailed
             }
             return ImageTransfer(image: image)
             #else
-            guard let image = NSImage(data: data) else {
+            guard let image = UIImage(data: data) else {
                 throw TransferError.importFailed
             }
             return ImageTransfer(image: image)

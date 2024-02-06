@@ -1,7 +1,7 @@
 import SwiftUI
 import AVKit
 
-#if os(iOS)
+#if !os(macOS)
 struct VideoView: UIViewRepresentable {
     let name: String
     

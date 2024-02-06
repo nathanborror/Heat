@@ -1,4 +1,4 @@
-#if os(iOS)
+#if !os(macOS)
 import UIKit
 
 extension UIImage {
