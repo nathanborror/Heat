@@ -24,7 +24,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "56d62bdd0c5c0e0d4643971584d0cc53068d6e88"
+        "revision" : "926595783e7a40730ed3591979cec80ab39d6ab4"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "e4b64c33d56095998ca1dfd2440749872d92962f"
+        "revision" : "1e6389ef325f3bf3ae2f58dfaf3e71fc7a452b60"
       }
     },
     {

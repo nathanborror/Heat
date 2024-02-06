@@ -222,6 +222,11 @@ public final class Store {
                 throw HeatKitError.missingServiceToken
             }
             return OpenAIService(configuration: .init(token: token))
+        case "ollama":
+            guard let host = service.host else {
+                throw HeatKitError.missingServiceHost
+            }
+            return OllamaService(configuration: .init(host: host))
         default:
             throw HeatKitError.missingService
         }
