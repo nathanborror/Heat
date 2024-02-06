@@ -93,27 +93,6 @@ final class ImagePickerViewModel {
         return filename
     }
     
-    func resizeImage(_ targetSize: CGSize) -> Data? {
-        guard megabytes > 15 else { return data }
-        guard let image else { return nil }
-        
-        let size = image.size
-        let widthRatio  = targetSize.width  / size.width
-        let heightRatio = targetSize.height / size.height
-        let scaleFactor = min(widthRatio, heightRatio)
-        let scaledImageSize = CGSize(
-            width: size.width * scaleFactor,
-            height: size.height * scaleFactor
-        )
-        let renderer = UIGraphicsImageRenderer(size: scaledImageSize)
-        let scaledImage = renderer.image { _ in
-            image.draw(in: CGRect(origin: .zero, size: scaledImageSize))
-        }
-        return scaledImage.pngData()
-    }
-    
-    
-    
     private func handleLoadTransferable(from imageSelection: PhotosPickerItem) -> Progress {
         return imageSelection.loadTransferable(type: ImageTransfer.self) { result in
             DispatchQueue.main.async {

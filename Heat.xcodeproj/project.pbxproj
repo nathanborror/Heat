@@ -24,6 +24,7 @@
 		D4B2D2672B649DFD0017FB52 /* ConversationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2662B649DFD0017FB52 /* ConversationList.swift */; };
 		D4B2D2692B6563DB0017FB52 /* ConversationInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
+		D8753DF22B720662005BD3A7 /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8753DF12B720662005BD3A7 /* UIImage+.swift */; };
 		D88D23092B3CFB5100CCCC61 /* MessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
 		D8E1FC0C2B6FFCF3006C9366 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC0B2B6FFCF3006C9366 /* ImagePicker.swift */; };
@@ -54,6 +55,7 @@
 		D4B2D2662B649DFD0017FB52 /* ConversationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationList.swift; sourceTree = "<group>"; };
 		D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationInput.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
+		D8753DF12B720662005BD3A7 /* UIImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
 		D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
 		D8E1FC0B2B6FFCF3006C9366 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 				D4017C8F2B6EEFB5001CE137 /* Asset+.swift */,
 				D4017C912B6EEFBE001CE137 /* Color+.swift */,
 				D8E1FC0D2B700D62006C9366 /* NSImage+.swift */,
+				D8753DF12B720662005BD3A7 /* UIImage+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -272,6 +275,7 @@
 				D8E1FC0C2B6FFCF3006C9366 /* ImagePicker.swift in Sources */,
 				D4017C8D2B6EEF70001CE137 /* Squircle.swift in Sources */,
 				D41E19352AE4C665002516C1 /* AgentForm.swift in Sources */,
+				D8753DF22B720662005BD3A7 /* UIImage+.swift in Sources */,
 				D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */,
 				D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */,
 			);

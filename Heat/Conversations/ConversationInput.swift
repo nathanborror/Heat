@@ -114,7 +114,7 @@ struct ConversationInput: View {
         
         do {
             if isVisionRequest {
-                if let data = imagePickerViewModel.resizeImage(.init(width: 512, height: 512)) {
+                if let data = imagePickerViewModel.image?.resize(to: .init(width: 512, height: 512)) {
                     try conversationViewModel.generate(content, images: [data])
                 } else {
                     try conversationViewModel.generate(content, images: [])
