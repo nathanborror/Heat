@@ -72,11 +72,6 @@ struct ConversationInput: View {
         #if !os(macOS)
         .background(.background)
         #endif
-        .onOpenURL { url in
-            guard let host = url.host() else { return }
-            guard host == "focus" else { return }
-            isFocused = true
-        }
         .onAppear {
             isFocused = true
         }
