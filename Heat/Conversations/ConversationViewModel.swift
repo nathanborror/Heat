@@ -52,17 +52,16 @@ final class ConversationViewModel {
         }
         Task {
             await MessageManager(messages: messages)
-                .append(message: .init(role: .user, content: content))
-                .sink { messages in
-                    store.upsert(messages: messages, conversationID: conversation.id)
+                .append(message: .init(role: .user, content: content)) { message in
+                    self.store.upsert(message: message, conversationID: conversation.id)
                 }
-                .generateStream(service: chatService, model: chatModel) { messages in
-                    store.upsert(messages: messages, conversationID: conversation.id)
+                .generateStream(service: chatService, model: chatModel) { message in
+                    self.store.replace(message: message, conversationID: conversation.id)
                 }
-                .sinkError { error in
-                    guard let error else { return }
+                .manage { manager in
+                    guard let error = manager.error else { return }
                     let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                    store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(message: message, conversationID: conversation.id)
                 }
             if title == Conversation.titlePlaceholder {
                 try generateTitle()
@@ -84,17 +83,16 @@ final class ConversationViewModel {
         })
         Task {
             await MessageManager(messages: messages)
-                .append(message: message)
-                .sink { messages in
-                    store.upsert(messages: messages, conversationID: conversation.id)
+                .append(message: message) { message in
+                    self.store.upsert(message: message, conversationID: conversation.id)
                 }
-                .generateStream(service: visionService, model: visionModel) { messages in
-                    store.upsert(messages: messages, conversationID: conversation.id)
+                .generateStream(service: visionService, model: visionModel) { message in
+                    self.store.replace(message: message, conversationID: conversation.id)
                 }
-                .sinkError { error in
-                    guard let error else { return }
+                .manage { manager in
+                    guard let error = manager.error else { return }
                     let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                    store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(message: message, conversationID: conversation.id)
                 }
             if title == Conversation.titlePlaceholder {
                 try generateTitle()
@@ -117,19 +115,14 @@ final class ConversationViewModel {
                     Return NONE if there is no clear subject.
                     Do not return anything else.
                     """))
-                .generate(service: chatService, model: chatModel)
-                .sink { messages in
-                    guard let title = messages.last?.content else { return }
-                    guard !title.isEmpty else { return }
-                    guard title != "NONE" else { return }
-                    var conversation = conversation
-                    conversation.title = title
-                    store.upsert(conversation: conversation)
+                .generate(service: chatService, model: chatModel) { message in
+                    guard let title = message.content, !title.isEmpty, title != "NONE" else { return }
+                    self.store.upsert(title: title, conversationID: conversation.id)
                 }
-                .sinkError { error in
-                    guard let error else { return }
+                .manage { manager in
+                    guard let error = manager.error else { return }
                     let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                    store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(message: message, conversationID: conversation.id)
                 }
         }
     }

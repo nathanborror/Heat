@@ -51,7 +51,7 @@ public struct Constants {
         .init(
             id: "ollama",
             name: "Ollama",
-            host: URL(string: "http://localhost:8080/api")!,
+            host: URL(string: "http://localhost:11434/api")!,
             requiresHost: true
         ),
     ]

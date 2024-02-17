@@ -5,9 +5,11 @@ import GenKit
 private let logger = Logger(subsystem: "MessageManager", category: "HeatKit")
 
 public final class MessageManager {
+    public typealias CallBack = (MessageManager) async throws -> Void
+    public typealias MessageCallback = (Message) -> Void
     
-    private var messages: [Message]
-    private var error: Error?
+    public private(set) var messages: [Message]
+    public private(set) var error: Error?
     
     private var filteredMessages: [Message] {
         messages.filter { $0.kind != .error }
@@ -19,18 +21,20 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func append(message: Message) -> Self {
+    public func append(message: Message, callback: MessageCallback? = nil) async -> Self {
         messages.append(message)
+        await MainActor.run { callback?(message) }
         return self
     }
     
     @discardableResult
-    public func generate(service: ChatService, model: String) async -> Self {
+    public func generate(service: ChatService, model: String, callback: MessageCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             let req = ChatServiceRequest(model: model, messages: filteredMessages)
             let message = try await service.completion(request: req)
-            return append(message: message)
+            await append(message: message)
+            await MainActor.run { callback?(message) }
         } catch {
             apply(error: error)
         }
@@ -38,13 +42,13 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func generateStream(service: ChatService, model: String, sink: ([Message]) -> Void) async -> Self {
+    public func generateStream(service: ChatService, model: String, callback: MessageCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             let req = ChatServiceRequest(model: model, messages: filteredMessages)
             try await service.completionStream(request: req) { message in
-                apply(delta: message)
-                await MainActor.run { sink(messages) }
+                let message = apply(delta: message)
+                await MainActor.run { callback?(message) }
             }
         } catch {
             apply(error: error)
@@ -53,12 +57,13 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func generate(service: VisionService, model: String) async -> Self {
+    public func generate(service: VisionService, model: String, callback: MessageCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
             let message = try await service.completion(request: req)
-            return append(message: message)
+            await append(message: message)
+            await MainActor.run { callback?(message) }
         } catch {
             apply(error: error)
         }
@@ -66,13 +71,13 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func generateStream(service: VisionService, model: String, sink: ([Message]) -> Void) async -> Self {
+    public func generateStream(service: VisionService, model: String, callback: MessageCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
             try await service.completionStream(request: req) { message in
-                apply(delta: message)
-                await MainActor.run { sink(messages) }
+                let message = apply(delta: message)
+                await MainActor.run { callback?(message) }
             }
         } catch {
             apply(error: error)
@@ -81,24 +86,25 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func sink(callback: ([Message]) -> Void) async -> Self {
-        await MainActor.run { callback(messages) }
-        return self
-    }
-    
-    @discardableResult
-    public func sinkError(callback: (Error?) -> Void) async -> Self {
-        await MainActor.run { callback(error) }
+    public func manage(callback: CallBack) async -> Self {
+        do {
+            try await callback(self)
+        } catch {
+            apply(error: error)
+        }
         return self
     }
 
-    // MARK: Private
+    // MARK: - Private
     
-    private func apply(delta message: Message) {
+    private func apply(delta message: Message) -> Message {
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
-            messages[index] = messages[index].apply(message)
+            let newMessage = messages[index].apply(message)
+            messages[index] = newMessage
+            return newMessage
         } else {
             messages.append(message)
+            return message
         }
     }
     
