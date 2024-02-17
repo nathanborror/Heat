@@ -54,15 +54,19 @@ final class ConversationViewModel {
             await MessageManager(messages: messages)
                 .append(message: .init(role: .user, content: content)) { message in
                     self.store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
                 .generateStream(service: chatService, model: chatModel) { message in
+                    self.store.upsert(state: .streaming, conversationID: conversation.id)
                     self.store.replace(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
                 }
                 .manage { manager in
-                    guard let error = manager.error else { return }
-                    let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                    self.store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(state: .none, conversationID: conversation.id)
+                    if let error = manager.error {
+                        let message = Message(kind: .error, role: .system, content: error.localizedDescription)
+                        self.store.upsert(message: message, conversationID: conversation.id)
+                    }
                 }
             if title == Conversation.titlePlaceholder {
                 try generateTitle()
@@ -86,15 +90,19 @@ final class ConversationViewModel {
             await MessageManager(messages: messages)
                 .append(message: message) { message in
                     self.store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
                 .generateStream(service: visionService, model: visionModel) { message in
+                    self.store.upsert(state: .streaming, conversationID: conversation.id)
                     self.store.replace(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
                 }
                 .manage { manager in
-                    guard let error = manager.error else { return }
-                    let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                    self.store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(state: .none, conversationID: conversation.id)
+                    if let error = manager.error {
+                        let message = Message(kind: .error, role: .system, content: error.localizedDescription)
+                        self.store.upsert(message: message, conversationID: conversation.id)
+                    }
                 }
             if title == Conversation.titlePlaceholder {
                 try generateTitle()
