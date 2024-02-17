@@ -23,6 +23,7 @@
 		D4713D702AEAB9670005597E /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4713D6F2AEAB9670005597E /* Operators.swift */; };
 		D4B2D2672B649DFD0017FB52 /* ConversationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2662B649DFD0017FB52 /* ConversationList.swift */; };
 		D4B2D2692B6563DB0017FB52 /* ConversationInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */; };
+		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
 		D8753DF22B720662005BD3A7 /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8753DF12B720662005BD3A7 /* UIImage+.swift */; };
 		D88D23092B3CFB5100CCCC61 /* MessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */; };
@@ -54,6 +55,7 @@
 		D4B2D2632B649D5C0017FB52 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4B2D2662B649DFD0017FB52 /* ConversationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationList.swift; sourceTree = "<group>"; };
 		D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationInput.swift; sourceTree = "<group>"; };
+		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		D8753DF12B720662005BD3A7 /* UIImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
 		D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 			children = (
 				D8E1FC0B2B6FFCF3006C9366 /* ImagePicker.swift */,
 				D4713D6F2AEAB9670005597E /* Operators.swift */,
+				D4FECDD22B817A3900E1BA13 /* HapticManager.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -273,6 +276,7 @@
 				D88D23092B3CFB5100CCCC61 /* MessageBubble.swift in Sources */,
 				D4017C8B2B6EEF01001CE137 /* MainCompactView.swift in Sources */,
 				D8E1FC0C2B6FFCF3006C9366 /* ImagePicker.swift in Sources */,
+				D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */,
 				D4017C8D2B6EEF70001CE137 /* Squircle.swift in Sources */,
 				D41E19352AE4C665002516C1 /* AgentForm.swift in Sources */,
 				D8753DF22B720662005BD3A7 /* UIImage+.swift in Sources */,

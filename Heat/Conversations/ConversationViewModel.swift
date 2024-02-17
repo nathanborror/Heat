@@ -57,6 +57,7 @@ final class ConversationViewModel {
                 }
                 .generateStream(service: chatService, model: chatModel) { message in
                     self.store.replace(message: message, conversationID: conversation.id)
+                    self.hapticTap(style: .light)
                 }
                 .manage { manager in
                     guard let error = manager.error else { return }
@@ -88,6 +89,7 @@ final class ConversationViewModel {
                 }
                 .generateStream(service: visionService, model: visionModel) { message in
                     self.store.replace(message: message, conversationID: conversation.id)
+                    self.hapticTap(style: .light)
                 }
                 .manage { manager in
                     guard let error = manager.error else { return }
@@ -129,6 +131,12 @@ final class ConversationViewModel {
     
     func generateStop() {
         logger.warning("generateStop: not implemented")
+    }
+    
+    // MARK: - Private
+    
+    private func hapticTap(style: HapticManager.FeedbackStyle) {
+        HapticManager.shared.tap(style: style)
     }
 }
 
