@@ -11,9 +11,17 @@ struct ConversationView: View {
         ScrollView {
             ScrollViewReader { proxy in
                 LazyVStack(spacing: 4) {
+                    
+                    // Messages
                     ForEach(viewModel.humanVisibleMessages) { message in
                         MessageBubble(message: message)
                     }
+                    
+                    // Typing indicator
+                    if viewModel.conversation?.state == .processing {
+                        TypingIndicator(.leading)
+                    }
+                    
                     ScrollMarker(id: "bottom")
                 }
                 .padding(.horizontal)
