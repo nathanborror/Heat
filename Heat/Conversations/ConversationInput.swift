@@ -9,23 +9,31 @@ private let logger = Logger(subsystem: "ConversationInput", category: "Heat")
 struct ConversationInput: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
 
-    @State var imagePickerViewModel = ImagePickerViewModel()
-    @State var content = ""
+    @State var imagePickerViewModel: ImagePickerViewModel
+    @State var content: String
+    @State var isShowingPhotos: Bool
     
     @FocusState var isFocused: Bool
+    
+    init(content: String = "", command: String = "") {
+        self.imagePickerViewModel = .init()
+        self.content = content
+        self.isShowingPhotos = false
+    }
     
     var body: some View {
         HStack(alignment: .bottom) {
             HStack(alignment: .bottom, spacing: 0) {
-                if showInlineControls {
-                    PhotosPicker(selection: $imagePickerViewModel.imageSelection, matching: .images, photoLibrary: .shared()) {
-                        Image(systemName: "plus")
-                            .modifier(ConversationInlineButtonModifier())
+                Menu {
+                    Button(action: { isShowingPhotos = true }) {
+                        Label("Attach Photo", systemImage: "photo")
                     }
-                    .buttonStyle(.plain)
+                } label: {
+                    Image(systemName: "plus")
+                        .modifier(ConversationInlineButtonModifier())
                 }
+                .buttonStyle(.plain)
                 
-                // TODO: Clean this up
                 VStack(alignment: .leading, spacing: 4) {
                     if let image = imagePickerViewModel.image {
                         ConversationInputImage(image: image)
@@ -36,7 +44,7 @@ struct ConversationInput: View {
                     TextField("Message", text: $content, axis: .vertical)
                         .textFieldStyle(.plain)
                         .padding(.vertical, verticalPadding)
-                        .padding(.horizontal, showInputPadding ? 16 : 0)
+                        .padding(.trailing, showInputPadding ? 16 : 0)
                         .frame(minHeight: minHeight)
                         .focused($isFocused)
                         #if os(macOS)
@@ -60,6 +68,7 @@ struct ConversationInput: View {
                     Image(systemName: "stop.fill")
                         .modifier(ConversationButtonModifier())
                 }
+                .buttonStyle(.plain)
             }
             if showSubmit {
                 Button(action: handleSubmit) {
@@ -69,41 +78,45 @@ struct ConversationInput: View {
                 .buttonStyle(.plain)
             }
         }
+        .photosPicker(isPresented: $isShowingPhotos, selection: $imagePickerViewModel.imageSelection, matching: .images, photoLibrary: .shared())
         #if !os(macOS)
         .background(.background)
         #endif
-        .onAppear {
-            isFocused = true
-        }
     }
     
     func handleSubmit() {
+        
+        // Ignore empty content
         guard !content.isEmpty else { return }
+        
+        // Create conversation if one doesn't already exist
         if conversationViewModel.conversationID == nil {
             conversationViewModel.newConversation()
         }
         
-        let message = conversationViewModel.humanVisibleMessages.first(where: { message in
-            let attachment = message.attachments.first { attachment in
-                switch attachment {
-                case .agent: return false
-                case .asset(let asset): return asset.noop == false
-                }
-            }
-            return attachment != nil
-        })
-        
-        let isVisionRequest = message != nil || imagePickerViewModel.image != nil
+        // Handle vision prompt if exists
+        if hasVisionAsset || imagePickerViewModel.image != nil {
+            handleVisionSubmit()
+            return
+        }
         
         do {
-            if isVisionRequest {
-                if let data = imagePickerViewModel.image?.resize(to: .init(width: 512, height: 512)) {
-                    try conversationViewModel.generate(content, images: [data])
-                } else {
-                    try conversationViewModel.generate(content, images: [])
-                }
+            try conversationViewModel.generate(content)
+        } catch let error as HeatKitError {
+            conversationViewModel.error = error
+        } catch {
+            logger.warning("failed to submit: \(error)")
+        }
+        content = ""
+        imagePickerViewModel.imageSelection = nil
+    }
+    
+    func handleVisionSubmit() {
+        do {
+            if let data = imagePickerViewModel.image?.resize(to: .init(width: 512, height: 512)) {
+                try conversationViewModel.generate(content, images: [data])
             } else {
-                try conversationViewModel.generate(content)
+                try conversationViewModel.generate(content, images: [])
             }
         } catch let error as HeatKitError {
             conversationViewModel.error = error
@@ -119,6 +132,21 @@ struct ConversationInput: View {
     }
     
     func handleSpeak() {}
+    
+    private var hasVisionAsset: Bool {
+        let message = conversationViewModel.humanVisibleMessages.first { message in
+            let attachment = message.attachments.first { attachment in
+                switch attachment {
+                case .agent:
+                    return false
+                case .asset(let asset):
+                    return asset.noop == false
+                }
+            }
+            return attachment != nil
+        }
+        return message != nil
+    }
     
     private var showInlineControls: Bool    { content.isEmpty }
     private var showInputPadding: Bool      { !content.isEmpty }
