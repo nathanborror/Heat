@@ -241,7 +241,7 @@ struct ConversationInputImage: View {
     ScrollView {
         VStack(spacing: 16) {
             ConversationInput()
-                .environment(ConversationViewModel(store: Store.preview))
+                .environment(ConversationViewModel())
 //            ConversationInput(viewModel: .init(text: "Lorem ipsum dolor sit amet"))
 //            ConversationInput(viewModel: .init(text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."))
 //            ConversationInput(viewModel: .init(isGenerating: true))

@@ -11,8 +11,8 @@ final class ConversationViewModel {
     var conversationID: String?
     var error: HeatKitError?
     
-    init(store: Store, conversationID: String? = nil) {
-        self.store = store
+    init(conversationID: String? = nil) {
+        self.store = Store.shared
         self.conversationID = conversationID
         self.error = nil
     }

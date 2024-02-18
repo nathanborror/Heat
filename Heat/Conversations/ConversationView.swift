@@ -3,8 +3,10 @@ import HeatKit
 
 struct ConversationView: View {
     @Environment(Store.self) var store
-    @Environment(ConversationViewModel.self) private var viewModel
     
+    @Binding var conversationID: String?
+    
+    @State private var viewModel: ConversationViewModel = .init()
     @State private var isShowingError = false
     
     var body: some View {
@@ -54,6 +56,9 @@ struct ConversationView: View {
         } message: {
             Text($0.recoverySuggestion)
         }
+        .onChange(of: conversationID) { _, newValue in
+            viewModel.conversationID = newValue
+        }
         .onChange(of: viewModel.error) { _, newValue in
             guard newValue != nil else { return }
             isShowingError = true
@@ -74,12 +79,8 @@ struct ScrollMarker: View {
 
 #Preview {
     let store = Store.preview
-    let viewModel = ConversationViewModel(store: store)
-    viewModel.conversationID = store.conversations.first?.id
-    
     return NavigationStack {
-        ConversationView()
+        ConversationView(conversationID: .constant(nil))
     }
     .environment(store)
-    .environment(viewModel)
 }

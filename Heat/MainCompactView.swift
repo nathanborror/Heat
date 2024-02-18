@@ -6,7 +6,10 @@ private let logger = Logger(subsystem: "MainCompactView", category: "Heat")
 
 struct MainCompactView: View {
     @Environment(Store.self) var store
-    @Environment(ConversationViewModel.self) private var viewModel
+    
+    @Binding var conversationID: String?
+    
+    @State private var sheet: Sheet? = nil
     
     enum Sheet: String, Identifiable {
         case conversationList
@@ -14,15 +17,12 @@ struct MainCompactView: View {
         var id: String { rawValue }
     }
     
-    @State var sheet: Sheet? = nil
-    
     var body: some View {
-        @Bindable var viewModel = viewModel
         NavigationStack {
-            ConversationView()
+            ConversationView(conversationID: $conversationID)
                 .toolbar {
                     Menu {
-                        Button(action: {}) {
+                        Button(action: { conversationID = nil }) {
                             Label("New Conversation", systemImage: "plus")
                         }
                         Button(action: { sheet = .conversationList }) {
@@ -50,10 +50,9 @@ struct MainCompactView: View {
                         .environment(store)
                     case .conversationList:
                         NavigationStack {
-                            ConversationList()
+                            ConversationList(selection: $conversationID)
                         }
                         .environment(store)
-                        .environment(viewModel)
                         .presentationDetents([.medium, .large])
                     }
                 }
@@ -62,7 +61,6 @@ struct MainCompactView: View {
 }
 
 #Preview {
-    MainCompactView()
+    MainCompactView(conversationID: .constant(nil))
         .environment(Store.preview)
-        .environment(ConversationViewModel(store: Store.preview))
 }

@@ -149,12 +149,8 @@ extension View {
 
 #Preview {
     let store = Store.preview
-    let viewModel = ConversationViewModel(store: store)
-    viewModel.conversationID = store.conversations.first?.id
-    
     return NavigationStack {
-        ConversationView()
+        ConversationView(conversationID: .constant(nil))
     }
     .environment(store)
-    .environment(viewModel)
 }

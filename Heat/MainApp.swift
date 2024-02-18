@@ -22,51 +22,37 @@ struct MainApp: App {
     #endif
     
     @State private var store = Store.shared
-    @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
+    @State private var conversationID: String?
     
     var body: some Scene {
         #if os(macOS)
-        WindowGroup {
-            NavigationStack {
-                ConversationView()
+        Window("Heat", id: "heat") {
+            NavigationSplitView {
+                ConversationList(selection: $conversationID)
+                    .environment(store)
+                    .frame(minWidth: 200)
+            } detail: {
+                ConversationView(conversationID: $conversationID)
+                    .environment(store)
             }
-            .environment(store)
-            .environment(conversationViewModel)
             .onChange(of: scenePhase) { _, _ in
                 handlePhaseChange()
             }
             .onAppear {
                 handleRestore()
-                NSWindow.allowsAutomaticWindowTabbing = false
             }
         }
-        .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 450, height: 500)
+        .defaultSize(width: 600, height: 700)
+        .defaultPosition(.center)
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button("New Conversation") {
-                    print("not implemented")
+                    conversationID = nil
                 }
                 .keyboardShortcut("n", modifiers: .command)
             }
-            CommandGroup(before: .windowList) {
-                Button("Show History") {
-                    openWindow(id: "history")
-                }
-                .keyboardShortcut("h", modifiers: [.shift, .command])
-            }
         }
-        
-        Window("History", id: "history") {
-            NavigationStack {
-                ConversationList()
-            }
-            .environment(store)
-            .environment(conversationViewModel)
-        }
-        .defaultSize(width: 700, height: 550)
-        .defaultPosition(.center)
-        
+
         Settings {
             NavigationStack {
                 PreferencesWindow()
@@ -76,9 +62,8 @@ struct MainApp: App {
         }
         #else
         WindowGroup {
-            MainCompactView()
+            MainCompactView(conversationID: $conversationID)
                 .environment(store)
-                .environment(conversationViewModel)
                 .onChange(of: scenePhase) { _, _ in
                     handlePhaseChange()
                 }
