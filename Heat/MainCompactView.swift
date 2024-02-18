@@ -20,50 +20,43 @@ struct MainCompactView: View {
         @Bindable var viewModel = viewModel
         NavigationStack {
             ConversationView()
-        }
-        .safeAreaInset(edge: .top) {
-            HStack {
-                Spacer()
-                Menu {
-                    Button(action: { viewModel.conversationID = nil }) {
-                        Label("New Conversation", systemImage: "plus")
-                    }
-                    Button(action: { self.sheet = .conversationList }) {
-                        Label("History", systemImage: "clock")
-                    }
-                    Button(action: { self.sheet = .preferences }) {
-                        Label("Preferences", systemImage: "slider.horizontal.3")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .padding()
-                        .background(.ultraThinMaterial)
-                        .clipShape(.rect(cornerRadius: 10))
-                        .tint(.secondary)
-                }
-            }
-            .padding()
-        }
-        .sheet(item: $sheet) { sheet in
-            switch sheet {
-            case .preferences:
-                NavigationStack {
-                    PreferencesForm()
-                        .toolbar {
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Done") { self.sheet = nil }
-                            }
+                .toolbar {
+                    Menu {
+                        Button(action: {}) {
+                            Label("New Conversation", systemImage: "plus")
                         }
+                        Button(action: { sheet = .conversationList }) {
+                            Label("History", systemImage: "clock")
+                        }
+                        Divider()
+                        Button(action: { sheet = .preferences }) {
+                            Label("Preferences", systemImage: "slider.horizontal.3")
+                        }
+                    } label: {
+                        Label("Menu", systemImage: "ellipsis")
+                    }
                 }
-                .environment(store)
-            case .conversationList:
-                NavigationStack {
-                    ConversationList()
+                .sheet(item: $sheet) { sheet in
+                    switch sheet {
+                    case .preferences:
+                        NavigationStack {
+                            PreferencesForm()
+                                .toolbar {
+                                    ToolbarItem(placement: .confirmationAction) {
+                                        Button("Done") { self.sheet = nil }
+                                    }
+                                }
+                        }
+                        .environment(store)
+                    case .conversationList:
+                        NavigationStack {
+                            ConversationList()
+                        }
+                        .environment(store)
+                        .environment(viewModel)
+                        .presentationDetents([.medium, .large])
+                    }
                 }
-                .environment(store)
-                .environment(viewModel)
-                .presentationDetents([.medium, .large])
-            }
         }
     }
 }
