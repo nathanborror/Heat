@@ -17,6 +17,9 @@ private let logger = Logger(subsystem: "MainApp", category: "Heat")
 @main
 struct MainApp: App {
     @Environment(\.scenePhase) var scenePhase
+    #if os(macOS)
+    @Environment(\.openWindow) private var openWindow
+    #endif
     
     @State private var store = Store.shared
     @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
@@ -48,11 +51,21 @@ struct MainApp: App {
             }
             CommandGroup(before: .windowList) {
                 Button("Show History") {
-                    print("not implemented")
+                    openWindow(id: "history")
                 }
                 .keyboardShortcut("h", modifiers: [.shift, .command])
             }
         }
+        
+        Window("History", id: "history") {
+            NavigationStack {
+                ConversationList()
+            }
+            .environment(store)
+            .environment(conversationViewModel)
+        }
+        .defaultSize(width: 700, height: 550)
+        .defaultPosition(.center)
         
         Settings {
             NavigationStack {
