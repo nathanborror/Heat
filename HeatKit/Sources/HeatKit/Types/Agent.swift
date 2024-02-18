@@ -55,6 +55,7 @@ extension Agent {
     
     public static var preview: Self = {
         .init(
+            id: "bundle-assistant",
             name: "Assistant",
             picture: .init(name: "person", kind: .symbol, location: .none, background: "#FA6400"),
             instructions: [

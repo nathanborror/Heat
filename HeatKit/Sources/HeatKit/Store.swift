@@ -256,6 +256,21 @@ public final class Store {
         }
     }
     
+    public func preferredToolService() throws -> ChatService {
+        guard let service = get(serviceID: preferences.preferredToolServiceID) else {
+            throw HeatKitError.missingService
+        }
+        switch service.id {
+        case "openai":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
+            return OpenAIService(configuration: .init(token: token))
+        default:
+            throw HeatKitError.missingService
+        }
+    }
+    
     // MARK: - Model Preferences
     
     public func preferredChatModel() throws -> String {
@@ -293,6 +308,14 @@ public final class Store {
     public func preferredVisionModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredVisionServiceID),
               let model = service.preferredVisionModel else {
+            throw HeatKitError.missingServiceModel
+        }
+        return model
+    }
+    
+    public func preferredToolModel() throws -> String {
+        guard let service = get(serviceID: preferences.preferredToolServiceID),
+              let model = service.preferredChatModel else {
             throw HeatKitError.missingServiceModel
         }
         return model

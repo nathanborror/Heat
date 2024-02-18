@@ -13,6 +13,7 @@ public struct Preferences: Codable {
     public var preferredEmbeddingServiceID: String?
     public var preferredTranscriptionServiceID: String?
     public var preferredVisionServiceID: String?
+    public var preferredToolServiceID: String?
     
     public init() {
         self.services = []
@@ -25,6 +26,7 @@ public struct Preferences: Codable {
         self.preferredEmbeddingServiceID = Constants.defaultTranscriptionServiceID
         self.preferredTranscriptionServiceID = Constants.defaultTranscriptionServiceID
         self.preferredVisionServiceID = Constants.defaultVisionServiceID
+        self.preferredToolServiceID = Constants.defaultToolServiceID
         
         self.services = Constants.defaultServices
     }
