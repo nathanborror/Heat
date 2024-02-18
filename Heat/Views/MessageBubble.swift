@@ -46,12 +46,12 @@ struct MessageBubbleStyle: ViewModifier {
                 .foregroundStyle(foregroundColor)
         case .assistant:
             content
-                .font(.system(size: 16))
+                .font(font)
                 .lineSpacing(2)
                 .padding(.vertical, paddingVertical)
         case .user:
             content
-                .font(.system(size: 16))
+                .font(font)
                 .padding(.horizontal, paddingHorizontal)
                 .padding(.vertical, paddingVertical)
                 .foregroundStyle(foregroundColor)
@@ -80,10 +80,12 @@ struct MessageBubbleStyle: ViewModifier {
     private let paddingHorizontal: CGFloat = 12
     private let paddingVertical: CGFloat = 6
     private let cornerRadius: CGFloat = 10
+    private let font: Font = .body
     #else
     private let paddingHorizontal: CGFloat = 16
     private let paddingVertical: CGFloat = 10
     private let cornerRadius: CGFloat = 20
+    private let font: Font = .body
     #endif
 }
 

@@ -11,11 +11,19 @@ struct TypingIndicator: View {
         case trailing
     }
     
+    #if os(macOS)
+    init(_ alignment: Alignment, foregroundColor: Color = .secondary, backgroundColor: Color = .clear) {
+        self.alignment = alignment
+        self.foregroundColor = foregroundColor
+        self.backgroundColor = backgroundColor
+    }
+    #else
     init(_ alignment: Alignment, foregroundColor: Color = .secondary, backgroundColor: Color = .secondary.opacity(0.15)) {
         self.alignment = alignment
         self.foregroundColor = foregroundColor
         self.backgroundColor = backgroundColor
     }
+    #endif
     
     var body: some View {
         HStack(alignment: .bottom) {
@@ -52,9 +60,9 @@ private struct TypingEllipsis: View {
     #if os(macOS)
     private let dotSize: CGFloat = 5
     private let dotSpacing: CGFloat = 2
-    private let paddingHorizontal: CGFloat = 13
-    private let paddingVertical: CGFloat = 13
-    private let cornerRadius: CGFloat = 16
+    private let paddingHorizontal: CGFloat = 0
+    private let paddingVertical: CGFloat = 0
+    private let cornerRadius: CGFloat = 0
     #else
     private let dotSize: CGFloat = 7
     private let dotSpacing: CGFloat = 3
