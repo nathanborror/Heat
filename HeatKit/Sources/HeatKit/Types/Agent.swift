@@ -10,23 +10,16 @@ public struct Agent: Codable, Identifiable {
     public var name: String
     public var picture: Asset?
     public var instructions: [Message]
+    public var voice: String?
     public var created: Date
     public var modified: Date
     
-    public init(id: String = .id, name: String, picture: Asset? = nil, instructions: [Message]) {
+    public init(id: String = .id, name: String, picture: Asset? = nil, instructions: [Message], voice: String? = nil) {
         self.id = id
         self.name = name
         self.picture = picture
         self.instructions = instructions
-        self.created = .now
-        self.modified = .now
-    }
-    
-    init(resource: AgentsResource.Agent) {
-        self.id = resource.id
-        self.name = resource.name
-        self.picture = .init(name: "Pictures/\(resource.asset)", kind: .image, location: .bundle)
-        self.instructions = resource.instructions.map { Message(kind: .instruction, role: .init(rawValue: $0.role)!, content: $0.content) }
+        self.voice = voice
         self.created = .now
         self.modified = .now
     }
@@ -35,6 +28,7 @@ public struct Agent: Codable, Identifiable {
         self.name = agent.name
         self.picture = agent.picture
         self.instructions = agent.instructions
+        self.voice = agent.voice
         self.modified = .now
     }
     
@@ -81,17 +75,49 @@ extension Agent {
 
 /// Used to import agents from a YAML file located in the build resources.
 struct AgentsResource: Decodable {
-    let agents: [Agent]
+    let agents: [AgentResource]
     
-    struct Agent: Decodable {
+    struct AgentResource: Decodable {
         let id: String
         let name: String
-        let asset: String
-        let instructions: [Message]
+        let asset: AssetResource?
+        let tagline: String?
+        let kind: String?
+        let categories: [String]?
+        let instructions: [MessageResource]
+        let tools: [String]?
+        let voice: String?
         
-        struct Message: Decodable {
+        struct MessageResource: Decodable {
             let role: String
             let content: String
+        }
+        
+        struct AssetResource: Decodable {
+            let picture: String?
+            let video: String?
+            let scale: Double?
+            let offsetX: Double?
+            let offsetY: Double?
+        }
+        
+        var encode: Agent {
+            .init(
+                id: id,
+                name: name,
+                picture: encodeAsset,
+                instructions: encodeInstructions,
+                voice: voice
+            )
+        }
+        
+        var encodeAsset: Asset? {
+            guard let asset, let picture = asset.picture else { return nil }
+            return .init(name: "Pictures/\(picture)", kind: .image, location: .bundle)
+        }
+        
+        var encodeInstructions: [Message] {
+            instructions.map { .init(kind: .instruction, role: .init(rawValue: $0.role)!, content: $0.content) }
         }
     }
 }

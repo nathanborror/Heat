@@ -31,6 +31,13 @@ struct MainApp: App {
                 ConversationList(selection: $conversationID)
                     .environment(store)
                     .frame(minWidth: 200)
+                    .toolbar {
+                        ToolbarItem {
+                            Button(action: { conversationID = nil }) {
+                                Label("New Conversation", systemImage: "plus")
+                            }
+                        }
+                    }
             } detail: {
                 ConversationView(conversationID: $conversationID)
                     .environment(store)
