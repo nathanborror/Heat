@@ -30,17 +30,17 @@ struct MainApp: App {
             NavigationSplitView {
                 ConversationList(selection: $conversationID)
                     .environment(store)
-                    .frame(minWidth: 200)
+                    .navigationSplitViewStyle(.prominentDetail)
+            } detail: {
+                ConversationView(conversationID: $conversationID)
+                    .environment(store)
                     .toolbar {
-                        ToolbarItem {
+                        ToolbarItem(placement: .primaryAction) {
                             Button(action: { conversationID = nil }) {
                                 Label("New Conversation", systemImage: "plus")
                             }
                         }
                     }
-            } detail: {
-                ConversationView(conversationID: $conversationID)
-                    .environment(store)
             }
             .onChange(of: scenePhase) { _, _ in
                 handlePhaseChange()
