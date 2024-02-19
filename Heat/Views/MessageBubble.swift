@@ -123,6 +123,8 @@ struct MessageBubbleAttachments: ViewModifier {
                         PictureView(asset: asset)
                             .frame(width: 200, height: 200)
                             .clipShape(.rect(cornerRadius: 10))
+                    case .automation, .component:
+                        EmptyView()
                     }
                 }
                 if message.role == .assistant { Spacer() }

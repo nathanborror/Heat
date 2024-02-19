@@ -10,8 +10,9 @@ public struct Constants {
     public static var defaultImageServiceID = ""
     public static var defaultEmbeddingServiceID = ""
     public static var defaultTranscriptionServiceID = ""
-    public static var defaultVisionServiceID = ""
     public static var defaultToolServiceID = ""
+    public static var defaultVisionServiceID = ""
+    public static var defaultSpeechServiceID = ""
     
     public static var defaultServices: [Service] = [
         .init(
@@ -37,6 +38,12 @@ public struct Constants {
             name: "Ollama",
             host: URL(string: "http://localhost:11434/api")!,
             requiresHost: true
+        ),
+        .init(
+            id: "elevenlabs",
+            name: "ElevenLabs",
+            token: "",
+            requiresToken: true
         ),
     ]
 }

@@ -15,7 +15,16 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "6c7ec363da47357aaf1f2f423d30117ff077f696"
+        "revision" : "a0f43bb719eb3ade9005818e72557ea023af0e60"
+      }
+    },
+    {
+      "identity" : "swift-elevenlabs",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/swift-elevenlabs",
+      "state" : {
+        "branch" : "main",
+        "revision" : "d5374f08e7231734ca5a9a11f6f601e8f7025bcd"
       }
     },
     {
@@ -24,7 +33,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "926595783e7a40730ed3591979cec80ab39d6ab4"
+        "revision" : "84a77605e4d0ce7053da833879c89d37ffbe7ded"
       }
     },
     {
@@ -51,7 +60,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "18e6fa862767a2a4ab38e7f24e779752be657bdc"
+        "revision" : "c7f72ddfd0567a0c4f59ea8e211c2df68b178ab3"
       }
     },
     {
@@ -69,7 +78,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "9321d6686b24a6f121679ba5eb7e5ba89e14f8c6"
+        "revision" : "a1836e402067463d7342f0c87e9c103416f157f0"
       }
     }
   ],

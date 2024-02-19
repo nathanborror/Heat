@@ -57,7 +57,9 @@ struct ServiceList: View {
             (service.supportsImages) ? "Images" : nil,
             (service.supportsEmbeddings) ? "Embeddings" : nil,
             (service.supportsTranscriptions) ? "Transcriptions" : nil,
+            (service.supportsTools) ? "Tools" : nil,
             (service.supportsVision) ? "Vision" : nil,
+            (service.supportsSpeech) ? "Speech" : nil,
         ].compactMap { $0 }
         if supports.isEmpty { return nil }
         return supports.joined(separator: ", ")

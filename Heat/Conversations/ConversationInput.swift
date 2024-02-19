@@ -137,7 +137,7 @@ struct ConversationInput: View {
         let message = conversationViewModel.humanVisibleMessages.first { message in
             let attachment = message.attachments.first { attachment in
                 switch attachment {
-                case .agent:
+                case .agent, .automation, .component:
                     return false
                 case .asset(let asset):
                     return asset.noop == false

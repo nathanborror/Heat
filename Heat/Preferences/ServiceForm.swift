@@ -52,7 +52,13 @@ struct ServiceForm: View {
                 Picker("Transcriptions", selection: $service.preferredTranscriptionModel ?? "") {
                     servicePickerModels
                 }
+                Picker("Tools", selection: $service.preferredToolModel ?? "") {
+                    servicePickerModels
+                }
                 Picker("Vision", selection: $service.preferredVisionModel ?? "") {
+                    servicePickerModels
+                }
+                Picker("Speech", selection: $service.preferredSpeechModel ?? "") {
                     servicePickerModels
                 }
             } footer: {
@@ -125,6 +131,9 @@ struct ServiceForm: View {
             case "perplexity":
                 guard let token = service.token else { return }
                 client = PerplexityService(configuration: .init(token: token))
+            case "elevenlabs":
+                guard let token = service.token else { return }
+                client = ElevenLabsService(configuration: .init(token: token))
             default:
                 return
             }

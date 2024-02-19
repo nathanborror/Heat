@@ -103,11 +103,29 @@ struct PreferencesForm: View {
                         }
                     }
                 }
+                Picker("Tools", selection: $store.preferences.preferredToolServiceID ?? "") {
+                    Text("None").tag("")
+                    Divider()
+                    ForEach(store.preferences.services) { service in
+                        if service.supportsTools {
+                            Text(service.name).tag(service.id)
+                        }
+                    }
+                }
                 Picker("Vision", selection: $store.preferences.preferredVisionServiceID ?? "") {
                     Text("None").tag("")
                     Divider()
                     ForEach(store.preferences.services) { service in
                         if service.supportsVision {
+                            Text(service.name).tag(service.id)
+                        }
+                    }
+                }
+                Picker("Speech", selection: $store.preferences.preferredSpeechServiceID ?? "") {
+                    Text("None").tag("")
+                    Divider()
+                    ForEach(store.preferences.services) { service in
+                        if service.supportsSpeech {
                             Text(service.name).tag(service.id)
                         }
                     }

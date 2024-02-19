@@ -236,6 +236,21 @@ public final class Store {
         }
     }
     
+    public func preferredToolService() throws -> ChatService {
+        guard let service = get(serviceID: preferences.preferredToolServiceID) else {
+            throw HeatKitError.missingService
+        }
+        switch service.id {
+        case "openai":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
+            return OpenAIService(configuration: .init(token: token))
+        default:
+            throw HeatKitError.missingService
+        }
+    }
+    
     public func preferredVisionService() throws -> VisionService {
         guard let service = get(serviceID: preferences.preferredVisionServiceID) else {
             throw HeatKitError.missingService
@@ -256,8 +271,8 @@ public final class Store {
         }
     }
     
-    public func preferredToolService() throws -> ChatService {
-        guard let service = get(serviceID: preferences.preferredToolServiceID) else {
+    public func preferredSpeechService() throws -> SpeechService {
+        guard let service = get(serviceID: preferences.preferredSpeechServiceID) else {
             throw HeatKitError.missingService
         }
         switch service.id {
@@ -266,6 +281,11 @@ public final class Store {
                 throw HeatKitError.missingServiceToken
             }
             return OpenAIService(configuration: .init(token: token))
+        case "elevenlabs":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
+            return ElevenLabsService(configuration: .init(token: token))
         default:
             throw HeatKitError.missingService
         }
@@ -305,6 +325,14 @@ public final class Store {
         return model
     }
     
+    public func preferredToolModel() throws -> String {
+        guard let service = get(serviceID: preferences.preferredToolServiceID),
+              let model = service.preferredChatModel else {
+            throw HeatKitError.missingServiceModel
+        }
+        return model
+    }
+    
     public func preferredVisionModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredVisionServiceID),
               let model = service.preferredVisionModel else {
@@ -313,9 +341,9 @@ public final class Store {
         return model
     }
     
-    public func preferredToolModel() throws -> String {
-        guard let service = get(serviceID: preferences.preferredToolServiceID),
-              let model = service.preferredChatModel else {
+    public func preferredSpeechModel() throws -> String {
+        guard let service = get(serviceID: preferences.preferredSpeechServiceID),
+              let model = service.preferredSpeechModel else {
             throw HeatKitError.missingServiceModel
         }
         return model
