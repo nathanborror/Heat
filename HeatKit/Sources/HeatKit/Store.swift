@@ -176,6 +176,11 @@ public final class Store {
                 throw HeatKitError.missingServiceHost
             }
             return OllamaService(configuration: .init(host: host))
+        case "google":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceHost
+            }
+            return GoogleService(configuration: .init(token: token))
         default:
             throw HeatKitError.missingService
         }

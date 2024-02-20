@@ -45,5 +45,11 @@ public struct Constants {
             token: "",
             requiresToken: true
         ),
+        .init(
+            id: "google",
+            name: "Google",
+            token: "",
+            requiresToken: true
+        ),
     ]
 }

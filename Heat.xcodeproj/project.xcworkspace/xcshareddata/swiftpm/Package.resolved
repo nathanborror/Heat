@@ -33,7 +33,16 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "84a77605e4d0ce7053da833879c89d37ffbe7ded"
+        "revision" : "707f4745b7db25ea4ebf6a2843db74a64c60315b"
+      }
+    },
+    {
+      "identity" : "swift-google-gen",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/swift-google-gen",
+      "state" : {
+        "branch" : "main",
+        "revision" : "67e8319dee077982c20e6df79a2530bac894f3c6"
       }
     },
     {
@@ -78,7 +87,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "a1836e402067463d7342f0c87e9c103416f157f0"
+        "revision" : "a1f7aceb6653df58ae088199a6db10ffc174e990"
       }
     }
   ],
