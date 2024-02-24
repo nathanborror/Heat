@@ -3,6 +3,7 @@ import Foundation
 public enum HeatKitError: LocalizedError, Equatable {
     case failedGenerateResponse
     case failedtoolDecoding
+    case failedSuggestions
     case missingResource
     case missingService
     case missingServiceModel
@@ -17,6 +18,8 @@ public enum HeatKitError: LocalizedError, Equatable {
             "Failed to generate response"
         case .failedtoolDecoding:
             "Failed to decode tool"
+        case .failedSuggestions:
+            "Failed to generate suggestions"
         case .missingResource:
             "Missing resource"
         case .missingService:
@@ -39,6 +42,8 @@ public enum HeatKitError: LocalizedError, Equatable {
         case .failedGenerateResponse:
             "Try again."
         case .failedtoolDecoding:
+            "Try again"
+        case .failedSuggestions:
             "Try again"
         case .missingResource:
             "Try again"

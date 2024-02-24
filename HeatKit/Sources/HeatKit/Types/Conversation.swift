@@ -11,6 +11,7 @@ public struct Conversation: Codable, Identifiable {
     public var subtitle: String?
     public var picture: Asset?
     public var messages: [Message]
+    public var suggestions: [String]
     public var state: State
     public var created: Date
     public var modified: Date
@@ -18,16 +19,18 @@ public struct Conversation: Codable, Identifiable {
     public enum State: Codable {
         case processing
         case streaming
+        case suggesting
         case none
     }
     
     public init(id: String = .id, title: String = Self.titlePlaceholder, subtitle: String? = nil, picture: Asset? = nil,
-                messages: [Message] = [], state: State = .none) {
+                messages: [Message] = [], suggestions: [String] = [], state: State = .none) {
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.picture = picture
         self.messages = messages
+        self.suggestions = suggestions
         self.state = state
         self.created = .now
         self.modified = .now
@@ -38,6 +41,7 @@ public struct Conversation: Codable, Identifiable {
         self.subtitle = conversation.subtitle
         self.picture = conversation.picture
         self.messages = conversation.messages
+        self.suggestions = conversation.suggestions
         self.state = conversation.state
         self.modified = .now
     }

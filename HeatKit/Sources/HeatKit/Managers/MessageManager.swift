@@ -51,20 +51,6 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func generate(service: ChatService, model: String, tool: Tool, callback: MessageCallback? = nil) async -> Self {
-        do {
-            try Task.checkCancellation()
-            let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: [tool], toolChoice: tool)
-            let message = try await service.completion(request: req)
-            await append(message: message)
-            await MainActor.run { callback?(message) }
-        } catch {
-            apply(error: error)
-        }
-        return self
-    }
-    
-    @discardableResult
     public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback? = nil, completion: MessageCompletionCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
@@ -97,6 +83,47 @@ public final class MessageManager {
         // If there are no toolCall responses then this step is ignored. Explicitly making the choice not to provide
         // any tools to avoid a loop but this may change in the future.
         return await generateStream(service: service, model: model, tools: [], callback: callback, completion: completion)
+    }
+    
+    // Tools
+    
+    @discardableResult
+    public func generateStream(service: ToolService, model: String, tool: Tool, callback: MessageCallback? = nil, completion: MessageCompletionCallback? = nil) async -> Self {
+        do {
+            try Task.checkCancellation()
+            let req = ToolServiceRequest(model: model, messages: filteredMessages, tool: tool)
+            var message: Message? = nil
+            try await service.completionStream(request: req) { delta in
+                let messageDelta = apply(delta: delta)
+                message = messageDelta
+                await MainActor.run { callback?(messageDelta) }
+            }
+            
+            // Return the final message and append any toolCall responses that are returned from the completion
+            // callback. If there are any responses then we flag the manager to allow a new stream to be executed
+            // to respond to the toolCall responses.
+            if let message, let resp = try await completion?(message) {
+                self.messages += resp.messages
+                self.hasToolResponses = resp.shouldContinue
+            }
+        } catch {
+            apply(error: error)
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func generate(service: ToolService, model: String, tool: Tool, callback: MessageCallback? = nil) async -> Self {
+        do {
+            try Task.checkCancellation()
+            let req = ToolServiceRequest(model: model, messages: filteredMessages, tool: tool)
+            let message = try await service.completion(request: req)
+            await append(message: message)
+            await MainActor.run { callback?(message) }
+        } catch {
+            apply(error: error)
+        }
+        return self
     }
     
     // Vision

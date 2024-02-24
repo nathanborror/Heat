@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "fuzi",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cezheng/Fuzi",
+      "state" : {
+        "branch" : "master",
+        "revision" : "e853de3bdeb6fd458bcab6daa4d56e68ff80c531"
+      }
+    },
+    {
       "identity" : "swift-anthropic",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-anthropic",
@@ -33,7 +42,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "707f4745b7db25ea4ebf6a2843db74a64c60315b"
+        "revision" : "d24203b95691b8cb19a63018f2d3c6c6f2c0048c"
       }
     },
     {

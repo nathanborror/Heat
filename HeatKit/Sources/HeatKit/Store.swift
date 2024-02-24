@@ -109,6 +109,15 @@ public final class Store {
         upsert(conversation: conversation)
     }
     
+    public func upsert(suggestions: [String], conversationID: String) {
+        guard var conversation = get(conversationID: conversationID) else {
+            logger.warning("missing conversation")
+            return
+        }
+        conversation.suggestions = suggestions
+        upsert(conversation: conversation)
+    }
+    
     public func upsert(state: Conversation.State, conversationID: String) {
         guard var conversation = get(conversationID: conversationID) else {
             logger.warning("missing conversation")
@@ -247,7 +256,7 @@ public final class Store {
         }
     }
     
-    public func preferredToolService() throws -> ChatService {
+    public func preferredToolService() throws -> ToolService {
         guard let service = get(serviceID: preferences.preferredToolServiceID) else {
             throw HeatKitError.missingService
         }
@@ -257,6 +266,11 @@ public final class Store {
                 throw HeatKitError.missingServiceToken
             }
             return OpenAIService(configuration: .init(token: token))
+        case "ollama":
+            guard let host = service.host else {
+                throw HeatKitError.missingServiceHost
+            }
+            return OllamaService(configuration: .init(host: host))
         default:
             throw HeatKitError.missingService
         }

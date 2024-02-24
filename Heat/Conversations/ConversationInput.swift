@@ -134,7 +134,7 @@ struct ConversationInput: View {
     func handleSpeak() {}
     
     private var hasVisionAsset: Bool {
-        let message = conversationViewModel.humanVisibleMessages.first { message in
+        let message = conversationViewModel.messagesVisible.first { message in
             let attachment = message.attachments.first { attachment in
                 switch attachment {
                 case .agent, .automation, .component:

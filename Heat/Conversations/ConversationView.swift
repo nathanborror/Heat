@@ -1,5 +1,8 @@
 import SwiftUI
+import OSLog
 import HeatKit
+
+private let logger = Logger(subsystem: "ConversationView", category: "Heat")
 
 struct ConversationView: View {
     @Environment(Store.self) var store
@@ -13,13 +16,21 @@ struct ConversationView: View {
                 LazyVStack(spacing: 4) {
                     
                     // Messages
-                    ForEach(conversationViewModel.humanVisibleMessages) { message in
+                    ForEach(conversationViewModel.messagesVisible) { message in
                         MessageBubble(message: message)
                     }
                     
                     // Typing indicator
                     if conversationViewModel.conversation?.state == .processing {
                         TypingIndicator(.leading)
+                    }
+                    
+                    // Suggestions
+                    if conversationViewModel.conversation?.state == .suggesting {
+                        TypingIndicator(.trailing)
+                    }
+                    SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
+                        SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
                     }
                     
                     ScrollMarker(id: "bottom")
@@ -59,6 +70,19 @@ struct ConversationView: View {
         .onChange(of: conversationViewModel.error) { _, newValue in
             guard newValue != nil else { return }
             isShowingError = true
+        }
+    }
+    
+    func handleSuggestion(_ suggestion: String) {
+        if conversationViewModel.conversationID == nil {
+            conversationViewModel.newConversation()
+        }
+        do {
+            try conversationViewModel.generate(suggestion)
+        } catch let error as HeatKitError {
+            conversationViewModel.error = error
+        } catch {
+            logger.warning("failed to submit: \(error)")
         }
     }
 }
