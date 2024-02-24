@@ -22,26 +22,26 @@ struct MainApp: App {
     #endif
     
     @State private var store = Store.shared
-    @State private var conversationID: String?
+    @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
     
     var body: some Scene {
         #if os(macOS)
         Window("Heat", id: "heat") {
             NavigationSplitView {
-                ConversationList(selection: $conversationID)
-                    .environment(store)
+                ConversationList()
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
-                ConversationView(conversationID: $conversationID)
-                    .environment(store)
+                ConversationView()
                     .toolbar {
                         ToolbarItem(placement: .primaryAction) {
-                            Button(action: { conversationID = nil }) {
+                            Button(action: { conversationViewModel.conversationID = nil }) {
                                 Label("New Conversation", systemImage: "plus")
                             }
                         }
                     }
             }
+            .environment(store)
+            .environment(conversationViewModel)
             .onChange(of: scenePhase) { _, _ in
                 handlePhaseChange()
             }
@@ -54,7 +54,7 @@ struct MainApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button("New Conversation") {
-                    conversationID = nil
+                    conversationViewModel.conversationID = nil
                 }
                 .keyboardShortcut("n", modifiers: .command)
             }
@@ -69,8 +69,9 @@ struct MainApp: App {
         }
         #else
         WindowGroup {
-            MainCompactView(conversationID: $conversationID)
+            MainCompactView()
                 .environment(store)
+                .environment(conversationViewModel)
                 .onChange(of: scenePhase) { _, _ in
                     handlePhaseChange()
                 }

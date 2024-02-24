@@ -79,6 +79,12 @@ public final class Store {
         }
     }
     
+    public func upsert(messages: [Message], conversationID: String) {
+        for message in messages {
+            upsert(message: message, conversationID: conversationID)
+        }
+    }
+    
     public func upsert(message: Message, conversationID: String) {
         guard var conversation = get(conversationID: conversationID) else {
             logger.warning("missing conversation")

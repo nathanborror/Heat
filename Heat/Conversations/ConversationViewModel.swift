@@ -11,9 +11,11 @@ final class ConversationViewModel {
     var conversationID: String?
     var error: HeatKitError?
     
-    init(conversationID: String? = nil) {
-        self.store = Store.shared
-        self.conversationID = conversationID
+    private var generateTask: Task<(), Error>? = nil
+    
+    init(store: Store) {
+        self.store = store
+        self.conversationID = nil
         self.error = nil
     }
     
@@ -50,7 +52,7 @@ final class ConversationViewModel {
         guard let conversation else {
             throw HeatKitError.missingConversation
         }
-        Task {
+        generateTask = Task {
             await MessageManager(messages: messages)
                 .append(message: .init(role: .user, content: content)) { message in
                     self.store.upsert(message: message, conversationID: conversation.id)
@@ -86,7 +88,7 @@ final class ConversationViewModel {
         let message = Message(role: .user, content: content, attachments: images.map {
             .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
         })
-        Task {
+        generateTask = Task {
             await MessageManager(messages: messages)
                 .append(message: message) { message in
                     self.store.upsert(message: message, conversationID: conversation.id)
@@ -117,7 +119,7 @@ final class ConversationViewModel {
         guard let conversation else {
             throw HeatKitError.missingConversation
         }
-        Task {
+        generateTask = Task {
             await MessageManager(messages: messages)
                 .append(message: .init(role: .user, content: """
                     Return a title for this conversation if there is a clear subject.
@@ -138,7 +140,9 @@ final class ConversationViewModel {
     }
     
     func generateStop() {
-        logger.warning("generateStop: not implemented")
+        generateTask?.cancel()
+        guard let conversationID else { return }
+        store.upsert(state: .none, conversationID: conversationID)
     }
     
     // MARK: - Private

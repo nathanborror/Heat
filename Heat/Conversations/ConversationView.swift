@@ -3,10 +3,8 @@ import HeatKit
 
 struct ConversationView: View {
     @Environment(Store.self) var store
+    @Environment(ConversationViewModel.self) var conversationViewModel
     
-    @Binding var conversationID: String?
-    
-    @State private var conversationViewModel: ConversationViewModel = .init()
     @State private var isShowingError = false
     
     var body: some View {
@@ -62,14 +60,6 @@ struct ConversationView: View {
             guard newValue != nil else { return }
             isShowingError = true
         }
-        .onChange(of: conversationViewModel.conversationID) { _, _ in
-            guard conversationID != conversationViewModel.conversationID else { return }
-            conversationID = conversationViewModel.conversationID
-        }
-        .onChange(of: conversationID) { _, _ in
-            guard conversationID != conversationViewModel.conversationID else { return }
-            conversationViewModel.conversationID = conversationID
-        }
     }
 }
 
@@ -85,9 +75,9 @@ struct ScrollMarker: View {
 }
 
 #Preview {
-    let store = Store.preview
-    return NavigationStack {
-        ConversationView(conversationID: .constant(nil))
+    NavigationStack {
+        ConversationView()
     }
-    .environment(store)
+    .environment(Store.preview)
+    .environment(ConversationViewModel(store: Store.preview))
 }

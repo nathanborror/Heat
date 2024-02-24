@@ -3,11 +3,11 @@ import HeatKit
 
 struct ConversationList: View {
     @Environment(Store.self) var store
-    
-    @Binding var selection: String?
+    @Environment(ConversationViewModel.self) var conversationViewModel
     
     var body: some View {
-        List(selection: $selection) {
+        @Bindable var conversationViewModel = conversationViewModel
+        List(selection: $conversationViewModel.conversationID) {
             ForEach(store.conversations) { conversation in
                 NavigationLink(value: conversation.id) {
                     VStack(alignment: .leading) {
@@ -33,7 +33,8 @@ struct ConversationList: View {
 
 #Preview {
     NavigationStack {
-        ConversationList(selection: .constant(""))
+        ConversationList()
     }
     .environment(Store.preview)
+    .environment(ConversationViewModel(store: Store.preview))
 }
