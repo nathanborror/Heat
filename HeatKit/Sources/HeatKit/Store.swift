@@ -271,6 +271,11 @@ public final class Store {
                 throw HeatKitError.missingServiceToken
             }
             return MistralService(configuration: .init(token: token))
+        case "perplexity":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceToken
+            }
+            return PerplexityService(configuration: .init(token: token))
         case "ollama":
             guard let host = service.host else {
                 throw HeatKitError.missingServiceHost
