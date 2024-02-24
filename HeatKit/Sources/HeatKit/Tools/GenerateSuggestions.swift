@@ -8,7 +8,7 @@ extension Tool {
             type: .function,
             function: .init(
                 name: "suggested_user_replies",
-                description: "Return a list of three suggested user replies based on the last message sent by the assistant.",
+                description: "Return a list of three suggested user replies based on the message history.",
                 parameters: .init(
                     type: .object,
                     properties: [
