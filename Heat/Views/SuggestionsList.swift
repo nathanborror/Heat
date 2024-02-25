@@ -9,8 +9,8 @@ struct SuggestionList<Content: View>: View {
         VStack(spacing: 4) {
             ForEach(suggestions, id: \.self) { suggestion in
                 HStack {
-                    Spacer()
                     content(suggestion)
+                    Spacer()
                 }
             }
         }
@@ -24,24 +24,16 @@ struct SuggestionView: View {
     let action: (String) -> Void
     
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            Button(action: { handleTap(suggestion) }) {
-                Text(suggestion)
-                    .multilineTextAlignment(.leading)
-                    #if os(iOS)
-                    .padding(.vertical, 10)
-                    #endif
-            }
-            #if os(iOS)
-            .buttonStyle(.borderless)
-            #endif
+        Button(action: { handleTap(suggestion) }) {
+            Text(suggestion)
+                .multilineTextAlignment(.leading)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
         }
-        #if os(iOS)
-        .padding(.horizontal)
+        .buttonStyle(.borderless)
         .background(colorScheme == .light ? Color.accentColor.opacity(0.1) : .secondary.opacity(0.2))
         .tint(colorScheme == .light ? .accentColor : .white.opacity(0.65))
-        .clipShape(.rect(cornerRadius: 22))
-        #endif
+        .clipShape(.rect(cornerRadius: 10))
     }
     
     func handleTap(_ text: String) {

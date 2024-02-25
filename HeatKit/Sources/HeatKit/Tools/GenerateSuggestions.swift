@@ -7,20 +7,23 @@ extension Tool {
         .init(
             type: .function,
             function: .init(
-                name: "suggested_user_replies",
-                description: "Return a list of three suggested user replies based on the message history.",
+                name: "suggested_prompts",
+                description: """
+                    Return a list of suggested prompts related to the conversation. These should be prompts a user \
+                    might say next in the conversation.
+                    """,
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "suggestions": .init(type: .array, description: "A list of short reply suggestions.", items: .init(type: .string, minItems: 2, maxItems: 4)),
+                        "prompts": .init(type: .array, description: "A list of short prompts", items: .init(type: .string, minItems: 2, maxItems: 3)),
                     ],
-                    required: ["suggestions"]
+                    required: ["prompts"]
                 )
             )
         )
     
     public struct GenerateSuggestions: Codable {
-        public var suggestions: [String]
+        public var prompts: [String]
         
         public static func decode(_ arguments: String) throws -> Self {
             guard let data = arguments.data(using: .utf8) else {

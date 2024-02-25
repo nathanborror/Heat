@@ -215,7 +215,7 @@ final class ConversationViewModel {
         guard let toolCall = toolCalls.first(where: { $0.function.name == Tool.generateSuggestions.function.name }) else { return [] }
         do {
             let suggestions = try Tool.GenerateSuggestions.decode(toolCall.function.arguments)
-            return suggestions.suggestions
+            return suggestions.prompts
         } catch {
             self.error = HeatKitError.failedSuggestions
         }

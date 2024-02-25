@@ -10,6 +10,7 @@ struct MessageBubble: View {
             .messageBubbleStyle(message)
             .messageBubbleSpacing(message)
             .messageBubbleAttachments(message)
+            .textSelection(.enabled)
     }
 }
 
@@ -97,12 +98,9 @@ struct MessageBubbleSpacing: ViewModifier {
             switch message.role {
             case .system, .tool:
                 content
-            case .assistant:
+            case .assistant, .user:
                 content
                 Spacer(minLength: 16)
-            case .user:
-                Spacer(minLength: 16)
-                content
             }
         }
     }
