@@ -13,21 +13,21 @@ struct ConversationView: View {
     var body: some View {
         ScrollView {
             ScrollViewReader { proxy in
-                LazyVStack(spacing: 4) {
+                LazyVStack(spacing: 16) {
                     
                     // Messages
                     ForEach(conversationViewModel.messagesVisible) { message in
-                        MessageBubble(message: message)
+                        MessageView(message: message)
                     }
                     
                     // Typing indicator
                     if conversationViewModel.conversation?.state == .processing {
-                        TypingIndicator(.leading)
+                        TypingIndicator()
                     }
                     
                     // Suggestions
                     if conversationViewModel.conversation?.state == .suggesting {
-                        TypingIndicator(.trailing)
+                        TypingIndicator()
                     }
                     SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
                         SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
@@ -36,7 +36,6 @@ struct ConversationView: View {
                     ScrollMarker(id: "bottom")
                 }
                 .padding(.horizontal)
-                .padding(.top, 64)
                 .onChange(of: conversationViewModel.conversationID) { oldValue, newValue in
                     guard oldValue != newValue else { return }
                     proxy.scrollTo("bottom", anchor: .bottom)

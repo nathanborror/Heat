@@ -22,12 +22,20 @@
 		D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E194B2AE591EA002516C1 /* PreferencesForm.swift */; };
 		D45CC1FA2B8A5C1A009DFDF4 /* SuggestionsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45CC1F92B8A5C1A009DFDF4 /* SuggestionsList.swift */; };
 		D4713D702AEAB9670005597E /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4713D6F2AEAB9670005597E /* Operators.swift */; };
+		D4A2C55A2B8BF8550004F27B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = D4A2C5592B8BF8550004F27B /* MarkdownUI */; };
+		D4A2C55D2B8BF89A0004F27B /* Splash in Frameworks */ = {isa = PBXBuildFile; productRef = D4A2C55C2B8BF89A0004F27B /* Splash */; };
+		D4A2C55F2B8BF89A0004F27B /* SplashHTMLGen in Frameworks */ = {isa = PBXBuildFile; productRef = D4A2C55E2B8BF89A0004F27B /* SplashHTMLGen */; };
+		D4A2C5612B8BF89A0004F27B /* SplashImageGen in Frameworks */ = {isa = PBXBuildFile; productRef = D4A2C5602B8BF89A0004F27B /* SplashImageGen */; };
+		D4A2C5632B8BF89A0004F27B /* SplashMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = D4A2C5622B8BF89A0004F27B /* SplashMarkdown */; };
+		D4A2C5652B8BF89A0004F27B /* SplashTokenizer in Frameworks */ = {isa = PBXBuildFile; productRef = D4A2C5642B8BF89A0004F27B /* SplashTokenizer */; };
+		D4A2C5672B8BF9CE0004F27B /* MarkdownUI+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */; };
+		D4A2C5692B8BF9EC0004F27B /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A2C5682B8BF9EC0004F27B /* Markdown.swift */; };
 		D4B2D2672B649DFD0017FB52 /* ConversationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2662B649DFD0017FB52 /* ConversationList.swift */; };
 		D4B2D2692B6563DB0017FB52 /* ConversationInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */; };
 		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
 		D8753DF22B720662005BD3A7 /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8753DF12B720662005BD3A7 /* UIImage+.swift */; };
-		D88D23092B3CFB5100CCCC61 /* MessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */; };
+		D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageView.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
 		D8E1FC0C2B6FFCF3006C9366 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC0B2B6FFCF3006C9366 /* ImagePicker.swift */; };
 		D8E1FC0E2B700D62006C9366 /* NSImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC0D2B700D62006C9366 /* NSImage+.swift */; };
@@ -54,13 +62,15 @@
 		D41E194B2AE591EA002516C1 /* PreferencesForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesForm.swift; sourceTree = "<group>"; };
 		D45CC1F92B8A5C1A009DFDF4 /* SuggestionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsList.swift; sourceTree = "<group>"; };
 		D4713D6F2AEAB9670005597E /* Operators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
+		D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownUI+.swift"; sourceTree = "<group>"; };
+		D4A2C5682B8BF9EC0004F27B /* Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Markdown.swift; sourceTree = "<group>"; };
 		D4B2D2632B649D5C0017FB52 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4B2D2662B649DFD0017FB52 /* ConversationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationList.swift; sourceTree = "<group>"; };
 		D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationInput.swift; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		D8753DF12B720662005BD3A7 /* UIImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
-		D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBubble.swift; sourceTree = "<group>"; };
+		D88D23082B3CFB5100CCCC61 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
 		D8E1FC0B2B6FFCF3006C9366 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		D8E1FC0D2B700D62006C9366 /* NSImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+.swift"; sourceTree = "<group>"; };
@@ -74,7 +84,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4A2C5652B8BF89A0004F27B /* SplashTokenizer in Frameworks */,
 				D41E19322AE467F5002516C1 /* HeatKit in Frameworks */,
+				D4A2C55A2B8BF8550004F27B /* MarkdownUI in Frameworks */,
+				D4A2C55D2B8BF89A0004F27B /* Splash in Frameworks */,
+				D4A2C55F2B8BF89A0004F27B /* SplashHTMLGen in Frameworks */,
+				D4A2C5632B8BF89A0004F27B /* SplashMarkdown in Frameworks */,
+				D4A2C5612B8BF89A0004F27B /* SplashImageGen in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +104,7 @@
 				D4017C912B6EEFBE001CE137 /* Color+.swift */,
 				D8E1FC0D2B700D62006C9366 /* NSImage+.swift */,
 				D8753DF12B720662005BD3A7 /* UIImage+.swift */,
+				D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -142,6 +159,7 @@
 				D8E1FC0B2B6FFCF3006C9366 /* ImagePicker.swift */,
 				D4713D6F2AEAB9670005597E /* Operators.swift */,
 				D4FECDD22B817A3900E1BA13 /* HapticManager.swift */,
+				D4A2C5682B8BF9EC0004F27B /* Markdown.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -158,6 +176,7 @@
 		D41E194A2AE58D29002516C1 /* Conversations */ = {
 			isa = PBXGroup;
 			children = (
+				D4A2C56C2B8BFA830004F27B /* Views */,
 				D4B2D2662B649DFD0017FB52 /* ConversationList.swift */,
 				D41E193A2AE4C759002516C1 /* ConversationView.swift */,
 				D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */,
@@ -166,15 +185,22 @@
 			path = Conversations;
 			sourceTree = "<group>";
 		};
-		D88D23072B3CFB2C00CCCC61 /* Views */ = {
+		D4A2C56C2B8BFA830004F27B /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
-				D88D23082B3CFB5100CCCC61 /* MessageBubble.swift */,
+				D88D23082B3CFB5100CCCC61 /* MessageView.swift */,
+				D45CC1F92B8A5C1A009DFDF4 /* SuggestionsList.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D88D23072B3CFB2C00CCCC61 /* Views */ = {
+			isa = PBXGroup;
+			children = (
 				D4017C8C2B6EEF70001CE137 /* Squircle.swift */,
 				D41E193D2AE4CD20002516C1 /* PictureView.swift */,
 				D41E193F2AE4CD4F002516C1 /* VideoView.swift */,
-				D45CC1F92B8A5C1A009DFDF4 /* SuggestionsList.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -207,6 +233,12 @@
 			name = Heat;
 			packageProductDependencies = (
 				D41E19312AE467F5002516C1 /* HeatKit */,
+				D4A2C5592B8BF8550004F27B /* MarkdownUI */,
+				D4A2C55C2B8BF89A0004F27B /* Splash */,
+				D4A2C55E2B8BF89A0004F27B /* SplashHTMLGen */,
+				D4A2C5602B8BF89A0004F27B /* SplashImageGen */,
+				D4A2C5622B8BF89A0004F27B /* SplashMarkdown */,
+				D4A2C5642B8BF89A0004F27B /* SplashTokenizer */,
 			);
 			productName = Heat;
 			productReference = D4B2D2632B649D5C0017FB52 /* Heat.app */;
@@ -236,6 +268,10 @@
 				Base,
 			);
 			mainGroup = D41E19122AE45C9B002516C1;
+			packageReferences = (
+				D4A2C5582B8BF8550004F27B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				D4A2C55B2B8BF89A0004F27B /* XCRemoteSwiftPackageReference "Splash" */,
+			);
 			productRefGroup = D41E19122AE45C9B002516C1;
 			projectDirPath = "";
 			projectRoot = "";
@@ -262,9 +298,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4A2C5692B8BF9EC0004F27B /* Markdown.swift in Sources */,
 				D4B2D2672B649DFD0017FB52 /* ConversationList.swift in Sources */,
 				D8E1FC182B704CDD006C9366 /* ServiceForm.swift in Sources */,
 				D8FBB20D2AEDB60700783E9B /* AgentList.swift in Sources */,
+				D4A2C5672B8BF9CE0004F27B /* MarkdownUI+.swift in Sources */,
 				D4017C902B6EEFB5001CE137 /* Asset+.swift in Sources */,
 				D4017C922B6EEFBE001CE137 /* Color+.swift in Sources */,
 				D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */,
@@ -276,7 +314,7 @@
 				D8E1FC0E2B700D62006C9366 /* NSImage+.swift in Sources */,
 				D41E193E2AE4CD20002516C1 /* PictureView.swift in Sources */,
 				D41E193B2AE4C759002516C1 /* ConversationView.swift in Sources */,
-				D88D23092B3CFB5100CCCC61 /* MessageBubble.swift in Sources */,
+				D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */,
 				D4017C8B2B6EEF01001CE137 /* MainCompactView.swift in Sources */,
 				D8E1FC0C2B6FFCF3006C9366 /* ImagePicker.swift in Sources */,
 				D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */,
@@ -511,10 +549,59 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		D4A2C5582B8BF8550004F27B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.0;
+			};
+		};
+		D4A2C55B2B8BF89A0004F27B /* XCRemoteSwiftPackageReference "Splash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JohnSundell/Splash";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		D41E19312AE467F5002516C1 /* HeatKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HeatKit;
+		};
+		D4A2C5592B8BF8550004F27B /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4A2C5582B8BF8550004F27B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+		D4A2C55C2B8BF89A0004F27B /* Splash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4A2C55B2B8BF89A0004F27B /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = Splash;
+		};
+		D4A2C55E2B8BF89A0004F27B /* SplashHTMLGen */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4A2C55B2B8BF89A0004F27B /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashHTMLGen;
+		};
+		D4A2C5602B8BF89A0004F27B /* SplashImageGen */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4A2C55B2B8BF89A0004F27B /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashImageGen;
+		};
+		D4A2C5622B8BF89A0004F27B /* SplashMarkdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4A2C55B2B8BF89A0004F27B /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashMarkdown;
+		};
+		D4A2C5642B8BF89A0004F27B /* SplashTokenizer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4A2C55B2B8BF89A0004F27B /* XCRemoteSwiftPackageReference "Splash" */;
+			productName = SplashTokenizer;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

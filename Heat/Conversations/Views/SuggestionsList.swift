@@ -6,7 +6,7 @@ struct SuggestionList<Content: View>: View {
     var content: (String) -> Content
     
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
             ForEach(suggestions, id: \.self) { suggestion in
                 HStack {
                     content(suggestion)
@@ -25,15 +25,18 @@ struct SuggestionView: View {
     
     var body: some View {
         Button(action: { handleTap(suggestion) }) {
-            Text(suggestion)
-                .multilineTextAlignment(.leading)
-                .padding(.vertical, 6)
-                .padding(.horizontal, 12)
+            HStack(alignment: .firstTextBaseline) {
+                Image(systemName: "chevron.right")
+                    .imageScale(.small)
+                    .opacity(0.5)
+                Text(suggestion)
+                    .multilineTextAlignment(.leading)
+                    .font(.body)
+                    .lineSpacing(2)
+            }
         }
         .buttonStyle(.borderless)
-        .background(colorScheme == .light ? Color.accentColor.opacity(0.1) : .secondary.opacity(0.2))
         .tint(colorScheme == .light ? .accentColor : .white.opacity(0.65))
-        .clipShape(.rect(cornerRadius: 10))
     }
     
     func handleTap(_ text: String) {
