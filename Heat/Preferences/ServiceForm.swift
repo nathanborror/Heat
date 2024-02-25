@@ -137,6 +137,9 @@ struct ServiceForm: View {
             case "google":
                 guard let token = service.token else { return }
                 client = GoogleService(configuration: .init(token: token))
+            case "anthropic":
+                guard let token = service.token else { return }
+                client = AnthropicService(configuration: .init(token: token))
             default:
                 return
             }

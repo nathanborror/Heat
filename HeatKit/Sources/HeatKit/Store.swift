@@ -196,6 +196,11 @@ public final class Store {
                 throw HeatKitError.missingServiceHost
             }
             return GoogleService(configuration: .init(token: token))
+        case "anthropic":
+            guard let token = service.token else {
+                throw HeatKitError.missingServiceHost
+            }
+            return AnthropicService(configuration: .init(token: token))
         default:
             throw HeatKitError.missingService
         }
