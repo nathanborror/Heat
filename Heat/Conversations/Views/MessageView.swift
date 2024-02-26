@@ -25,7 +25,9 @@ struct MessageViewText: View {
     
     var body: some View {
         if message.role == .user {
-            Text(message.content ?? "")
+            Markdown(message.content ?? "")
+                .markdownTheme(.mate)
+                .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
                 .textSelection(.enabled)
         } else {
             Markdown(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
@@ -75,33 +77,16 @@ struct MessageViewSpacing: ViewModifier {
             case .system, .tool:
                 content
             case .assistant:
-                Image(systemName: "smallcircle.circle.fill")
-                    .imageScale(.small)
-                    .foregroundStyle(assistantSymbolColor)
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text("Assistant")
-                            .font(roleFont)
-                            .lineSpacing(2)
-                            .opacity(roleOpacity)
-                        Spacer()
-                    }
-                    content
-                }
+                content
+                Spacer()
             case .user:
-                Image(systemName: "person.crop.circle.fill")
-                    .imageScale(.small)
-                    .foregroundStyle(userSymbolColor)
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text("You")
-                            .font(roleFont)
-                            .lineSpacing(2)
-                            .opacity(roleOpacity)
-                        Spacer()
-                    }
-                    content
-                }
+                content
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.primary.opacity(0.05))
+                    .clipShape(.rect(cornerRadius: 10))
+                    .padding(.leading, -12)
+                Spacer()
             }
         }
     }
@@ -161,4 +146,16 @@ extension View {
     func messageAttachments(_ message: Message) -> some View {
         self.modifier(MessageViewAttachments(message: message))
     }
+}
+
+#Preview {
+    let store = Store.preview
+    let viewModel = ConversationViewModel(store: Store.preview)
+    viewModel.conversationID = store.conversations.first?.id
+    
+    return NavigationStack {
+        ConversationView()
+    }
+    .environment(store)
+    .environment(viewModel)
 }

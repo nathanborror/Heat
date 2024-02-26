@@ -25,21 +25,31 @@ struct SuggestionView: View {
     
     var body: some View {
         Button(action: { handleTap(suggestion) }) {
-            HStack(alignment: .firstTextBaseline) {
-                Image(systemName: "chevron.right")
-                    .imageScale(.small)
-                    .opacity(0.5)
-                Text(suggestion)
-                    .multilineTextAlignment(.leading)
-                    .font(.body)
-                    .lineSpacing(2)
-            }
+            Text(suggestion)
+                .multilineTextAlignment(.leading)
+                .font(.system(size: fontSize))
+                .lineSpacing(2)
         }
         .buttonStyle(.borderless)
         .tint(colorScheme == .light ? .accentColor : .white.opacity(0.65))
+        #if os(macOS)
+        .onHover { inside in
+            if inside {
+                NSCursor.pointingHand.set()
+            } else {
+                NSCursor.arrow.set()
+            }
+        }
+        #endif
     }
     
     func handleTap(_ text: String) {
         action(suggestion)
     }
+    
+    #if os(macOS)
+    private let fontSize: CGFloat = 14
+    #else
+    private let fontSize: CGFloat = 17
+    #endif
 }

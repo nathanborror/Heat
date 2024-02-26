@@ -13,7 +13,7 @@ struct ConversationView: View {
     var body: some View {
         ScrollView {
             ScrollViewReader { proxy in
-                LazyVStack(spacing: 16) {
+                LazyVStack(spacing: 11) {
                     
                     // Messages
                     ForEach(conversationViewModel.messagesVisible) { message in
@@ -27,15 +27,19 @@ struct ConversationView: View {
                     
                     // Suggestions
                     if conversationViewModel.conversation?.state == .suggesting {
-                        TypingIndicator()
+                        TypingIndicator(foregroundColor: .accentColor)
                     }
                     SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
                         SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
                     }
+                    .padding(.top, 8)
                     
                     ScrollMarker(id: "bottom")
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 24)
+                #if os(macOS)
+                .padding(.top, 32)
+                #endif
                 .onChange(of: conversationViewModel.conversationID) { oldValue, newValue in
                     guard oldValue != newValue else { return }
                     proxy.scrollTo("bottom", anchor: .bottom)
@@ -55,7 +59,7 @@ struct ConversationView: View {
         .safeAreaInset(edge: .bottom, alignment: .center) {
             ConversationInput()
                 .environment(conversationViewModel)
-                .padding()
+                .padding(12)
                 .background(.background)
         }
         .alert(isPresented: $isShowingError, error: conversationViewModel.error) { _ in
@@ -98,9 +102,13 @@ struct ScrollMarker: View {
 }
 
 #Preview {
-    NavigationStack {
+    let store = Store.preview
+    let viewModel = ConversationViewModel(store: Store.preview)
+    viewModel.conversationID = store.conversations.first?.id
+    
+    return NavigationStack {
         ConversationView()
     }
-    .environment(Store.preview)
-    .environment(ConversationViewModel(store: Store.preview))
+    .environment(store)
+    .environment(viewModel)
 }
