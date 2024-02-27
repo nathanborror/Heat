@@ -5,8 +5,8 @@ public enum HeatKitError: LocalizedError, Equatable {
     case failedtoolDecoding
     case failedSuggestions
     case missingResource
-    case missingService
-    case missingServiceModel
+    case missingService(String)
+    case missingServiceModel(String)
     case missingServiceToken
     case missingServiceHost
     case missingConversation
@@ -22,10 +22,10 @@ public enum HeatKitError: LocalizedError, Equatable {
             "Failed to generate suggestions"
         case .missingResource:
             "Missing resource"
-        case .missingService:
-            "Missing service"
-        case .missingServiceModel:
-            "Missing service model"
+        case .missingService(let service):
+            "Missing '\(service)' service"
+        case .missingServiceModel(let service):
+            "Missing '\(service)' service model"
         case .missingServiceToken:
             "Missing service token"
         case .missingServiceHost:

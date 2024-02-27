@@ -35,7 +35,7 @@ final class ConversationViewModel {
         conversation?.suggestions ?? []
     }
     
-    private var messages: [Message] {
+    var messages: [Message] {
         conversation?.messages ?? []
     }
     
