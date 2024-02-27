@@ -67,67 +67,74 @@ struct PreferencesForm: View {
             #endif
             
             Section {
-                Picker("Chats", selection: $store.preferences.preferredChatServiceID ?? "") {
+                Picker("Chats", selection: Binding(
+                    get: { store.preferences.preferredChatServiceID?.rawValue ?? "" },
+                    set: { store.preferences.preferredChatServiceID = Service.ServiceID(rawValue: $0) }
+                )) {
                     Text("None").tag("")
                     Divider()
                     ForEach(store.preferences.services) { service in
-                        if service.supportsChats {
-                            Text(service.name).tag(service.id)
-                        }
+                        Text(service.name).tag(service.id.rawValue)
                     }
                 }
-                Picker("Images", selection: $store.preferences.preferredImageServiceID ?? "") {
+                Picker("Images", selection: Binding(
+                    get: { store.preferences.preferredImageServiceID?.rawValue ?? "" },
+                    set: { store.preferences.preferredImageServiceID = Service.ServiceID(rawValue: $0) }
+                )) {
                     Text("None").tag("")
                     Divider()
                     ForEach(store.preferences.services) { service in
-                        if service.supportsImages {
-                            Text(service.name).tag(service.id)
-                        }
+                        Text(service.name).tag(service.id.rawValue)
                     }
                 }
-                Picker("Embeddings", selection: $store.preferences.preferredEmbeddingServiceID ?? "") {
+                Picker("Embeddings", selection: Binding(
+                    get: { store.preferences.preferredEmbeddingServiceID?.rawValue ?? "" },
+                    set: { store.preferences.preferredEmbeddingServiceID = Service.ServiceID(rawValue: $0) }
+                )) {
                     Text("None").tag("")
                     Divider()
                     ForEach(store.preferences.services) { service in
-                        if service.supportsEmbeddings {
-                            Text(service.name).tag(service.id)
-                        }
+                        Text(service.name).tag(service.id.rawValue)
                     }
                 }
-                Picker("Transcriptions", selection: $store.preferences.preferredTranscriptionServiceID ?? "") {
+                Picker("Transcriptions", selection: Binding(
+                    get: { store.preferences.preferredTranscriptionServiceID?.rawValue ?? "" },
+                    set: { store.preferences.preferredTranscriptionServiceID = Service.ServiceID(rawValue: $0) }
+                )) {
                     Text("None").tag("")
                     Divider()
                     ForEach(store.preferences.services) { service in
-                        if service.supportsTranscriptions {
-                            Text(service.name).tag(service.id)
-                        }
+                        Text(service.name).tag(service.id.rawValue)
                     }
                 }
-                Picker("Tools", selection: $store.preferences.preferredToolServiceID ?? "") {
+                Picker("Tools", selection: Binding(
+                    get: { store.preferences.preferredToolServiceID?.rawValue ?? "" },
+                    set: { store.preferences.preferredToolServiceID = Service.ServiceID(rawValue: $0) }
+                )) {
                     Text("None").tag("")
                     Divider()
                     ForEach(store.preferences.services) { service in
-                        if service.supportsTools {
-                            Text(service.name).tag(service.id)
-                        }
+                        Text(service.name).tag(service.id.rawValue)
                     }
                 }
-                Picker("Vision", selection: $store.preferences.preferredVisionServiceID ?? "") {
+                Picker("Vision", selection: Binding(
+                    get: { store.preferences.preferredVisionServiceID?.rawValue ?? "" },
+                    set: { store.preferences.preferredVisionServiceID = Service.ServiceID(rawValue: $0) }
+                )) {
                     Text("None").tag("")
                     Divider()
                     ForEach(store.preferences.services) { service in
-                        if service.supportsVision {
-                            Text(service.name).tag(service.id)
-                        }
+                        Text(service.name).tag(service.id.rawValue)
                     }
                 }
-                Picker("Speech", selection: $store.preferences.preferredSpeechServiceID ?? "") {
+                Picker("Speech", selection: Binding(
+                    get: { store.preferences.preferredSpeechServiceID?.rawValue ?? "" },
+                    set: { store.preferences.preferredSpeechServiceID = Service.ServiceID(rawValue: $0) }
+                )) {
                     Text("None").tag("")
                     Divider()
                     ForEach(store.preferences.services) { service in
-                        if service.supportsSpeech {
-                            Text(service.name).tag(service.id)
-                        }
+                        Text(service.name).tag(service.id.rawValue)
                     }
                 }
             } footer: {

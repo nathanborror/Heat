@@ -6,56 +6,49 @@ public struct Constants {
     public static var defaultAgentID = "bundle-assistant"
     public static var defaultAgents: [Agent] = [.preview]
     
-    public static var defaultChatServiceID = ""
-    public static var defaultImageServiceID = ""
-    public static var defaultEmbeddingServiceID = ""
-    public static var defaultTranscriptionServiceID = ""
-    public static var defaultToolServiceID = ""
-    public static var defaultVisionServiceID = ""
-    public static var defaultSpeechServiceID = ""
+    public static var defaultChatServiceID: Service.ServiceID? = nil
+    public static var defaultImageServiceID: Service.ServiceID? = nil
+    public static var defaultEmbeddingServiceID: Service.ServiceID? = nil
+    public static var defaultTranscriptionServiceID: Service.ServiceID? = nil
+    public static var defaultToolServiceID: Service.ServiceID? = nil
+    public static var defaultVisionServiceID: Service.ServiceID? = nil
+    public static var defaultSpeechServiceID: Service.ServiceID? = nil
     
     public static var defaultServices: [Service] = [
         .init(
-            id: "openai",
+            id: .openAI,
             name: "OpenAI",
-            token: "",
-            requiresToken: true
+            credentials: nil
         ),
         .init(
-            id: "mistral",
+            id: .mistral,
             name: "Mistral",
-            token: "",
-            requiresToken: true
+            credentials: nil
         ),
         .init(
-            id: "perplexity",
+            id: .perplexity,
             name: "Perplexity",
-            token: "",
-            requiresToken: true
+            credentials: nil
         ),
         .init(
-            id: "ollama",
+            id: .ollama,
             name: "Ollama",
-            host: URL(string: "http://localhost:11434/api")!,
-            requiresHost: true
+            credentials: .host(URL(string: "http://localhost:11434/api")!)
         ),
         .init(
-            id: "elevenlabs",
+            id: .elevenLabs,
             name: "ElevenLabs",
-            token: "",
-            requiresToken: true
+            credentials: nil
         ),
         .init(
-            id: "anthropic",
+            id: .anthropic,
             name: "Anthropic",
-            token: "",
-            requiresToken: true
+            credentials: nil
         ),
         .init(
-            id: "google",
+            id: .google,
             name: "Google",
-            token: "",
-            requiresToken: true
+            credentials: nil
         ),
     ]
 }

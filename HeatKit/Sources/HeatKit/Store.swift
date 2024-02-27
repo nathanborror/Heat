@@ -40,7 +40,7 @@ public final class Store {
         tools.first(where: { $0.function.name == name })
     }
     
-    public func get(serviceID: String?) -> Service? {
+    public func get(serviceID: Service.ServiceID?) -> Service? {
         preferences.services.first(where: { $0.id == serviceID })
     }
     
@@ -170,165 +170,49 @@ public final class Store {
         guard let service = get(serviceID: preferences.preferredChatServiceID) else {
             throw HeatKitError.missingService
         }
-        switch service.id {
-        case "openai":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return OpenAIService(configuration: .init(token: token))
-        case "mistral":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return MistralService(configuration: .init(token: token))
-        case "perplexity":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return PerplexityService(configuration: .init(token: token))
-        case "ollama":
-            guard let host = service.host else {
-                throw HeatKitError.missingServiceHost
-            }
-            return OllamaService(configuration: .init(host: host))
-        case "google":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceHost
-            }
-            return GoogleService(configuration: .init(token: token))
-        case "anthropic":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceHost
-            }
-            return AnthropicService(configuration: .init(token: token))
-        default:
-            throw HeatKitError.missingService
-        }
+        return try service.chatService()
     }
     
     public func preferredImageService() throws -> ImageService {
         guard let service = get(serviceID: preferences.preferredImageServiceID) else {
             throw HeatKitError.missingService
         }
-        switch service.id {
-        case "openai":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return OpenAIService(configuration: .init(token: token))
-        default:
-            throw HeatKitError.missingService
-        }
+        return try service.imageService()
     }
     
     public func preferredEmbeddingService() throws -> EmbeddingService {
         guard let service = get(serviceID: preferences.preferredEmbeddingServiceID) else {
             throw HeatKitError.missingService
         }
-        switch service.id {
-        case "openai":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return OpenAIService(configuration: .init(token: token))
-        case "mistral":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return MistralService(configuration: .init(token: token))
-        case "ollama":
-            guard let host = service.host else {
-                throw HeatKitError.missingServiceHost
-            }
-            return OllamaService(configuration: .init(host: host))
-        default:
-            throw HeatKitError.missingService
-        }
+        return try service.embeddingService()
     }
     
     public func preferredTranscriptionService() throws -> TranscriptionService {
         guard let service = get(serviceID: preferences.preferredTranscriptionServiceID) else {
             throw HeatKitError.missingService
         }
-        switch service.id {
-        case "openai":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return OpenAIService(configuration: .init(token: token))
-        default:
-            throw HeatKitError.missingService
-        }
+        return try service.transcriptionService()
     }
     
     public func preferredToolService() throws -> ToolService {
         guard let service = get(serviceID: preferences.preferredToolServiceID) else {
             throw HeatKitError.missingService
         }
-        switch service.id {
-        case "openai":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return OpenAIService(configuration: .init(token: token))
-        case "mistral":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return MistralService(configuration: .init(token: token))
-        case "perplexity":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return PerplexityService(configuration: .init(token: token))
-        case "ollama":
-            guard let host = service.host else {
-                throw HeatKitError.missingServiceHost
-            }
-            return OllamaService(configuration: .init(host: host))
-        default:
-            throw HeatKitError.missingService
-        }
+        return try service.toolService()
     }
     
     public func preferredVisionService() throws -> VisionService {
         guard let service = get(serviceID: preferences.preferredVisionServiceID) else {
             throw HeatKitError.missingService
         }
-        switch service.id {
-        case "openai":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return OpenAIService(configuration: .init(token: token))
-        case "ollama":
-            guard let host = service.host else {
-                throw HeatKitError.missingServiceHost
-            }
-            return OllamaService(configuration: .init(host: host))
-        default:
-            throw HeatKitError.missingService
-        }
+        return try service.visionService()
     }
     
     public func preferredSpeechService() throws -> SpeechService {
         guard let service = get(serviceID: preferences.preferredSpeechServiceID) else {
             throw HeatKitError.missingService
         }
-        switch service.id {
-        case "openai":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return OpenAIService(configuration: .init(token: token))
-        case "elevenlabs":
-            guard let token = service.token else {
-                throw HeatKitError.missingServiceToken
-            }
-            return ElevenLabsService(configuration: .init(token: token))
-        default:
-            throw HeatKitError.missingService
-        }
+        return try service.speechService()
     }
     
     // MARK: - Model Preferences

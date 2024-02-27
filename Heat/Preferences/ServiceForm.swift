@@ -8,6 +8,8 @@ struct ServiceForm: View {
     
     @State var service: Service
     
+    @State private var token: String = ""
+    @State private var host: String = ""
     @State private var isShowingAlert = false
     @State private var error: PreferencesError? = nil
     
@@ -24,19 +26,14 @@ struct ServiceForm: View {
     var body: some View {
         Form {
             Section {
-                TextField("Identifier", text: $service.id)
                 TextField("Name", text: $service.name)
-                TextField("Host", text: Binding<String>(
-                    get: { service.host?.absoluteString ?? "" },
-                    set: { service.host = ($0.isEmpty) ? nil : URL(string: $0) }
-                ))
-                .autocorrectionDisabled()
-                .textContentType(.URL)
-                #if !os(macOS)
-                .textInputAutocapitalization(.never)
-                #endif
-                
-                TextField("Token", text: $service.token ?? "")
+                TextField("Host", text: $host)
+                    .autocorrectionDisabled()
+                    .textContentType(.URL)
+                    #if !os(macOS)
+                    .textInputAutocapitalization(.never)
+                    #endif
+                TextField("Token", text: $token)
             }
             
             Section {
@@ -93,6 +90,7 @@ struct ServiceForm: View {
             Text(error.recoverySuggestion)
         }
         .onAppear {
+            handleLoadCredentials()
             handleLoadModels()
         }
         .onDisappear {
@@ -101,61 +99,57 @@ struct ServiceForm: View {
     }
     
     func handleSave() {
-        if service.id.isEmpty {
-            error = .missingID
-            isShowingAlert = true
-            return
-        }
         if service.name.isEmpty {
             error = .missingName
             isShowingAlert = true
             return
         }
+        handleApplyCredentials()
         store.upsert(service: service)
         dismiss()
     }
     
     func handleLoadModels() {
+        handleApplyCredentials()
         Task {
-            var client: ModelService? = nil
-            switch service.id {
-            case "openai":
-                guard let token = service.token else { return }
-                client = OpenAIService(configuration: .init(token: token))
-            case "ollama":
-                guard let host = service.host else { return }
-                client = OllamaService(configuration: .init(host: host))
-            case "mistral":
-                guard let token = service.token else { return }
-                client = MistralService(configuration: .init(token: token))
-            case "perplexity":
-                guard let token = service.token else { return }
-                client = PerplexityService(configuration: .init(token: token))
-            case "elevenlabs":
-                guard let token = service.token else { return }
-                client = ElevenLabsService(configuration: .init(token: token))
-            case "google":
-                guard let token = service.token else { return }
-                client = GoogleService(configuration: .init(token: token))
-            case "anthropic":
-                guard let token = service.token else { return }
-                client = AnthropicService(configuration: .init(token: token))
-            default:
-                return
-            }
             do {
-                guard let models = try await client?.models() else { return }
+                let client = try service.modelService()
+                let models = try await client.models()
                 service.models = models
             } catch {
                 print(error)
             }
         }
     }
+    
+    func handleLoadCredentials() {
+        if let credentials = service.credentials {
+            switch credentials {
+            case .host(let host):
+                self.host = host.absoluteString
+            case .token(let token):
+                self.token = token
+            }
+        }
+    }
+    
+    func handleApplyCredentials() {
+        switch (token.isEmpty, host.isEmpty) {
+        case (false, true):
+            service.credentials = .token(token)
+        case (true, false):
+            service.credentials = .host(URL(string: host)!)
+        case (false, false):
+            print("not implemented")
+        default:
+            service.credentials = nil
+        }
+    }
 }
 
 #Preview {
     NavigationStack {
-        ServiceForm(service: .init(id: "", name: ""))
+        ServiceForm(service: .init(id: .mistral, name: "Mistral"))
     }
     .environment(Store.preview)
 }

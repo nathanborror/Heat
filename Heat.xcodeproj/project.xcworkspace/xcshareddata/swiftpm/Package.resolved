@@ -60,7 +60,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "aa6bf75cd671fbe8398919149901dddefcd6609a"
+        "revision" : "4817d27dfb71344d123bc09a471e232a11489489"
       }
     },
     {
@@ -87,7 +87,7 @@
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
-        "revision" : "8fdc60b12246316b911da86156c0f1d780fc79a7"
+        "revision" : "e49f6f9e8bc319ff0f21990dffd1d3c3f872c26f"
       }
     },
     {

@@ -8,13 +8,13 @@ public struct Preferences: Codable {
     
     public var defaultAgentID: String?
     
-    public var preferredChatServiceID: String?
-    public var preferredImageServiceID: String?
-    public var preferredEmbeddingServiceID: String?
-    public var preferredTranscriptionServiceID: String?
-    public var preferredToolServiceID: String?
-    public var preferredVisionServiceID: String?
-    public var preferredSpeechServiceID: String?
+    public var preferredChatServiceID: Service.ServiceID?
+    public var preferredImageServiceID: Service.ServiceID?
+    public var preferredEmbeddingServiceID: Service.ServiceID?
+    public var preferredTranscriptionServiceID: Service.ServiceID?
+    public var preferredToolServiceID: Service.ServiceID?
+    public var preferredVisionServiceID: Service.ServiceID?
+    public var preferredSpeechServiceID: Service.ServiceID?
     
     public init() {
         self.services = []
