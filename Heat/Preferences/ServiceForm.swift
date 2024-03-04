@@ -73,6 +73,7 @@ struct ServiceForm: View {
         .frame(width: 400)
         .frame(minHeight: 450)
         #endif
+        .scrollDismissesKeyboard(.immediately)
         .navigationTitle("Service")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
