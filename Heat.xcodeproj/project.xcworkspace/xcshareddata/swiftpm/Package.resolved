@@ -42,7 +42,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "1c8215f18a812a1396d53948d66820552697f437"
+        "revision" : "3dcbdb06ffd57004a37532671eadbcf3aed6d77f"
       }
     },
     {
@@ -60,7 +60,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "986929f9ea7c934d6c03f3a98c8c4de36e947b79"
+        "revision" : "698e8baf71c6d8d3200a07b497875ab196544e9f"
       }
     },
     {
