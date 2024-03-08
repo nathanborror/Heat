@@ -36,7 +36,10 @@ struct PreferencesForm: View {
         @Bindable var store = store
         Form {
             Section {
-                TextField("Introduction", text: $store.preferences.instructions ?? "", axis: .vertical)
+                TextField("Introduction", text: Binding(
+                    get: { store.preferences.instructions ?? "" },
+                    set: { store.preferences.instructions = $0.isEmpty ? nil : $0 }
+                ), axis: .vertical)
             } footer: {
                 Text("Personalize your experience by describing who you are.")
             }
