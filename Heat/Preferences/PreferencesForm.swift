@@ -73,7 +73,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services) { service in
+                    ForEach(store.preferences.services.filter { $0.supportsChats }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -83,7 +83,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services) { service in
+                    ForEach(store.preferences.services.filter { $0.supportsImages }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -93,7 +93,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services) { service in
+                    ForEach(store.preferences.services.filter { $0.supportsEmbeddings }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -103,7 +103,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services) { service in
+                    ForEach(store.preferences.services.filter { $0.supportsTranscriptions }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -113,7 +113,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services) { service in
+                    ForEach(store.preferences.services.filter { $0.supportsTools }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -123,7 +123,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services) { service in
+                    ForEach(store.preferences.services.filter { $0.supportsVision }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -133,7 +133,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services) { service in
+                    ForEach(store.preferences.services.filter { $0.supportsSpeech }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
