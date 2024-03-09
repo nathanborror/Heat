@@ -303,8 +303,8 @@ public final class MessageManager {
                     )
                     messages.append(toolResponse)
                 } catch {
-                    let message = Message(role: .tool, content: "Tool Failed: \(error.localizedDescription)", toolCallID: toolCall.id, name: toolCall.function.name)
-                    messages.append(message)
+                    let toolFailed = Message(role: .tool, content: "Tool Failed: \(error.localizedDescription)", toolCallID: toolCall.id, name: toolCall.function.name)
+                    messages.append(toolFailed)
                 }
                 
             // Web Browser
@@ -324,8 +324,8 @@ public final class MessageManager {
                     )
                     messages.append(toolResponse)
                 } catch {
-                    let message = Message(role: .tool, content: "Tool Failed: \(error.localizedDescription)", toolCallID: toolCall.id, name: toolCall.function.name)
-                    messages.append(message)
+                    let toolFailed = Message(role: .tool, content: "Tool Failed: \(error.localizedDescription)", toolCallID: toolCall.id, name: toolCall.function.name)
+                    messages.append(toolFailed)
                 }
                 
             // Image prompts
