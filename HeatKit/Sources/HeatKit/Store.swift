@@ -48,7 +48,12 @@ public final class Store {
     // MARK: - Creators
     
     public func createConversation(agent: Agent, state: Conversation.State = .none) -> Conversation {
-        var conversation = Conversation(messages: agent.instructions, tools: agent.tools, state: state)
+        let instructions = agent.instructions.map {
+            var message = $0
+            message.content = message.content?.replacingOccurrences(of: "{datetime}", with: Date.now.format(as: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"))
+            return message
+        }
+        var conversation = Conversation(messages: instructions, tools: agent.tools, state: state)
         
         // Append user profile if it exists
         if let instructions = preferences.instructions {
