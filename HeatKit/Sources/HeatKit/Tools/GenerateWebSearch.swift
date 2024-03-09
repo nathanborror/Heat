@@ -3,24 +3,24 @@ import GenKit
 
 extension Tool {
     
-    public static var generateImagePrompt: Self =
+    public static var generateWebSearch: Self =
         .init(
             type: .function,
             function: .init(
-                name: "generate_image",
-                description: "Return a thoughtful, detailed image prompt.",
+                name: "search_web",
+                description: "Return a search query to search the web.",
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "prompt": .init(type: .string, description: "A detailed prompt describing the image to generate."),
+                        "query": .init(type: .string, description: "A web search query"),
                     ],
-                    required: ["prompt"]
+                    required: ["query"]
                 )
             )
         )
     
-    public struct GenerateImagePrompt: Codable {
-        public var prompt: String
+    public struct GenerateWebSearch: Codable {
+        public var query: String
         
         public static func decode(_ arguments: String) throws -> Self {
             guard let data = arguments.data(using: .utf8) else {

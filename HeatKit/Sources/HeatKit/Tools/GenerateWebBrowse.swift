@@ -3,11 +3,11 @@ import GenKit
 
 extension Tool {
     
-    public static var generateBrowserSession: Self =
+    public static var generateWebBrowse: Self =
         .init(
             type: .function,
             function: .init(
-                name: "browser",
+                name: "browse_web",
                 description: "Return a list of URLs that should be browsed.",
                 parameters: .init(
                     type: .object,
@@ -20,7 +20,7 @@ extension Tool {
             )
         )
     
-    public struct GenerateBrowserSession: Codable {
+    public struct GenerateWebBrowse: Codable {
         public var instructions: String
         public var urls: [String]
         

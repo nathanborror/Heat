@@ -55,12 +55,21 @@
       }
     },
     {
+      "identity" : "swift-fal",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/swift-fal",
+      "state" : {
+        "branch" : "main",
+        "revision" : "9134dced8100584463d7c427773708eae7289889"
+      }
+    },
+    {
       "identity" : "swift-gen-kit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "698e8baf71c6d8d3200a07b497875ab196544e9f"
+        "revision" : "a0def7aec73654f15115c79cc061ad9334e8146f"
       }
     },
     {
@@ -124,6 +133,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "a1f7aceb6653df58ae088199a6db10ffc174e990"
+      }
+    },
+    {
+      "identity" : "yams",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jpsim/Yams",
+      "state" : {
+        "branch" : "main",
+        "revision" : "905887811fd911f60b36873a960d88c2bc435517"
       }
     }
   ],

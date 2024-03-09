@@ -76,13 +76,49 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func generateStreamForToolResponses(service: ChatService, model: String, callback: MessageCallback? = nil, completion: MessageCompletionCallback? = nil) async -> Self {
+    public func generateLoop(service: ChatService, model: String, tools: Set<Tool>, callback: MessageCallback) async -> Self {
+        do {
+            try Task.checkCancellation()
+            
+            var shouldContinue = true
+
+            while shouldContinue {
+                let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: tools)
+                var message: Message? = nil
+                try await service.completionStream(request: req) { delta in
+                    let messageDelta = apply(delta: delta)
+                    message = messageDelta
+                    await MainActor.run { callback(messageDelta) }
+                }
+                
+                if let message {
+                    let toolMessages = try await prepareToolResponses(message)
+                    if !toolMessages.isEmpty {
+                        for message in toolMessages {
+                            await self.append(message: message)
+                            await MainActor.run { callback(message) }
+                        }
+                    } else {
+                        shouldContinue = false
+                    }
+                } else {
+                    shouldContinue = false
+                }
+            }
+        } catch {
+            apply(error: error)
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func generateStreamForToolResponses(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback? = nil, completion: MessageCompletionCallback? = nil) async -> Self {
         guard hasToolResponses else { return self }
         hasToolResponses = false
         
         // If there are no toolCall responses then this step is ignored. Explicitly making the choice not to provide
         // any tools to avoid a loop but this may change in the future.
-        return await generateStream(service: service, model: model, tools: [], callback: callback, completion: completion)
+        return await generateStream(service: service, model: model, tools: tools, callback: callback, completion: completion)
     }
     
     // Tools
@@ -240,6 +276,65 @@ public final class MessageManager {
             logger.error("MessageManager Error: \(error, privacy: .public)")
             self.error = error
         }
+    }
+    
+    private func prepareToolResponses(_ message: Message) async throws -> [Message] {
+        var messages = [Message]()
+        guard let toolCalls = message.toolCalls else { return [] }
+        
+        for toolCall in toolCalls {
+            switch toolCall.function.name {
+            
+            // Web Search
+            case Tool.generateWebSearch.function.name:
+                let obj = try Tool.GenerateWebSearch.decode(toolCall.function.arguments)
+                let response = try await SearchManager.shared.search(query: obj.query)
+                let toolResponse = Message(
+                    role: .tool,
+                    content: """
+                        Use the following search results to choose the top three URLs to browse using your \
+                        `browse_web` function. Do not perform another search.
+                        
+                        Search Results:
+                        \(response.results.map { $0.description }.joined(separator: "\n\n"))
+                        """,
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name
+                )
+                messages.append(toolResponse)
+                
+            // Web Browser
+            case Tool.generateWebBrowse.function.name:
+                let obj = try Tool.GenerateWebBrowse.decode(toolCall.function.arguments)
+                var context: [String] = []
+                for url in obj.urls {
+                    let markdown = try await BrowserManager.shared.fetch(url: URL(string: url)!, urlMode: .omit, hideJSONLD: true, hideImages: true)
+                    context.append(markdown)
+                }
+                let toolResponse = Message(
+                    role: .tool,
+                    content: context.joined(separator: "\n\n"),
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name
+                )
+                messages.append(toolResponse)
+            
+            // Image prompts
+            case Tool.generateImages.function.name:
+                let obj = try Tool.GenerateImages.decode(toolCall.function.arguments)
+                let toolResponse = Message(
+                    role: .tool,
+                    content: obj.prompts.joined(separator: "\n\n"),
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name
+                )
+                messages.append(toolResponse)
+                
+            default:
+                break
+            }
+        }
+        return messages
     }
     
     public struct ToolsResponse {

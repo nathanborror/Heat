@@ -15,51 +15,7 @@ public class BrowserManager {
     }
 }
 
-extension String {
-    
-    var nilIfEmpty: String? {
-        return isEmpty ? nil : self
-    }
-    
-    var nilIfEmptyOrJustWhitespace: String? {
-        trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
-    }
-    
-    var collapseWhitespace: String {
-        components(separatedBy: .whitespacesAndNewlines).filter({ $0.count > 0 }).joined(separator: " ")
-    }
-    
-    var collapseWhitespaceWithoutTrimming: String {
-        var results = [String]()
-        var lastCompWasEmpty = false
-        for comp in components(separatedBy: .whitespacesAndNewlines) {
-            if comp == "" && !lastCompWasEmpty {
-                results.append("")
-            } else if comp != "" {
-                results.append(comp)
-            }
-            lastCompWasEmpty = comp == ""
-        }
-        return results.joined(separator: " ")
-    }
-    
-    var isURL: Bool {
-        if starts(with: "https://") || starts(with: "http://"), firstIndex(where: { $0.isWhitespace }) == nil {
-            return true
-        }
-        return false
-    }
-    
-    func truncateTail(maxLen: Int) -> String {
-        if count + 3 > maxLen {
-            if maxLen <= 3 {
-                return ""
-            }
-            return prefix(maxLen - 3) + "..."
-        }
-        return self
-    }
-}
+// Below from: https://github.com/nate-parrott/chattoys
 
 public class FastHTMLProcessor {
     
@@ -369,6 +325,52 @@ public class FastHTMLProcessor {
         } else {
             return url.absoluteString
         }
+    }
+}
+
+extension String {
+    
+    var nilIfEmpty: String? {
+        return isEmpty ? nil : self
+    }
+    
+    var nilIfEmptyOrJustWhitespace: String? {
+        trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty
+    }
+    
+    var collapseWhitespace: String {
+        components(separatedBy: .whitespacesAndNewlines).filter({ $0.count > 0 }).joined(separator: " ")
+    }
+    
+    var collapseWhitespaceWithoutTrimming: String {
+        var results = [String]()
+        var lastCompWasEmpty = false
+        for comp in components(separatedBy: .whitespacesAndNewlines) {
+            if comp == "" && !lastCompWasEmpty {
+                results.append("")
+            } else if comp != "" {
+                results.append(comp)
+            }
+            lastCompWasEmpty = comp == ""
+        }
+        return results.joined(separator: " ")
+    }
+    
+    var isURL: Bool {
+        if starts(with: "https://") || starts(with: "http://"), firstIndex(where: { $0.isWhitespace }) == nil {
+            return true
+        }
+        return false
+    }
+    
+    func truncateTail(maxLen: Int) -> String {
+        if count + 3 > maxLen {
+            if maxLen <= 3 {
+                return ""
+            }
+            return prefix(maxLen - 3) + "..."
+        }
+        return self
     }
 }
 

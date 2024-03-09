@@ -66,7 +66,7 @@ final class ConversationViewModel {
                     self.store.upsert(message: message, conversationID: conversation.id)
                     self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
-                .generateStream(service: chatService, model: chatModel) { message in
+                .generateLoop(service: chatService, model: chatModel, tools: conversation.tools) { message in
                     self.store.upsert(state: .streaming, conversationID: conversation.id)
                     self.store.replace(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
@@ -128,6 +128,70 @@ final class ConversationViewModel {
         }
     }
     
+    func generateSummary(url: String, markdown: String) throws {
+        let chatService = try store.preferredChatService()
+        let chatModel = try store.preferredChatModel()
+        
+        let toolService = try store.preferredToolService()
+        let toolModel = try store.preferredToolModel()
+        
+        guard let conversation else {
+            throw HeatKitError.missingConversation
+        }
+        generateTask = Task {
+            await MessageManager(messages: messages)
+                .append(message: .init(kind: .instruction, role: .user, content: "Summarize:\n\n\(markdown)")) { message in
+                    self.store.upsert(suggestions: [], conversationID: conversation.id)
+                    self.store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(state: .processing, conversationID: conversation.id)
+                }
+                .append(message: .init(kind: .ignore, role: .user, content: "Summarize: \(url)")) { message in
+                    self.store.upsert(message: message, conversationID: conversation.id)
+                }
+                .generateStream(service: chatService, model: chatModel, tools: conversation.tools) { message in
+                    self.store.replace(message: message, conversationID: conversation.id)
+                    self.store.upsert(state: .streaming, conversationID: conversation.id)
+                }
+                .manage { _ in
+                    self.store.upsert(state: .suggesting, conversationID: conversation.id)
+                }
+                .generate(service: toolService, model: toolModel, tool: .generateSuggestions) { message in
+                    let suggestions = self.prepareSuggestions(message)
+                    self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
+                    self.store.upsert(state: .none, conversationID: conversation.id)
+                }
+                .manage { manager in
+                    guard let error else { return }
+                    let message = Message(kind: .error, role: .system, content: error.localizedDescription)
+                    self.store.upsert(message: message, conversationID: conversation.id)
+                }
+        }
+    }
+    
+    func generateImage(_ content: String) throws {
+        let imageService = try store.preferredImageService()
+        let imageModel = try store.preferredImageModel()
+        
+        guard let conversation else {
+            throw HeatKitError.missingConversation
+        }
+        generateTask = Task {
+            await MediaManager()
+                .manage { _ in
+                    self.store.upsert(state: .processing, conversationID: conversation.id)
+                    self.store.upsert(message: .init(role: .user, content: content), conversationID: conversation.id)
+                }
+                .generate(service: imageService, model: imageModel, prompt: content) { images in
+                    let attachments = images.map {
+                        Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: content))
+                    }
+                    let message = Message(role: .assistant, content: "A generated image using the prompt:\n\(content)", attachments: attachments)
+                    self.store.upsert(message: message, conversationID: conversation.id)
+                    self.store.upsert(state: .none, conversationID: conversation.id)
+                }
+        }
+    }
+    
     func generateTitle() throws {
         let chatService = try store.preferredChatService()
         let chatModel = try store.preferredChatModel()
@@ -165,49 +229,6 @@ final class ConversationViewModel {
     
     private func hapticTap(style: HapticManager.FeedbackStyle) {
         HapticManager.shared.tap(style: style)
-    }
-    
-    private func prepareToolResponses(_ message: Message) async throws -> MessageManager.ToolsResponse {
-        var resp = MessageManager.ToolsResponse()
-        guard let toolCalls = message.toolCalls else { return resp }
-        
-        for toolCall in toolCalls {
-            switch toolCall.function.name {
-                
-            // Browser
-            case Tool.generateBrowserSession.function.name:
-                let obj = try Tool.GenerateBrowserSession.decode(toolCall.function.arguments)
-                var context: [String] = []
-                for url in obj.urls {
-                    let markdown = try await BrowserManager.shared.fetch(url: URL(string: url)!, urlMode: .omit, hideJSONLD: true, hideImages: true)
-                    context.append(markdown)
-                }
-                let toolResponse = Message(
-                    role: .tool,
-                    content: context.joined(separator: "\n\n"),
-                    toolCallID: toolCall.id,
-                    name: toolCall.function.name
-                )
-                resp.messages.append(toolResponse)
-                resp.shouldContinue = true
-            
-            // Image prompts
-            case Tool.generateImagePrompt.function.name:
-                let obj = try Tool.GenerateImagePrompt.decode(toolCall.function.arguments)
-                let toolResponse = Message(
-                    role: .tool,
-                    content: obj.prompt,
-                    toolCallID: toolCall.id,
-                    name: toolCall.function.name
-                )
-                resp.messages.append(toolResponse)
-                resp.shouldContinue = true
-                
-            default:
-                break
-            }
-        }
-        return resp
     }
     
     private func prepareSuggestions(_ message: Message) -> [String] {

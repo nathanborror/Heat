@@ -17,7 +17,15 @@ struct ConversationView: View {
                     
                     // Messages
                     ForEach(conversationViewModel.messagesVisible) { message in
-                        MessageView(message: message)
+                        switch message.role {
+                        case .user, .assistant:
+                            MessageView(message: message)
+                        case .tool:
+                            MessageTool(message: message)
+                        case .system:
+                            MessageSystem(message: message)
+                        }
+                        
                     }
                     
                     // Typing indicator

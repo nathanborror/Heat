@@ -11,37 +11,93 @@ struct ConversationInput: View {
 
     @State var imagePickerViewModel: ImagePickerViewModel
     @State var content: String
+    @State var command: String
     @State var isShowingPhotos: Bool
     
     @FocusState var isFocused: Bool
     
-    init(content: String = "", command: String = "") {
-        self.imagePickerViewModel = .init()
+    init(imagePickerViewModel: ImagePickerViewModel = .init(), content: String = "", command: String = "") {
+        self.imagePickerViewModel = imagePickerViewModel
         self.content = content
+        self.command = command
         self.isShowingPhotos = false
     }
     
     var body: some View {
         HStack(alignment: .bottom) {
-            HStack(alignment: .bottom, spacing: 0) {
-                Menu {
-                    Button(action: { isShowingPhotos = true }) {
-                        Label("Attach Photo", systemImage: "photo")
-                    }
-                } label: {
-                    Image(systemName: "plus")
-                        .modifier(ConversationInlineButtonModifier())
-                }
-                .buttonStyle(.plain)
+            VStack {
                 
-                VStack(alignment: .leading, spacing: 4) {
-                    if let image = imagePickerViewModel.image {
-                        ConversationInputImage(image: image)
-                            .environment(imagePickerViewModel)
-                            .padding(.top)
-                            .padding(.leading, showInputPadding ? 16 : 0)
+                // Attached images
+                if let image = imagePickerViewModel.image {
+                    ConversationInputImage(image: image)
+                        .environment(imagePickerViewModel)
+                        .padding(.top)
+                        .padding(.leading, showInputPadding ? 16 : 0)
+                }
+                
+                // Input field with buttons
+                HStack(alignment: .bottom, spacing: 0) {
+                    
+                    // Command menu
+                    if command.isEmpty {
+                        Menu {
+                            Button(action: { isShowingPhotos = true }) {
+                                Label("Attach Photo", systemImage: "photo")
+                            }
+                            .keyboardShortcut("1", modifiers: .command)
+                            Button(action: { command = "imagine" }) {
+                                Label("Imagine", systemImage: "paintpalette")
+                            }
+                            .keyboardShortcut("2", modifiers: .command)
+                            Button(action: { command = "summarize" }) {
+                                Label("Summarize", systemImage: "doc.text.magnifyingglass")
+                            }
+                            .keyboardShortcut("3", modifiers: .command)
+                            Button(action: { command = "search" }) {
+                                Label("Search", systemImage: "magnifyingglass")
+                            }
+                            .keyboardShortcut("4", modifiers: .command)
+                        } label: {
+                            Image(systemName: "plus")
+                                .modifier(ConversationInlineButtonModifier())
+                        }
+                        .buttonStyle(.plain)
                     }
+                    
+                    // Selected command
+                    if !command.isEmpty {
+                        HStack {
+                            Text(command)
+                            Button(action: { command = "" }) {
+                                Image(systemName: "xmark")
+                                    .imageScale(.small)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        #if os(macOS)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(.tint)
+                        .foregroundStyle(.white)
+                        .clipShape(.rect(cornerRadius: 8))
+                        .padding(.bottom, 3)
+                        .padding(.leading, 3)
+                        .padding(.trailing, 8)
+                        #else
+                        .font(.subheadline)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.tint)
+                        .foregroundStyle(.white)
+                        .clipShape(.rect(cornerRadius: 6))
+                        .padding(.bottom, 9)
+                        .padding(.horizontal, 9)
+                        #endif
+                    }
+                    
+                    // Text input
                     TextField("Message", text: $content, axis: .vertical)
+                        .focusable()
                         .textFieldStyle(.plain)
                         .padding(.vertical, verticalPadding)
                         .padding(.trailing, showInputPadding ? 16 : 0)
@@ -50,18 +106,19 @@ struct ConversationInput: View {
                         #if os(macOS)
                         .onSubmit(handleSubmit)
                         #endif
-                }
-                
-                if showInlineControls {
-                    Button(action: handleSpeak) {
-                        Image(systemName: "waveform")
-                            .modifier(ConversationInlineButtonModifier())
+                    
+                    // Audio input
+                    if showInlineControls {
+                        Button(action: handleSpeak) {
+                            Image(systemName: "waveform")
+                                .modifier(ConversationInlineButtonModifier())
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
+                .background(.primary.opacity(0.05))
+                .clipShape(.rect(cornerRadius: 10))
             }
-            .background(.primary.opacity(0.05))
-            .clipShape(.rect(cornerRadius: 10))
             
             if showStopGenerating {
                 Button(action: handleStop) {
@@ -69,8 +126,7 @@ struct ConversationInput: View {
                         .modifier(ConversationButtonModifier())
                 }
                 .buttonStyle(.plain)
-            }
-            if showSubmit {
+            } else if showSubmit {
                 Button(action: handleSubmit) {
                     Image(systemName: "arrow.up")
                         .modifier(ConversationButtonModifier())
@@ -85,20 +141,33 @@ struct ConversationInput: View {
     }
     
     func handleSubmit() {
-        
-        // Ignore empty content
-        guard !content.isEmpty else { return }
-        
         // Create conversation if one doesn't already exist
         if conversationViewModel.conversationID == nil {
             conversationViewModel.newConversation()
         }
         
+        switch command {
+        case "imagine":
+            handleImagine(content)
+            return
+        case "summarize":
+            handleSummarize(content)
+            return
+        case "search":
+            handleSearch(content)
+            return
+        default:
+            break
+        }
+        
         // Handle vision prompt if exists
         if hasVisionAsset || imagePickerViewModel.image != nil {
-            handleVisionSubmit()
+            handleVision(content)
             return
         }
+        
+        // Ignore empty content
+        guard !content.isEmpty else { return }
         
         do {
             try conversationViewModel.generate(content)
@@ -107,11 +176,10 @@ struct ConversationInput: View {
         } catch {
             logger.warning("failed to submit: \(error)")
         }
-        content = ""
-        imagePickerViewModel.imageSelection = nil
+        clear()
     }
     
-    func handleVisionSubmit() {
+    func handleVision(_ content: String) {
         do {
             if let data = imagePickerViewModel.image?.resize(to: .init(width: 512, height: 512)) {
                 try conversationViewModel.generate(content, images: [data])
@@ -123,15 +191,63 @@ struct ConversationInput: View {
         } catch {
             logger.warning("failed to submit: \(error)")
         }
-        content = ""
-        imagePickerViewModel.imageSelection = nil
+        clear()
+    }
+    
+    func handleImagine(_ content: String) {
+        do {
+            try conversationViewModel.generateImage(content)
+        } catch let error as HeatKitError {
+            conversationViewModel.error = error
+        } catch {
+            logger.warning("failed to submit: \(error)")
+        }
+        clear()
+    }
+    
+    func handleSummarize(_ content: String) {
+        guard let url = URL(string: content) else {
+            print("failed to make URL")
+            return
+        }
+        Task {
+            do {
+                let markdown = try await BrowserManager.shared.fetch(url: url, urlMode: .omit, hideJSONLD: true, hideImages: true)
+                try conversationViewModel.generateSummary(url: url.absoluteString, markdown: markdown)
+            } catch let error as HeatKitError {
+                conversationViewModel.error = error
+            } catch {
+                logger.error("Failed to fetch: \(error)")
+            }
+        }
+        clear()
+    }
+    
+    func handleSearch(_ content: String) {
+        Task {
+            do {
+                try await SearchManager.shared.search(query: content)
+            } catch {
+                logger.error("Failed to search: \(error)")
+            }
+        }
+        clear()
+    }
+    
+    func handleSpeak() {
+        logger.debug("not implemented")
     }
     
     func handleStop() {
         conversationViewModel.generateStop()
     }
     
-    func handleSpeak() {}
+    private func clear() {
+        content = ""
+        command = ""
+        //self.imagePickerViewModel.removeAll()
+        imagePickerViewModel.imageSelection = nil
+    }
     
     private var hasVisionAsset: Bool {
         let message = conversationViewModel.messagesVisible.first { message in

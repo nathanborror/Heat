@@ -10,15 +10,17 @@ public struct Agent: Codable, Identifiable {
     public var name: String
     public var picture: Asset?
     public var instructions: [Message]
+    public var tools: Set<Tool>
     public var voice: String?
     public var created: Date
     public var modified: Date
     
-    public init(id: String = .id, name: String, picture: Asset? = nil, instructions: [Message], voice: String? = nil) {
+    public init(id: String = .id, name: String, picture: Asset? = nil, instructions: [Message], tools: Set<Tool> = [], voice: String? = nil) {
         self.id = id
         self.name = name
         self.picture = picture
         self.instructions = instructions
+        self.tools = tools
         self.voice = voice
         self.created = .now
         self.modified = .now
@@ -28,6 +30,7 @@ public struct Agent: Codable, Identifiable {
         self.name = agent.name
         self.picture = agent.picture
         self.instructions = agent.instructions
+        self.tools = agent.tools
         self.voice = agent.voice
         self.modified = .now
     }
@@ -107,6 +110,7 @@ struct AgentsResource: Decodable {
                 name: name,
                 picture: encodeAsset,
                 instructions: encodeInstructions,
+                tools: Set(encodeTools),
                 voice: voice
             )
         }
@@ -114,6 +118,21 @@ struct AgentsResource: Decodable {
         var encodeAsset: Asset? {
             guard let asset, let picture = asset.picture else { return nil }
             return .init(name: "Pictures/\(picture)", kind: .image, location: .bundle)
+        }
+        
+        var encodeTools: [Tool] {
+            tools?.map { name -> Tool? in
+                switch name {
+                case Tool.generateWebSearch.function.name:
+                    return Tool.generateWebSearch
+                case Tool.generateWebBrowse.function.name:
+                    return Tool.generateWebBrowse
+                case Tool.generateImages.function.name:
+                    return Tool.generateImages
+                default:
+                    return nil
+                }
+            }.compactMap { $0 } ?? []
         }
         
         var encodeInstructions: [Message] {

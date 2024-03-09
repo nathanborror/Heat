@@ -3,6 +3,7 @@ import Observation
 import SharedKit
 import GenKit
 import OSLog
+import Yams
 
 private let logger = Logger(subsystem: "Store", category: "HeatKit")
 
@@ -47,7 +48,7 @@ public final class Store {
     // MARK: - Creators
     
     public func createConversation(agent: Agent, state: Conversation.State = .none) -> Conversation {
-        var conversation = Conversation(messages: agent.instructions, state: state)
+        var conversation = Conversation(messages: agent.instructions, tools: agent.tools, state: state)
         
         // Append user profile if it exists
         if let instructions = preferences.instructions {
@@ -324,7 +325,12 @@ public final class Store {
     }
     
     public func resetAgents() throws {
-        self.agents = Constants.defaultAgents
+        guard let url = Bundle.module.url(forResource: "agents", withExtension: "yaml") else {
+            throw HeatKitError.missingResource
+        }
+        let data = try Data(contentsOf: url)
+        let response = try YAMLDecoder().decode(AgentsResource.self, from: data)
+        self.agents = response.agents.map { $0.encode }
         self.preferences.defaultAgentID = Constants.defaultAgentID
     }
     
