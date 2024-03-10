@@ -226,7 +226,8 @@ struct ConversationInput: View {
     func handleSearch(_ content: String) {
         Task {
             do {
-                try await SearchManager.shared.search(query: content)
+                let resp = try await SearchManager.shared.search(query: content)
+                print(resp)
             } catch {
                 logger.error("Failed to search: \(error)")
             }
