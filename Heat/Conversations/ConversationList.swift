@@ -9,15 +9,14 @@ struct ConversationList: View {
         @Bindable var conversationViewModel = conversationViewModel
         List(selection: $conversationViewModel.conversationID) {
             ForEach(store.conversations) { conversation in
-                NavigationLink(value: conversation.id) {
-                    VStack(alignment: .leading) {
-                        Text(conversation.title)
-                        Text(conversation.messages.last?.content ?? "None")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
+                VStack(alignment: .leading) {
+                    Text(conversation.title)
+                    Text(conversation.messages.last?.content ?? "None")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
+                .tag(conversation.id)
                 .swipeActions {
                     Button(role: .destructive, action: { store.delete(conversationID: conversation.id) }) {
                         Label("Trash", systemImage: "trash")
