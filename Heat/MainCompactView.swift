@@ -20,19 +20,23 @@ struct MainCompactView: View {
         NavigationStack {
             ConversationView()
                 .toolbar {
-                    Menu {
+                    ToolbarItem {
+                        Menu {
+                            Button(action: { sheet = .conversationList }) {
+                                Label("History", systemImage: "clock")
+                            }
+                            Divider()
+                            Button(action: { sheet = .preferences }) {
+                                Label("Preferences", systemImage: "slider.horizontal.3")
+                            }
+                        } label: {
+                            Label("Menu", systemImage: "ellipsis")
+                        }
+                    }
+                    ToolbarItem {
                         Button(action: { conversationViewModel.conversationID = nil }) {
                             Label("New Conversation", systemImage: "plus")
                         }
-                        Button(action: { sheet = .conversationList }) {
-                            Label("History", systemImage: "clock")
-                        }
-                        Divider()
-                        Button(action: { sheet = .preferences }) {
-                            Label("Preferences", systemImage: "slider.horizontal.3")
-                        }
-                    } label: {
-                        Label("Menu", systemImage: "ellipsis")
                     }
                 }
                 .sheet(item: $sheet) { sheet in
