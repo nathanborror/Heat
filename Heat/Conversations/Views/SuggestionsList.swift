@@ -28,12 +28,12 @@ struct SuggestionView: View {
             Text(suggestion)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .background(.primary.opacity(0.05))
+                .background(.tint.opacity(0.05))
+                .foregroundStyle(.tint)
                 .clipShape(.rect(cornerRadius: 10))
                 .padding(.leading, -12)
         }
         .buttonStyle(.plain)
-        .tint(.accentColor)
         #if os(macOS)
         .onHover { inside in
             if inside {
