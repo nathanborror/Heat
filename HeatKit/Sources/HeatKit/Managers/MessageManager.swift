@@ -7,7 +7,6 @@ private let logger = Logger(subsystem: "MessageManager", category: "HeatKit")
 
 public final class MessageManager {
     public typealias MessageCallback = (Message) -> Void
-    public typealias MessageCompletionCallback = (Message) async throws -> ToolsResponse?
     
     public private(set) var messages: [Message]
     public private(set) var error: Error?
@@ -51,32 +50,7 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback? = nil, completion: MessageCompletionCallback? = nil) async -> Self {
-        do {
-            try Task.checkCancellation()
-            let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: tools)
-            var message: Message? = nil
-            try await service.completionStream(request: req) { delta in
-                let messageDelta = apply(delta: delta)
-                message = messageDelta
-                await MainActor.run { callback?(messageDelta) }
-            }
-            
-            // Return the final message and append any toolCall responses that are returned from the completion
-            // callback. If there are any responses then we flag the manager to allow a new stream to be executed
-            // to respond to the toolCall responses.
-            if let message, let resp = try await completion?(message) {
-                self.messages += resp.messages
-                self.hasToolResponses = resp.shouldContinue
-            }
-        } catch {
-            apply(error: error)
-        }
-        return self
-    }
-    
-    @discardableResult
-    public func generateLoop(service: ChatService, model: String, tools: Set<Tool>, callback: MessageCallback) async -> Self {
+    public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback) async -> Self {
         do {
             try Task.checkCancellation()
             var shouldContinue = true
@@ -110,42 +84,7 @@ public final class MessageManager {
         return self
     }
     
-    @discardableResult
-    public func generateStreamForToolResponses(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback? = nil, completion: MessageCompletionCallback? = nil) async -> Self {
-        guard hasToolResponses else { return self }
-        hasToolResponses = false
-        
-        // If there are no toolCall responses then this step is ignored. Explicitly making the choice not to provide
-        // any tools to avoid a loop but this may change in the future.
-        return await generateStream(service: service, model: model, tools: tools, callback: callback, completion: completion)
-    }
-    
     // Tools
-    
-    @discardableResult
-    public func generateStream(service: ToolService, model: String, tool: Tool, callback: MessageCallback? = nil, completion: MessageCompletionCallback? = nil) async -> Self {
-        do {
-            try Task.checkCancellation()
-            let req = ToolServiceRequest(model: model, messages: filteredMessages, tool: tool)
-            var message: Message? = nil
-            try await service.completionStream(request: req) { delta in
-                let messageDelta = apply(delta: delta)
-                message = messageDelta
-                await MainActor.run { callback?(messageDelta) }
-            }
-            
-            // Return the final message and append any toolCall responses that are returned from the completion
-            // callback. If there are any responses then we flag the manager to allow a new stream to be executed
-            // to respond to the toolCall responses.
-            if let message, let resp = try await completion?(message) {
-                self.messages += resp.messages
-                self.hasToolResponses = resp.shouldContinue
-            }
-        } catch {
-            apply(error: error)
-        }
-        return self
-    }
     
     @discardableResult
     public func generate(service: ToolService, model: String, tool: Tool, callback: MessageCallback? = nil) async -> Self {
@@ -344,15 +283,5 @@ public final class MessageManager {
             }
         }
         return messages
-    }
-    
-    public struct ToolsResponse {
-        public var messages: [Message]
-        public var shouldContinue: Bool
-        
-        public init(messages: [Message] = [], shouldContinue: Bool = false) {
-            self.messages = messages
-            self.shouldContinue = shouldContinue
-        }
     }
 }
