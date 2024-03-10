@@ -19,9 +19,17 @@ struct ConversationView: View {
                 
                 // Pushes the initial conversation to the bottom (desirable) and also fixes a bug with tap targets not
                 // lining up properly when relying on defaultScrollAnchor(.bottom).
-                Rectangle()
-                    .fill(.clear)
-                    .containerRelativeFrame(.vertical)
+                HStack {
+                    Image("Icon")
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .padding(6)
+                        .background(.primary)
+                        .clipShape(Squircle())
+                        .opacity(hasHistory ? 0 : 1)
+                        
+                }
+                .containerRelativeFrame(.vertical)
                 
                 // Show message history
                 ForEach(conversationViewModel.messagesVisible) { message in
@@ -50,7 +58,6 @@ struct ConversationView: View {
                     SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
                         SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
                     }
-                    .padding(.top, 8)
                 }
             }
             .padding(.horizontal, 24)
@@ -90,6 +97,10 @@ struct ConversationView: View {
         } catch {
             logger.warning("failed to submit: \(error)")
         }
+    }
+    
+    private var hasHistory: Bool {
+        !conversationViewModel.messagesVisible.isEmpty
     }
 }
 
