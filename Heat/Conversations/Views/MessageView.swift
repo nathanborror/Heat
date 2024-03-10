@@ -13,6 +13,7 @@ struct MessageView: View {
                 .messageStyle(message)
                 .messageSpacing(message)
                 .messageAttachments(message)
+                .textSelection(.enabled)
         }
     }
 }
@@ -28,12 +29,10 @@ struct MessageViewText: View {
             Markdown(message.content ?? "")
                 .markdownTheme(.mate)
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
-                .textSelection(.enabled)
         } else {
             Markdown(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
                 .markdownTheme(.mate)
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
-                .textSelection(.enabled)
         }
     }
     
