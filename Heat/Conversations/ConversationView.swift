@@ -13,7 +13,7 @@ struct ConversationView: View {
     var body: some View {
         ScrollView {
             ScrollViewReader { proxy in
-                LazyVStack(spacing: 11) {
+                LazyVStack(spacing: 16) {
                     
                     // Messages
                     ForEach(conversationViewModel.messagesVisible) { message in
@@ -48,22 +48,16 @@ struct ConversationView: View {
                 #if os(macOS)
                 .padding(.top, 32)
                 #endif
-                .onChange(of: conversationViewModel.conversationID) { oldValue, newValue in
+                .onChange(of: conversationViewModel.conversation?.suggestions) { oldValue, newValue in
                     guard oldValue != newValue else { return }
-                    proxy.scrollTo("bottom", anchor: .bottom)
-                }
-                .onChange(of: conversationViewModel.conversation?.modified) { oldValue, newValue in
-                    guard oldValue != newValue else { return }
-                    proxy.scrollTo("bottom", anchor: .bottom)
-                }
-                .onAppear {
                     proxy.scrollTo("bottom", anchor: .bottom)
                 }
             }
         }
-        .background(.background)
+        .defaultScrollAnchor(.bottom)
         .scrollDismissesKeyboard(.interactively)
         .scrollIndicators(.hidden)
+        .background(.background)
         .safeAreaInset(edge: .bottom, alignment: .center) {
             ConversationInput()
                 .environment(conversationViewModel)
