@@ -37,6 +37,15 @@ struct ServiceForm: View {
             }
             
             Section {
+                Button(action: handleSetDefaults) {
+                    Text("Set Defaults")
+                }
+                Button(action: handleLoadModels) {
+                    Text("Reload Models")
+                }
+            }
+            
+            Section {
                 Picker("Chats", selection: $service.preferredChatModel ?? "") {
                     servicePickerModels
                 }
@@ -60,12 +69,6 @@ struct ServiceForm: View {
                 }
             } footer: {
                 Text("Preferred models to use.")
-            }
-            
-            Section {
-                Button(action: handleLoadModels) {
-                    Text("Reload Models")
-                }
             }
         }
         #if os(macOS)
@@ -110,6 +113,25 @@ struct ServiceForm: View {
         dismiss()
     }
     
+    func handleSetDefaults() {
+        handleLoadModels()
+        
+        switch service.id {
+        case .openAI:
+            service.applyDefaults(defaults: Constants.openAIDefaults)
+        case .anthropic:
+            service.applyDefaults(defaults: Constants.anthropicDefaults)
+        case .mistral:
+            service.applyDefaults(defaults: Constants.mistralDefaults)
+        case .perplexity:
+            service.applyDefaults(defaults: Constants.perplexityDefaults)
+        case .google:
+            service.applyDefaults(defaults: Constants.googleDefaults)
+        default:
+            break
+        }
+    }
+    
     func handleLoadModels() {
         handleApplyCredentials()
         Task {
@@ -145,6 +167,19 @@ struct ServiceForm: View {
         default:
             service.credentials = nil
         }
+    }
+}
+
+extension Service {
+    
+    mutating func applyDefaults(defaults service: Service) {
+        self.preferredChatModel = service.preferredChatModel
+        self.preferredImageModel = service.preferredImageModel
+        self.preferredEmbeddingModel = service.preferredEmbeddingModel
+        self.preferredTranscriptionModel = service.preferredTranscriptionModel
+        self.preferredToolModel = service.preferredToolModel
+        self.preferredVisionModel = service.preferredVisionModel
+        self.preferredSpeechModel = service.preferredSpeechModel
     }
 }
 

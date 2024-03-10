@@ -51,4 +51,47 @@ public struct Constants {
             credentials: nil
         ),
     ]
+    
+    public static var openAIDefaults =
+        Service(
+            id: .openAI,
+            name: "OpenAI",
+            preferredChatModel: "gpt-4",
+            preferredImageModel: "dall-e-3",
+            preferredEmbeddingModel: "text-embeddings-3-small",
+            preferredTranscriptionModel: "whisper-1",
+            preferredToolModel: "gpt-4",
+            preferredVisionModel: "gpt-4-vision-preview",
+            preferredSpeechModel: "tts-1-hd"
+        )
+    
+    public static var anthropicDefaults =
+        Service(
+            id: .anthropic,
+            name: "Anthropic",
+            preferredChatModel: "claude-3-opus-20240229"
+        )
+    
+    public static var mistralDefaults =
+        Service(
+            id: .mistral,
+            name: "Mistral",
+            preferredChatModel: "mistral-large-latest",
+            preferredEmbeddingModel: "mistral-embed",
+            preferredToolModel: "mistral-large-latest"
+        )
+    
+    public static var perplexityDefaults =
+        Service(
+            id: .perplexity,
+            name: "Perplexity",
+            preferredChatModel: "pplx-70b-chat"
+        )
+    
+    public static var googleDefaults =
+        Service(
+            id: .google,
+            name: "Google",
+            preferredChatModel: "gemini-pro"
+        )
 }
