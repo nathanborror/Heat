@@ -355,12 +355,18 @@ struct ConversationInputImage: View {
     }
 }
 
-#Preview {
-    ScrollView {
-        VStack(spacing: 16) {
-            ConversationInput()
-        }
-        .padding()
+#Preview("Conversation Input") {
+    let store = Store.preview
+    let viewModel = ConversationViewModel(store: store)
+    let imageModel = ImagePickerViewModel()
+    imageModel.imageState = .success(.init(named: "Icon")!)
+    
+    return VStack {
+        ConversationInput()
+        ConversationInput(content: "Hello, world")
+        ConversationInput(command: "imagine")
+        ConversationInput(imagePickerViewModel: imageModel)
     }
-    .environment(ConversationViewModel(store: Store.preview))
+    .padding()
+    .environment(viewModel)
 }

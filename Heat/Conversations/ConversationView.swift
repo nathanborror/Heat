@@ -104,7 +104,18 @@ struct ConversationView: View {
     }
 }
 
-#Preview {
+#Preview("New Conversation") {
+    let store = Store.preview
+    let viewModel = ConversationViewModel(store: Store.preview)
+    
+    return NavigationStack {
+        ConversationView()
+    }
+    .environment(store)
+    .environment(viewModel)
+}
+
+#Preview("Active Conversation") {
     let store = Store.preview
     let viewModel = ConversationViewModel(store: Store.preview)
     viewModel.conversationID = store.conversations.first?.id
