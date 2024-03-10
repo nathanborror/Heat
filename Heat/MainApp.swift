@@ -42,10 +42,10 @@ struct MainApp: App {
             }
             .environment(store)
             .environment(conversationViewModel)
-            .onChange(of: scenePhase) { _, _ in
+            .task(id: scenePhase) {
                 handlePhaseChange()
             }
-            .onAppear {
+            .task {
                 handleRestore()
             }
         }
@@ -72,10 +72,10 @@ struct MainApp: App {
             MainCompactView()
                 .environment(store)
                 .environment(conversationViewModel)
-                .onChange(of: scenePhase) { _, _ in
+                .task(id: scenePhase) {
                     handlePhaseChange()
                 }
-                .onAppear {
+                .task {
                     handleRestore()
                 }
         }

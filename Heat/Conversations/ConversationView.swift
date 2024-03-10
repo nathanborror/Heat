@@ -65,6 +65,9 @@ struct ConversationView: View {
             .task(id: conversationViewModel.conversation) {
                 proxy.scrollTo("bottom")
             }
+            .task(id: conversationViewModel.error) {
+                isShowingError = conversationViewModel.error != nil
+            }
         }
         .scrollDismissesKeyboard(.interactively)
         .scrollIndicators(.hidden)
@@ -82,10 +85,6 @@ struct ConversationView: View {
             }
         } message: {
             Text($0.recoverySuggestion)
-        }
-        .onChange(of: conversationViewModel.error) { _, newValue in
-            guard newValue != nil else { return }
-            isShowingError = true
         }
     }
     
