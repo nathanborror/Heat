@@ -71,6 +71,7 @@ struct ConversationInput: View {
                             Button(action: { command = "" }) {
                                 Image(systemName: "xmark")
                                     .imageScale(.small)
+                                    .opacity(0.5)
                             }
                             .buttonStyle(.plain)
                         }
@@ -85,13 +86,13 @@ struct ConversationInput: View {
                         .padding(.trailing, 8)
                         #else
                         .font(.subheadline)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
                         .background(.tint)
                         .foregroundStyle(.white)
                         .clipShape(.rect(cornerRadius: 6))
-                        .padding(.bottom, 9)
-                        .padding(.horizontal, 9)
+                        .padding(.bottom, 5)
+                        .padding(.horizontal, 5)
                         #endif
                     }
                     
