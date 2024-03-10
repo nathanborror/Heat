@@ -6,7 +6,7 @@ struct SuggestionList<Content: View>: View {
     var content: (String) -> Content
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 2) {
             ForEach(suggestions, id: \.self) { suggestion in
                 HStack {
                     content(suggestion)
@@ -26,12 +26,14 @@ struct SuggestionView: View {
     var body: some View {
         Button(action: { handleTap(suggestion) }) {
             Text(suggestion)
-                .multilineTextAlignment(.leading)
-                .font(.system(size: fontSize))
-                .lineSpacing(2)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.primary.opacity(0.05))
+                .clipShape(.rect(cornerRadius: 10))
+                .padding(.leading, -12)
         }
-        .buttonStyle(.borderless)
-        .tint(colorScheme == .light ? .accentColor : .white.opacity(0.65))
+        .buttonStyle(.plain)
+        .tint(.accentColor)
         #if os(macOS)
         .onHover { inside in
             if inside {

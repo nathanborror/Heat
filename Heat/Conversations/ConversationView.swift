@@ -12,47 +12,48 @@ struct ConversationView: View {
     
     var body: some View {
         ScrollView {
-            ScrollViewReader { proxy in
-                LazyVStack(spacing: 16) {
-                    
-                    // Messages
-                    ForEach(conversationViewModel.messagesVisible) { message in
-                        switch message.role {
-                        case .user, .assistant:
-                            MessageView(message: message)
-                        case .tool:
-                            MessageTool(message: message)
-                        case .system:
-                            MessageSystem(message: message)
-                        }
-                        
+            
+            // Making this a LazyVStack causes an undesirable animation behavior that appears to be influenced by the
+            // TypingIndicator animation, VStack solves this until I can debug.
+            VStack(spacing: 16) {
+                
+                // Pushes the initial conversation to the bottom (desirable) and also fixes a bug with tap targets not
+                // lining up properly when relying on defaultScrollAnchor(.bottom).
+                Rectangle()
+                    .fill(.clear)
+                    .containerRelativeFrame(.vertical)
+                
+                // Show message history
+                ForEach(conversationViewModel.messagesVisible) { message in
+                    switch message.role {
+                    case .user, .assistant:
+                        MessageView(message: message)
+                    case .tool:
+                        MessageTool(message: message)
+                    case .system:
+                        MessageSystem(message: message)
                     }
-                    
-                    // Typing indicator
-                    if conversationViewModel.conversation?.state == .processing {
-                        TypingIndicator()
-                    }
-                    
-                    // Suggestions
-                    if conversationViewModel.conversation?.state == .suggesting {
-                        TypingIndicator(foregroundColor: .accentColor)
-                    }
+                }
+                
+                // Assistant typing indicator when processing
+                if conversationViewModel.conversation?.state == .processing {
+                    TypingIndicator()
+                }
+                
+                // Suggestions typing indicator when suggesting
+                if conversationViewModel.conversation?.state == .suggesting {
+                    TypingIndicator(foregroundColor: .accentColor)
+                }
+                
+                // Show suggestions when they are available
+                if !conversationViewModel.suggestions.isEmpty {
                     SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
                         SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
                     }
                     .padding(.top, 8)
-                    
-                    ScrollMarker(id: "bottom")
-                }
-                .padding(.horizontal, 24)
-                #if os(macOS)
-                .padding(.top, 32)
-                #endif
-                .onChange(of: conversationViewModel.conversation?.suggestions) { oldValue, newValue in
-                    guard oldValue != newValue else { return }
-                    proxy.scrollTo("bottom", anchor: .bottom)
                 }
             }
+            .padding(.horizontal, 24)
         }
         .defaultScrollAnchor(.bottom)
         .scrollDismissesKeyboard(.interactively)
@@ -89,17 +90,6 @@ struct ConversationView: View {
         } catch {
             logger.warning("failed to submit: \(error)")
         }
-    }
-}
-
-struct ScrollMarker: View {
-    let id: String
-    
-    var body: some View {
-        Rectangle()
-            .fill(.clear)
-            .frame(height: 1)
-            .id(id)
     }
 }
 
