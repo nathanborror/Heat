@@ -8,7 +8,12 @@ public class BrowserManager {
     init() {}
     
     public func fetch(url: URL, urlMode: FastHTMLProcessor.URLMode, hideJSONLD: Bool, hideImages: Bool) async throws -> String {
-        let resp = try await URLSession.shared.data(from: url)
+        var request = URLRequest(url: url)
+        
+        let userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3.1 Safari/605.1.15"
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        let resp = try await URLSession.shared.data(for: request)
+        
         let proc = try FastHTMLProcessor(url: resp.1.url ?? url, data: resp.0)
         let markdown = proc.markdown(urlMode: urlMode, hideJSONLD: hideJSONLD, hideImages: hideImages)
         return markdown
@@ -88,7 +93,7 @@ public class FastHTMLProcessor {
 
         // Then, detect main content elements and conver them to markdown:
         let mainElements: [Fuzi.XMLElement] = {
-            for sel in ["article", "main", "#content", "*[itemprop='mainEntity']"] {
+            for sel in ["article", "main", "#app", "#content", "#site-content", "*[itemprop='mainEntity']"] {
                 let matches = body.css(sel)
                 if matches.count > 0 {
                     return Array(matches)

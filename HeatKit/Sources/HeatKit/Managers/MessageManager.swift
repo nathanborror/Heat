@@ -253,7 +253,11 @@ public final class MessageManager {
                     var context: [String] = []
                     for url in obj.urls {
                         let markdown = try await BrowserManager.shared.fetch(url: URL(string: url)!, urlMode: .omit, hideJSONLD: true, hideImages: true)
-                        context.append(markdown)
+                        context.append("""
+                            [\(url)]
+                            
+                            \(markdown)
+                            """)
                     }
                     let toolResponse = Message(
                         role: .tool,
