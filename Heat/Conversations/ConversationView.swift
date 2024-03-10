@@ -11,58 +11,61 @@ struct ConversationView: View {
     @State private var isShowingError = false
     
     var body: some View {
-        ScrollView {
-            
-            // Making this a LazyVStack causes an undesirable animation behavior that appears to be influenced by the
-            // TypingIndicator animation, VStack solves this until I can debug.
-            VStack(spacing: 16) {
-                
-                // Pushes the initial conversation to the bottom (desirable) and also fixes a bug with tap targets not
-                // lining up properly when relying on defaultScrollAnchor(.bottom).
-                HStack {
-                    Image("Icon")
-                        .resizable()
-                        .frame(width: 48, height: 48)
-                        .padding(6)
-                        .background(.primary)
-                        .clipShape(Squircle())
-                        .opacity(hasHistory ? 0 : 1)
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 16) {
+                    HStack {
+                        Spacer()
+                        Image("Icon")
+                            .resizable()
+                            .frame(width: 48, height: 48)
+                            .padding(4)
+                            .background(.primary.opacity(0.1))
+                            .clipShape(Squircle())
+                            .opacity(hasHistory ? 0 : 1)
+                        Spacer()
+                            
+                    }
+                    .containerRelativeFrame(.vertical)
+                    
+                    // Show message history
+                    ForEach(conversationViewModel.messagesVisible) { message in
+                        switch message.role {
+                        case .user, .assistant:
+                            MessageView(message: message)
+                        case .tool:
+                            MessageTool(message: message)
+                        case .system:
+                            MessageSystem(message: message)
+                        }
+                    }
+                    
+                    VStack(spacing: 0) {
+                        // Assistant typing indicator when processing
+                        if conversationViewModel.conversation?.state == .processing {
+                            TypingIndicator()
+                        }
                         
-                }
-                .containerRelativeFrame(.vertical)
-                
-                // Show message history
-                ForEach(conversationViewModel.messagesVisible) { message in
-                    switch message.role {
-                    case .user, .assistant:
-                        MessageView(message: message)
-                    case .tool:
-                        MessageTool(message: message)
-                    case .system:
-                        MessageSystem(message: message)
+                        // Suggestions typing indicator when suggesting
+                        if conversationViewModel.conversation?.state == .suggesting {
+                            TypingIndicator(foregroundColor: .accentColor)
+                        }
+                        
+                        // Show suggestions when they are available
+                        if !conversationViewModel.suggestions.isEmpty {
+                            SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
+                                SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
+                            }
+                        }
                     }
+                    .id("bottom")
                 }
-                
-                // Assistant typing indicator when processing
-                if conversationViewModel.conversation?.state == .processing {
-                    TypingIndicator()
-                }
-                
-                // Suggestions typing indicator when suggesting
-                if conversationViewModel.conversation?.state == .suggesting {
-                    TypingIndicator(foregroundColor: .accentColor)
-                }
-                
-                // Show suggestions when they are available
-                if !conversationViewModel.suggestions.isEmpty {
-                    SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
-                        SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
-                    }
-                }
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
+            .task(id: conversationViewModel.conversation) {
+                proxy.scrollTo("bottom")
+            }
         }
-        .defaultScrollAnchor(.bottom)
         .scrollDismissesKeyboard(.interactively)
         .scrollIndicators(.hidden)
         .background(.background)
