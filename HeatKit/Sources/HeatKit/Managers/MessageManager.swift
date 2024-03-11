@@ -50,7 +50,7 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback) async -> Self {
+    public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback, processing: (() -> Void)? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             
@@ -71,6 +71,7 @@ public final class MessageManager {
                 }
                 
                 // Prepare possible tool responses
+                await MainActor.run { processing?() }
                 let toolResponses = try await prepareToolResponses(service: service, model: model, message: message)
                 if toolResponses.isEmpty {
                     shouldContinue = false

@@ -70,6 +70,8 @@ final class ConversationViewModel {
                     self.store.upsert(state: .streaming, conversationID: conversation.id)
                     self.store.replace(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
+                } processing: {
+                   self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
                 .manage { _ in
                     self.store.upsert(state: .suggesting, conversationID: conversation.id)
