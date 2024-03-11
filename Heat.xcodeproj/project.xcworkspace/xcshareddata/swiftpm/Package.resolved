@@ -69,7 +69,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "a0def7aec73654f15115c79cc061ad9334e8146f"
+        "revision" : "210f9412def8ee6534f8fd368af15d097e90ee49"
       }
     },
     {
@@ -114,7 +114,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "c7f72ddfd0567a0c4f59ea8e211c2df68b178ab3"
+        "revision" : "412e686ec6ad292289b410bca04a5dd438e7b9c9"
       }
     },
     {
