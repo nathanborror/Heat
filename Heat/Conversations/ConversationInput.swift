@@ -207,14 +207,13 @@ struct ConversationInput: View {
     }
     
     func handleSummarize(_ content: String) {
-        guard let url = URL(string: content) else {
-            print("failed to make URL")
-            return
-        }
         Task {
             do {
-                let markdown = try await BrowserManager.shared.fetch(url: url, urlMode: .omit, hideJSONLD: true, hideImages: true)
-                try conversationViewModel.generateSummary(url: url.absoluteString, markdown: markdown)
+                if let markdown = try await BrowserManager().generateMarkdown(for: content) {
+                    try conversationViewModel.generateSummary(url: content, markdown: markdown)
+                } else {
+                    logger.error("Failed to generate markdown")
+                }
             } catch let error as HeatKitError {
                 conversationViewModel.error = error
             } catch {

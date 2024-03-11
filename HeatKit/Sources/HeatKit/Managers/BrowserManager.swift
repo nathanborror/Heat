@@ -1,13 +1,37 @@
 import Foundation
+import GenKit
 import Fuzi
 
 public class BrowserManager {
     
-    public static var shared = BrowserManager()
+    public init() {}
     
-    init() {}
+    public func generateMarkdown(for url: String) async throws -> String? {
+        guard let url = URL(string: url) else { return nil }
+        return try await fetch(url: url, urlMode: .omit, hideJSONLD: true, hideImages: true)
+    }
     
-    public func fetch(url: URL, urlMode: FastHTMLProcessor.URLMode, hideJSONLD: Bool, hideImages: Bool) async throws -> String {
+    public func generateSummary(service: ChatService, model: String, url: String) async throws -> String? {
+        guard let url = URL(string: url) else { return nil }
+        
+        let markdown = try await fetch(url: url, urlMode: .omit, hideJSONLD: true, hideImages: true)
+        let message = Message(role: .user, content: """
+            Summarize the following:
+            
+            \(markdown)
+            """)
+        
+        var summary: String? = nil
+        await MessageManager(messages: [message])
+            .generate(service: service, model: model) { message in
+                summary = message.content
+            }
+        return summary
+    }
+    
+    // MARK: - Private
+    
+    private func fetch(url: URL, urlMode: FastHTMLProcessor.URLMode, hideJSONLD: Bool, hideImages: Bool) async throws -> String {
         var request = URLRequest(url: url)
         
         let userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3.1 Safari/605.1.15"

@@ -53,7 +53,10 @@ public final class MessageManager {
     public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback) async -> Self {
         do {
             try Task.checkCancellation()
+            
             var shouldContinue = true
+            
+            // What could go wrong?
             while shouldContinue {
                 var message: Message? = nil
                 
@@ -68,7 +71,7 @@ public final class MessageManager {
                 }
                 
                 // Prepare possible tool responses
-                let toolResponses = try await prepareToolResponses(message)
+                let toolResponses = try await prepareToolResponses(service: service, model: model, message: message)
                 if toolResponses.isEmpty {
                     shouldContinue = false
                 } else {
@@ -216,7 +219,7 @@ public final class MessageManager {
         }
     }
     
-    private func prepareToolResponses(_ message: Message?) async throws -> [Message] {
+    private func prepareToolResponses(service: ChatService, model: String, message: Message?) async throws -> [Message] {
         var messages = [Message]()
         guard let toolCalls = message?.toolCalls else { return [] }
         
@@ -252,11 +255,11 @@ public final class MessageManager {
                     let obj = try Tool.GenerateWebBrowse.decode(toolCall.function.arguments)
                     var context: [String] = []
                     for url in obj.urls {
-                        let markdown = try await BrowserManager.shared.fetch(url: URL(string: url)!, urlMode: .omit, hideJSONLD: true, hideImages: true)
+                        let summary = try await BrowserManager().generateSummary(service: service, model: model, url: url)
                         context.append("""
                             [\(url)]
                             
-                            \(markdown)
+                            \(summary ?? "")
                             """)
                     }
                     let toolResponse = Message(
