@@ -56,11 +56,11 @@ public struct Constants {
         Service(
             id: .openAI,
             name: "OpenAI",
-            preferredChatModel: "gpt-4-0125-preview",
+            preferredChatModel: "gpt-4-turbo-preview",
             preferredImageModel: "dall-e-3",
             preferredEmbeddingModel: "text-embeddings-3-small",
             preferredTranscriptionModel: "whisper-1",
-            preferredToolModel: "gpt-4-0125-preview",
+            preferredToolModel: "gpt-4-turbo-preview",
             preferredVisionModel: "gpt-4-vision-preview",
             preferredSpeechModel: "tts-1-hd"
         )
