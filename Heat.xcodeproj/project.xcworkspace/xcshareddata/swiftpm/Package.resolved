@@ -51,7 +51,7 @@
       "location" : "https://github.com/nathanborror/swift-elevenlabs",
       "state" : {
         "branch" : "main",
-        "revision" : "d5374f08e7231734ca5a9a11f6f601e8f7025bcd"
+        "revision" : "fe859b3fa58aa7eb47e8218bebe68132340940ec"
       }
     },
     {
@@ -69,7 +69,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "210f9412def8ee6534f8fd368af15d097e90ee49"
+        "revision" : "863c03476ac69f0f0b3ec56c2494c479c9a7af0f"
       }
     },
     {
@@ -78,7 +78,7 @@
       "location" : "https://github.com/nathanborror/swift-google-gen",
       "state" : {
         "branch" : "main",
-        "revision" : "67e8319dee077982c20e6df79a2530bac894f3c6"
+        "revision" : "d0a04a228ccd46b097220085cf33c4adcefe7a8d"
       }
     },
     {
@@ -105,7 +105,7 @@
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "1e6389ef325f3bf3ae2f58dfaf3e71fc7a452b60"
+        "revision" : "8c4b8110333dcfc05ee6a234923f3df577feaa28"
       }
     },
     {
@@ -132,7 +132,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "a1f7aceb6653df58ae088199a6db10ffc174e990"
+        "revision" : "2250f24084dd6153d978f852be1ba32738ba9995"
       }
     },
     {
