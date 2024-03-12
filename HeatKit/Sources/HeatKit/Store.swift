@@ -359,7 +359,7 @@ public final class Store {
     public static var preview: Store = {
         let store = Store(persistence: MemoryPersistence.shared)
         store.agents = [.preview]
-        store.conversations = [.preview]
+        store.conversations = [.preview1, .preview2]
         return store
     }()
 }

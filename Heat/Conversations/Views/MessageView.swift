@@ -14,6 +14,7 @@ struct MessageView: View {
                 .messageSpacing(message)
                 .messageAttachments(message)
                 .textSelection(.enabled)
+                .padding(.vertical, 8)
         }
     }
 }

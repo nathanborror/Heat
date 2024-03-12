@@ -14,18 +14,18 @@ struct MessageTool: View {
             switch message.name {
             case Tool.generateWebSearch.function.name:
                 Button(action: { isShowingContext = true }) {
-                    MessageToolContent(content: "Searching", symbol: "magnifyingglass")
+                    MessageToolContent(message: message, symbol: "macwindow")
                 }
                 .buttonStyle(.plain)
                 .tint(.secondary)
             case Tool.generateWebBrowse.function.name:
                 Button(action: { isShowingContext = true }) {
-                    MessageToolContent(content: "Browsing", symbol: "macwindow")
+                    MessageToolContent(message: message, symbol: "macwindow.and.cursorarrow")
                 }
                 .buttonStyle(.plain)
                 .tint(.secondary)
             case Tool.generateImages.function.name:
-                MessageToolContent(content: "Generating Images", symbol: "photo")
+                MessageToolContent(message: message, symbol: "photo")
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(message.attachments.indices, id: \.self) { index in
@@ -78,17 +78,18 @@ struct MessageTool: View {
 }
 
 struct MessageToolContent: View {
-    let content: String
+    let message: Message
     let symbol: String
     
     var body: some View {
         HStack {
             Image(systemName: symbol)
-            Text(content)
+            Text(message.metadata["label"] ?? "Unknown")
             Spacer()
         }
+        .font(.subheadline)
         .foregroundStyle(.secondary)
-        .padding(.vertical, 8)
+        .padding(.vertical, 4)
     }
 }
 

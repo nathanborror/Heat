@@ -245,7 +245,8 @@ public final class MessageManager {
                             \(response.results.map { $0.description }.joined(separator: "\n\n"))
                             """,
                         toolCallID: toolCall.id,
-                        name: toolCall.function.name
+                        name: toolCall.function.name,
+                        metadata: ["label": "Searched the web for '\(obj.query)'"]
                     )
                     messages.append(toolResponse)
                 } catch {
@@ -266,11 +267,13 @@ public final class MessageManager {
                             \(summary ?? "")
                             """)
                     }
+                    let label = obj.urls.count == 1 ? "Read \(URL(string: obj.urls[0])?.host() ?? "")" : "Read \(obj.urls.count) webpages"
                     let toolResponse = Message(
                         role: .tool,
                         content: context.joined(separator: "\n\n"),
                         toolCallID: toolCall.id,
-                        name: toolCall.function.name
+                        name: toolCall.function.name,
+                        metadata: ["label": label]
                     )
                     messages.append(toolResponse)
                 } catch {
@@ -285,7 +288,8 @@ public final class MessageManager {
                     role: .tool,
                     content: obj.prompts.joined(separator: "\n\n"),
                     toolCallID: toolCall.id,
-                    name: toolCall.function.name
+                    name: toolCall.function.name,
+                    metadata: ["label": obj.prompts.count == 1 ? "Generating an image" : "Generating \(obj.prompts.count) images"]
                 )
                 messages.append(toolResponse)
                 

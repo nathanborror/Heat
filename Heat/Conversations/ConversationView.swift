@@ -13,7 +13,7 @@ struct ConversationView: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: 0) {
                     HStack {
                         Spacer()
                         Image("Icon")
@@ -56,6 +56,7 @@ struct ConversationView: View {
                             SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
                                 SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
                             }
+                            .padding(.vertical, 8)
                         }
                     }
                     .id("bottom")
@@ -106,7 +107,7 @@ struct ConversationView: View {
     }
 }
 
-#Preview("New Conversation") {
+#Preview("New") {
     let store = Store.preview
     let viewModel = ConversationViewModel(store: Store.preview)
     
@@ -117,10 +118,22 @@ struct ConversationView: View {
     .environment(viewModel)
 }
 
-#Preview("Active Conversation") {
+#Preview("Active") {
     let store = Store.preview
     let viewModel = ConversationViewModel(store: Store.preview)
-    viewModel.conversationID = store.conversations.first?.id
+    viewModel.conversationID = Conversation.preview1.id
+    
+    return NavigationStack {
+        ConversationView()
+    }
+    .environment(store)
+    .environment(viewModel)
+}
+
+#Preview("Tool Use") {
+    let store = Store.preview
+    let viewModel = ConversationViewModel(store: Store.preview)
+    viewModel.conversationID = Conversation.preview2.id
     
     return NavigationStack {
         ConversationView()
