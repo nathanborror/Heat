@@ -51,6 +51,11 @@ public struct Constants {
             name: "Google",
             credentials: nil
         ),
+        .init(
+            id: .fal,
+            name: "Fal",
+            credentials: nil
+        )
     ]
     
     public static var openAIDefaults =
