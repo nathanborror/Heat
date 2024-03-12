@@ -140,6 +140,16 @@ struct PreferencesForm: View {
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
+                Picker("Summarization", selection: Binding(
+                    get: { store.preferences.preferredSummarizationServiceID?.rawValue ?? "" },
+                    set: { store.preferences.preferredSummarizationServiceID = Service.ServiceID(rawValue: $0) }
+                )) {
+                    Text("None").tag("")
+                    Divider()
+                    ForEach(store.preferences.services.filter { $0.supportsSummarization }) { service in
+                        Text(service.name).tag(service.id.rawValue)
+                    }
+                }
             } footer: {
                 Text("Only services with preferred models selected to support the behavior will show up in the picker.")
             }

@@ -221,6 +221,13 @@ public final class Store {
         return try service.speechService()
     }
     
+    public func preferredSummarizationService() throws -> ChatService {
+        guard let service = get(serviceID: preferences.preferredSummarizationServiceID) else {
+            throw HeatKitError.missingService("Summarization")
+        }
+        return try service.summarizationService()
+    }
+    
     // MARK: - Model Preferences
     
     public func preferredChatModel() throws -> String {
@@ -275,6 +282,14 @@ public final class Store {
         guard let service = get(serviceID: preferences.preferredSpeechServiceID),
               let model = service.preferredSpeechModel else {
             throw HeatKitError.missingServiceModel("Speech")
+        }
+        return model
+    }
+    
+    public func preferredSummarizationModel() throws -> String {
+        guard let service = get(serviceID: preferences.preferredSummarizationServiceID),
+              let model = service.preferredSummarizationModel else {
+            throw HeatKitError.missingServiceModel("Summarization")
         }
         return model
     }

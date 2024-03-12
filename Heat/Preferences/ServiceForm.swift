@@ -67,6 +67,9 @@ struct ServiceForm: View {
                 Picker("Speech", selection: $service.preferredSpeechModel ?? "") {
                     servicePickerModels
                 }
+                Picker("Summarization", selection: $service.preferredSummarizationModel ?? "") {
+                    servicePickerModels
+                }
             } footer: {
                 Text("Preferred models to use.")
             }
@@ -180,6 +183,7 @@ extension Service {
         self.preferredToolModel = service.preferredToolModel
         self.preferredVisionModel = service.preferredVisionModel
         self.preferredSpeechModel = service.preferredSpeechModel
+        self.preferredSummarizationModel = service.preferredSummarizationModel
     }
 }
 

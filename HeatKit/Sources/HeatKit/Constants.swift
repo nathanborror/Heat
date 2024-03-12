@@ -13,6 +13,7 @@ public struct Constants {
     public static var defaultToolServiceID: Service.ServiceID? = nil
     public static var defaultVisionServiceID: Service.ServiceID? = nil
     public static var defaultSpeechServiceID: Service.ServiceID? = nil
+    public static var defaultSummarizationServiceID: Service.ServiceID? = nil
     
     public static var defaultServices: [Service] = [
         .init(
@@ -58,11 +59,12 @@ public struct Constants {
             name: "OpenAI",
             preferredChatModel: "gpt-4-turbo-preview",
             preferredImageModel: "dall-e-3",
-            preferredEmbeddingModel: "text-embeddings-3-small",
+            preferredEmbeddingModel: "text-embedding-3-small",
             preferredTranscriptionModel: "whisper-1",
             preferredToolModel: "gpt-4-turbo-preview",
             preferredVisionModel: "gpt-4-vision-preview",
-            preferredSpeechModel: "tts-1-hd"
+            preferredSpeechModel: "tts-1-hd",
+            preferredSummarizationModel: "gpt-3.5-turbo-16k"
         )
     
     public static var anthropicDefaults =

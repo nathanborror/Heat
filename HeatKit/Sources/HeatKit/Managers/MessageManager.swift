@@ -72,7 +72,7 @@ public final class MessageManager {
                 
                 // Prepare possible tool responses
                 await MainActor.run { processing?() }
-                let toolResponses = try await prepareToolResponses(service: service, model: model, message: message)
+                let toolResponses = try await prepareToolResponses(message: message)
                 if toolResponses.isEmpty {
                     shouldContinue = false
                 } else {
@@ -220,9 +220,12 @@ public final class MessageManager {
         }
     }
     
-    private func prepareToolResponses(service: ChatService, model: String, message: Message?) async throws -> [Message] {
+    private func prepareToolResponses(message: Message?) async throws -> [Message] {
         var messages = [Message]()
         guard let toolCalls = message?.toolCalls else { return [] }
+        
+        let summarizationService = try Store.shared.preferredSummarizationService()
+        let summarizationModel = try Store.shared.preferredSummarizationModel()
         
         for toolCall in toolCalls {
             switch toolCall.function.name {
@@ -256,7 +259,7 @@ public final class MessageManager {
                     let obj = try Tool.GenerateWebBrowse.decode(toolCall.function.arguments)
                     var context: [String] = []
                     for url in obj.urls {
-                        let summary = try await BrowserManager().generateSummary(service: service, model: model, url: url)
+                        let summary = try await BrowserManager().generateSummary(service: summarizationService, model: summarizationModel, url: url)
                         context.append("""
                             [\(url)]
                             
