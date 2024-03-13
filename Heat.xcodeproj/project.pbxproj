@@ -183,11 +183,11 @@
 		D4A2C56C2B8BFA830004F27B /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 				D88D23082B3CFB5100CCCC61 /* MessageView.swift */,
 				D815698C2B9CF19000C53D4D /* MessageTool.swift */,
 				D815698E2B9CF56700C53D4D /* MessageSystem.swift */,
 				D45CC1F92B8A5C1A009DFDF4 /* SuggestionsList.swift */,
+				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";

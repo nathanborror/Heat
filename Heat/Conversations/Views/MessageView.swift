@@ -54,16 +54,13 @@ struct MessageViewStyle: ViewModifier {
         case .system, .tool:
             content
                 .font(.footnote)
-                .lineSpacing(2)
                 .foregroundStyle(.secondary)
         case .assistant:
             content
                 .font(.body)
-                .lineSpacing(2)
         case .user:
             content
                 .font(.body)
-                .lineSpacing(2)
         }
     }
 }
