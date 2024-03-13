@@ -301,6 +301,11 @@ public final class Store {
     static private var preferencesJSON = "preferences.json"
     
     public func restore() async throws {
+        // Reset all data when new version is available
+        if BundleVersion.shared.isBundleVersionNew() {
+            deleteAll()
+            return
+        }
         do {
             let agents: [Agent] = try await persistence.load(objects: Self.agentsJSON)
             let conversations: [Conversation] = try await persistence.load(objects: Self.conversationsJSON)
