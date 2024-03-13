@@ -7,10 +7,10 @@ private let logger = Logger(subsystem: "MessageManager", category: "HeatKit")
 
 public final class MessageManager {
     public typealias MessageCallback = (Message) -> Void
+    public typealias ProcessingCallback = () -> Void
     
     public private(set) var messages: [Message]
     public private(set) var error: Error?
-    public private(set) var hasToolResponses = false
     
     private var filteredMessages: [Message] {
         messages.filter { $0.kind != .error && $0.kind != .ignore }
@@ -50,7 +50,7 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback, processing: (() -> Void)? = nil) async -> Self {
+    public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback, processing: ProcessingCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             
