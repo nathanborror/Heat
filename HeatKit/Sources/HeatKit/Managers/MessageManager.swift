@@ -258,18 +258,18 @@ public final class MessageManager {
             case Tool.generateWebBrowse.function.name:
                 do {
                     let obj = try Tool.GenerateWebBrowse.decode(toolCall.function.arguments)
-                    var articles: [Article] = []
+                    var sources: [Tool.GenerateWebBrowse.Source] = []
                     for url in obj.urls {
                         let summary = try await BrowserManager().generateSummary(service: summarizationService, model: summarizationModel, url: url)
-                        articles.append(.init(url: url, summary: summary ?? ""))
+                        sources.append(.init(url: url, summary: summary ?? ""))
                     }
-                    let contentData = try JSONEncoder().encode(articles)
-                    let content = String(data: contentData, encoding: .utf8)
+                    let sourcesData = try JSONEncoder().encode(sources)
+                    let sourcesString = String(data: sourcesData, encoding: .utf8)
                     
                     let label = obj.urls.count == 1 ? "Read \(URL(string: obj.urls[0])?.host() ?? "")" : "Read \(obj.urls.count) webpages"
                     let toolResponse = Message(
                         role: .tool,
-                        content: content,
+                        content: sourcesString,
                         toolCallID: toolCall.id,
                         name: toolCall.function.name,
                         metadata: ["label": label]
@@ -298,9 +298,4 @@ public final class MessageManager {
         }
         return messages
     }
-}
-
-struct Article: Codable {
-    let url: String
-    let summary: String
 }

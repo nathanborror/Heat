@@ -30,5 +30,12 @@ extension Tool {
             }
             return try JSONDecoder().decode(Self.self, from: data)
         }
+        
+        public struct Source: Codable, Identifiable {
+            public let url: String
+            public let summary: String
+            
+            public var id: String { url }
+        }
     }
 }

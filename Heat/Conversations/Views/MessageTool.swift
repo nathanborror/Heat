@@ -5,8 +5,6 @@ import MarkdownUI
 import Splash
 
 struct MessageTool: View {
-    @Environment(\.openURL) var openURL
-    
     let message: Message
     
     @State private var isShowingContext = false
@@ -26,48 +24,7 @@ struct MessageTool: View {
                 }
                 .buttonStyle(.plain)
                 .tint(.secondary)
-                
-                ScrollView(.horizontal) {
-                    HStack(alignment: .top) {
-                        ForEach(handleWebPageSummaries(message.content)) { article in
-                            if let url = URL(string: article.url) {
-                                Button(action: { openURL(url) }) {
-                                    VStack(alignment: .leading) {
-                                        Text(URL(string: article.url)?.host() ?? article.url)
-                                            .lineLimit(1)
-                                            .font(.footnote.weight(.semibold))
-                                        Text(article.summary)
-                                            .lineLimit(4)
-                                            .font(.footnote)
-                                    }
-                                    .frame(width: 200)
-                                    .padding(12)
-                                    .background(.primary.opacity(0.05))
-                                    .foregroundStyle(.secondary)
-                                    .clipShape(.rect(cornerRadius: 10))
-                                }
-                                .buttonStyle(.plain)
-                            } else {
-                                VStack(alignment: .leading) {
-                                    Text(URL(string: article.url)?.host() ?? article.url)
-                                        .lineLimit(1)
-                                        .font(.footnote.weight(.semibold))
-                                    Text(article.summary)
-                                        .lineLimit(4)
-                                        .font(.footnote)
-                                }
-                                .frame(width: 200)
-                                .padding(12)
-                                .background(.primary.opacity(0.05))
-                                .foregroundStyle(.secondary)
-                                .clipShape(.rect(cornerRadius: 10))
-                            }
-                        }
-                    }
-                }
-                .scrollClipDisabled()
-                .padding(.leading, -12)
-                .padding(.bottom, 8)
+                MessageToolSourceList(message: message)
             case Tool.generateImages.function.name:
                 MessageToolContent(message: message, symbol: "photo")
                 ScrollView(.horizontal) {
@@ -114,23 +71,6 @@ struct MessageTool: View {
         }
     }
     
-    private func handleWebPageSummaries(_ content: String?) -> [Article] {
-        guard let data = content?.data(using: .utf8) else { return [] }
-        var articles: [Article] = []
-        do {
-            articles = try JSONDecoder().decode([Article].self, from: data)
-        } catch {
-            print(error)
-        }
-        return articles
-    }
-    
-    struct Article: Codable, Identifiable {
-        var id: String { return url }
-        var url: String = ""
-        var summary: String = ""
-    }
-    
     #if os(macOS)
     var monospaceFontSize: CGFloat = 11
     #else
@@ -151,5 +91,56 @@ struct MessageToolContent: View {
         .font(.subheadline)
         .foregroundStyle(.secondary)
         .padding(.vertical, 4)
+    }
+}
+
+struct MessageToolSourceList: View {
+    @Environment(\.openURL) var openURL
+    
+    let message: Message
+    
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack(alignment: .top) {
+                ForEach(prepareSources(message.content)) { source in
+                    if let url = URL(string: source.url) {
+                        Button(action: { openURL(url) }) {
+                            MessageToolSource(source: source)
+                        }.buttonStyle(.plain)
+                    } else {
+                        MessageToolSource(source: source)
+                    }
+                }
+            }
+        }
+        .scrollClipDisabled()
+        .padding(.leading, -12)
+        .padding(.bottom, 8)
+    }
+    
+    private func prepareSources(_ content: String?) -> [Tool.GenerateWebBrowse.Source] {
+        guard let data = content?.data(using: .utf8) else { return [] }
+        let sources = try? JSONDecoder().decode([Tool.GenerateWebBrowse.Source].self, from: data)
+        return sources ?? []
+    }
+}
+
+struct MessageToolSource: View {
+    let source: Tool.GenerateWebBrowse.Source
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(URL(string: source.url)?.host() ?? source.url)
+                .lineLimit(1)
+                .font(.footnote.weight(.semibold))
+            Text(source.summary)
+                .lineLimit(4)
+                .font(.footnote)
+        }
+        .frame(width: 200)
+        .padding(12)
+        .background(.primary.opacity(0.05))
+        .foregroundStyle(.secondary)
+        .clipShape(.rect(cornerRadius: 10))
     }
 }
