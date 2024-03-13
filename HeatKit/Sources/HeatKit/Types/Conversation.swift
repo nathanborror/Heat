@@ -96,14 +96,28 @@ extension Conversation {
                 .init(role: .assistant, content: "What can I help you with today?"),
                 .init(role: .user, content: "What are the latest Apple rumors?"),
                 .init(role: .tool, name: Tool.generateWebSearch.function.name, metadata: ["label": "Searched the web for 'latest apple rumors'"]),
-                .init(role: .tool, content: "Lots of text", name: Tool.generateWebBrowse.function.name, metadata: ["label": "Read wikipedia.org"]),
-                .init(role: .assistant, content: """
-                    In 2024, Apple has some exciting products and updates planned:
-                    
-                    1. iPad Models: Updates are expected for the iPad Air and iPad Pro models around late March/Early April, with potential changes across all iPad models later in the year.
-                    2. iPhone 16 and iPhone 16 Pro: These are anticipated for a September launch, with rumors of a new design and updated features.
-                    3. AirPods: Updates might come to the AirPods lineup, including a new version of AirPods Max and a potential new set of AirPods with Active Noise Cancellation.
-                    """),
+                .init(
+                    role: .tool,
+                    content: """
+                        [
+                            {"url": "macrumors.com", "summary": "iPad Models: Updates are expected for the iPad Air and iPad Pro models around late March/Early April, with potential changes across all iPad models later in the year."},
+                            {"url": "9to5mac.com", "summary": "iPhone 16 and iPhone 16 Pro: These are anticipated for a September launch, with rumors of a new design and updated features."},
+                            {"url": "cnet.com", "summary": "AirPods: Updates might come to the AirPods lineup, including a new version of AirPods Max and a potential new set of AirPods with Active Noise Cancellation."}
+                        ]
+                        """,
+                    name: Tool.generateWebBrowse.function.name,
+                    metadata: ["label": "Read wikipedia.org"]
+                ),
+                .init(
+                    role: .assistant,
+                    content: """
+                        In 2024, Apple has some exciting products and updates planned:
+                        
+                        1. iPad Models: Updates are expected for the iPad Air and iPad Pro models around late March/Early April, with potential changes across all iPad models later in the year.
+                        2. iPhone 16 and iPhone 16 Pro: These are anticipated for a September launch, with rumors of a new design and updated features.
+                        3. AirPods: Updates might come to the AirPods lineup, including a new version of AirPods Max and a potential new set of AirPods with Active Noise Cancellation.
+                        """
+                ),
             ],
             suggestions: [
                 "Tell me more about the Vision Pro headset.",

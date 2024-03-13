@@ -147,15 +147,3 @@ extension View {
         self.modifier(MessageViewAttachments(message: message))
     }
 }
-
-#Preview {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: Store.preview)
-    viewModel.conversationID = store.conversations.first?.id
-    
-    return NavigationStack {
-        ConversationView()
-    }
-    .environment(store)
-    .environment(viewModel)
-}
