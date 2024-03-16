@@ -237,14 +237,19 @@ public final class MessageManager {
                 do {
                     let obj = try Tool.GenerateWebSearch.decode(toolCall.function.arguments)
                     let response = try await SearchManager.shared.search(query: obj.query)
+                    
+                    let resultsData = try JSONEncoder().encode(response.results)
+                    let resultsString = String(data: resultsData, encoding: .utf8) ?? "[]"
+                    
                     let toolResponse = Message(
                         role: .tool,
                         content: """
                             Use the following search results to choose the top three URLs to browse using your \
-                            `browse_web` function. Do not perform another search.
+                            `browse_web` function. Do not perform another search. Remember, the `browse_web` function \
+                            can take multiple URLs so try not to call it multiple times with a single URL.
                             
                             Search Results:
-                            \(response.results.map { $0.description }.joined(separator: "\n\n"))
+                            \(resultsString)
                             """,
                         toolCallID: toolCall.id,
                         name: toolCall.function.name,

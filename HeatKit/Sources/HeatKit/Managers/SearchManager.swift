@@ -105,12 +105,10 @@ private extension Fuzi.XMLElement {
         // Search for elements with a href starting with https://www.youtube.com, which contain a div role=heading
         // a[href^='https://www.youtube.com']:has(div[role=heading])
         for element in css("a[href]") {
-            if let link = element.attr("href"),
-               link.hasPrefix("https://www.youtube.com"),
-               let parsed = URL(string: link),
-               let title = element.css("div[role='heading'] span").first?.stringValue {
-                results.append(WebSearchResult(url: parsed, title: title, snippet: nil))
-            }
+            guard let link = element.attr("href"), link.hasPrefix("https://www.youtube.com") else { continue }
+            guard let parsed = URL(string: link) else { continue }
+            guard let title = element.css("div[role='heading'] span").first?.stringValue else { continue }
+            results.append(WebSearchResult(url: parsed, title: title, description: nil))
         }
         return results
     }
@@ -127,7 +125,7 @@ private extension Fuzi.XMLElement {
             return nil
         }
 
-        let snippet: String? = { () -> String? in
+        let description: String? = { () -> String? in
             guard let farParent = self.nthParent(5) else { return nil }
             // First, look for an element with `div[style='-webkit-line-clamp:2']`
             if let div = farParent.css("div[style='-webkit-line-clamp:2']").first,
@@ -144,9 +142,8 @@ private extension Fuzi.XMLElement {
             }
             return nil
         }()
-
-
-        return WebSearchResult(url: parsed, title: title, snippet: snippet)
+        
+        return WebSearchResult(url: parsed, title: title, description: description)
     }
 
     var firstDescendantWithInnerText: Fuzi.XMLElement? {
