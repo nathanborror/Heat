@@ -260,15 +260,12 @@ public final class MessageManager {
             case Tool.generateWebBrowse.function.name:
                 do {
                     let obj = try Tool.GenerateWebBrowse.decode(toolCall.function.arguments)
-                    var sources: [Tool.GenerateWebBrowse.Source] = []
-                    for url in obj.urls {
-                        let summary = try await BrowserManager().generateSummary(service: summarizationService, model: summarizationModel, url: url)
-                        sources.append(.init(url: url, summary: summary ?? ""))
-                    }
+                    let sources = await prepareSummaries(webpages: obj.webpages, service: summarizationService, model: summarizationModel)
+                    
                     let sourcesData = try JSONEncoder().encode(sources)
                     let sourcesString = String(data: sourcesData, encoding: .utf8)
                     
-                    let label = obj.urls.count == 1 ? "Read \(URL(string: obj.urls[0])?.host() ?? "")" : "Read \(obj.urls.count) webpages"
+                    let label = obj.webpages.count == 1 ? "Read \(URL(string: obj.webpages[0].url)?.host() ?? "")" : "Read \(obj.webpages.count) webpages"
                     let toolResponse = Message(
                         role: .tool,
                         content: sourcesString,
@@ -299,5 +296,29 @@ public final class MessageManager {
             }
         }
         return messages
+    }
+    
+    private func prepareSummaries(webpages: [Tool.GenerateWebBrowse.Webpage], service: ChatService, model: String) async -> [Tool.GenerateWebBrowse.Source] {
+        var sources: [Tool.GenerateWebBrowse.Source] = []
+        
+        await withTaskGroup(of: Tool.GenerateWebBrowse.Source.self) { group in
+            for webpage in webpages {
+                group.addTask {
+                    logger.debug("Browsing: \(webpage.url)")
+                    do {
+                        let summary = try await BrowserManager().generateSummary(service: service, model: model, url: webpage.url)
+                        logger.debug("Summarized: \(webpage.url)")
+                        return .init(title: webpage.title ?? "No Title", url: webpage.url, summary: summary ?? "")
+                    } catch {
+                        logger.error("Failed to generate summary")
+                        return .init(title: webpage.title ?? "No Title", url: webpage.url, summary: "Failed to summarize.")
+                    }
+                }
+            }
+            for await source in group {
+                sources.append(source)
+            }
+        }
+        return sources
     }
 }
