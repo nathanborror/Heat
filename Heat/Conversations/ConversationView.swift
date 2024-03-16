@@ -14,21 +14,18 @@ struct ConversationView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(spacing: 0) {
-                    if conversationViewModel.messagesVisible.isEmpty {
-                        HStack {
-                            Spacer()
-                            Image("Icon")
-                                .resizable()
-                                .frame(width: 48, height: 48)
-                                .padding(4)
-                                .background(.primary.opacity(0.1))
-                                .clipShape(Squircle())
-                                .opacity(hasHistory ? 0 : 1)
-                            Spacer()
-                                
-                        }
-                        .padding(.top, 128)
+                    HStack {
+                        Spacer()
+                        Image("Icon")
+                            .resizable()
+                            .frame(width: 48, height: 48)
+                            .padding(4)
+                            .background(.primary.opacity(0.1))
+                            .clipShape(Squircle())
+                        Spacer()
+                            
                     }
+                    .padding(.vertical, 64)
                     
                     // Show message history
                     ForEach(conversationViewModel.messagesVisible) { message in
