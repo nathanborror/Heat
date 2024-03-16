@@ -13,7 +13,7 @@ public final class MessageManager {
     public private(set) var error: Error?
     
     private var filteredMessages: [Message] {
-        messages.filter { $0.kind != .error && $0.kind != .ignore }
+        messages.filter { ![.error, .ignore].contains($0.kind) }
     }
     
     public init(messages: [Message] = []) {
