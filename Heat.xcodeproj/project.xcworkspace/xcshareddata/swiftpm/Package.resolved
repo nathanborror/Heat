@@ -42,7 +42,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "3dcbdb06ffd57004a37532671eadbcf3aed6d77f"
+        "revision" : "985dba101b53b3a2b7ae36ebf8f76d1e80ef0aa2"
       }
     },
     {
@@ -69,7 +69,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "0ab01aeea404338c0a7bde336cccc24aae7efef9"
+        "revision" : "8a8d90f410d358fd2d17049951662ddd2dcc2a4e"
       }
     },
     {
@@ -96,7 +96,7 @@
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
-        "revision" : "e49f6f9e8bc319ff0f21990dffd1d3c3f872c26f"
+        "revision" : "ae1c820a2949ff12fa26b0347aefb27626975d8d"
       }
     },
     {
@@ -114,7 +114,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "412e686ec6ad292289b410bca04a5dd438e7b9c9"
+        "revision" : "26fe30cb7db3ca174d5682726100c934142fa13d"
       }
     },
     {
@@ -132,7 +132,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "2250f24084dd6153d978f852be1ba32738ba9995"
+        "revision" : "6f337fff5f44d79640a05e44aa9408ce64a3c63b"
       }
     },
     {
@@ -141,7 +141,7 @@
       "location" : "https://github.com/jpsim/Yams",
       "state" : {
         "branch" : "main",
-        "revision" : "905887811fd911f60b36873a960d88c2bc435517"
+        "revision" : "626b33bf6639c5cdde366d555b1a07061805c7a0"
       }
     }
   ],

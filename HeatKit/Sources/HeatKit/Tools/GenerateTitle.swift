@@ -1,6 +1,5 @@
 import Foundation
 import GenKit
-import OpenAI
 
 extension Tool {
     
@@ -10,7 +9,7 @@ extension Tool {
             function: .init(
                 name: "title_maker",
                 description: "Returns a title that represents the main topic of conversation",
-                parameters: JSONSchema(
+                parameters: .init(
                     type: .object,
                     properties: [
                         "title": .init(
