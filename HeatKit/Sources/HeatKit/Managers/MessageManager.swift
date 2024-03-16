@@ -6,8 +6,8 @@ import GenKit
 private let logger = Logger(subsystem: "MessageManager", category: "HeatKit")
 
 public final class MessageManager {
-    public typealias MessageCallback = (Message) -> Void
-    public typealias ProcessingCallback = () -> Void
+    public typealias MessageCallback = @MainActor (Message) -> Void
+    public typealias ProcessingCallback = @MainActor () -> Void
     
     public private(set) var messages: [Message]
     public private(set) var error: Error?
@@ -21,15 +21,15 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func manage(callback: (MessageManager) -> Void) async -> Self {
-        await MainActor.run { callback(self) }
+    public func manage(callback: @MainActor (MessageManager) -> Void) async -> Self {
+        await callback(self)
         return self
     }
     
     @discardableResult
     public func append(message: Message, callback: MessageCallback? = nil) async -> Self {
         messages.append(message)
-        await MainActor.run { callback?(message) }
+        await callback?(message)
         return self
     }
     
@@ -42,7 +42,7 @@ public final class MessageManager {
             let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: tools)
             let message = try await service.completion(request: req)
             await append(message: message)
-            await MainActor.run { callback?(message) }
+            await callback?(message)
         } catch {
             apply(error: error)
         }
@@ -67,18 +67,20 @@ public final class MessageManager {
                 try await service.completionStream(request: req) { delta in
                     let messageDelta = apply(delta: delta)
                     message = messageDelta
-                    await MainActor.run { callback(messageDelta) }
+                    await callback(messageDelta)
                 }
                 
                 // Prepare possible tool responses
-                await MainActor.run { processing?() }
+                await processing?()
+                
+                // Prepare possible tool responses
                 let toolResponses = try await prepareToolResponses(message: message)
                 if toolResponses.isEmpty {
                     shouldContinue = false
                 } else {
                     for response in toolResponses {
                         await self.append(message: response)
-                        await MainActor.run { callback(response) }
+                        await callback(response)
                     }
                 }
             }
@@ -97,7 +99,7 @@ public final class MessageManager {
             let req = ToolServiceRequest(model: model, messages: filteredMessages, tool: tool)
             let message = try await service.completion(request: req)
             await append(message: message)
-            await MainActor.run { callback?(message) }
+            await callback?(message)
         } catch {
             apply(error: error)
         }
@@ -113,7 +115,7 @@ public final class MessageManager {
             let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
             let message = try await service.completion(request: req)
             await append(message: message)
-            await MainActor.run { callback?(message) }
+            await callback?(message)
         } catch {
             apply(error: error)
         }
@@ -127,7 +129,7 @@ public final class MessageManager {
             let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
             try await service.completionStream(request: req) { message in
                 let message = apply(delta: message)
-                await MainActor.run { callback?(message) }
+                await callback?(message)
             }
         } catch {
             apply(error: error)
@@ -138,13 +140,13 @@ public final class MessageManager {
     // Images
     
     @discardableResult
-    public func generate(service: ImageService, model: String, prompt: String? = nil, callback: (String, [Data]) -> Void) async -> Self {
+    public func generate(service: ImageService, model: String, prompt: String? = nil, callback: @MainActor (String, [Data]) -> Void) async -> Self {
         do {
             try Task.checkCancellation()
             let prompt = prompt ?? ""
             let req = ImagineServiceRequest(model: model, prompt: prompt)
             let images = try await service.imagine(request: req)
-            await MainActor.run { callback(prompt, images) }
+            await callback(prompt, images)
         } catch {
             apply(error: error)
         }
@@ -154,7 +156,7 @@ public final class MessageManager {
     // Speech
     
     @discardableResult
-    public func generate(service: SpeechService, model: String, voice: String?, callback: (Message) -> Void) async -> Self {
+    public func generate(service: SpeechService, model: String, voice: String?, callback: MessageCallback) async -> Self {
         guard let voice else { return self }
         do {
             try Task.checkCancellation()
@@ -169,7 +171,7 @@ public final class MessageManager {
             
             let attachment = Message.Attachment.asset(.init(name: resource.name, kind: .audio, location: .filesystem))
             let newMessage = apply(attachment: attachment, message: message)
-            await MainActor.run { callback(newMessage) }
+            await callback(newMessage)
         } catch {
             apply(error: error)
         }
@@ -215,7 +217,7 @@ public final class MessageManager {
     
     private func apply(error: Error?) {
         if let error = error {
-            logger.error("MessageManager Error: \(error, privacy: .public)")
+            logger.error("MessageManagerError: \(error, privacy: .public)")
             self.error = error
         }
     }
