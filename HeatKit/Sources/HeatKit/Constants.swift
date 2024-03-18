@@ -76,7 +76,8 @@ public struct Constants {
         Service(
             id: .anthropic,
             name: "Anthropic",
-            preferredChatModel: "claude-3-opus-20240229"
+            preferredChatModel: "claude-3-opus-20240229",
+            preferredVisionModel: "claude-3-opus-20240229"
         )
     
     public static var mistralDefaults =
