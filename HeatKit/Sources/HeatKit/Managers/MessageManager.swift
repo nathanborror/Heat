@@ -226,9 +226,6 @@ public final class MessageManager {
         var messages = [Message]()
         guard let toolCalls = message?.toolCalls else { return [] }
         
-        let summarizationService = try Store.shared.preferredSummarizationService()
-        let summarizationModel = try Store.shared.preferredSummarizationModel()
-        
         for toolCall in toolCalls {
             switch toolCall.function.name {
             
@@ -244,9 +241,9 @@ public final class MessageManager {
                     let toolResponse = Message(
                         role: .tool,
                         content: """
-                            Use the following search results to choose the top three URLs to browse using your \
+                            Use the following search results to choose the top three webpages to browse using your \
                             `browse_web` function. Do not perform another search. Remember, the `browse_web` function \
-                            can take multiple URLs so try not to call it multiple times with a single URL.
+                            can take multiple websites so try not to call it multiple times.
                             
                             Search Results:
                             \(resultsString)
@@ -264,20 +261,7 @@ public final class MessageManager {
             // Web Browser
             case Tool.generateWebBrowse.function.name:
                 do {
-                    let obj = try Tool.GenerateWebBrowse.decode(toolCall.function.arguments)
-                    let sources = await prepareSummaries(webpages: obj.webpages, service: summarizationService, model: summarizationModel)
-                    
-                    let sourcesData = try JSONEncoder().encode(sources)
-                    let sourcesString = String(data: sourcesData, encoding: .utf8)
-                    
-                    let label = obj.webpages.count == 1 ? "Read \(URL(string: obj.webpages[0].url)?.host() ?? "")" : "Read \(obj.webpages.count) webpages"
-                    let toolResponse = Message(
-                        role: .tool,
-                        content: sourcesString,
-                        toolCallID: toolCall.id,
-                        name: toolCall.function.name,
-                        metadata: ["label": label]
-                    )
+                    let toolResponse = try await prepareWebBrowseResponse(toolCall: toolCall)
                     messages.append(toolResponse)
                 } catch {
                     let toolFailed = Message(role: .tool, content: "Tool Failed: \(error.localizedDescription)", toolCallID: toolCall.id, name: toolCall.function.name)
@@ -303,7 +287,28 @@ public final class MessageManager {
         return messages
     }
     
-    private func prepareSummaries(webpages: [Tool.GenerateWebBrowse.Webpage], service: ChatService, model: String) async -> [Tool.GenerateWebBrowse.Source] {
+    private func prepareWebBrowseResponse(toolCall: ToolCall) async throws -> Message {
+        let obj = try Tool.GenerateWebBrowse.decode(toolCall.function.arguments)
+        let sources = try await prepareWebBrowseSummaries(webpages: obj.webpages)
+        
+        let sourcesData = try JSONEncoder().encode(sources)
+        let sourcesString = String(data: sourcesData, encoding: .utf8)
+        
+        let label = obj.webpages.count == 1 ? "Read \(URL(string: obj.webpages[0].url)?.host() ?? "")" : "Read \(obj.webpages.count) webpages"
+        let toolResponse = Message(
+            role: .tool,
+            content: sourcesString,
+            toolCallID: toolCall.id,
+            name: toolCall.function.name,
+            metadata: ["label": label]
+        )
+        return toolResponse
+    }
+    
+    private func prepareWebBrowseSummaries(webpages: [Tool.GenerateWebBrowse.Webpage]) async throws -> [Tool.GenerateWebBrowse.Source] {
+        let summarizationService = try Store.shared.preferredSummarizationService()
+        let summarizationModel = try Store.shared.preferredSummarizationModel()
+        
         var sources: [Tool.GenerateWebBrowse.Source] = []
         
         await withTaskGroup(of: Tool.GenerateWebBrowse.Source.self) { group in
@@ -311,7 +316,7 @@ public final class MessageManager {
                 group.addTask {
                     logger.debug("Browsing: \(webpage.url)")
                     do {
-                        let summary = try await BrowserManager().generateSummary(service: service, model: model, url: webpage.url)
+                        let summary = try await BrowserManager().generateSummary(service: summarizationService, model: summarizationModel, url: webpage.url)
                         logger.debug("Summarized: \(webpage.url)")
                         return .init(title: webpage.title ?? "No Title", url: webpage.url, summary: summary ?? "")
                     } catch {
