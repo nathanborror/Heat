@@ -109,6 +109,7 @@ final class ConversationViewModel {
         generateTask = Task {
             await MessageManager(messages: messages)
                 .append(message: message) { message in
+                    self.store.upsert(suggestions: [], conversationID: conversation.id)
                     self.store.upsert(message: message, conversationID: conversation.id)
                     self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
