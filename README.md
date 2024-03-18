@@ -2,7 +2,9 @@
 
 More people need to experience open source LLMs. Heat is an open source native iOS and macOS client for interacting with the most popular LLM services. A sister project, [Swift GenKit](https://github.com/nathanborror/swift-gen-kit), attempts to abstract away all the differences across each service including OpenAI, Mistral, Perplexity, Anthropic and all the models available with [Ollama](https://ollama.ai) which you can run locally.
 
-[![image](https://github.com/nathanborror/Heat/blob/main/Screens/Screens.png?raw=true)](https://github.com/nathanborror/Heat/blob/main/Screens/Screens.png?raw=true)
+### TestFlight
+
+https://testflight.apple.com/join/AX9JftGk
 
 ### Basic Instructions
 
