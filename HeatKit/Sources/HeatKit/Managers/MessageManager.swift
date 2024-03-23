@@ -83,6 +83,11 @@ public final class MessageManager {
                         await callback(response)
                     }
                 }
+                
+                // Halt if the last message is from the assistant
+                if filteredMessages.last?.role == .assistant {
+                    shouldContinue = false
+                }
             }
         } catch {
             apply(error: error)
