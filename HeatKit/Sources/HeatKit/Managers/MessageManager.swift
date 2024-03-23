@@ -246,11 +246,14 @@ public final class MessageManager {
                     let toolResponse = Message(
                         role: .tool,
                         content: """
-                            Use the following search results to choose the top three webpages to browse using your \
-                            `browse_web` function. Do not perform another search. Remember, the `browse_web` function \
-                            can take multiple websites so try not to call it multiple times.
+                            Do not perform another search unless the results below are unhelpful. Pick the three most \
+                            relevant search results to browse using the `\(Tool.generateWebBrowse.function.name)` \
+                            function. The `\(Tool.generateWebBrowse.function.name)` function can take multiple websites \
+                            so try to only call it once. When you have browsed the results prepare a response that \
+                            compares and contrasts the information you've gathered. Remember to use citations.
                             
                             Search Results:
+                            
                             \(resultsString)
                             """,
                         toolCallID: toolCall.id,
