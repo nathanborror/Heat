@@ -155,6 +155,10 @@ struct PreferencesForm: View {
             }
             
             Section {
+                Button("Set Defaults", action: handleSetDefaults)
+            }
+            
+            Section {
                 Button("Reset Agents", action: handleAgentReset)
                 Button("Delete All Data", role: .destructive, action: { isShowingDeleteConfirmation = true })
             }
@@ -180,6 +184,17 @@ struct PreferencesForm: View {
     func handleDeleteAll() {
         store.deleteAll()
         dismiss()
+    }
+    
+    func handleSetDefaults() {
+        store.preferences.preferredChatServiceID = .openAI
+        store.preferences.preferredImageServiceID = .openAI
+        store.preferences.preferredEmbeddingServiceID = .openAI
+        store.preferences.preferredTranscriptionServiceID = .openAI
+        store.preferences.preferredToolServiceID = .openAI
+        store.preferences.preferredVisionServiceID = .openAI
+        store.preferences.preferredSpeechServiceID = .openAI
+        store.preferences.preferredSummarizationServiceID = .openAI
     }
 }
 
