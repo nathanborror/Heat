@@ -33,7 +33,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "44243d6b4355ad04f74dbd0d7a366bbae741b8bf"
+        "revision" : "1e4d8d0bcfe07cbf4adf0d600944968a1f82e967"
       }
     },
     {
@@ -123,7 +123,7 @@
       "location" : "https://github.com/nathanborror/swift-perplexity",
       "state" : {
         "branch" : "main",
-        "revision" : "7e8cff7587b774ebdd92e4e0426ac610c2d10c3b"
+        "revision" : "c9df8111f9f77e7821a40a2dd91a32d1d667acbe"
       }
     },
     {
@@ -132,7 +132,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "6f337fff5f44d79640a05e44aa9408ce64a3c63b"
+        "revision" : "3ffb007b3c4960e289a83e2815421a0af7bca1e7"
       }
     },
     {
@@ -141,7 +141,7 @@
       "location" : "https://github.com/jpsim/Yams",
       "state" : {
         "branch" : "main",
-        "revision" : "626b33bf6639c5cdde366d555b1a07061805c7a0"
+        "revision" : "0d523dfc0905f5705d22efe0149209dcb6852021"
       }
     }
   ],

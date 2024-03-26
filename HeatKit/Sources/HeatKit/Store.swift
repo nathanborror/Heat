@@ -50,7 +50,9 @@ public final class Store {
     public func createConversation(agent: Agent, state: Conversation.State = .none) -> Conversation {
         let instructions = agent.instructions.map {
             var message = $0
-            message.content = message.content?.replacingOccurrences(of: "{datetime}", with: Date.now.format(as: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"))
+            message.content = message.content?.apply(context: [
+                "datetime": Date.now.format(as: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+            ])
             return message
         }
         var conversation = Conversation(messages: instructions, tools: agent.tools, state: state)
