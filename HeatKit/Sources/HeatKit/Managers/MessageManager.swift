@@ -183,15 +183,6 @@ public final class MessageManager {
         return self
     }
     
-    // MARK: Helpers
-    
-    public func remove(message: Message) {
-        guard let index = messages.firstIndex(where: { $0.id == message.id }) else {
-            return
-        }
-        messages.remove(at: index)
-    }
-    
     // MARK: Private
     
     private func apply(delta message: Message) -> Message {
