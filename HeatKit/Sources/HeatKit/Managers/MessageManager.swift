@@ -6,8 +6,10 @@ import GenKit
 private let logger = Logger(subsystem: "MessageManager", category: "HeatKit")
 
 public final class MessageManager {
+    public typealias ManagerCallback = @MainActor (MessageManager) -> Void
     public typealias MessageCallback = @MainActor (Message) -> Void
     public typealias ProcessingCallback = @MainActor () -> Void
+    public typealias ImagesCallback = @MainActor (String, [Data]) -> Void
     
     public private(set) var messages: [Message]
     public private(set) var error: Error?
@@ -21,7 +23,7 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func manage(callback: @MainActor (MessageManager) -> Void) async -> Self {
+    public func manage(callback: ManagerCallback) async -> Self {
         await callback(self)
         return self
     }
@@ -147,7 +149,7 @@ public final class MessageManager {
     // Images
     
     @discardableResult
-    public func generate(service: ImageService, model: String, prompt: String? = nil, callback: @MainActor (String, [Data]) -> Void) async -> Self {
+    public func generate(service: ImageService, model: String, prompt: String? = nil, callback: ImagesCallback) async -> Self {
         do {
             try Task.checkCancellation()
             let prompt = prompt ?? ""

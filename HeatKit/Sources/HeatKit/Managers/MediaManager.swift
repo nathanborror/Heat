@@ -6,23 +6,26 @@ import GenKit
 private let logger = Logger(subsystem: "MediaManager", category: "MateKit")
 
 public final class MediaManager {
+    public typealias ManagerCallback = @MainActor (MediaManager) -> Void
+    public typealias ImagesCallback = @MainActor ([Data]) -> Void
+    
     public private(set) var error: Error?
 
     public init() {}
     
     @discardableResult
-    public func manage(callback: (MediaManager) -> Void) async -> Self {
-        await MainActor.run { callback(self) }
+    public func manage(callback: ManagerCallback) async -> Self {
+        await callback(self)
         return self
     }
     
     @discardableResult
-    public func generate(service: ImageService, model: String, prompt: String, callback: ([Data]) -> Void) async -> Self {
+    public func generate(service: ImageService, model: String, prompt: String, callback: ImagesCallback) async -> Self {
         do {
             try Task.checkCancellation()
             let req = ImagineServiceRequest(model: model, prompt: prompt)
             let images = try await service.imagine(request: req)
-            await MainActor.run { callback(images) }
+            await callback(images)
         } catch {
             apply(error: error)
         }
