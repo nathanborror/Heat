@@ -33,7 +33,6 @@
 		D4B2D2692B6563DB0017FB52 /* ConversationInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */; };
 		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
 		D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698C2B9CF19000C53D4D /* MessageTool.swift */; };
-		D815698F2B9CF56700C53D4D /* MessageSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698E2B9CF56700C53D4D /* MessageSystem.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
 		D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageView.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
@@ -67,7 +66,6 @@
 		D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationInput.swift; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D815698C2B9CF19000C53D4D /* MessageTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTool.swift; sourceTree = "<group>"; };
-		D815698E2B9CF56700C53D4D /* MessageSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSystem.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		D88D23082B3CFB5100CCCC61 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
@@ -185,7 +183,6 @@
 			children = (
 				D88D23082B3CFB5100CCCC61 /* MessageView.swift */,
 				D815698C2B9CF19000C53D4D /* MessageTool.swift */,
-				D815698E2B9CF56700C53D4D /* MessageSystem.swift */,
 				D45CC1F92B8A5C1A009DFDF4 /* SuggestionsList.swift */,
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 			);
@@ -316,7 +313,6 @@
 				D4017C8D2B6EEF70001CE137 /* Squircle.swift in Sources */,
 				D41E19352AE4C665002516C1 /* AgentForm.swift in Sources */,
 				D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */,
-				D815698F2B9CF56700C53D4D /* MessageSystem.swift in Sources */,
 				D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */,
 				D45CC1FA2B8A5C1A009DFDF4 /* SuggestionsList.swift in Sources */,
 				D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */,

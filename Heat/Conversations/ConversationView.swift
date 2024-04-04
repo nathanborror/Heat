@@ -30,12 +30,10 @@ struct ConversationView: View {
                     // Show message history
                     ForEach(conversationViewModel.messagesVisible) { message in
                         switch message.role {
-                        case .user, .assistant:
+                        case .system, .user, .assistant:
                             MessageView(message: message)
                         case .tool:
                             MessageTool(message: message)
-                        case .system:
-                            MessageSystem(message: message)
                         }
                     }
                     

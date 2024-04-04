@@ -10,11 +10,11 @@ struct MessageView: View {
     var body: some View {
         if message.content != nil {
             MessageViewText(message: message, finishReason: message.finishReason)
-                .messageStyle(message)
                 .messageSpacing(message)
                 .messageAttachments(message)
                 .textSelection(.enabled)
                 .padding(.vertical, 8)
+                .opacity(message.kind == .instruction ? 0.3 : 1)
         }
     }
 }
@@ -26,14 +26,18 @@ struct MessageViewText: View {
     let finishReason: Message.FinishReason?
     
     var body: some View {
-        if message.role == .user {
+        switch message.role {
+        case .user:
             Markdown(message.content ?? "")
                 .markdownTheme(.mate)
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
-        } else {
+        case .assistant:
             Markdown(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
                 .markdownTheme(.mate)
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
+        case .system, .tool:
+            Text(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+                .font(.subheadline)
         }
     }
     
@@ -45,25 +49,6 @@ struct MessageViewText: View {
 }
 
 // Modifiers
-
-struct MessageViewStyle: ViewModifier {
-    let message: Message
-    
-    func body(content: Content) -> some View {
-        switch message.role {
-        case .system, .tool:
-            content
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        case .assistant:
-            content
-                .font(.body)
-        case .user:
-            content
-                .font(.body)
-        }
-    }
-}
 
 struct MessageViewSpacing: ViewModifier {
     let message: Message
@@ -131,10 +116,6 @@ struct MessageViewAttachments: ViewModifier {
 }
 
 extension View {
-    
-    func messageStyle(_ message: Message) -> some View {
-        self.modifier(MessageViewStyle(message: message))
-    }
     
     func messageSpacing(_ message: Message) -> some View {
         self.modifier(MessageViewSpacing(message: message))
