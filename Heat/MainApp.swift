@@ -32,6 +32,7 @@ struct MainApp: App {
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
                 ConversationView()
+                    #if !os(macOS)
                     .toolbar {
                         ToolbarItem(placement: .primaryAction) {
                             Button(action: { conversationViewModel.conversationID = nil }) {
@@ -39,6 +40,7 @@ struct MainApp: App {
                             }
                         }
                     }
+                    #endif
             }
             .environment(store)
             .environment(conversationViewModel)
