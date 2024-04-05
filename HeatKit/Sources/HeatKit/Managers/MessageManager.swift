@@ -40,13 +40,40 @@ public final class MessageManager {
     // Chat
     
     @discardableResult
-    public func generate(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback? = nil) async -> Self {
+    public func generate(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback? = nil, processing: ProcessingCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
-            let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: tools)
-            let message = try await service.completion(request: req)
-            await append(message: message)
-            await callback?(message)
+            var shouldContinue = true
+            
+            while shouldContinue {
+                
+                // Prepare chat request for service
+                let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: tools)
+                
+                // Generate completion
+                let message = try await service.completion(request: req)
+                await append(message: message)
+                await callback?(message)
+                
+                // Prepare possible tool responses
+                await processing?()
+                
+                // Prepare possible tool responses
+                let toolResponses = try await prepareToolResponses(message: message)
+                if toolResponses.isEmpty {
+                    shouldContinue = false
+                } else {
+                    for response in toolResponses {
+                        await self.append(message: response)
+                        await callback?(response)
+                    }
+                }
+                
+                // Halt if the last message is from the assistant
+                if filteredMessages.last?.role == .assistant {
+                    shouldContinue = false
+                }
+            }
         } catch {
             apply(error: error)
         }
@@ -57,10 +84,8 @@ public final class MessageManager {
     public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback, processing: ProcessingCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
-            
             var shouldContinue = true
             
-            // What could go wrong?
             while shouldContinue {
                 var message: Message? = nil
                 
