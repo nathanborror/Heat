@@ -11,10 +11,6 @@ struct ConversationList: View {
             ForEach(store.conversations) { conversation in
                 VStack(alignment: .leading) {
                     Text(conversation.title)
-                    Text(conversation.messages.last?.content ?? "None")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
                 }
                 .tag(conversation.id)
                 .swipeActions {
