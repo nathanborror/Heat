@@ -24,7 +24,6 @@ struct MessageTool: View {
                 }
                 .buttonStyle(.plain)
                 .tint(.secondary)
-                MessageToolSourceList(message: message)
             case Tool.generateImages.function.name:
                 MessageToolContent(message: message, symbol: "photo")
                 ScrollView(.horizontal) {
