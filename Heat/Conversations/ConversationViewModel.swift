@@ -202,28 +202,21 @@ final class ConversationViewModel {
     }
     
     func generateTitle() throws {
-        let chatService = try store.preferredChatService()
-        let chatModel = try store.preferredChatModel()
+        let service = try store.preferredToolService()
+        let model = try store.preferredToolModel()
         
         guard let conversation else {
             throw HeatKitError.missingConversation
         }
         generateTask = Task {
             await MessageManager(messages: messages)
-                .append(message: .init(role: .user, content: """
-                    Return a title for this conversation if there is a clear subject.
-                    Keep the title under 4 words.
-                    Return NONE if there is no clear subject.
-                    Do not return anything else.
-                    """))
-                .generate(service: chatService, model: chatModel) { message in
-                    guard let title = message.content, !title.isEmpty, title != "NONE" else { return }
+                .generate(service: service, model: model, tool: .generateTitle) { message in
+                    guard let title = self.prepareTitle(message) else { return }
                     self.store.upsert(title: title, conversationID: conversation.id)
                 }
                 .manage { manager in
                     guard let error = manager.error else { return }
-                    let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                    self.store.upsert(message: message, conversationID: conversation.id)
+                    logger.error("Failed to generate title: \(error)")
                 }
         }
     }
@@ -244,12 +237,24 @@ final class ConversationViewModel {
         guard let toolCalls = message.toolCalls else { return [] }
         guard let toolCall = toolCalls.first(where: { $0.function.name == Tool.generateSuggestions.function.name }) else { return [] }
         do {
-            let suggestions = try Tool.GenerateSuggestions.decode(toolCall.function.arguments)
-            return Array(suggestions.prompts.prefix(3))
+            let obj = try Tool.GenerateSuggestions.decode(toolCall.function.arguments)
+            return Array(obj.prompts.prefix(3))
         } catch {
             self.error = HeatKitError.failedSuggestions
         }
         return []
+    }
+    
+    private func prepareTitle(_ message: Message) -> String? {
+        guard let toolCalls = message.toolCalls else { return nil }
+        guard let toolCall = toolCalls.first(where: { $0.function.name == Tool.generateTitle.function.name }) else { return nil }
+        do {
+            let obj = try Tool.GenerateTitle.decode(toolCall.function.arguments)
+            return obj.title
+        } catch {
+            print(error)
+        }
+        return nil
     }
 }
 
