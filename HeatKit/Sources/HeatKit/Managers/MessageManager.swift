@@ -40,48 +40,7 @@ public final class MessageManager {
     // Chat
     
     @discardableResult
-    public func generate(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback? = nil, processing: ProcessingCallback? = nil) async -> Self {
-        do {
-            try Task.checkCancellation()
-            var shouldContinue = true
-            
-            while shouldContinue {
-                
-                // Prepare chat request for service
-                let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: tools)
-                
-                // Generate completion
-                let message = try await service.completion(request: req)
-                await append(message: message)
-                await callback?(message)
-                
-                // Prepare possible tool responses
-                await processing?()
-                
-                // Prepare possible tool responses
-                let toolResponses = try await prepareToolResponses(message: message)
-                if toolResponses.isEmpty {
-                    shouldContinue = false
-                } else {
-                    for response in toolResponses {
-                        await self.append(message: response)
-                        await callback?(response)
-                    }
-                }
-                
-                // Halt if the last message is from the assistant
-                if filteredMessages.last?.role == .assistant {
-                    shouldContinue = false
-                }
-            }
-        } catch {
-            apply(error: error)
-        }
-        return self
-    }
-    
-    @discardableResult
-    public func generateStream(service: ChatService, model: String, tools: Set<Tool> = [], callback: MessageCallback, processing: ProcessingCallback? = nil) async -> Self {
+    public func generate(service: ChatService, model: String, tools: Set<Tool> = [], stream: Bool = true, callback: MessageCallback, processing: ProcessingCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             var shouldContinue = true
@@ -92,11 +51,17 @@ public final class MessageManager {
                 // Prepare chat request for service
                 let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: tools)
                 
-                // Generate completion stream
-                try await service.completionStream(request: req) { delta in
-                    let messageDelta = apply(delta: delta)
-                    message = messageDelta
-                    await callback(messageDelta)
+                // Generate completion
+                if stream {
+                    try await service.completionStream(request: req) { delta in
+                        let messageDelta = apply(delta: delta)
+                        message = messageDelta
+                        await callback(messageDelta)
+                    }
+                } else {
+                    message = try await service.completion(request: req)
+                    await append(message: message!)
+                    await callback(message!)
                 }
                 
                 // Prepare possible tool responses
@@ -143,26 +108,18 @@ public final class MessageManager {
     // Vision
     
     @discardableResult
-    public func generate(service: VisionService, model: String, callback: MessageCallback? = nil) async -> Self {
+    public func generate(service: VisionService, model: String, stream: Bool = true, callback: MessageCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
-            let message = try await service.completion(request: req)
-            await append(message: message)
-            await callback?(message)
-        } catch {
-            apply(error: error)
-        }
-        return self
-    }
-    
-    @discardableResult
-    public func generateStream(service: VisionService, model: String, callback: MessageCallback? = nil) async -> Self {
-        do {
-            try Task.checkCancellation()
-            let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
-            try await service.completionStream(request: req) { message in
-                let message = apply(delta: message)
+            if stream {
+                try await service.completionStream(request: req) { message in
+                    let message = apply(delta: message)
+                    await callback?(message)
+                }
+            } else {
+                let message = try await service.completion(request: req)
+                await append(message: message)
                 await callback?(message)
             }
         } catch {
