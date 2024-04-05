@@ -32,7 +32,7 @@ final class ConversationViewModel {
     }
     
     var suggestions: [String] {
-        conversation?.suggestions ?? []
+        Array((conversation?.suggestions ?? []).prefix(3))
     }
     
     var messages: [Message] {
