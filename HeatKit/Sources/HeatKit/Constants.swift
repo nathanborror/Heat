@@ -77,6 +77,7 @@ public struct Constants {
             id: .anthropic,
             name: "Anthropic",
             preferredChatModel: "claude-3-opus-20240229",
+            preferredToolModel: "claude-3-opus-20240229",
             preferredVisionModel: "claude-3-opus-20240229"
         )
     

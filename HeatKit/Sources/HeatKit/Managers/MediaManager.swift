@@ -3,7 +3,7 @@ import OSLog
 import SharedKit
 import GenKit
 
-private let logger = Logger(subsystem: "MediaManager", category: "MateKit")
+private let logger = Logger(subsystem: "MediaManager", category: "HeatKit")
 
 public final class MediaManager {
     public typealias ManagerCallback = @MainActor (MediaManager) -> Void

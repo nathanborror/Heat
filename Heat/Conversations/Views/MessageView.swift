@@ -38,6 +38,7 @@ struct MessageViewText: View {
         case .system, .tool:
             Text(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
                 .font(.subheadline)
+                .foregroundStyle(message.kind == .error ? .red : .secondary)
         }
     }
     
@@ -58,6 +59,7 @@ struct MessageViewSpacing: ViewModifier {
             switch message.role {
             case .system, .tool:
                 content
+                Spacer()
             case .assistant:
                 content
                 Spacer()

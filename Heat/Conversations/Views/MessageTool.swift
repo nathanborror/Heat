@@ -130,13 +130,13 @@ struct MessageToolSource: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text(source.title)
+            Text(source.title ?? "Missing title")
                 .lineLimit(1)
                 .font(.footnote.weight(.semibold))
             Text(URL(string: source.url)?.host() ?? source.url)
                 .lineLimit(1)
                 .font(.footnote)
-            Text(source.summary)
+            Text(source.summary ?? "Missing summary.")
                 .lineLimit(4)
                 .font(.footnote)
         }

@@ -33,7 +33,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "3062c6ffa1b16b3ba136e7c330174ba10524a7a4"
+        "revision" : "173c035298ebcfb0a7a041ec9994d221fd152fbd"
       }
     },
     {
@@ -69,7 +69,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "745427515244e30131fccfd25abb7ae04884d4e8"
+        "revision" : "d583b43f62883dd9d8deb26fa05bfe451f8b8379"
       }
     },
     {

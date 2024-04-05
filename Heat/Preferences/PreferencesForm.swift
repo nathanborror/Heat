@@ -59,6 +59,10 @@ struct PreferencesForm: View {
                 Text("Used to start new conversations.")
             }
             
+            Section {
+                Toggle("Stream responses", isOn: $store.preferences.shouldStream)
+            }
+            
             #if !os(macOS)
             Section {
                 NavigationLink("Services") {

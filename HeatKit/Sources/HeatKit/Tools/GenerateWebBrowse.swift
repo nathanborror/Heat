@@ -8,7 +8,7 @@ extension Tool {
             type: .function,
             function: .init(
                 name: "browse_web",
-                description: "Browse a list of webpages using the given instructions.",
+                description: "Browse a webpage URL using the given instructions.",
                 parameters: .init(
                     type: .object,
                     properties: [
@@ -16,32 +16,24 @@ extension Tool {
                             type: .string,
                             description: "Instructions to perform on the given URLs. Default to summarization."
                         ),
-                        "webpages": .init(
-                            type: .array,
-                            description: "A list of webpages",
-                            items: .init(
-                                type: .object,
-                                properties: [
-                                    "url": .init(type: .string, description: "Webpage url"),
-                                    "title": .init(type: .string, description: "Webpage title"),
-                                ]
-                            ),
-                            required: ["url"]
+                        "title": .init(
+                            type: .string,
+                            description: "A webpage title"
+                        ),
+                        "url": .init(
+                            type: .string,
+                            description: "A webpage URL"
                         ),
                     ],
-                    required: ["instructions", "webpages"]
+                    required: ["instructions", "url"]
                 )
             )
         )
     
     public struct GenerateWebBrowse: Codable {
         public var instructions: String
-        public var webpages: [Webpage]
-        
-        public struct Webpage: Codable {
-            public var url: String
-            public var title: String?
-        }
+        public var title: String?
+        public var url: String
         
         public static func decode(_ arguments: String) throws -> Self {
             guard let data = arguments.data(using: .utf8) else {
@@ -51,9 +43,10 @@ extension Tool {
         }
         
         public struct Source: Codable, Identifiable {
-            public let title: String
+            public let title: String?
             public let url: String
-            public let summary: String
+            public let summary: String?
+            public let success: Bool
             
             public var id: String { url }
         }

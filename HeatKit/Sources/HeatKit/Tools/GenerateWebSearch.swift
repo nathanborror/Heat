@@ -29,4 +29,9 @@ extension Tool {
             return try JSONDecoder().decode(Self.self, from: data)
         }
     }
+    
+    public struct GenerateWebSearchResponse: Codable {
+        public var instructions: String
+        public var results: [WebSearchResult]
+    }
 }

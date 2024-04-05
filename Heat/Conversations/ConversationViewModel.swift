@@ -72,7 +72,7 @@ final class ConversationViewModel {
                     self.store.upsert(message: message, conversationID: conversation.id)
                     self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
-                .generate(service: chatService, model: chatModel, tools: conversation.tools) { message in
+                .generate(service: chatService, model: chatModel, tools: conversation.tools, stream: store.preferences.shouldStream) { message in
                     self.store.upsert(state: .streaming, conversationID: conversation.id)
                     self.store.replace(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
