@@ -11,6 +11,8 @@ final class ConversationViewModel {
     var conversationID: String?
     var error: HeatKitError?
     
+    var showInstructions = true
+    
     private var generateTask: Task<(), Error>? = nil
     
     init(store: Store) {
@@ -24,7 +26,11 @@ final class ConversationViewModel {
     }
     
     var messagesVisible: [Message] {
-        conversation?.messages.filter { $0.kind != .instruction } ?? []
+        if showInstructions {
+            conversation?.messages ?? []
+        } else {
+            conversation?.messages.filter { $0.kind != .instruction } ?? []
+        }
     }
     
     var title: String {
@@ -148,7 +154,7 @@ final class ConversationViewModel {
                     self.store.upsert(message: message, conversationID: conversation.id)
                     self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
-                .append(message: .init(kind: .ignore, role: .user, content: "Summarize: \(url)")) { message in
+                .append(message: .init(kind: .local, role: .user, content: "Summarize: \(url)")) { message in
                     self.store.upsert(message: message, conversationID: conversation.id)
                 }
                 .generateStream(service: chatService, model: chatModel, tools: conversation.tools) { message in

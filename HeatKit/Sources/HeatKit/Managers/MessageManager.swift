@@ -15,7 +15,7 @@ public final class MessageManager {
     public private(set) var error: Error?
     
     private var filteredMessages: [Message] {
-        messages.filter { ![.error, .ignore].contains($0.kind) }
+        messages.filter { ![.error, .local].contains($0.kind) }
     }
     
     public init(messages: [Message] = []) {
