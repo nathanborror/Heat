@@ -61,6 +61,7 @@ struct PreferencesForm: View {
             
             Section {
                 Toggle("Stream responses", isOn: $store.preferences.shouldStream)
+                Toggle("Debug", isOn: $store.preferences.debug)
             }
             
             #if !os(macOS)

@@ -7,6 +7,7 @@ public struct Preferences: Codable {
     public var instructions: String?
     public var defaultAgentID: String?
     public var shouldStream: Bool
+    public var debug: Bool
     
     public var preferredChatServiceID: Service.ServiceID?
     public var preferredImageServiceID: Service.ServiceID?
@@ -22,6 +23,7 @@ public struct Preferences: Codable {
         self.instructions = nil
         self.defaultAgentID = nil
         self.shouldStream = true
+        self.debug = false
 
         self.preferredChatServiceID = Constants.defaultChatServiceID
         self.preferredImageServiceID = Constants.defaultImageServiceID

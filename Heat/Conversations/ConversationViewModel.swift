@@ -11,8 +11,6 @@ final class ConversationViewModel {
     var conversationID: String?
     var error: HeatKitError?
     
-    var showInstructions = true
-    
     private var generateTask: Task<(), Error>? = nil
     
     init(store: Store) {
@@ -26,7 +24,7 @@ final class ConversationViewModel {
     }
     
     var messagesVisible: [Message] {
-        if showInstructions {
+        if store.preferences.debug {
             conversation?.messages ?? []
         } else {
             conversation?.messages.filter { $0.kind != .instruction } ?? []
