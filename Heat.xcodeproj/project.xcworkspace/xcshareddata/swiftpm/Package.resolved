@@ -69,7 +69,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "d583b43f62883dd9d8deb26fa05bfe451f8b8379"
+        "revision" : "9a6f09f6e5aa25312ce743cf917dc525694ab157"
       }
     },
     {
@@ -114,7 +114,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "26fe30cb7db3ca174d5682726100c934142fa13d"
+        "revision" : "07f3a376d202a25167a2c92a69e56968d9e21c9b"
       }
     },
     {
@@ -141,7 +141,7 @@
       "location" : "https://github.com/jpsim/Yams",
       "state" : {
         "branch" : "main",
-        "revision" : "0d523dfc0905f5705d22efe0149209dcb6852021"
+        "revision" : "9234124cff5e22e178988c18d8b95a8ae8007f76"
       }
     }
   ],

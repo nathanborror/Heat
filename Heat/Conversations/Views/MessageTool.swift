@@ -84,7 +84,7 @@ struct MessageToolContent: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Image(systemName: symbol)
-            Text(message.metadata["label"] ?? "Unknown")
+            Text(message.metadata.label)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .font(.subheadline)
