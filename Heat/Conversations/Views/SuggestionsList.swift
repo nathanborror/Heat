@@ -11,6 +11,7 @@ struct SuggestionList<Content: View>: View {
                 content(suggestion)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
