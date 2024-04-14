@@ -12,9 +12,9 @@ public final class Store {
     
     public static var shared = Store(persistence: DiskPersistence.shared)
     
-    public var agents: [Agent] = []
-    public var conversations: [Conversation] = []
-    public var tools: [Tool] = []
+    public private(set) var agents: [Agent] = []
+    public private(set) var conversations: [Conversation] = []
+    public private(set) var tools: [Tool] = []
     public var preferences: Preferences = .init()
     
     private let persistence: Persistence
