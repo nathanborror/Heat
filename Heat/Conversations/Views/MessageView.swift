@@ -57,12 +57,8 @@ struct MessageViewSpacing: ViewModifier {
     func body(content: Content) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
             switch message.role {
-            case .system, .tool:
+            case .system, .tool, .assistant:
                 content
-                Spacer()
-            case .assistant:
-                content
-                Spacer()
             case .user:
                 content
                     .padding(.horizontal, 12)
@@ -70,9 +66,9 @@ struct MessageViewSpacing: ViewModifier {
                     .background(.primary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 10))
                     .padding(.leading, -12)
-                Spacer()
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     #if os(macOS)
@@ -96,7 +92,6 @@ struct MessageViewAttachments: ViewModifier {
         } else {
             VStack {
                 HStack {
-                    if message.role == .user { Spacer() }
                     ForEach(message.attachments.indices, id: \.self) { index in
                         switch message.attachments[index] {
                         case .agent(let agentID):
@@ -109,7 +104,6 @@ struct MessageViewAttachments: ViewModifier {
                             EmptyView()
                         }
                     }
-                    if message.role == .assistant { Spacer() }
                 }
                 content
             }

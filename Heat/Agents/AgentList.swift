@@ -20,7 +20,7 @@ struct AgentList: View {
                 ForEach(store.agents) { agent in
                     HStack {
                         Text(agent.name)
-                        Spacer()
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         Button("Edit") {
                             selectedAgent = agent
                             isShowingAgentForm = true

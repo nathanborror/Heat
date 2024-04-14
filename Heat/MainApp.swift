@@ -35,7 +35,7 @@ struct MainApp: App {
                     #if !os(macOS)
                     .toolbar {
                         ToolbarItem(placement: .primaryAction) {
-                            Button(action: { conversationViewModel.conversationID = nil }) {
+                            Button(action: handleNewConversation) {
                                 Label("New Conversation", systemImage: "plus")
                             }
                         }
@@ -55,10 +55,8 @@ struct MainApp: App {
         .defaultPosition(.center)
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button("New Conversation") {
-                    conversationViewModel.conversationID = nil
-                }
-                .keyboardShortcut("n", modifiers: .command)
+                Button("New Conversation", action: handleNewConversation)
+                    .keyboardShortcut("n", modifiers: .command)
             }
         }
 
@@ -105,5 +103,9 @@ struct MainApp: App {
     
     func handleSave() {
         Task { try await store.saveAll() }
+    }
+    
+    func handleNewConversation() {
+        conversationViewModel.conversationID = nil
     }
 }

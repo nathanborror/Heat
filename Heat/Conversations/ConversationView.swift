@@ -15,16 +15,14 @@ struct ConversationView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     HStack {
-                        Spacer()
                         Image("Icon")
                             .resizable()
                             .frame(width: 48, height: 48)
                             .padding(4)
                             .background(.primary.opacity(0.1))
                             .clipShape(Squircle())
-                        Spacer()
-                            
                     }
+                    .frame(maxWidth: .infinity)
                     .padding(.vertical, 64)
                     
                     // Show message history

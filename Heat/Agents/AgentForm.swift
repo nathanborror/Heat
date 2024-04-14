@@ -137,43 +137,40 @@ struct AgentPicture: View {
     let picture: Asset?
     
     var body: some View {
-        HStack {
-            Spacer()
-            ZStack(alignment: .bottomTrailing) {
-                Group {
-                    switch viewModel.imageState {
-                    case .empty:
-                        if let picture {
-                            PictureView(asset: picture)
-                        } else {
-                            Rectangle()
-                        }
-                    case .loading:
-                        Rectangle()
-                    case .success(let image):
-                        #if os(macOS)
-                        Image(nsImage: image).resizable()
-                        #else
-                        Image(uiImage: image).resizable()
-                        #endif
-                    case .failure:
+        ZStack(alignment: .bottomTrailing) {
+            Group {
+                switch viewModel.imageState {
+                case .empty:
+                    if let picture {
+                        PictureView(asset: picture)
+                    } else {
                         Rectangle()
                     }
+                case .loading:
+                    Rectangle()
+                case .success(let image):
+                    #if os(macOS)
+                    Image(nsImage: image).resizable()
+                    #else
+                    Image(uiImage: image).resizable()
+                    #endif
+                case .failure:
+                    Rectangle()
                 }
-                .frame(width: 100, height: 100)
-                .clipShape(Squircle())
-                .tint(.primary)
-                
-                Image(systemName: "pencil")
-                    .font(.system(size: 17, weight: .semibold))
-                    .frame(width: 32, height: 32)
-                    .foregroundStyle(.white)
-                    .background(.tint)
-                    .clipShape(.circle)
-                    .offset(x: 4, y: 4)
             }
-            Spacer()
+            .frame(width: 100, height: 100)
+            .clipShape(Squircle())
+            .tint(.primary)
+            
+            Image(systemName: "pencil")
+                .font(.system(size: 17, weight: .semibold))
+                .frame(width: 32, height: 32)
+                .foregroundStyle(.white)
+                .background(.tint)
+                .clipShape(.circle)
+                .offset(x: 4, y: 4)
         }
+        .frame(maxWidth: .infinity)
     }
 }
 

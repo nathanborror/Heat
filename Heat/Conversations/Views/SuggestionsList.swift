@@ -8,10 +8,7 @@ struct SuggestionList<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             ForEach(suggestions, id: \.self) { suggestion in
-                HStack {
-                    content(suggestion)
-                    Spacer()
-                }
+                content(suggestion)
             }
         }
     }

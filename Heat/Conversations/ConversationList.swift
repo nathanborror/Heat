@@ -5,23 +5,11 @@ struct ConversationList: View {
     @Environment(Store.self) var store
     @Environment(ConversationViewModel.self) var conversationViewModel
     
-    @State private var filterQuery = ""
-    
-    var filteredConversations: [Conversation] {
-        if filterQuery.isEmpty {
-            return store.conversations
-        }
-        return store.conversations
-            .filter { conversation in
-                conversation.title.lowercased().contains(filterQuery.lowercased())
-            }
-    }
-    
     var body: some View {
         @Bindable var conversationViewModel = conversationViewModel
         List(selection: $conversationViewModel.conversationID) {
             Section {
-                ForEach(filteredConversations) { conversation in
+                ForEach(store.conversations) { conversation in
                     VStack(alignment: .leading) {
                         Text(conversation.title)
                     }
@@ -32,8 +20,6 @@ struct ConversationList: View {
                         }
                     }
                 }
-            } header: {
-                Text("History")
             }
         }
         .scrollDismissesKeyboard(.interactively)
@@ -47,11 +33,8 @@ struct ConversationList: View {
                         .padding(8)
                 }
                 .buttonStyle(.plain)
-                
-                TextField("Filter", text: $filterQuery)
-                    .padding(.trailing, 8)
-                    .textFieldStyle(.roundedBorder)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 2)
         }
         #endif

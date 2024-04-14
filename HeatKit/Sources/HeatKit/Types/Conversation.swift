@@ -87,7 +87,9 @@ extension Conversation {
                 "What is the first law of thermodynamics?",
                 "Explain thermal equilibrium.",
                 "How does the zeroth law apply in real life?",
-            ])
+            ],
+            state: .processing
+        )
     }()
     
     public static var preview2: Conversation = {

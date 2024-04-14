@@ -12,10 +12,8 @@ struct ServiceList: View {
             Section {
                 ForEach(store.preferences.services) { service in
                     HStack {
-                        VStack(alignment: .leading) {
-                            Text(service.name)
-                        }
-                        Spacer()
+                        Text(service.name)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         Button("Edit") {
                             selectedService = service
                         }
