@@ -206,28 +206,32 @@ struct PreferencesForm: View {
 struct PreferencesWindow: View {
     @Environment(Store.self) private var store
     
-    @State var selection = "general"
+    @State var selection = Tabs.general
+    
+    enum Tabs: Hashable {
+        case general, services, agents
+    }
     
     var body: some View {
         TabView(selection: $selection) {
             PreferencesForm()
                 .padding(20)
                 .frame(width: 400)
-                .tag("general")
+                .tag(Tabs.general)
                 .tabItem {
                     Label("General", systemImage: "gearshape")
                 }
             ServiceList()
                 .padding(20)
                 .frame(width: 400)
-                .tag("services")
+                .tag(Tabs.services)
                 .tabItem {
                     Label("Services", systemImage: "cloud")
                 }
             AgentList()
                 .padding(20)
                 .frame(width: 400)
-                .tag("agents")
+                .tag(Tabs.agents)
                 .tabItem {
                     Label("Agents", systemImage: "person.crop.rectangle.stack")
                 }
