@@ -1,8 +1,6 @@
 agents:
   - id: bundle-assistant
     name: Assistant
-    asset:
-      picture: Uhura
     tagline: Assistant
     kind: assistant
     categories: ["organize"]
