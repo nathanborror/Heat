@@ -5,6 +5,101 @@ import PhotosUI
 
 private let logger = Logger(subsystem: "ImagePicker", category: "Heat")
 
+@Observable
+final class ImagePickerViewModel {
+
+    struct SelectedImage: Identifiable {
+        var id: String
+        var state: State
+        #if os(macOS)
+        var image: NSImage?
+        #else
+        var image: UIImage?
+        #endif
+        
+        enum State {
+            case empty
+            case loading(Progress)
+            case success
+            case failure(ImagePickerError)
+        }
+    }
+    
+    var imagesSelected: [SelectedImage] = []
+    var imagesPicked: [PhotosPickerItem] = [] {
+        didSet { handleSelectionChange() }
+    }
+    
+    func writeAll() throws -> [String] {
+        var out = [String]()
+        for selected in imagesSelected {
+            guard let image = selected.image else {
+                throw ImagePickerError.missingImage
+            }
+            guard let data = image.pngData() else {
+                throw ImagePickerError.missingImage
+            }
+            let filename = "\(selected.id).png"
+            let resource = Resource.document(filename)
+            
+            guard let url = resource.url else {
+                throw ImagePickerError.missingResourceURL
+            }
+            try data.write(to: url)
+            out.append(filename)
+        }
+        return out
+    }
+    
+    func remove(id: String) {
+        imagesSelected.removeAll { $0.id == id }
+        imagesPicked.removeAll { $0.itemIdentifier == id }
+    }
+    
+    func removeAll() {
+        imagesSelected.removeAll()
+        imagesPicked.removeAll()
+    }
+    
+    // MARK: - Private
+    
+    private func handleSelectionChange() {
+        for item in imagesPicked {
+            if let id = item.itemIdentifier, let progress = handleLoadTransferable(from: item) {
+                let image = SelectedImage(id: id, state: .loading(progress))
+                upsert(image: image)
+            }
+        }
+    }
+    
+    private func handleLoadTransferable(from item: PhotosPickerItem) -> Progress? {
+        guard let id = item.itemIdentifier else { return nil }
+        return item.loadTransferable(type: ImageTransfer.self) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let image?):
+                    let image = SelectedImage(id: id, state: .success, image: image.image)
+                    self.upsert(image: image)
+                case .success(nil):
+                    let image = SelectedImage(id: id, state: .empty)
+                    self.upsert(image: image)
+                case .failure:
+                    let image = SelectedImage(id: id, state: .failure(.transferFailed))
+                    self.upsert(image: image)
+                }
+            }
+        }
+    }
+    
+    private func upsert(image: SelectedImage) {
+        if let index = imagesSelected.firstIndex(where: { $0.id == image.id }) {
+            imagesSelected[index] = image
+        } else {
+            imagesSelected.append(image)
+        }
+    }
+}
+
 enum ImagePickerError: LocalizedError {
     case missingImage
     case missingResourceURL
@@ -26,80 +121,6 @@ enum ImagePickerError: LocalizedError {
         case .missingResourceURL: "Try picking an image again."
         case .transferFailed: "Try again"
         case .transferInProgress: "Wait for transfer to complete."
-        }
-    }
-}
-
-@Observable
-final class ImagePickerViewModel {
-    
-    enum ImageState {
-        case empty
-        case loading(Progress)
-        #if os(macOS)
-        case success(NSImage)
-        #else
-        case success(UIImage)
-        #endif
-        case failure(ImagePickerError)
-    }
-    
-    var imageState: ImageState = .empty
-    
-    var imageSelection: PhotosPickerItem? = nil {
-        didSet {
-            if let imageSelection {
-                let progress = handleLoadTransferable(from: imageSelection)
-                imageState = .loading(progress)
-            } else {
-                imageState = .empty
-            }
-        }
-    }
-    
-    #if os(macOS)
-    var image: NSImage? {
-        guard case .success(let image) = imageState else { return nil }
-        return image
-    }
-    #else
-    var image: UIImage? {
-        guard case .success(let image) = imageState else { return nil }
-        return image
-    }
-    #endif
-    
-    func write() throws -> String {
-        guard let data = image?.pngData() else {
-            throw ImagePickerError.missingImage
-        }
-        let filename = "\(String.id).png"
-        let resource = Resource.document(filename)
-        
-        guard let url = resource.url else {
-            throw ImagePickerError.missingResourceURL
-        }
-        try data.write(to: url)
-        return filename
-    }
-    
-    private func handleLoadTransferable(from imageSelection: PhotosPickerItem) -> Progress {
-        return imageSelection.loadTransferable(type: ImageTransfer.self) { result in
-            DispatchQueue.main.async {
-                guard imageSelection == self.imageSelection else {
-                    print("Failed to get the selected item.")
-                    return
-                }
-                switch result {
-                case .success(let image?):
-                    self.imageState = .success(image.image)
-                case .success(nil):
-                    self.imageState = .empty
-                case .failure(let error):
-                    self.imageState = .failure(.transferFailed)
-                    logger.error("image transfer failed: \(error)")
-                }
-            }
         }
     }
 }

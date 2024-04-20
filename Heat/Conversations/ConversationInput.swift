@@ -28,11 +28,19 @@ struct ConversationInput: View {
             VStack {
                 
                 // Attached images
-                if let image = imagePickerViewModel.image {
-                    ConversationInputImage(image: image)
-                        .environment(imagePickerViewModel)
-                        .padding(.top)
-                        .padding(.leading, showInputPadding ? 16 : 0)
+                if !imagePickerViewModel.imagesSelected.isEmpty {
+                    ScrollView(.horizontal) {
+                        HStack(alignment: .bottom) {
+                            ForEach(imagePickerViewModel.imagesSelected) { selected in
+                                ConversationInputImage(id: selected.id, image: selected.image)
+                                    .environment(imagePickerViewModel)
+                                    .padding(.top, 8)
+                            }
+                        }
+                        .padding(.horizontal, 8)
+                    }
+                    .scrollIndicators(.hidden)
+                    .scrollClipDisabled()
                 }
                 
                 // Input field with buttons
@@ -98,7 +106,6 @@ struct ConversationInput: View {
                     
                     // Text input
                     TextField("Message", text: $content, axis: .vertical)
-                        .focusable()
                         .textFieldStyle(.plain)
                         .padding(.vertical, verticalPadding)
                         .padding(.trailing, showInputPadding ? 16 : 0)
@@ -108,7 +115,7 @@ struct ConversationInput: View {
                         .onSubmit(handleSubmit)
                         #endif
                     
-                    // Audio input
+                    // Speech to text
                     if showInlineControls {
                         Button(action: handleSpeak) {
                             Image(systemName: "waveform")
@@ -117,9 +124,9 @@ struct ConversationInput: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .background(.primary.opacity(0.05))
-                .clipShape(.rect(cornerRadius: 10))
             }
+            .background(.primary.opacity(0.05))
+            .clipShape(.rect(cornerRadius: 10))
             
             if showStopGenerating {
                 Button(action: handleStop) {
@@ -135,7 +142,7 @@ struct ConversationInput: View {
                 .buttonStyle(.plain)
             }
         }
-        .photosPicker(isPresented: $isShowingPhotos, selection: $imagePickerViewModel.imageSelection, matching: .images, photoLibrary: .shared())
+        .photosPicker(isPresented: $isShowingPhotos, selection: $imagePickerViewModel.imagesPicked, maxSelectionCount: 3, matching: .images, photoLibrary: .shared())
         #if !os(macOS)
         .background(.background)
         #endif
@@ -147,6 +154,7 @@ struct ConversationInput: View {
             conversationViewModel.newConversation()
         }
         
+        // Check for command
         switch command {
         case "imagine":
             handleImagine(content)
@@ -162,9 +170,8 @@ struct ConversationInput: View {
         }
         
         // Handle vision prompt if exists
-        if hasVisionAsset || imagePickerViewModel.image != nil {
-            handleVision(content)
-            return
+        if hasVisionAsset || !imagePickerViewModel.imagesSelected.isEmpty {
+            handleVision(content); return
         }
         
         // Ignore empty content
@@ -182,11 +189,11 @@ struct ConversationInput: View {
     
     func handleVision(_ content: String) {
         do {
-            if let data = imagePickerViewModel.image?.resize(to: .init(width: 512, height: 512)) {
-                try conversationViewModel.generate(content, images: [data])
-            } else {
-                try conversationViewModel.generate(content, images: [])
-            }
+            let images = imagePickerViewModel.imagesSelected.map {
+                // Resize image so we're not sending huge amounts of data to the services.
+                $0.image?.resize(to: .init(width: 512, height: 512))
+            }.compactMap { $0 }
+            try conversationViewModel.generate(content, images: images)
         } catch let error as HeatKitError {
             conversationViewModel.error = error
         } catch {
@@ -246,8 +253,7 @@ struct ConversationInput: View {
     private func clear() {
         content = ""
         command = ""
-        //self.imagePickerViewModel.removeAll()
-        imagePickerViewModel.imageSelection = nil
+        imagePickerViewModel.removeAll()
     }
     
     private var hasVisionAsset: Bool {
@@ -319,22 +325,38 @@ struct ConversationInlineButtonModifier: ViewModifier {
 struct ConversationInputImage: View {
     @Environment(ImagePickerViewModel.self) var imagePickerViewModel
     
+    let id: String
     #if os(macOS)
-    let image: NSImage
+    let image: NSImage?
     #else
-    let image: UIImage
+    let image: UIImage?
     #endif
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            imageView
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 100, height: 100)
-                .clipShape(.rect(cornerRadius: 10))
-         
+            if let image {
+                #if os(macOS)
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 100, height: 100)
+                    //.clipShape(.rect(cornerRadius: 10))
+                #else
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 100, height: 100)
+                    .clipShape(.rect(cornerRadius: 10))
+                #endif
+            } else {
+                Rectangle()
+                    .fill(.secondary)
+                    .frame(width: 100, height: 100)
+                    .clipShape(.rect(cornerRadius: 10))
+            }
+            
             Button {
-                imagePickerViewModel.imageSelection = nil
+                imagePickerViewModel.remove(id: id)
             } label: {
                 Image(systemName: "xmark.circle.fill")
                     .imageScale(.medium)
@@ -344,27 +366,16 @@ struct ConversationInputImage: View {
             .shadow(color: .primary.opacity(0.25), radius: 5)
         }
     }
-    
-    private var imageView: Image {
-        #if os(macOS)
-        Image(nsImage: image)
-        #else
-        Image(uiImage: image)
-        #endif
-    }
 }
 
 #Preview("Conversation Input") {
     let store = Store.preview
     let viewModel = ConversationViewModel(store: store)
-    let imageModel = ImagePickerViewModel()
-    imageModel.imageState = .success(.init(named: "Icon")!)
     
     return VStack {
         ConversationInput()
         ConversationInput(content: "Hello, world")
         ConversationInput(command: "imagine")
-        ConversationInput(imagePickerViewModel: imageModel)
     }
     .padding()
     .environment(viewModel)

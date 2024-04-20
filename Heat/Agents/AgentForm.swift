@@ -1,6 +1,5 @@
 import SwiftUI
 import OSLog
-import PhotosUI
 import SharedKit
 import GenKit
 import HeatKit
@@ -13,21 +12,12 @@ struct AgentForm: View {
     
     @State var agent: Agent
     @State var instructions: [(String, String)] = []
-    @State var viewModel = ImagePickerViewModel()
     
     @State private var isShowingAlert = false
     @State private var error: ImagePickerError? = nil
     
     var body: some View {
         Form {
-            Section {
-                PhotosPicker(selection: $viewModel.imageSelection, matching: .images, photoLibrary: .shared()) {
-                    AgentPicture(picture: agent.picture)
-                        .environment(viewModel)
-                }
-            }
-            .listRowBackground(Color.clear)
-            
             Section {
                 TextField("Name", text: $agent.name)
             }
@@ -81,21 +71,6 @@ struct AgentForm: View {
     
     private func handleDone() {
         do {
-            switch viewModel.imageState {
-            case .empty:
-                break
-            case .loading:
-                self.error = .transferInProgress
-                isShowingAlert = true
-                return
-            case .success:
-                let filename = try viewModel.write()
-                agent.picture = .init(name: filename, kind: .image, location: .filesystem)
-            case .failure(let error):
-                self.error = error
-                isShowingAlert = true
-                return
-            }
             agent.instructions = instructions
                 .filter({ !$0.1.isEmpty })
                 .map {
@@ -103,9 +78,6 @@ struct AgentForm: View {
                 }
             store.upsert(agent: agent)
             dismiss()
-        } catch let error as ImagePickerError {
-            self.error = error
-            isShowingAlert = true
         } catch {
             logger.error("failed to save image: \(error)")
         }
@@ -138,30 +110,6 @@ struct AgentPicture: View {
     
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            Group {
-                switch viewModel.imageState {
-                case .empty:
-                    if let picture {
-                        PictureView(asset: picture)
-                    } else {
-                        Rectangle()
-                    }
-                case .loading:
-                    Rectangle()
-                case .success(let image):
-                    #if os(macOS)
-                    Image(nsImage: image).resizable()
-                    #else
-                    Image(uiImage: image).resizable()
-                    #endif
-                case .failure:
-                    Rectangle()
-                }
-            }
-            .frame(width: 100, height: 100)
-            .clipShape(Squircle())
-            .tint(.primary)
-            
             Image(systemName: "pencil")
                 .font(.system(size: 17, weight: .semibold))
                 .frame(width: 32, height: 32)
