@@ -48,15 +48,15 @@ public enum HeatKitError: LocalizedError, Equatable {
         case .missingResource:
             "Try again"
         case .missingService:
-            "Pick a service in preferences."
+            "Pick a service in Preferences."
         case .missingServiceModel:
-            "Pick a model for the specific service in preferences."
+            "Pick a model in Preferences > Services."
         case .missingServiceToken:
-            "The service requires a token to operate."
+            "Add a token in Preferences 􀯻 Services."
         case .missingServiceHost:
-            "The service requires a host URL to operate."
+            "Add a host in Preferences 􀯻 Services."
         case .missingConversation:
-            "Try again"
+            "Create a new conversation"
         case .unknown:
             "Try again"
         }
