@@ -70,7 +70,7 @@ struct ConversationInput: View {
                             }
                             .keyboardShortcut("4", modifiers: .command)
                         } label: {
-                            Image(systemName: "paperclip")
+                            Image(systemName: "plus")
                                 .modifier(ConversationInlineButtonModifier())
                         }
                         .buttonStyle(.plain)
