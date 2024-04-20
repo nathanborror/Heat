@@ -14,7 +14,7 @@ public final class Store {
     
     public private(set) var agents: [Agent] = []
     public private(set) var conversations: [Conversation] = []
-    public private(set) var tools: [Tool] = []
+    public private(set) var tools: Set<Tool> = []
     public var preferences: Preferences = .init()
     
     private let persistence: Persistence
@@ -41,6 +41,10 @@ public final class Store {
         tools.first(where: { $0.function.name == name })
     }
     
+    public func get(tools: Set<String>) -> Set<Tool> {
+        Set(tools.compactMap { get(tool: $0) })
+    }
+    
     public func get(serviceID: Service.ServiceID?) -> Service? {
         preferences.services.first(where: { $0.id == serviceID })
     }
@@ -55,7 +59,8 @@ public final class Store {
             ])
             return message
         }
-        var conversation = Conversation(messages: instructions, tools: agent.tools, state: state)
+        let tools = get(tools: agent.toolIDs)
+        var conversation = Conversation(messages: instructions, tools: tools, state: state)
         
         // Append user profile if it exists
         if let instructions = preferences.instructions {
@@ -359,6 +364,10 @@ public final class Store {
         let response = try YAMLDecoder().decode(AgentsResource.self, from: data)
         self.agents = response.agents.map { $0.encode }
         self.preferences.defaultAgentID = Constants.defaultAgentID
+    }
+    
+    public func resetTools() {
+        self.tools = Constants.defaultTools
     }
     
     // MARK: - Preview

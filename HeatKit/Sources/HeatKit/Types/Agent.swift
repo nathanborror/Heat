@@ -9,15 +9,15 @@ public struct Agent: Codable, Identifiable {
     public var id: String
     public var name: String
     public var instructions: [Message]
-    public var tools: Set<Tool>
+    public var toolIDs: Set<String>
     public var created: Date
     public var modified: Date
     
-    public init(id: String = .id, name: String, instructions: [Message], tools: Set<Tool> = []) {
+    public init(id: String = .id, name: String, instructions: [Message], toolIDs: Set<String> = []) {
         self.id = id
         self.name = name
         self.instructions = instructions
-        self.tools = tools
+        self.toolIDs = toolIDs
         self.created = .now
         self.modified = .now
     }
@@ -25,7 +25,7 @@ public struct Agent: Codable, Identifiable {
     mutating func apply(agent: Agent) {
         self.name = agent.name
         self.instructions = agent.instructions
-        self.tools = agent.tools
+        self.toolIDs = agent.toolIDs
         self.modified = .now
     }
     
@@ -78,23 +78,8 @@ struct AgentsResource: Decodable {
                 id: id,
                 name: name,
                 instructions: encodeInstructions,
-                tools: Set(encodeTools)
+                toolIDs: Set(tools ?? [])
             )
-        }
-        
-        var encodeTools: [Tool] {
-            tools?.map { name -> Tool? in
-                switch name {
-                case Tool.generateWebSearch.function.name:
-                    return Tool.generateWebSearch
-                case Tool.generateWebBrowse.function.name:
-                    return Tool.generateWebBrowse
-                case Tool.generateImages.function.name:
-                    return Tool.generateImages
-                default:
-                    return nil
-                }
-            }.compactMap { $0 } ?? []
         }
         
         var encodeInstructions: [Message] {

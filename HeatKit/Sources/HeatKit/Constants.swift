@@ -58,6 +58,12 @@ public struct Constants {
         )
     ]
     
+    public static var defaultTools: Set<Tool> = [
+        .generateImages,
+        .generateWebBrowse,
+        .generateWebSearch,
+    ]
+    
     public static var openAIDefaults =
         Service(
             id: .openAI,
