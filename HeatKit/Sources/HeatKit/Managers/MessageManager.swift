@@ -29,8 +29,8 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func append(message: Message, context: [String: any StringProtocol]? = nil, callback: MessageCallback? = nil) async -> Self {
-        var message = message
+    public func append(message: Message?, context: [String: any StringProtocol]? = nil, callback: MessageCallback? = nil) async -> Self {
+        guard var message else { return self }
         message.content = message.content?.apply(context: context ?? [:])
         messages.append(message)
         await callback?(message)

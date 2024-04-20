@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import OSLog
 import PhotosUI
 import GenKit
@@ -8,7 +9,10 @@ private let logger = Logger(subsystem: "ConversationInput", category: "Heat")
 
 struct ConversationInput: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
-
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
+    
     @State var imagePickerViewModel: ImagePickerViewModel
     @State var content: String
     @State var command: String
@@ -178,7 +182,7 @@ struct ConversationInput: View {
         guard !content.isEmpty else { return }
         
         do {
-            try conversationViewModel.generate(content)
+            try conversationViewModel.generate(content, context: memories.map { $0.content })
         } catch let error as HeatKitError {
             conversationViewModel.error = error
         } catch {

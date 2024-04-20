@@ -9,6 +9,7 @@
  */
 
 import SwiftUI
+import SwiftData
 import OSLog
 import HeatKit
 
@@ -49,6 +50,7 @@ struct MainApp: App {
             }
             .task {
                 handleRestore()
+            .modelContainer(for: Memory.self)
             }
         }
         .defaultSize(width: 600, height: 700)
@@ -72,6 +74,7 @@ struct MainApp: App {
             MainCompactView()
                 .environment(store)
                 .environment(conversationViewModel)
+                .modelContainer(for: Memory.self)
                 .task(id: scenePhase) {
                     handlePhaseChange()
                 }

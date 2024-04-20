@@ -34,6 +34,7 @@
 		D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */; };
 		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
 		D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698C2B9CF19000C53D4D /* MessageTool.swift */; };
+		D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
 		D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageView.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
@@ -67,6 +68,7 @@
 		D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D815698C2B9CF19000C53D4D /* MessageTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTool.swift; sourceTree = "<group>"; };
+		D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryList.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		D88D23082B3CFB5100CCCC61 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 			children = (
 				D41E191E2AE45C9B002516C1 /* MainApp.swift */,
 				D4017C8A2B6EEF01001CE137 /* MainCompactView.swift */,
+				D8247E2C2BD41C3100D918C0 /* Memory */,
 				D8E1FC162B704CD2006C9366 /* Preferences */,
 				D41E19492AE58D1B002516C1 /* Agents */,
 				D41E194A2AE58D29002516C1 /* Conversations */,
@@ -187,6 +190,14 @@
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		D8247E2C2BD41C3100D918C0 /* Memory */ = {
+			isa = PBXGroup;
+			children = (
+				D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */,
+			);
+			path = Memory;
 			sourceTree = "<group>";
 		};
 		D88D23072B3CFB2C00CCCC61 /* Views */ = {
@@ -298,6 +309,7 @@
 				D8FBB20D2AEDB60700783E9B /* AgentList.swift in Sources */,
 				D4A2C5672B8BF9CE0004F27B /* MarkdownUI+.swift in Sources */,
 				D4017C902B6EEFB5001CE137 /* Asset+.swift in Sources */,
+				D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */,
 				D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */,
 				D41E191F2AE45C9B002516C1 /* MainApp.swift in Sources */,
 				D41E19402AE4CD4F002516C1 /* VideoView.swift in Sources */,

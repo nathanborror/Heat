@@ -51,8 +51,11 @@ final class ConversationViewModel {
         conversationID = conversation.id
     }
     
-    func generate(_ content: String) throws {
+    func generate(_ content: String, context: [String] = []) throws {
         guard !content.isEmpty else { return }
+        guard let conversation else {
+            throw HeatKitError.missingConversation
+        }
         
         let chatService = try store.preferredChatService()
         let chatModel = try store.preferredChatModel()
@@ -60,11 +63,11 @@ final class ConversationViewModel {
         let toolService = try store.preferredToolService()
         let toolModel = try store.preferredToolModel()
         
-        guard let conversation else {
-            throw HeatKitError.missingConversation
-        }
+        let context = prepareContext(context)
+        
         generateTask = Task {
             await MessageManager(messages: messages)
+                .append(message: context)
                 .append(message: .init(role: .user, content: content)) { message in
                     self.store.upsert(suggestions: [], conversationID: conversation.id)
                     self.store.upsert(message: message, conversationID: conversation.id)
@@ -253,6 +256,16 @@ final class ConversationViewModel {
             print(error)
         }
         return nil
+    }
+    
+    private func prepareContext(_ context: [String]) -> Message? {
+        guard !context.isEmpty else { return nil }
+        
+        return Message(role: .system, content: """
+            Some things to remember about who the user is. Use these to better relate to the user when responding:
+            
+            \(context.joined(separator: "\n"))
+            """)
     }
 }
 

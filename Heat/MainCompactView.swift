@@ -12,6 +12,7 @@ struct MainCompactView: View {
     
     enum Sheet: String, Identifiable {
         case conversationList
+        case memories
         case preferences
         var id: String { rawValue }
     }
@@ -24,6 +25,9 @@ struct MainCompactView: View {
                         Menu {
                             Button(action: { sheet = .conversationList }) {
                                 Label("History", systemImage: "clock")
+                            }
+                            Button(action: { sheet = .memories }) {
+                                Label("Memory", systemImage: "brain")
                             }
                             Divider()
                             Button(action: { sheet = .preferences }) {
@@ -40,25 +44,19 @@ struct MainCompactView: View {
                     }
                 }
                 .sheet(item: $sheet) { sheet in
-                    switch sheet {
-                    case .preferences:
-                        NavigationStack {
+                    NavigationStack {
+                        switch sheet {
+                        case .preferences:
                             PreferencesForm()
-                                .toolbar {
-                                    ToolbarItem(placement: .confirmationAction) {
-                                        Button("Done") { self.sheet = nil }
-                                    }
-                                }
-                        }
-                        .environment(store)
-                    case .conversationList:
-                        NavigationStack {
+                        case .memories:
+                            MemoryList()
+                        case .conversationList:
                             ConversationList()
                         }
-                        .environment(store)
-                        .environment(conversationViewModel)
-                        .presentationDetents([.medium, .large])
                     }
+                    .environment(store)
+                    .environment(conversationViewModel)
+                    .presentationDragIndicator(.visible)
                 }
         }
     }
