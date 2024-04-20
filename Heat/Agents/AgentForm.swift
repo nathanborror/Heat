@@ -70,17 +70,13 @@ struct AgentForm: View {
     }
     
     private func handleDone() {
-        do {
-            agent.instructions = instructions
-                .filter({ !$0.1.isEmpty })
-                .map {
-                    Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
-                }
-            store.upsert(agent: agent)
-            dismiss()
-        } catch {
-            logger.error("failed to save image: \(error)")
-        }
+        agent.instructions = instructions
+            .filter({ !$0.1.isEmpty })
+            .map {
+                Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
+            }
+        store.upsert(agent: agent)
+        dismiss()
     }
     
     private func handleAddInstruction() {
