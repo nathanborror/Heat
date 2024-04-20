@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import OSLog
 import SharedKit
 import GenKit
@@ -305,6 +306,25 @@ public final class MessageManager {
             )
             return ([toolResponse], false)
         
+        // Memory
+        case Tool.generateMemory.function.name:
+            let obj = try Tool.GenerateMemory.decode(toolCall.function.arguments)
+            let container = try ModelContainer(for: Memory.self)
+            
+            Task { @MainActor in
+                obj.items.forEach {
+                    container.mainContext.insert(Memory(content: $0))
+                }
+            }
+            let toolResponse = Message(
+                role: .tool,
+                content: "Saved to memory.",
+                toolCallID: toolCall.id,
+                name: toolCall.function.name,
+                metadata: ["label": obj.items.count == 1 ? "Stored memory" : "Stored \(obj.items.count) memories"]
+            )
+            return ([toolResponse], true)
+            
         // Unknown tool
         default:
             let toolResponse = Message(

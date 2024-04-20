@@ -5,6 +5,8 @@ import MarkdownUI
 import Splash
 
 struct MessageView: View {
+    @Environment(Store.self) var store
+    
     let message: Message
     
     var body: some View {
@@ -15,6 +17,17 @@ struct MessageView: View {
                 .textSelection(.enabled)
                 .padding(.vertical, 8)
                 .opacity(message.kind == .instruction ? 0.3 : 1)
+        }
+        if store.preferences.debug, let toolCalls = message.toolCalls {
+            ForEach(toolCalls, id: \.id) { toolCall in
+                VStack(alignment: .leading) {
+                    Text(toolCall.function.name)
+                    Text(toolCall.function.arguments)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            }
         }
     }
 }

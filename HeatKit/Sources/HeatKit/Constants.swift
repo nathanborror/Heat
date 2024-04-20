@@ -62,6 +62,7 @@ public struct Constants {
         .generateImages,
         .generateWebBrowse,
         .generateWebSearch,
+        .generateMemory,
     ]
     
     public static var openAIDefaults =

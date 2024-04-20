@@ -322,6 +322,7 @@ public final class Store {
                 self.agents = agents
                 self.conversations = conversations
                 self.preferences = preferences ?? self.preferences
+                self.resetTools()
             }
             
             if self.agents.isEmpty {

@@ -69,6 +69,7 @@ struct PreferencesForm: View {
                 NavigationLink("Services") {
                     ServiceList()
                 }
+                Button("Set Defaults", action: handleSetDefaults)
             } footer: {
                 Text("Manage service configurations like preferred models, authentication tokens and API endpoints.")
             }
@@ -157,10 +158,6 @@ struct PreferencesForm: View {
                 }
             } footer: {
                 Text("Only services with preferred models selected to support the behavior will show up in the picker.")
-            }
-            
-            Section {
-                Button("Set Defaults", action: handleSetDefaults)
             }
             
             Section {

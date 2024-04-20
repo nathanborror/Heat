@@ -15,3 +15,4 @@ agents:
       - generate_images
       - search_web
       - browse_web
+      - remember
