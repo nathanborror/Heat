@@ -40,6 +40,8 @@ struct MessageTool: View {
                 }
                 .scrollIndicators(.hidden)
                 .scrollClipDisabled()
+            case Tool.generateMemory.function.name:
+                MessageToolContent(message: message, symbol: "checkmark.circle")
             default:
                 EmptyView()
             }

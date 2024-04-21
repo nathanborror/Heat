@@ -9,7 +9,9 @@ extension Tool {
             function: .init(
                 name: "remember",
                 description: """
-                    Return a list of things to remember for future conversations.
+                    Return a list of useful things to remember about the user for future conversations. Some examples
+                    include names, important dates, facts about the user, and interests. Basically anything meaninful
+                    that would help relate to the user more.
                     """,
                 parameters: .init(
                     type: .object,

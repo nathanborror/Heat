@@ -16,6 +16,8 @@ struct MessageToolCall: View {
                         MessageToolCallContent(label: "Browsing the web...", symbol: "circle")
                     case Tool.generateImages.function.name:
                         MessageToolCallContent(label: "Generating images...", symbol: "circle")
+                    case Tool.generateMemory.function.name:
+                        MessageToolCallContent(label: "Remembering...", symbol: "circle")
                     default:
                         MessageToolCallContent(label: "\(toolCall.function.name)...", symbol: "questionmark.circle")
                     }
