@@ -12,6 +12,7 @@ import SwiftUI
 import SwiftData
 import OSLog
 import HeatKit
+import HotKey
 
 private let logger = Logger(subsystem: "MainApp", category: "Heat")
 
@@ -24,6 +25,10 @@ struct MainApp: App {
     
     @State private var store = Store.shared
     @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
+    
+    #if os(macOS)
+    private let hotKey = HotKey(key: .h, modifiers: [.command, .option])
+    #endif
     
     var body: some Scene {
         #if os(macOS)
@@ -51,6 +56,7 @@ struct MainApp: App {
             }
             .task {
                 handleRestore()
+                handleHotKeySetup()
             }
         }
         .defaultSize(width: 600, height: 700)
@@ -110,5 +116,17 @@ struct MainApp: App {
     
     func handleNewConversation() {
         conversationViewModel.conversationID = nil
+    }
+    
+    func handleHotKeySetup() {
+        #if os(macOS)
+        hotKey.keyDownHandler = {
+            if let keyWindow = NSApplication.shared.keyWindow {
+                keyWindow.close()
+            } else {
+                NSWorkspace.shared.open(URL(string: "heat://focus")!)
+            }
+        }
+        #endif
     }
 }
