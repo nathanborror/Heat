@@ -68,12 +68,13 @@ public final class MessageManager {
                 // Generate completion
                 if stream {
                     try await service.completionStream(request: req) { delta in
-                        let messageDelta = apply(delta: delta)
+                        let messageDelta = apply(delta: delta, runID: runID)
                         message = messageDelta
                         await callback(messageDelta)
                     }
                 } else {
                     message = try await service.completion(request: req)
+                    message?.runID = runID
                     await append(message: message!)
                     await callback(message!)
                 }
@@ -177,7 +178,10 @@ public final class MessageManager {
     
     // MARK: Appliers
     
-    private func apply(delta message: Message) -> Message {
+    private func apply(delta message: Message, runID: String? = nil) -> Message {
+        var message = message
+        message.runID = runID
+        
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
             let newMessage = messages[index].apply(message)
             messages[index] = newMessage
