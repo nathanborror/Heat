@@ -45,12 +45,12 @@ struct MainApp: App {
             }
             .environment(store)
             .environment(conversationViewModel)
+            .modelContainer(for: Memory.self)
             .task(id: scenePhase) {
                 handlePhaseChange()
             }
             .task {
                 handleRestore()
-            .modelContainer(for: Memory.self)
             }
         }
         .defaultSize(width: 600, height: 700)
