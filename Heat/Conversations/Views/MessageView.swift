@@ -10,23 +10,33 @@ struct MessageView: View {
     let message: Message
     
     var body: some View {
-        if message.content != nil {
-            MessageViewText(message: message, finishReason: message.finishReason)
-                .messageSpacing(message)
-                .messageAttachments(message)
-                .textSelection(.enabled)
-                .padding(.vertical, 8)
-                .opacity(message.kind == .instruction ? 0.3 : 1)
-        }
-        if store.preferences.debug, let toolCalls = message.toolCalls {
-            ForEach(toolCalls, id: \.id) { toolCall in
-                VStack(alignment: .leading) {
-                    Text(toolCall.function.name)
-                    Text(toolCall.function.arguments)
+        Group {
+            if message.role == .system && store.preferences.debug {
+                MessageSystemView(message: message)
+            }
+            if message.role == .user {
+                MessageViewText(message: message)
+                    .messageSpacing(message)
+                    .messageAttachments(message)
+                    .padding(.vertical, 8)
+            }
+            if message.role == .assistant && message.toolCalls == nil {
+                MessageViewText(message: message)
+                    .messageSpacing(message)
+                    .padding(.vertical, 8)
+            }
+            if message.role == .assistant && message.toolCalls != nil {
+                if message.content != nil {
+                    MessageViewText(message: message)
+                        .messageSpacing(message)
+                        .padding(.vertical, 8)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                if store.preferences.debug {
+                    MessageToolCall(message: message)
+                }
+            }
+            if message.role == .tool {
+                MessageTool(message: message)
             }
         }
     }
@@ -36,7 +46,6 @@ struct MessageViewText: View {
     @Environment(\.colorScheme) private var colorScheme
     
     let message: Message
-    let finishReason: Message.FinishReason?
     
     var body: some View {
         switch message.role {
@@ -45,14 +54,37 @@ struct MessageViewText: View {
                 .markdownTheme(.mate)
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
         case .assistant:
-            Markdown(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
+            Markdown(parsedText().restOfText)
                 .markdownTheme(.mate)
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
-        case .system, .tool:
-            Text(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
-                .font(.subheadline)
-                .foregroundStyle(message.kind == .error ? .red : .secondary)
+        default:
+            EmptyView()
         }
+    }
+    
+    func parsedText() -> ParsedText {
+        let text = message.content ?? ""
+        let regex = /<(\w+)>[^<]*<\/\1>/
+        let matches = text.matches(of: regex)
+        
+        var tagContents: [String: String] = [:]
+        var strippedText = text
+        
+        for match in matches {
+            let tagName = String(match.output.1)
+            let tagContent = match.output.0.replacingOccurrences(of: "<\\w+>|</\\w+>", with: "", options: .regularExpression)
+            
+            tagContents[tagName] = tagContent
+            strippedText = strippedText.replacingOccurrences(of: match.output.0, with: "")
+        }
+        
+        let restOfText = strippedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return ParsedText(tagContents: tagContents, restOfText: restOfText)
+    }
+    
+    struct ParsedText {
+        var tagContents: [String: String]
+        var restOfText: String
     }
     
     #if os(macOS)

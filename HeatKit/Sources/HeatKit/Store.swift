@@ -377,6 +377,7 @@ public final class Store {
         let store = Store(persistence: MemoryPersistence.shared)
         store.agents = [.preview]
         store.conversations = [.preview1, .preview2]
+        store.preferences.debug = true
         return store
     }()
 }

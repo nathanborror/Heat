@@ -261,7 +261,8 @@ struct ConversationInput: View {
     }
     
     private var hasVisionAsset: Bool {
-        let message = conversationViewModel.messagesVisible.first { message in
+        let visible = conversationViewModel.messages.filter { $0.kind != .instruction }
+        let message = visible.first { message in
             let attachment = message.attachments.first { attachment in
                 switch attachment {
                 case .agent, .automation, .component:

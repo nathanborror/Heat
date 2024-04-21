@@ -14,18 +14,18 @@ struct MessageTool: View {
             switch message.name {
             case Tool.generateWebSearch.function.name:
                 Button(action: { isShowingContext = true }) {
-                    MessageToolContent(message: message, symbol: "macwindow")
+                    MessageToolContent(message: message, symbol: "checkmark.circle")
                 }
                 .buttonStyle(.plain)
                 .tint(.secondary)
             case Tool.generateWebBrowse.function.name:
                 Button(action: { isShowingContext = true }) {
-                    MessageToolContent(message: message, symbol: "macwindow.and.cursorarrow")
+                    MessageToolContent(message: message, symbol: "checkmark.circle")
                 }
                 .buttonStyle(.plain)
                 .tint(.secondary)
             case Tool.generateImages.function.name:
-                MessageToolContent(message: message, symbol: "photo")
+                MessageToolContent(message: message, symbol: "checkmark.circle")
                 ScrollView(.horizontal) {
                     HStack {
                         ForEach(message.attachments.indices, id: \.self) { index in
@@ -89,7 +89,7 @@ struct MessageToolContent: View {
         }
         .font(.subheadline)
         .foregroundStyle(.secondary)
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 

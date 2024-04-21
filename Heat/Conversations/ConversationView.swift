@@ -26,13 +26,8 @@ struct ConversationView: View {
                     .padding(.vertical, 64)
                     
                     // Show message history
-                    ForEach(conversationViewModel.messagesVisible) { message in
-                        switch message.role {
-                        case .system, .user, .assistant:
-                            MessageView(message: message)
-                        case .tool:
-                            MessageTool(message: message)
-                        }
+                    ForEach(conversationViewModel.messages) { message in
+                        MessageView(message: message)
                     }
                     
                     VStack(spacing: 0) {
@@ -98,7 +93,7 @@ struct ConversationView: View {
     }
     
     private var hasHistory: Bool {
-        !conversationViewModel.messagesVisible.isEmpty
+        !conversationViewModel.messages.filter { $0.kind != .instruction }.isEmpty
     }
 }
 

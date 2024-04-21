@@ -36,6 +36,8 @@
 		D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698C2B9CF19000C53D4D /* MessageTool.swift */; };
 		D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
+		D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */; };
+		D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */; };
 		D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageView.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
 		D8E1FC182B704CDD006C9366 /* ServiceForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC172B704CDD006C9366 /* ServiceForm.swift */; };
@@ -70,6 +72,8 @@
 		D815698C2B9CF19000C53D4D /* MessageTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTool.swift; sourceTree = "<group>"; };
 		D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryList.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
+		D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageToolCall.swift; sourceTree = "<group>"; };
+		D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSystemView.swift; sourceTree = "<group>"; };
 		D88D23082B3CFB5100CCCC61 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
 		D8E1FC172B704CDD006C9366 /* ServiceForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceForm.swift; sourceTree = "<group>"; };
@@ -186,6 +190,8 @@
 			children = (
 				D88D23082B3CFB5100CCCC61 /* MessageView.swift */,
 				D815698C2B9CF19000C53D4D /* MessageTool.swift */,
+				D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */,
+				D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */,
 				D45CC1F92B8A5C1A009DFDF4 /* SuggestionsList.swift */,
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 			);
@@ -316,6 +322,8 @@
 				D4B2D2692B6563DB0017FB52 /* ConversationInput.swift in Sources */,
 				D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */,
 				D8E1FC1A2B704CE3006C9366 /* ServiceList.swift in Sources */,
+				D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */,
+				D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */,
 				D4713D702AEAB9670005597E /* Operators.swift in Sources */,
 				D41E193E2AE4CD20002516C1 /* PictureView.swift in Sources */,
 				D41E193B2AE4C759002516C1 /* ConversationView.swift in Sources */,

@@ -23,14 +23,6 @@ final class ConversationViewModel {
         store.get(conversationID: conversationID)
     }
     
-    var messagesVisible: [Message] {
-        if store.preferences.debug {
-            conversation?.messages ?? []
-        } else {
-            conversation?.messages.filter { $0.kind != .instruction } ?? []
-        }
-    }
-    
     var title: String {
         conversation?.title ?? Conversation.titlePlaceholder
     }

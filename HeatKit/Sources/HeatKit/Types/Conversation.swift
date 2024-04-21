@@ -95,20 +95,83 @@ extension Conversation {
     public static var preview2: Conversation = {
         .init(
             messages: Agent.preview.instructions + [
-                .init(role: .assistant, content: "What can I help you with today?"),
                 .init(role: .user, content: "What are the latest Apple rumors?"),
-                .init(role: .tool, name: Tool.generateWebSearch.function.name, metadata: ["label": "Searched the web for 'latest apple rumors'"]),
+                .init(
+                    role: .assistant,
+                    toolCalls: [
+                        .init(
+                            function: .init(
+                                name: Tool.generateWebSearch.function.name,
+                                arguments: """
+                                    {"query": "latest apple rumors"}
+                                    """
+                            )
+                        ),
+                    ],
+                    runID: "preview-run"
+                ),
+                .init(
+                    role: .tool,
+                    runID: "preview-run",
+                    name: Tool.generateWebSearch.function.name,
+                    metadata: ["label": "Searched the web for 'latest apple rumors'"]
+                ),
+                .init(
+                    role: .assistant,
+                    toolCalls: [
+                        .init(
+                            function: .init(
+                                name: Tool.generateWebBrowse.function.name,
+                                arguments: """
+                                    {"instructions": "Summarize the key rumors about apple products in 2024", "url": "https://macrumors.com"}
+                                    """
+                            )
+                        ),
+                        .init(
+                            function: .init(
+                                name: Tool.generateWebBrowse.function.name,
+                                arguments: """
+                                    {"instructions": "Summarize the key rumors about apple products in 2024", "url": "https://9to5mac.com"}
+                                    """
+                            )
+                        ),
+                        .init(
+                            function: .init(
+                                name: Tool.generateWebBrowse.function.name,
+                                arguments: """
+                                    {"instructions": "Summarize the key rumors about apple products in 2024", "url": "https://cnet.com"}
+                                    """
+                            )
+                        ),
+                    ],
+                    runID: "preview-run"
+                ),
                 .init(
                     role: .tool,
                     content: """
-                        [
-                            {"url": "macrumors.com", "summary": "iPad Models: Updates are expected for the iPad Air and iPad Pro models around late March/Early April, with potential changes across all iPad models later in the year."},
-                            {"url": "9to5mac.com", "summary": "iPhone 16 and iPhone 16 Pro: These are anticipated for a September launch, with rumors of a new design and updated features."},
-                            {"url": "cnet.com", "summary": "AirPods: Updates might come to the AirPods lineup, including a new version of AirPods Max and a potential new set of AirPods with Active Noise Cancellation."}
-                        ]
+                        {"url": "macrumors.com", "summary": "iPad Models: Updates are expected for the iPad Air and iPad Pro models around late March/Early April, with potential changes across all iPad models later in the year."}
                         """,
+                    runID: "preview-run",
                     name: Tool.generateWebBrowse.function.name,
-                    metadata: ["label": "Read wikipedia.org"]
+                    metadata: ["label": "Read macrumors.com"]
+                ),
+                .init(
+                    role: .tool,
+                    content: """
+                        {"url": "9to5mac.com", "summary": "iPhone 16 and iPhone 16 Pro: These are anticipated for a September launch, with rumors of a new design and updated features."},
+                        """,
+                    runID: "preview-run",
+                    name: Tool.generateWebBrowse.function.name,
+                    metadata: ["label": "Read 9to5mac.com"]
+                ),
+                .init(
+                    role: .tool,
+                    content: """
+                        {"url": "cnet.com", "summary": "AirPods: Updates might come to the AirPods lineup, including a new version of AirPods Max and a potential new set of AirPods with Active Noise Cancellation."}
+                        """,
+                    runID: "preview-run",
+                    name: Tool.generateWebBrowse.function.name,
+                    metadata: ["label": "Read cnet.com"]
                 ),
                 .init(
                     role: .assistant,
@@ -118,7 +181,8 @@ extension Conversation {
                         1. iPad Models: Updates are expected for the iPad Air and iPad Pro models around late March/Early April, with potential changes across all iPad models later in the year.
                         2. iPhone 16 and iPhone 16 Pro: These are anticipated for a September launch, with rumors of a new design and updated features.
                         3. AirPods: Updates might come to the AirPods lineup, including a new version of AirPods Max and a potential new set of AirPods with Active Noise Cancellation.
-                        """
+                        """,
+                    runID: "preview-run"
                 ),
             ],
             suggestions: [
