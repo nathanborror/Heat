@@ -25,6 +25,7 @@ struct MainApp: App {
     
     @State private var store = Store.shared
     @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
+    @State private var searchInput = ""
     
     #if os(macOS)
     private let hotKey = HotKey(key: .h, modifiers: [.command, .option])
@@ -38,15 +39,6 @@ struct MainApp: App {
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
                 ConversationView()
-                    #if !os(macOS)
-                    .toolbar {
-                        ToolbarItem(placement: .primaryAction) {
-                            Button(action: handleNewConversation) {
-                                Label("New Conversation", systemImage: "plus")
-                            }
-                        }
-                    }
-                    #endif
             }
             .environment(store)
             .environment(conversationViewModel)
