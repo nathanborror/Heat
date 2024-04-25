@@ -91,10 +91,6 @@ struct ConversationView: View {
             logger.warning("failed to submit: \(error)")
         }
     }
-    
-    private var hasHistory: Bool {
-        !conversationViewModel.messages.filter { $0.kind != .instruction }.isEmpty
-    }
 }
 
 #Preview("New") {

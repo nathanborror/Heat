@@ -39,6 +39,12 @@
 		D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */; };
 		D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */; };
 		D884AAC82BD5A6A500B90E9B /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = D884AAC72BD5A6A500B90E9B /* HotKey */; };
+		D884AAF52BD7F50E00B90E9B /* FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */; };
+		D884AAF72BD7F52600B90E9B /* LauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF62BD7F52600B90E9B /* LauncherView.swift */; };
+		D884AAF92BD7F54500B90E9B /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF82BD7F54500B90E9B /* VisualEffectView.swift */; };
+		D884AAFC2BD7F65600B90E9B /* LauncherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAFB2BD7F65600B90E9B /* LauncherViewModel.swift */; };
+		D884AAFE2BD9B40000B90E9B /* PermissionsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAFD2BD9B40000B90E9B /* PermissionsList.swift */; };
+		D884AB002BD9B9DE00B90E9B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAFF2BD9B9DE00B90E9B /* LocationManager.swift */; };
 		D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageView.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
 		D8E1FC182B704CDD006C9366 /* ServiceForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC172B704CDD006C9366 /* ServiceForm.swift */; };
@@ -75,6 +81,12 @@
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageToolCall.swift; sourceTree = "<group>"; };
 		D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSystemView.swift; sourceTree = "<group>"; };
+		D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
+		D884AAF62BD7F52600B90E9B /* LauncherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherView.swift; sourceTree = "<group>"; };
+		D884AAF82BD7F54500B90E9B /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
+		D884AAFB2BD7F65600B90E9B /* LauncherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherViewModel.swift; sourceTree = "<group>"; };
+		D884AAFD2BD9B40000B90E9B /* PermissionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsList.swift; sourceTree = "<group>"; };
+		D884AAFF2BD9B9DE00B90E9B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		D88D23082B3CFB5100CCCC61 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
 		D8E1FC172B704CDD006C9366 /* ServiceForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceForm.swift; sourceTree = "<group>"; };
@@ -124,6 +136,7 @@
 			children = (
 				D41E191E2AE45C9B002516C1 /* MainApp.swift */,
 				D4017C8A2B6EEF01001CE137 /* MainCompactView.swift */,
+				D884AAFA2BD7F64A00B90E9B /* Launcher */,
 				D8247E2C2BD41C3100D918C0 /* Memory */,
 				D8E1FC162B704CD2006C9366 /* Preferences */,
 				D41E19492AE58D1B002516C1 /* Agents */,
@@ -162,6 +175,9 @@
 				D4713D6F2AEAB9670005597E /* Operators.swift */,
 				D4FECDD22B817A3900E1BA13 /* HapticManager.swift */,
 				D4A2C5682B8BF9EC0004F27B /* Markdown.swift */,
+				D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */,
+				D884AAF82BD7F54500B90E9B /* VisualEffectView.swift */,
+				D884AAFF2BD9B9DE00B90E9B /* LocationManager.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -208,6 +224,15 @@
 			path = Memory;
 			sourceTree = "<group>";
 		};
+		D884AAFA2BD7F64A00B90E9B /* Launcher */ = {
+			isa = PBXGroup;
+			children = (
+				D884AAF62BD7F52600B90E9B /* LauncherView.swift */,
+				D884AAFB2BD7F65600B90E9B /* LauncherViewModel.swift */,
+			);
+			path = Launcher;
+			sourceTree = "<group>";
+		};
 		D88D23072B3CFB2C00CCCC61 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -224,6 +249,7 @@
 				D41E194B2AE591EA002516C1 /* PreferencesForm.swift */,
 				D8E1FC192B704CE3006C9366 /* ServiceList.swift */,
 				D8E1FC172B704CDD006C9366 /* ServiceForm.swift */,
+				D884AAFD2BD9B40000B90E9B /* PermissionsList.swift */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -315,20 +341,26 @@
 			files = (
 				D4A2C5692B8BF9EC0004F27B /* Markdown.swift in Sources */,
 				D4B2D2672B649DFD0017FB52 /* ConversationList.swift in Sources */,
+				D884AAF52BD7F50E00B90E9B /* FloatingPanel.swift in Sources */,
 				D8E1FC182B704CDD006C9366 /* ServiceForm.swift in Sources */,
 				D8FBB20D2AEDB60700783E9B /* AgentList.swift in Sources */,
+				D884AAF92BD7F54500B90E9B /* VisualEffectView.swift in Sources */,
 				D4A2C5672B8BF9CE0004F27B /* MarkdownUI+.swift in Sources */,
+				D884AAFE2BD9B40000B90E9B /* PermissionsList.swift in Sources */,
 				D4017C902B6EEFB5001CE137 /* Asset+.swift in Sources */,
 				D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */,
 				D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */,
+				D884AAF72BD7F52600B90E9B /* LauncherView.swift in Sources */,
 				D41E191F2AE45C9B002516C1 /* MainApp.swift in Sources */,
 				D41E19402AE4CD4F002516C1 /* VideoView.swift in Sources */,
+				D884AB002BD9B9DE00B90E9B /* LocationManager.swift in Sources */,
 				D4B2D2692B6563DB0017FB52 /* ConversationInput.swift in Sources */,
 				D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */,
 				D8E1FC1A2B704CE3006C9366 /* ServiceList.swift in Sources */,
 				D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */,
 				D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */,
 				D4713D702AEAB9670005597E /* Operators.swift in Sources */,
+				D884AAFC2BD7F65600B90E9B /* LauncherViewModel.swift in Sources */,
 				D41E193E2AE4CD20002516C1 /* PictureView.swift in Sources */,
 				D41E193B2AE4C759002516C1 /* ConversationView.swift in Sources */,
 				D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */,
@@ -475,10 +507,12 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Heat/Preview Content\"";
 				DEVELOPMENT_TEAM = 294VZ3T33E;
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Heat/Resources/Info.plist;
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "Manage your home accessories from Heat.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location is provided as additional context to personalize Heat.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -515,10 +549,12 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Heat/Preview Content\"";
 				DEVELOPMENT_TEAM = 294VZ3T33E;
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Heat/Resources/Info.plist;
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "Manage your home accessories from Heat.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location is provided as additional context to personalize Heat.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

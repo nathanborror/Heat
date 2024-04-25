@@ -13,6 +13,8 @@ import SwiftData
 import OSLog
 import HeatKit
 import HotKey
+import CoreServices
+import EventKit
 
 private let logger = Logger(subsystem: "MainApp", category: "Heat")
 
@@ -25,10 +27,13 @@ struct MainApp: App {
     
     @State private var store = Store.shared
     @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
+    @State private var launcherViewModel = LauncherViewModel(store: Store.shared)
     @State private var searchInput = ""
+    @State private var showingLauncher = false
+    @State private var isRestoring = false
     
     #if os(macOS)
-    private let hotKey = HotKey(key: .h, modifiers: [.command, .option])
+    private let hotKey = HotKey(key: .space, modifiers: [.shift, .control])
     #endif
     
     var body: some Scene {
@@ -43,12 +48,18 @@ struct MainApp: App {
             .environment(store)
             .environment(conversationViewModel)
             .modelContainer(for: Memory.self)
+            .task {
+                await handleRestore()
+                handleHotKeySetup()
+            }
             .task(id: scenePhase) {
                 handlePhaseChange()
             }
-            .task {
-                handleRestore()
-                handleHotKeySetup()
+            .floatingPanel(isPresented: $showingLauncher) {
+                LauncherView()
+                    .environment(store)
+                    .environment(launcherViewModel)
+                    .modelContainer(for: Memory.self)
             }
         }
         .defaultSize(width: 600, height: 700)
@@ -77,13 +88,14 @@ struct MainApp: App {
                     handlePhaseChange()
                 }
                 .task {
-                    handleRestore()
+                    await handleRestore()
                 }
         }
         #endif
     }
     
     func handlePhaseChange() {
+        guard !isRestoring else { return }
         #if os(macOS)
         guard scenePhase == .inactive else { return }
         #else
@@ -92,13 +104,13 @@ struct MainApp: App {
         handleSave()
     }
     
-    func handleRestore() {
-        Task {
-            do {
-                try await store.restore()
-            } catch {
-                logger.warning("failed to restore: \(error)")
-            }
+    func handleRestore() async {
+        do {
+            isRestoring = true
+            try await store.restore()
+            isRestoring = false
+        } catch {
+            logger.warning("failed to restore: \(error)")
         }
     }
     
@@ -113,11 +125,7 @@ struct MainApp: App {
     func handleHotKeySetup() {
         #if os(macOS)
         hotKey.keyDownHandler = {
-            if let keyWindow = NSApplication.shared.keyWindow {
-                keyWindow.close()
-            } else {
-                NSWorkspace.shared.open(URL(string: "heat://focus")!)
-            }
+            showingLauncher.toggle()
         }
         #endif
     }

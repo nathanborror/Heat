@@ -87,8 +87,7 @@ extension Conversation {
                 "What is the first law of thermodynamics?",
                 "Explain thermal equilibrium.",
                 "How does the zeroth law apply in real life?",
-            ],
-            state: .processing
+            ]
         )
     }()
     
@@ -101,7 +100,7 @@ extension Conversation {
                     toolCalls: [
                         .init(
                             function: .init(
-                                name: Tool.generateWebSearch.function.name,
+                                name: Tool.searchWeb.function.name,
                                 arguments: """
                                     {"query": "latest apple rumors"}
                                     """
@@ -113,7 +112,7 @@ extension Conversation {
                 .init(
                     role: .tool,
                     runID: "preview-run",
-                    name: Tool.generateWebSearch.function.name,
+                    name: Tool.searchWeb.function.name,
                     metadata: ["label": "Searched the web for 'latest apple rumors'"]
                 ),
                 .init(

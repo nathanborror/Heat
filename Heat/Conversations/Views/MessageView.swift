@@ -53,10 +53,12 @@ struct MessageViewText: View {
             Markdown(message.content ?? "")
                 .markdownTheme(.mate)
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
+                .textSelection(.enabled)
         case .assistant:
             Markdown(parsedText().restOfText)
                 .markdownTheme(.mate)
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
+                .textSelection(.enabled)
         default:
             EmptyView()
         }

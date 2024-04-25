@@ -261,9 +261,9 @@ public final class MessageManager {
         switch toolCall.function.name {
         
         // Web search
-        case Tool.generateWebSearch.function.name:
+        case Tool.searchWeb.function.name:
             do {
-                let obj = try Tool.GenerateWebSearch.decode(toolCall.function.arguments)
+                let obj = try Tool.SearchWeb.decode(toolCall.function.arguments)
                 let response = try await prepareSearchResults(obj.query)
                 let toolResponse = Message(
                     role: .tool,
@@ -282,6 +282,19 @@ public final class MessageManager {
                 )
                 return ([toolFailed], true)
             }
+        
+        // File search
+        case Tool.searchFiles.function.name:
+            let obj = try Tool.SearchFiles.decode(toolCall.function.arguments)
+            let results = try SpotlightManager().query(obj.query, kind: .init(rawValue: obj.kind ?? ""))
+            let toolResponse = Message(
+                role: .tool,
+                content: results.joined(separator: "\n"),
+                toolCallID: toolCall.id,
+                name: toolCall.function.name,
+                metadata: ["label": "Searched files for '\(obj.query)'"]
+            )
+            return ([toolResponse], true)
             
         // Web browser
         case Tool.generateWebBrowse.function.name:
@@ -328,6 +341,20 @@ public final class MessageManager {
                 metadata: ["label": obj.items.count == 1 ? "Stored memory" : "Stored \(obj.items.count) memories"]
             )
             return ([toolResponse], true)
+        
+        // Calendar search
+        case Tool.searchCalendar.function.name:
+            let obj = try Tool.SearchCalendar.decode(toolCall.function.arguments)
+            let events = CalendarManager().events(between: obj.start, end: obj.end)
+            
+            let toolResponse = Message(
+                role: .tool,
+                content: events.map { $0.title }.joined(separator: "\n"),
+                toolCallID: toolCall.id,
+                name: toolCall.function.name,
+                metadata: ["label": "Found \(events.count) calendar items."]
+            )
+            return ([toolResponse], true)
             
         // Unknown tool
         default:
@@ -344,7 +371,7 @@ public final class MessageManager {
     
     private func prepareSearchResults(_ query: String) async throws -> String? {
         let searchResponse = try await SearchManager.shared.search(query: query)
-        let toolResponse = Tool.GenerateWebSearchResponse(
+        let toolResponse = Tool.SearchWebResponse(
             instructions: """
                 Do not perform another search unless the results below are unhelpful. Pick the three most relevant \
                 results to browse the webpages using the `\(Tool.generateWebBrowse.function.name)` function. When you \

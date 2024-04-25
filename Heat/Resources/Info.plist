@@ -15,12 +15,16 @@
 			</array>
 		</dict>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Manage your calendar from Heat.</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Manage your reminders from Heat.</string>
 </dict>
 </plist>

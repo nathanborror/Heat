@@ -12,7 +12,15 @@ struct MessageTool: View {
     var body: some View {
         VStack(alignment: .leading) {
             switch message.name {
-            case Tool.generateWebSearch.function.name:
+            case Tool.searchWeb.function.name:
+                Button(action: { isShowingContext = true }) {
+                    MessageToolContent(message: message, symbol: "checkmark.circle")
+                }
+                .buttonStyle(.plain)
+                .tint(.secondary)
+            case Tool.searchCalendar.function.name:
+                MessageToolContent(message: message, symbol: "checkmark.circle")
+            case Tool.searchFiles.function.name:
                 Button(action: { isShowingContext = true }) {
                     MessageToolContent(message: message, symbol: "checkmark.circle")
                 }
@@ -43,14 +51,14 @@ struct MessageTool: View {
             case Tool.generateMemory.function.name:
                 MessageToolContent(message: message, symbol: "checkmark.circle")
             default:
-                EmptyView()
+                MessageToolContent(message: message, symbol: "questionmark.circle")
             }
         }
         .sheet(isPresented: $isShowingContext) {
             NavigationStack {
                 ScrollView {
                     switch message.name {
-                    case Tool.generateWebSearch.function.name:
+                    case Tool.searchWeb.function.name:
                         VStack {
                             Text(message.content ?? "None")
                                 .textSelection(.enabled)
@@ -80,17 +88,28 @@ struct MessageTool: View {
 }
 
 struct MessageToolContent: View {
+    @Environment(Store.self) var store
+    
     let message: Message
     let symbol: String
     
     var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Image(systemName: symbol)
-            Text(message.metadata.label)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading) {
+            HStack(alignment: .firstTextBaseline) {
+                Image(systemName: symbol)
+                Text(message.metadata.label)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            
+            if store.preferences.debug, let content = message.content {
+                Text(content)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary.opacity(0.5))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
         .padding(.vertical, 2)
     }
 }

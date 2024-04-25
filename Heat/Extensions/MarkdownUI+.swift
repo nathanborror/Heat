@@ -77,7 +77,7 @@ extension MarkdownUI.Theme {
     static let fontSize: CGFloat = 17
     static let monospacedSize: CGFloat = 14
     static let lineSpacing: CGFloat = 2
-    static let cornerRadius: CGFloat = 20
+    static let cornerRadius: CGFloat = 10
     static let paddingHorizontal: CGFloat = 16
     static let paddingVertical: CGFloat = 10
     #endif

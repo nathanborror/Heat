@@ -59,21 +59,23 @@ struct PreferencesForm: View {
                 Text("Used to start new conversations.")
             }
             
+            #if !os(macOS)
+            Section {
+                NavigationLink("Model Services") {
+                    ServiceList()
+                }
+                NavigationLink("Permissions") {
+                    PermissionsList()
+                }
+            } footer: {
+                Text("Manage service configurations and permissions to external data sources.")
+            }
+            #endif
+            
             Section {
                 Toggle("Stream responses", isOn: $store.preferences.shouldStream)
                 Toggle("Debug", isOn: $store.preferences.debug)
             }
-            
-            #if !os(macOS)
-            Section {
-                NavigationLink("Services") {
-                    ServiceList()
-                }
-                Button("Set Defaults", action: handleSetDefaults)
-            } footer: {
-                Text("Manage service configurations like preferred models, authentication tokens and API endpoints.")
-            }
-            #endif
             
             Section {
                 Picker("Chats", selection: Binding(
@@ -161,6 +163,7 @@ struct PreferencesForm: View {
             }
             
             Section {
+                Button("Reset Services", action: handleServicesReset)
                 Button("Reset Agents", action: handleAgentReset)
                 Button("Delete All Data", role: .destructive, action: { isShowingDeleteConfirmation = true })
             }
@@ -176,19 +179,14 @@ struct PreferencesForm: View {
     func handleAgentReset() {
         do {
             try store.resetAgents()
-            Task { try await store.saveAll() }
+            handleSave()
             dismiss()
         } catch {
             print(error)
         }
     }
     
-    func handleDeleteAll() {
-        store.deleteAll()
-        dismiss()
-    }
-    
-    func handleSetDefaults() {
+    func handleServicesReset() {
         store.preferences.preferredChatServiceID = .openAI
         store.preferences.preferredImageServiceID = .openAI
         store.preferences.preferredEmbeddingServiceID = .openAI
@@ -197,6 +195,17 @@ struct PreferencesForm: View {
         store.preferences.preferredVisionServiceID = .openAI
         store.preferences.preferredSpeechServiceID = .openAI
         store.preferences.preferredSummarizationServiceID = .openAI
+        handleSave()
+    }
+    
+    func handleDeleteAll() {
+        store.deleteAll()
+        handleSave()
+        dismiss()
+    }
+    
+    func handleSave() {
+        Task { try await store.saveAll() }
     }
 }
 
@@ -206,7 +215,7 @@ struct PreferencesWindow: View {
     @State var selection = Tabs.general
     
     enum Tabs: Hashable {
-        case general, services, agents
+        case general, services, agents, permissions
     }
     
     var body: some View {
@@ -230,7 +239,14 @@ struct PreferencesWindow: View {
                 .frame(width: 400)
                 .tag(Tabs.agents)
                 .tabItem {
-                    Label("Agents", systemImage: "person.crop.rectangle.stack")
+                    Label("Agents", systemImage: "network")
+                }
+            PermissionsList()
+                .padding(20)
+                .frame(width: 400)
+                .tag(Tabs.permissions)
+                .tabItem {
+                    Label("Permissions", systemImage: "hand.raised")
                 }
         }
     }
