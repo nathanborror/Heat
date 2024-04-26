@@ -14,16 +14,6 @@ struct ConversationView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(spacing: 0) {
-                    HStack {
-                        Image("IconLight")
-                            .resizable()
-                            .frame(width: 48, height: 48)
-                            .padding(4)
-                            .background(.primary.opacity(0.1))
-                            .clipShape(Squircle())
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 64)
                     
                     // Show message history
                     ForEach(conversationViewModel.messages) { message in
@@ -49,9 +39,10 @@ struct ConversationView: View {
                             .padding(.vertical, 8)
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .id("bottom")
                 }
-                .padding(.horizontal, 24)
+                .padding(24)
             }
             .task(id: conversationViewModel.conversation) {
                 proxy.scrollTo("bottom")
