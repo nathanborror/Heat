@@ -15,7 +15,10 @@ extension Tool {
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "title": .init(type: .string, description: "A short title")
+                        "title": .init(
+                            type: .string,
+                            description: "A short title"
+                        )
                     ]
                 )
             )

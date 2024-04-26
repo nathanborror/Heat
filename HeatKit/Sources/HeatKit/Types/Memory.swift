@@ -17,6 +17,8 @@ public final class Memory {
     }
 }
 
+// MARK: - Preview
+
 extension Memory {
     
     static var preview: Self {

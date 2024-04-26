@@ -311,12 +311,7 @@ public final class Store {
     static private var conversationsJSON = "conversations.json"
     static private var preferencesJSON = "preferences.json"
     
-    public func restore() async throws {
-        // Reset all data when new version is available
-        if BundleVersion.shared.isBundleVersionNew() {
-            deleteAll()
-            return
-        }
+    public func restoreAll() async throws {
         do {
             let agents: [Agent] = try await persistence.load(objects: Self.agentsJSON)
             let conversations: [Conversation] = try await persistence.load(objects: Self.conversationsJSON)
@@ -332,33 +327,32 @@ public final class Store {
             if self.agents.isEmpty {
                 try resetAgents()
             }
+            logger.info("Persistence: all data restored")
         } catch {
-            logger.warning("failed to restore, resetting")
+            logger.warning("Persistence: all data failed to restore")
             try resetAll()
         }
-        
-        logger.info("Persistence: data restored")
     }
     
     public func saveAll() async throws {
         try await persistence.save(filename: Self.agentsJSON, objects: agents)
         try await persistence.save(filename: Self.conversationsJSON, objects: conversations)
         try await persistence.save(filename: Self.preferencesJSON, object: preferences)
-        
-        logger.info("Persistence: data saved")
+        logger.info("Persistence: all data saved")
     }
     
-    public func deleteAll() {
-        try? persistence.delete(filename: Self.agentsJSON)
-        try? persistence.delete(filename: Self.conversationsJSON)
-        try? persistence.delete(filename: Self.preferencesJSON)
-        try? resetAll()
+    public func deleteAll() throws {
+        try persistence.deleteAll()
+        try resetAll()
+        logger.info("Persistence: all data deleted")
     }
     
     public func resetAll() throws {
-        self.conversations = []
-        self.preferences = .init()
-        try self.resetAgents()
+        agents = []
+        conversations = []
+        preferences = .init()
+        try resetAgents()
+        logger.info("Persistence: all data reset")
     }
     
     public func resetAgents() throws {
@@ -372,7 +366,15 @@ public final class Store {
     }
     
     public func resetTools() {
-        self.tools = Constants.defaultTools
+        self.tools = [
+            .generateImages,
+            .generateWebBrowse,
+            .searchCalendar,
+            .createCalendarEvent,
+            .searchWeb,
+            .searchFiles,
+            .generateMemory,
+        ]
     }
     
     // MARK: - Preview

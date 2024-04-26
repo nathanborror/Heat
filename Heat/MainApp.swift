@@ -127,7 +127,7 @@ struct MainApp: App {
     func handleRestore() async {
         do {
             isRestoring = true
-            try await store.restore()
+            try await store.restoreAll()
             showingBarrier = !store.isChatAvailable
             isRestoring = false
         } catch {

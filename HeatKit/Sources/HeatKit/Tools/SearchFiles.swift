@@ -14,8 +14,15 @@ extension Tool {
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "query": .init(type: .string, description: "A search query"),
-                        "kind": .init(type: .string, description: "An optional filter to restrict what kind of files to return.", enumValues: SpotlightManager.Kind.allCases.map { $0.rawValue })
+                        "query": .init(
+                            type: .string, 
+                            description: "A search query"
+                        ),
+                        "kind": .init(
+                            type: .string,
+                            description: "An optional filter to restrict what kind of files to return.", 
+                            enumValues: SpotlightManager.Kind.allCases.map { $0.rawValue }
+                        )
                     ],
                     required: ["query"]
                 )

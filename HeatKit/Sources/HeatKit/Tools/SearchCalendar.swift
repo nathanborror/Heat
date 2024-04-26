@@ -14,9 +14,20 @@ extension Tool {
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "start": .init(type: .string, description: "A start date. (Example: 2024-01-02)", format: "date"),
-                        "end": .init(type: .string, description: "An end date. (Example: 2024-02-02)", format: "date"),
-                        "query": .init(type: .string, description: "An optional search query"),
+                        "start": .init(
+                            type: .string,
+                            description: "A start date. (Example: 2024-01-02)",
+                            format: "date"
+                        ),
+                        "end": .init(
+                            type: .string, 
+                            description: "An end date. (Example: 2024-02-02)", 
+                            format: "date"
+                        ),
+                        "query": .init(
+                            type: .string, 
+                            description: "An optional search query"
+                        ),
                     ],
                     required: ["start", "end"]
                 )

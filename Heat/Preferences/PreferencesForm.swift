@@ -199,7 +199,7 @@ struct PreferencesForm: View {
     }
     
     func handleDeleteAll() {
-        store.deleteAll()
+        try? store.deleteAll()
         handleSave()
         dismiss()
     }

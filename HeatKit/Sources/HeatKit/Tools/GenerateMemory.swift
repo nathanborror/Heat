@@ -16,7 +16,11 @@ extension Tool {
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "items": .init(type: .array, description: "A short description of what to remember.", items: .init(type: .string)),
+                        "items": .init(
+                            type: .array,
+                            description: "A short description of what to remember.",
+                            items: .init(type: .string)
+                        ),
                     ],
                     required: ["items"]
                 )

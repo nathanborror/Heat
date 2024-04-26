@@ -15,7 +15,11 @@ extension Tool {
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "prompts": .init(type: .array, description: "A list of short replies", items: .init(type: .string, minItems: 2, maxItems: 3)),
+                        "prompts": .init(
+                            type: .array,
+                            description: "A list of short replies",
+                            items: .init(type: .string, minItems: 2, maxItems: 3)
+                        ),
                     ],
                     required: ["prompts"]
                 )

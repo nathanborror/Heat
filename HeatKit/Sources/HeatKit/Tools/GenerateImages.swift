@@ -12,7 +12,11 @@ extension Tool {
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "prompts": .init(type: .array, description: "A list of detailed prompts describing images to generate.", items: .init(type: .string, minItems: 1, maxItems: 9)),
+                        "prompts": .init(
+                            type: .array,
+                            description: "A list of detailed prompts describing images to generate.",
+                            items: .init(type: .string, minItems: 1, maxItems: 9)
+                        ),
                     ],
                     required: ["prompts"]
                 )

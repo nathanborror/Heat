@@ -12,7 +12,10 @@ extension Tool {
                 parameters: .init(
                     type: .object,
                     properties: [
-                        "query": .init(type: .string, description: "A web search query"),
+                        "query": .init(
+                            type: .string,
+                            description: "A web search query"
+                        ),
                     ],
                     required: ["query"]
                 )
