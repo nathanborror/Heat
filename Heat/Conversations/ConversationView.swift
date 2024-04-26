@@ -15,7 +15,7 @@ struct ConversationView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     HStack {
-                        Image("Icon")
+                        Image("IconLight")
                             .resizable()
                             .frame(width: 48, height: 48)
                             .padding(4)

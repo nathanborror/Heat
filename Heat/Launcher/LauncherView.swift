@@ -23,7 +23,7 @@ struct LauncherView: View {
     var body: some View {
         LauncherPanel(isShowingContent: $isShowingContent) {
             HStack {
-                Image("LaunchIcon")
+                Image("IconDark")
                     .resizable()
                     .frame(width: 32, height: 32)
                     .opacity(0.1)
