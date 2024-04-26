@@ -18,7 +18,7 @@ extension Tool {
                         "end": .init(type: .string, description: "An end date. (Example: 2024-02-02)", format: "date"),
                         "query": .init(type: .string, description: "An optional search query"),
                     ],
-                    required: ["start_date", "end_date"]
+                    required: ["start", "end"]
                 )
             )
         )
