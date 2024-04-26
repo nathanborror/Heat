@@ -121,15 +121,15 @@ struct ServiceForm: View {
         
         switch service.id {
         case .openAI:
-            service.applyDefaults(defaults: Constants.openAIDefaults)
+            service.applyPreferredModels(Constants.openAIDefaults)
         case .anthropic:
-            service.applyDefaults(defaults: Constants.anthropicDefaults)
+            service.applyPreferredModels(Constants.anthropicDefaults)
         case .mistral:
-            service.applyDefaults(defaults: Constants.mistralDefaults)
+            service.applyPreferredModels(Constants.mistralDefaults)
         case .perplexity:
-            service.applyDefaults(defaults: Constants.perplexityDefaults)
+            service.applyPreferredModels(Constants.perplexityDefaults)
         case .google:
-            service.applyDefaults(defaults: Constants.googleDefaults)
+            service.applyPreferredModels(Constants.googleDefaults)
         default:
             break
         }
@@ -170,20 +170,6 @@ struct ServiceForm: View {
         default:
             service.credentials = nil
         }
-    }
-}
-
-extension Service {
-    
-    mutating func applyDefaults(defaults service: Service) {
-        self.preferredChatModel = service.preferredChatModel
-        self.preferredImageModel = service.preferredImageModel
-        self.preferredEmbeddingModel = service.preferredEmbeddingModel
-        self.preferredTranscriptionModel = service.preferredTranscriptionModel
-        self.preferredToolModel = service.preferredToolModel
-        self.preferredVisionModel = service.preferredVisionModel
-        self.preferredSpeechModel = service.preferredSpeechModel
-        self.preferredSummarizationModel = service.preferredSummarizationModel
     }
 }
 

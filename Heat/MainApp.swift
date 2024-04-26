@@ -30,6 +30,7 @@ struct MainApp: App {
     @State private var launcherViewModel = LauncherViewModel(store: Store.shared)
     @State private var searchInput = ""
     @State private var showingLauncher = false
+    @State private var showingBarrier = false
     @State private var isRestoring = false
     
     #if os(macOS)
@@ -55,6 +56,14 @@ struct MainApp: App {
             .task(id: scenePhase) {
                 handlePhaseChange()
             }
+            .task(id: store.isChatAvailable) {
+                handleAvailabilityChange()
+            }
+            .sheet(isPresented: $showingBarrier) {
+                ConversationBarrier()
+                    .frame(width: 300, height: 325)
+                    .environment(store)
+            }
             .floatingPanel(isPresented: $showingLauncher) {
                 LauncherView()
                     .environment(store)
@@ -70,7 +79,7 @@ struct MainApp: App {
                     .keyboardShortcut("n", modifiers: .command)
             }
         }
-
+        
         Settings {
             NavigationStack {
                 PreferencesWindow()
@@ -87,8 +96,15 @@ struct MainApp: App {
                 .task(id: scenePhase) {
                     handlePhaseChange()
                 }
+                .task(id: store.isChatAvailable) {
+                    handleAvailabilityChange()
+                }
                 .task {
                     await handleRestore()
+                }
+                .sheet(isPresented: $showingBarrier) {
+                    ConversationBarrier()
+                        .environment(store)
                 }
         }
         #endif
@@ -104,10 +120,15 @@ struct MainApp: App {
         handleSave()
     }
     
+    func handleAvailabilityChange() {
+        showingBarrier = !store.isChatAvailable
+    }
+    
     func handleRestore() async {
         do {
             isRestoring = true
             try await store.restore()
+            showingBarrier = !store.isChatAvailable
             isRestoring = false
         } catch {
             logger.warning("failed to restore: \(error)")

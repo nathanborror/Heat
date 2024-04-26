@@ -19,6 +19,10 @@ public final class Store {
     
     private let persistence: Persistence
     
+    public var isChatAvailable: Bool {
+        preferences.preferredChatServiceID != nil
+    }
+    
     init(persistence: Persistence) {
         self.persistence = persistence
     }
