@@ -4,6 +4,7 @@ import HeatKit
 struct ConversationList: View {
     @Environment(Store.self) var store
     @Environment(ConversationViewModel.self) var conversationViewModel
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         @Bindable var conversationViewModel = conversationViewModel
@@ -36,6 +37,11 @@ struct ConversationList: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 2)
+        }
+        #else
+        .onChange(of: conversationViewModel.conversationID) { _, _ in
+            guard conversationViewModel.conversationID != nil else { return }
+            dismiss()
         }
         #endif
     }
