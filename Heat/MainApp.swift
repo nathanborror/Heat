@@ -121,6 +121,7 @@ struct MainApp: App {
     }
     
     func handleAvailabilityChange() {
+        guard !isRestoring else { return }
         showingBarrier = !store.isChatAvailable
     }
     
