@@ -23,6 +23,7 @@ struct MessageView: View {
             if message.role == .assistant && message.toolCalls == nil {
                 MessageViewText(message: message)
                     .messageSpacing(message)
+                    .messageAttachments(message)
                     .padding(.vertical, 8)
             }
             if message.role == .assistant && message.toolCalls != nil {
@@ -138,20 +139,23 @@ struct MessageViewAttachments: ViewModifier {
             content
         } else {
             VStack {
-                HStack {
-                    ForEach(message.attachments.indices, id: \.self) { index in
-                        switch message.attachments[index] {
-                        case .agent(let agentID):
-                            Text(agentID)
-                        case .asset(let asset):
-                            PictureView(asset: asset)
-                                .frame(width: 200, height: 200)
-                                .clipShape(.rect(cornerRadius: 10))
-                        default:
-                            EmptyView()
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(message.attachments.indices, id: \.self) { index in
+                            switch message.attachments[index] {
+                            case .agent(let agentID):
+                                Text(agentID)
+                            case .asset(let asset):
+                                PictureView(asset: asset)
+                                    .frame(width: 300, height: 300)
+                                    .clipShape(.rect(cornerRadius: 10))
+                            default:
+                                EmptyView()
+                            }
                         }
                     }
                 }
+                .scrollClipDisabled()
                 content
             }
         }

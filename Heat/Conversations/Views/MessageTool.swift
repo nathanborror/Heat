@@ -39,7 +39,7 @@ struct MessageTool: View {
                         ForEach(message.attachments.indices, id: \.self) { index in
                             if case .asset(let asset) = message.attachments[index] {
                                 PictureView(asset: asset)
-                                    .frame(width: 200, height: 200)
+                                    .frame(width: 300, height: 300)
                                     .clipShape(.rect(cornerRadius: 10))
                             }
                         }

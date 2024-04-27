@@ -314,9 +314,21 @@ public final class MessageManager {
         // Image prompts
         case Tool.generateImages.function.name:
             let obj = try Tool.GenerateImages.decode(toolCall.function.arguments)
+            
+            let imageService = try Store.shared.preferredImageService()
+            let imageModel = try Store.shared.preferredImageModel()
+            
+            // Generate image attachments
+            var attachments = [Message.Attachment]()
+            for prompt in obj.prompts {
+                if let attachment = await prepareImageResult(prompt: prompt, service: imageService, model: imageModel) {
+                    attachments.append(attachment)
+                }
+            }
             let toolResponse = Message(
                 role: .tool,
                 content: obj.prompts.joined(separator: "\n\n"),
+                attachments: attachments,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
                 metadata: ["label": obj.prompts.count == 1 ? "Generating an image" : "Generating \(obj.prompts.count) images"]
@@ -425,6 +437,17 @@ public final class MessageManager {
                 success: false
             )
         }
+    }
+    
+    private func prepareImageResult(prompt: String, service: ImageService, model: String) async -> Message.Attachment? {
+        var attachments = [Message.Attachment]()
+        await MediaManager()
+            .generate(service: service, model: model, prompt: prompt) { images in
+                attachments = images.map {
+                    Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: prompt))
+                }
+            }
+        return attachments.first
     }
     
     // MARK: Encoders
