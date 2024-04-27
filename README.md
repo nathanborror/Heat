@@ -13,8 +13,9 @@ More people need to experience open source LLMs. Heat is an open source native i
 - Multi-step tool use (dependent on model)
 - Web search and browsing to improve response accuracy
 - Calendar reading and understanding
-- Filesystem search
-- Basic remembering
+- Filesystem search (desktop only)
+- Basic memory persistence
+- No server dependencies aside from models being accessed.
 
 ### Install from TestFlight
 
