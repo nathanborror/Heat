@@ -425,7 +425,7 @@ public final class MessageManager {
             return .init(
                 title: webpage.title,
                 url: webpage.url,
-                summary: summary,
+                content: summary,
                 success: true
             )
         } catch {
@@ -433,7 +433,7 @@ public final class MessageManager {
             return .init(
                 title: webpage.title,
                 url: webpage.url,
-                summary: nil,
+                content: nil,
                 success: false
             )
         }

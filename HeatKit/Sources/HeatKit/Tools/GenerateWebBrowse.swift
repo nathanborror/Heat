@@ -45,7 +45,7 @@ extension Tool {
         public struct Source: Codable, Identifiable {
             public let title: String?
             public let url: String
-            public let summary: String?
+            public let content: String?
             public let success: Bool
             
             public var id: String { url }

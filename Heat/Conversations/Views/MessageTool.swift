@@ -156,7 +156,7 @@ struct MessageToolSource: View {
             Text(URL(string: source.url)?.host() ?? source.url)
                 .lineLimit(1)
                 .font(.footnote)
-            Text(source.summary ?? "Missing summary.")
+            Text(source.content ?? "Missing content.")
                 .lineLimit(4)
                 .font(.footnote)
         }
