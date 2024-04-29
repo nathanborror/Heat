@@ -370,7 +370,6 @@ public final class Store {
             .generateImages,
             .generateWebBrowse,
             .searchCalendar,
-            .createCalendarEvent,
             .searchWeb,
             .searchFiles,
             .generateMemory,
