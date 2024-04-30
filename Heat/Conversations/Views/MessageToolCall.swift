@@ -9,7 +9,7 @@ struct MessageToolCall: View {
         if let toolCalls = message.toolCalls {
             ForEach(toolCalls, id: \.id) { toolCall in
                 VStack(alignment: .leading, spacing: 0) {
-                    if let tool = AgentTools(rawValue: toolCall.function.name) {
+                    if let tool = AgentTools(name: toolCall.function.name) {
                         switch tool {
                         case .generateImages:
                             MessageToolCallContent(label: "Generating images...", symbol: "circle")

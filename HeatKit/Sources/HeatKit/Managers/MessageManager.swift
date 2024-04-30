@@ -258,7 +258,7 @@ public final class MessageManager {
     }
     
     private func prepareToolResponse(toolCall: ToolCall) async throws -> ([Message], Bool) {
-        if let tool = AgentTools(rawValue: toolCall.function.name) {
+        if let tool = AgentTools(name: toolCall.function.name) {
             switch tool {
             case .generateImages:
                 let obj = try Tool.GenerateImages.decode(toolCall.function.arguments)

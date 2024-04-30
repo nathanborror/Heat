@@ -11,7 +11,7 @@ struct MessageTool: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            if let name = message.name, let tool = AgentTools(rawValue: name) {
+            if let name = message.name, let tool = AgentTools(name: name) {
                 switch tool {
                 case .generateImages:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
