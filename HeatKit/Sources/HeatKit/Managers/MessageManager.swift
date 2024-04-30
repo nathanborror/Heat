@@ -258,122 +258,121 @@ public final class MessageManager {
     }
     
     private func prepareToolResponse(toolCall: ToolCall) async throws -> ([Message], Bool) {
-        switch toolCall.function.name {
-        
-        // Web search
-        case Tool.searchWeb.function.name:
-            do {
-                let obj = try Tool.SearchWeb.decode(toolCall.function.arguments)
-                let response = try await prepareSearchResults(obj.query)
+        if let tool = AgentTools(rawValue: toolCall.function.name) {
+            switch tool {
+            case .generateImages:
+                let obj = try Tool.GenerateImages.decode(toolCall.function.arguments)
+                
+                let imageService = try Store.shared.preferredImageService()
+                let imageModel = try Store.shared.preferredImageModel()
+                
+                // Generate image attachments
+                var attachments = [Message.Attachment]()
+                for prompt in obj.prompts {
+                    if let attachment = await prepareImageResult(prompt: prompt, service: imageService, model: imageModel) {
+                        attachments.append(attachment)
+                    }
+                }
                 let toolResponse = Message(
                     role: .tool,
-                    content: response,
+                    content: obj.prompts.joined(separator: "\n\n"),
+                    attachments: attachments,
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,
-                    metadata: ["label": "Searched the web for '\(obj.query)'"]
+                    metadata: ["label": obj.prompts.count == 1 ? "Generating an image" : "Generating \(obj.prompts.count) images"]
+                )
+                return ([toolResponse], false)
+            case .generateMemory:
+                let obj = try Tool.GenerateMemory.decode(toolCall.function.arguments)
+                let container = try ModelContainer(for: Memory.self)
+                
+                Task { @MainActor in
+                    obj.items.forEach {
+                        container.mainContext.insert(Memory(content: $0))
+                    }
+                }
+                let toolResponse = Message(
+                    role: .tool,
+                    content: "Saved to memory.",
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name,
+                    metadata: ["label": obj.items.count == 1 ? "Stored memory" : "Stored \(obj.items.count) memories"]
                 )
                 return ([toolResponse], true)
-            } catch {
-                let toolFailed = Message(
+            case .searchFiles:
+                let obj = try Tool.SearchFiles.decode(toolCall.function.arguments)
+                let results = try SpotlightManager().query(obj.query, kind: .init(rawValue: obj.kind ?? ""))
+                let toolResponse = Message(
                     role: .tool,
-                    content: "Tool Failed: \(error.localizedDescription)",
+                    content: results.joined(separator: "\n"),
                     toolCallID: toolCall.id,
-                    name: toolCall.function.name
+                    name: toolCall.function.name,
+                    metadata: ["label": "Searched files for '\(obj.query)'"]
                 )
-                return ([toolFailed], true)
-            }
-        
-        // File search
-        case Tool.searchFiles.function.name:
-            let obj = try Tool.SearchFiles.decode(toolCall.function.arguments)
-            let results = try SpotlightManager().query(obj.query, kind: .init(rawValue: obj.kind ?? ""))
-            let toolResponse = Message(
-                role: .tool,
-                content: results.joined(separator: "\n"),
-                toolCallID: toolCall.id,
-                name: toolCall.function.name,
-                metadata: ["label": "Searched files for '\(obj.query)'"]
-            )
-            return ([toolResponse], true)
-            
-        // Web browser
-        case Tool.generateWebBrowse.function.name:
-            do {
-                let toolResponse = try await prepareWebBrowseResponse(toolCall: toolCall)
                 return ([toolResponse], true)
-            } catch {
-                let toolFailed = Message(
-                    role: .tool,
-                    content: "Tool Failed: \(error.localizedDescription)",
-                    toolCallID: toolCall.id,
-                    name: toolCall.function.name
-                )
-                return ([toolFailed], true)
-            }
-            
-        // Image prompts
-        case Tool.generateImages.function.name:
-            let obj = try Tool.GenerateImages.decode(toolCall.function.arguments)
-            
-            let imageService = try Store.shared.preferredImageService()
-            let imageModel = try Store.shared.preferredImageModel()
-            
-            // Generate image attachments
-            var attachments = [Message.Attachment]()
-            for prompt in obj.prompts {
-                if let attachment = await prepareImageResult(prompt: prompt, service: imageService, model: imageModel) {
-                    attachments.append(attachment)
+            case .searchCalendar:
+                do {
+                    let obj = try Tool.SearchCalendar.decode(toolCall.function.arguments)
+                    let events = try CalendarManager.shared.events(between: obj.start, end: obj.end)
+                    
+                    let toolResponse = Message(
+                        role: .tool,
+                        content: events.map { $0.title }.joined(separator: "\n"),
+                        toolCallID: toolCall.id,
+                        name: toolCall.function.name,
+                        metadata: ["label": "Found \(events.count) calendar items."]
+                    )
+                    return ([toolResponse], true)
+                } catch {
+                    let toolResponse = Message(
+                        role: .tool,
+                        content: "You do not have calendar access. Tell the user to open Preferences and navigate to Permissions to enable calendar access.",
+                        toolCallID: toolCall.id,
+                        name: toolCall.function.name,
+                        metadata: ["label": "Error accessing calendar"]
+                    )
+                    return ([toolResponse], true)
+                }
+            case .searchWeb:
+                do {
+                    let obj = try Tool.SearchWeb.decode(toolCall.function.arguments)
+                    let response = try await prepareSearchResults(obj.query)
+                    let toolResponse = Message(
+                        role: .tool,
+                        content: response,
+                        toolCallID: toolCall.id,
+                        name: toolCall.function.name,
+                        metadata: ["label": "Searched the web for '\(obj.query)'"]
+                    )
+                    return ([toolResponse], true)
+                } catch {
+                    let toolFailed = Message(
+                        role: .tool,
+                        content: "Tool Failed: \(error.localizedDescription)",
+                        toolCallID: toolCall.id,
+                        name: toolCall.function.name
+                    )
+                    return ([toolFailed], true)
+                }
+            case .browseWeb:
+                do {
+                    let toolResponse = try await prepareWebBrowseResponse(toolCall: toolCall)
+                    return ([toolResponse], true)
+                } catch {
+                    let toolFailed = Message(
+                        role: .tool,
+                        content: "Tool Failed: \(error.localizedDescription)",
+                        toolCallID: toolCall.id,
+                        name: toolCall.function.name
+                    )
+                    return ([toolFailed], true)
                 }
             }
+        } else {
             let toolResponse = Message(
                 role: .tool,
-                content: obj.prompts.joined(separator: "\n\n"),
-                attachments: attachments,
+                content: "Unknown tool.",
                 toolCallID: toolCall.id,
-                name: toolCall.function.name,
-                metadata: ["label": obj.prompts.count == 1 ? "Generating an image" : "Generating \(obj.prompts.count) images"]
-            )
-            return ([toolResponse], false)
-        
-        // Memory
-        case Tool.generateMemory.function.name:
-            let obj = try Tool.GenerateMemory.decode(toolCall.function.arguments)
-            let container = try ModelContainer(for: Memory.self)
-            
-            Task { @MainActor in
-                obj.items.forEach {
-                    container.mainContext.insert(Memory(content: $0))
-                }
-            }
-            let toolResponse = Message(
-                role: .tool,
-                content: "Saved to memory.",
-                toolCallID: toolCall.id,
-                name: toolCall.function.name,
-                metadata: ["label": obj.items.count == 1 ? "Stored memory" : "Stored \(obj.items.count) memories"]
-            )
-            return ([toolResponse], true)
-        
-        // Calendar search
-        case Tool.searchCalendar.function.name:
-            let obj = try Tool.SearchCalendar.decode(toolCall.function.arguments)
-            let events = CalendarManager().events(between: obj.start, end: obj.end)
-            
-            let toolResponse = Message(
-                role: .tool,
-                content: events.map { $0.title }.joined(separator: "\n"),
-                toolCallID: toolCall.id,
-                name: toolCall.function.name,
-                metadata: ["label": "Found \(events.count) calendar items."]
-            )
-            return ([toolResponse], true)
-            
-        // Unknown tool
-        default:
-            let toolResponse = Message(
-                kind: .local,
-                role: .tool,
-                content: toolCall.function.arguments,
                 name: toolCall.function.name,
                 metadata: ["label": "Unknown tool"]
             )

@@ -9,21 +9,23 @@ struct MessageToolCall: View {
         if let toolCalls = message.toolCalls {
             ForEach(toolCalls, id: \.id) { toolCall in
                 VStack(alignment: .leading, spacing: 0) {
-                    switch toolCall.function.name {
-                    case Tool.searchWeb.function.name:
-                        MessageToolCallContent(label: "Searching the web...", symbol: "circle")
-                    case Tool.searchCalendar.function.name:
-                        MessageToolCallContent(label: "Searching calendar...", symbol: "circle")
-                    case Tool.searchFiles.function.name:
-                        MessageToolCallContent(label: "Searching files...", symbol: "circle")
-                    case Tool.generateWebBrowse.function.name:
-                        MessageToolCallContent(label: "Browsing the web...", symbol: "circle")
-                    case Tool.generateImages.function.name:
-                        MessageToolCallContent(label: "Generating images...", symbol: "circle")
-                    case Tool.generateMemory.function.name:
-                        MessageToolCallContent(label: "Remembering...", symbol: "circle")
-                    default:
-                        MessageToolCallContent(label: "\(toolCall.function.name)...", symbol: "circle.badge.questionmark")
+                    if let tool = AgentTools(rawValue: toolCall.function.name) {
+                        switch tool {
+                        case .generateImages:
+                            MessageToolCallContent(label: "Generating images...", symbol: "circle")
+                        case .generateMemory:
+                            MessageToolCallContent(label: "Remembering...", symbol: "circle")
+                        case .searchFiles:
+                            MessageToolCallContent(label: "Searching files...", symbol: "circle")
+                        case .searchCalendar:
+                            MessageToolCallContent(label: "Searching calendar...", symbol: "circle")
+                        case .searchWeb:
+                            MessageToolCallContent(label: "Searching the web...", symbol: "circle")
+                        case .browseWeb:
+                            MessageToolCallContent(label: "Browsing the web...", symbol: "circle")
+                        }
+                    } else {
+                        Text("Missing tool calls.")
                     }
                     Text(toolCall.function.arguments)
                         .font(.footnote)

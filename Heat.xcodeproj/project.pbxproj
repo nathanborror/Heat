@@ -68,13 +68,13 @@
 		D41E193D2AE4CD20002516C1 /* PictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureView.swift; sourceTree = "<group>"; };
 		D41E193F2AE4CD4F002516C1 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		D41E194B2AE591EA002516C1 /* PreferencesForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesForm.swift; sourceTree = "<group>"; };
+		D443C3ED2BE1536B00C97FBD /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D45CC1F92B8A5C1A009DFDF4 /* SuggestionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsList.swift; sourceTree = "<group>"; };
 		D4713D6F2AEAB9670005597E /* Operators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
 		D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownUI+.swift"; sourceTree = "<group>"; };
 		D4A2C5682B8BF9EC0004F27B /* Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Markdown.swift; sourceTree = "<group>"; };
 		D4B2D2662B649DFD0017FB52 /* ConversationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationList.swift; sourceTree = "<group>"; };
 		D4B2D2682B6563DB0017FB52 /* ConversationInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationInput.swift; sourceTree = "<group>"; };
-		D4C68E922BCABA9A00EFEF24 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Heat.app; path = /Users/nborror/Work/Prototypes/Heat/build/Debug/Heat.app; sourceTree = "<absolute>"; };
 		D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D809F5A12BDABEFE00FD627B /* ConversationBarrier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationBarrier.swift; sourceTree = "<group>"; };
@@ -129,6 +129,7 @@
 			children = (
 				D41E191D2AE45C9B002516C1 /* Heat */,
 				D41E192D2AE45CE2002516C1 /* HeatKit */,
+				D443C3ED2BE1536B00C97FBD /* Heat.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -283,7 +284,7 @@
 				D884AAC72BD5A6A500B90E9B /* HotKey */,
 			);
 			productName = Heat;
-			productReference = D4C68E922BCABA9A00EFEF24 /* Heat.app */;
+			productReference = D443C3ED2BE1536B00C97FBD /* Heat.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

@@ -14,7 +14,6 @@ public final class Store {
     
     public private(set) var agents: [Agent] = []
     public private(set) var conversations: [Conversation] = []
-    public private(set) var tools: Set<Tool> = []
     public var preferences: Preferences = .init()
     
     private let persistence: Persistence
@@ -41,12 +40,11 @@ public final class Store {
         get(conversationID: conversationID)?.messages.first(where: { $0.id == messageID })
     }
     
-    public func get(tool name: String?) -> Tool? {
-        tools.first(where: { $0.function.name == name })
-    }
-    
-    public func get(tools: Set<String>) -> Set<Tool> {
-        Set(tools.compactMap { get(tool: $0) })
+    public func get(tools names: Set<String>) -> Set<Tool> {
+        let tools = AgentTools.allCases
+            .filter { names.contains($0.tool.function.name) }
+            .map { $0.tool }
+        return Set(tools)
     }
     
     public func get(serviceID: Service.ServiceID?) -> Service? {
@@ -321,7 +319,6 @@ public final class Store {
                 self.agents = agents
                 self.conversations = conversations
                 self.preferences = preferences ?? self.preferences
-                self.resetTools()
             }
             
             if self.agents.isEmpty {
@@ -352,7 +349,6 @@ public final class Store {
         conversations = []
         preferences = .init()
         try resetAgents()
-        resetTools()
         logger.info("Persistence: all data reset")
     }
     
@@ -364,17 +360,6 @@ public final class Store {
         let response = try YAMLDecoder().decode(AgentsResource.self, from: data)
         self.agents = response.agents.map { $0.encode }
         self.preferences.defaultAgentID = Constants.defaultAgentID
-    }
-    
-    public func resetTools() {
-        self.tools = [
-            .generateImages,
-            .generateWebBrowse,
-            .searchCalendar,
-            .searchWeb,
-            .searchFiles,
-            .generateMemory,
-        ]
     }
     
     // MARK: - Preview

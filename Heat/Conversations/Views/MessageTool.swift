@@ -11,47 +11,16 @@ struct MessageTool: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            switch message.name {
-            case Tool.searchWeb.function.name:
-                Button(action: { isShowingContext = true }) {
+            if let name = message.name, let tool = AgentTools(rawValue: name) {
+                switch tool {
+                case .generateImages:
+                    MessageToolContent(message: message, symbol: "checkmark.circle")
+                    MessageImagesComponent(attachments: message.attachments)
+                case .generateMemory, .searchFiles, .searchCalendar, .searchWeb, .browseWeb:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
                 }
-                .buttonStyle(.plain)
-                .tint(.secondary)
-            case Tool.searchCalendar.function.name:
-                MessageToolContent(message: message, symbol: "checkmark.circle")
-            case Tool.searchFiles.function.name:
-                Button(action: { isShowingContext = true }) {
-                    MessageToolContent(message: message, symbol: "checkmark.circle")
-                }
-                .buttonStyle(.plain)
-                .tint(.secondary)
-            case Tool.generateWebBrowse.function.name:
-                Button(action: { isShowingContext = true }) {
-                    MessageToolContent(message: message, symbol: "checkmark.circle")
-                }
-                .buttonStyle(.plain)
-                .tint(.secondary)
-            case Tool.generateImages.function.name:
-                MessageToolContent(message: message, symbol: "checkmark.circle")
-                ScrollView(.horizontal) {
-                    HStack {
-                        ForEach(message.attachments.indices, id: \.self) { index in
-                            if case .asset(let asset) = message.attachments[index] {
-                                PictureView(asset: asset)
-                                    .frame(width: 300, height: 300)
-                                    .clipShape(.rect(cornerRadius: 10))
-                            }
-                        }
-                        Spacer()
-                    }
-                }
-                .scrollIndicators(.hidden)
-                .scrollClipDisabled()
-            case Tool.generateMemory.function.name:
-                MessageToolContent(message: message, symbol: "checkmark.circle")
-            default:
-                MessageToolContent(message: message, symbol: "questionmark.circle")
+            } else {
+                MessageToolContent(message: message, symbol: "circle.badge.questionmark")
             }
         }
         .sheet(isPresented: $isShowingContext) {
@@ -111,6 +80,27 @@ struct MessageToolContent: View {
             }
         }
         .padding(.vertical, 2)
+    }
+}
+
+struct MessageImagesComponent: View {
+    let attachments: [Message.Attachment]
+    
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack {
+                ForEach(attachments.indices, id: \.self) { index in
+                    if case .asset(let asset) = attachments[index] {
+                        PictureView(asset: asset)
+                            .frame(width: 200, height: 200)
+                            .clipShape(.rect(cornerRadius: 10))
+                    }
+                }
+                Spacer()
+            }
+        }
+        .scrollIndicators(.hidden)
+        .scrollClipDisabled()
     }
 }
 

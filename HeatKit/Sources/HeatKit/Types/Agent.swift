@@ -78,12 +78,16 @@ struct AgentsResource: Decodable {
                 id: id,
                 name: name,
                 instructions: encodeInstructions,
-                toolIDs: Set(tools ?? [])
+                toolIDs: encodeTools
             )
         }
         
         var encodeInstructions: [Message] {
             instructions.map { .init(kind: .instruction, role: .init(rawValue: $0.role)!, content: $0.content) }
+        }
+        
+        var encodeTools: Set<String> {
+            Set(tools ?? AgentTools.allCases.map { $0.tool.function.name })
         }
     }
 }
