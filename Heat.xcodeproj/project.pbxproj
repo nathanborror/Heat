@@ -513,8 +513,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Heat/Resources/Info.plist;
-				INFOPLIST_KEY_NSHomeKitUsageDescription = "Manage your home accessories from Heat.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location is provided as additional context to personalize Heat.";
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "Manage your home accessories with the Assistant.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location is provided as additional context to personalize your experience.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -554,8 +554,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Heat/Resources/Info.plist;
-				INFOPLIST_KEY_NSHomeKitUsageDescription = "Manage your home accessories from Heat.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location is provided as additional context to personalize Heat.";
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "Manage your home accessories with the Assistant.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location is provided as additional context to personalize your experience.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

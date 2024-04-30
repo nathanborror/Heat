@@ -23,8 +23,8 @@
 		<true/>
 	</dict>
 	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>Manage your calendar from Heat.</string>
+	<string>Manage your calendar with the Assistant.</string>
 	<key>NSRemindersFullAccessUsageDescription</key>
-	<string>Manage your reminders from Heat.</string>
+	<string>Manage your reminders with the Assistant.</string>
 </dict>
 </plist>
