@@ -385,10 +385,10 @@ public final class MessageManager {
         let searchResponse = try await SearchManager.shared.search(query: query)
         let toolResponse = Tool.SearchWebResponse(
             instructions: """
-                Do not perform another search unless the results below are unhelpful. Pick the three most relevant \
-                results to browse the webpages using the `\(Tool.generateWebBrowse.function.name)` function. When you \
-                have finished browsing the results prepare a response that compares and contrasts the information \
-                you've gathered. Remember to use citations.
+                Do not perform another search unless the results below are unhelpful. Pick at least three of \
+                the most relevant results to browse the pages using the `\(Tool.generateWebBrowse.function.name)` \
+                function. Ignore all 'youtube.com' results. When you have finished browsing the results prepare \
+                a response that compares and contrasts the information you've gathered. Remember to use citations.
                 """,
             results: searchResponse.results
         )
