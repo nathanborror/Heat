@@ -352,6 +352,7 @@ public final class Store {
         conversations = []
         preferences = .init()
         try resetAgents()
+        resetTools()
         logger.info("Persistence: all data reset")
     }
     
