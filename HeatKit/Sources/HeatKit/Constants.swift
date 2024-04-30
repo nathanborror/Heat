@@ -4,7 +4,6 @@ import GenKit
 public struct Constants {
     
     public static var defaultAgentID = "bundle-assistant"
-    public static var defaultAgents: [Agent] = [.preview]
     
     public static var defaultChatServiceID: Service.ServiceID? = nil
     public static var defaultImageServiceID: Service.ServiceID? = nil
