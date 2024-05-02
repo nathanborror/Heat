@@ -45,5 +45,27 @@ extension Tool {
             }
             return try JSONDecoder().decode(Self.self, from: data)
         }
+        
+        public static func call(_ toolCall: ToolCall) async -> [Message] {
+            do {
+                let obj = try decode(toolCall.function.arguments)
+                let events = try CalendarManager.shared.events(between: obj.start, end: obj.end)
+                return [.init(
+                    role: .tool,
+                    content: events.map { $0.title }.joined(separator: "\n"),
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name,
+                    metadata: ["label": "Found \(events.count) calendar items."]
+                )]
+            } catch {
+                return [.init(
+                    role: .tool,
+                    content: "You do not have calendar access. Tell the user to open Preferences and navigate to Permissions to enable calendar access.",
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name,
+                    metadata: ["label": "Error accessing calendar"]
+                )]
+            }
+        }
     }
 }

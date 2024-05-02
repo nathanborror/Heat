@@ -49,7 +49,7 @@ public final class MessageManager {
         return self
     }
     
-    // Chat
+    // MARK: Generators
     
     @discardableResult
     public func generate(service: ChatService, model: String, tools: Set<Tool> = [], stream: Bool = true, callback: MessageCallback, processing: ProcessingCallback? = nil) async -> Self {
@@ -83,7 +83,7 @@ public final class MessageManager {
                 await processing?()
                 
                 // Prepare possible tool responses
-                let (toolResponses, shouldContinue) = try await prepareToolResponses(message: message, runID: runID)
+                let (toolResponses, shouldContinue) = try await prepareToolsResponse(message: message, runID: runID)
                 for response in toolResponses {
                     await self.upsert(message: response)
                     await callback(response)
@@ -95,8 +95,6 @@ public final class MessageManager {
         }
         return self
     }
-    
-    // Tools
     
     @discardableResult
     public func generate(service: ToolService, model: String, tool: Tool, callback: MessageCallback? = nil) async -> Self {
@@ -111,8 +109,6 @@ public final class MessageManager {
         }
         return self
     }
-    
-    // Vision
     
     @discardableResult
     public func generate(service: VisionService, model: String, stream: Bool = true, callback: MessageCallback? = nil) async -> Self {
@@ -135,8 +131,6 @@ public final class MessageManager {
         return self
     }
     
-    // Images
-    
     @discardableResult
     public func generate(service: ImageService, model: String, prompt: String? = nil, callback: ImagesCallback) async -> Self {
         do {
@@ -150,8 +144,6 @@ public final class MessageManager {
         }
         return self
     }
-    
-    // Speech
     
     @discardableResult
     public func generate(service: SpeechService, model: String, voice: String?, callback: MessageCallback) async -> Self {
@@ -216,7 +208,7 @@ public final class MessageManager {
     
     // MARK: Preparers
     
-    private func prepareToolResponses(message: Message?, runID: String? = nil) async throws -> ([Message], Bool) {
+    private func prepareToolsResponse(message: Message?, runID: String? = nil) async throws -> ([Message], Bool) {
         guard let toolCalls = message?.toolCalls else { return ([], false) }
         
         struct TaskResponse {
@@ -261,112 +253,17 @@ public final class MessageManager {
         if let tool = AgentTools(name: toolCall.function.name) {
             switch tool {
             case .generateImages:
-                let obj = try Tool.GenerateImages.decode(toolCall.function.arguments)
-                
-                let imageService = try Store.shared.preferredImageService()
-                let imageModel = try Store.shared.preferredImageModel()
-                
-                // Generate image attachments
-                var attachments = [Message.Attachment]()
-                for prompt in obj.prompts {
-                    if let attachment = await prepareImageResult(prompt: prompt, service: imageService, model: imageModel) {
-                        attachments.append(attachment)
-                    }
-                }
-                let toolResponse = Message(
-                    role: .tool,
-                    content: obj.prompts.joined(separator: "\n\n"),
-                    attachments: attachments,
-                    toolCallID: toolCall.id,
-                    name: toolCall.function.name,
-                    metadata: ["label": obj.prompts.count == 1 ? "Generating an image" : "Generating \(obj.prompts.count) images"]
-                )
-                return ([toolResponse], false)
+                return (await Tool.GenerateImages.call(toolCall), false)
             case .generateMemory:
-                let obj = try Tool.GenerateMemory.decode(toolCall.function.arguments)
-                let container = try ModelContainer(for: Memory.self)
-                
-                Task { @MainActor in
-                    obj.items.forEach {
-                        container.mainContext.insert(Memory(content: $0))
-                    }
-                }
-                let toolResponse = Message(
-                    role: .tool,
-                    content: "Saved to memory.",
-                    toolCallID: toolCall.id,
-                    name: toolCall.function.name,
-                    metadata: ["label": obj.items.count == 1 ? "Stored memory" : "Stored \(obj.items.count) memories"]
-                )
-                return ([toolResponse], true)
+                return (await Tool.GenerateMemory.call(toolCall), true)
             case .searchFiles:
-                let obj = try Tool.SearchFiles.decode(toolCall.function.arguments)
-                let results = try SpotlightManager().query(obj.query, kind: .init(rawValue: obj.kind ?? ""))
-                let toolResponse = Message(
-                    role: .tool,
-                    content: results.joined(separator: "\n"),
-                    toolCallID: toolCall.id,
-                    name: toolCall.function.name,
-                    metadata: ["label": "Searched files for '\(obj.query)'"]
-                )
-                return ([toolResponse], true)
+                return (await Tool.SearchFiles.call(toolCall), true)
             case .searchCalendar:
-                do {
-                    let obj = try Tool.SearchCalendar.decode(toolCall.function.arguments)
-                    let events = try CalendarManager.shared.events(between: obj.start, end: obj.end)
-                    
-                    let toolResponse = Message(
-                        role: .tool,
-                        content: events.map { $0.title }.joined(separator: "\n"),
-                        toolCallID: toolCall.id,
-                        name: toolCall.function.name,
-                        metadata: ["label": "Found \(events.count) calendar items."]
-                    )
-                    return ([toolResponse], true)
-                } catch {
-                    let toolResponse = Message(
-                        role: .tool,
-                        content: "You do not have calendar access. Tell the user to open Preferences and navigate to Permissions to enable calendar access.",
-                        toolCallID: toolCall.id,
-                        name: toolCall.function.name,
-                        metadata: ["label": "Error accessing calendar"]
-                    )
-                    return ([toolResponse], true)
-                }
+                return (await Tool.SearchCalendar.call(toolCall), true)
             case .searchWeb:
-                do {
-                    let obj = try Tool.SearchWeb.decode(toolCall.function.arguments)
-                    let response = try await prepareSearchResults(obj.query)
-                    let toolResponse = Message(
-                        role: .tool,
-                        content: response,
-                        toolCallID: toolCall.id,
-                        name: toolCall.function.name,
-                        metadata: ["label": "Searched the web for '\(obj.query)'"]
-                    )
-                    return ([toolResponse], true)
-                } catch {
-                    let toolFailed = Message(
-                        role: .tool,
-                        content: "Tool Failed: \(error.localizedDescription)",
-                        toolCallID: toolCall.id,
-                        name: toolCall.function.name
-                    )
-                    return ([toolFailed], true)
-                }
+                return (await Tool.SearchWeb.call(toolCall), true)
             case .browseWeb:
-                do {
-                    let toolResponse = try await prepareWebBrowseResponse(toolCall: toolCall)
-                    return ([toolResponse], true)
-                } catch {
-                    let toolFailed = Message(
-                        role: .tool,
-                        content: "Tool Failed: \(error.localizedDescription)",
-                        toolCallID: toolCall.id,
-                        name: toolCall.function.name
-                    )
-                    return ([toolFailed], true)
-                }
+                return (await Tool.GenerateWebBrowse.call(toolCall), true)
             }
         } else {
             let toolResponse = Message(
@@ -379,81 +276,4 @@ public final class MessageManager {
             return ([toolResponse], true)
         }
     }
-    
-    private func prepareSearchResults(_ query: String) async throws -> String? {
-        let searchResponse = try await SearchManager.shared.search(query: query)
-        let toolResponse = Tool.SearchWebResponse(
-            instructions: """
-                Do not perform another search unless the results below are unhelpful. Pick at least three of \
-                the most relevant results to browse the pages using the `\(Tool.generateWebBrowse.function.name)` \
-                function. Ignore all 'youtube.com' results. When you have finished browsing the results prepare \
-                a response that compares and contrasts the information you've gathered. Remember to use citations.
-                """,
-            results: searchResponse.results
-        )
-        let data = try encoder.encode(toolResponse)
-        return String(data: data, encoding: .utf8)
-    }
-    
-    private func prepareWebBrowseResponse(toolCall: ToolCall) async throws -> Message {
-        let obj = try Tool.GenerateWebBrowse.decode(toolCall.function.arguments)
-        let sources = try await prepareWebBrowseSummary(webpage: obj)
-        
-        let sourcesData = try JSONEncoder().encode(sources)
-        let sourcesString = String(data: sourcesData, encoding: .utf8)
-        
-        let label = "Read \(URL(string: obj.url)?.host() ?? "")"
-        let toolResponse = Message(
-            role: .tool,
-            content: sourcesString,
-            toolCallID: toolCall.id,
-            name: toolCall.function.name,
-            metadata: ["label": label]
-        )
-        return toolResponse
-    }
-    
-    private func prepareWebBrowseSummary(webpage: Tool.GenerateWebBrowse) async throws -> Tool.GenerateWebBrowse.Source {
-        let summarizationService = try Store.shared.preferredSummarizationService()
-        let summarizationModel = try Store.shared.preferredSummarizationModel()
-        
-        logger.debug("Browsing: \(webpage.url)")
-        do {
-            let summary = try await BrowserManager().generateSummary(service: summarizationService, model: summarizationModel, url: webpage.url)
-            logger.debug("Summarized: \(webpage.url)")
-            return .init(
-                title: webpage.title,
-                url: webpage.url,
-                content: summary,
-                success: true
-            )
-        } catch {
-            logger.error("Failed to generate summary")
-            return .init(
-                title: webpage.title,
-                url: webpage.url,
-                content: nil,
-                success: false
-            )
-        }
-    }
-    
-    private func prepareImageResult(prompt: String, service: ImageService, model: String) async -> Message.Attachment? {
-        var attachments = [Message.Attachment]()
-        await MediaManager()
-            .generate(service: service, model: model, prompt: prompt) { images in
-                attachments = images.map {
-                    Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: prompt))
-                }
-            }
-        return attachments.first
-    }
-    
-    // MARK: Encoders
-    
-    private var encoder: JSONEncoder = {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        return encoder
-    }()
 }

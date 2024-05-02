@@ -39,5 +39,26 @@ extension Tool {
             }
             return try JSONDecoder().decode(Self.self, from: data)
         }
+        
+        public static func call(_ toolCall: ToolCall) async -> [Message] {
+            do {
+                let obj = try decode(toolCall.function.arguments)
+                let results = try SpotlightManager().query(obj.query, kind: .init(rawValue: obj.kind ?? ""))
+                return [.init(
+                    role: .tool,
+                    content: results.joined(separator: "\n"),
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name,
+                    metadata: ["label": "Searched files for '\(obj.query)'"]
+                )]
+            } catch {
+                return [.init(
+                    role: .tool,
+                    content: "Tool Failed: \(error.localizedDescription)",
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name
+                )]
+            }
+        }
     }
 }

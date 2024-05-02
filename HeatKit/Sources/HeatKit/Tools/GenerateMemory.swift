@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import GenKit
 
 extension Tool {
@@ -35,6 +36,34 @@ extension Tool {
                 throw HeatKitError.failedtoolDecoding
             }
             return try JSONDecoder().decode(Self.self, from: data)
+        }
+        
+        public static func call(_ toolCall: ToolCall) async -> [Message] {
+            do {
+                let obj = try decode(toolCall.function.arguments)
+                let container = try ModelContainer(for: Memory.self)
+                
+                Task { @MainActor in
+                    obj.items.forEach {
+                        container.mainContext.insert(Memory(content: $0))
+                    }
+                }
+                
+                return [.init(
+                    role: .tool,
+                    content: "Saved to memory.",
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name,
+                    metadata: ["label": obj.items.count == 1 ? "Stored memory" : "Stored \(obj.items.count) memories"]
+                )]
+            } catch {
+                return [.init(
+                    role: .tool,
+                    content: "Tool Failed: \(error.localizedDescription)",
+                    toolCallID: toolCall.id,
+                    name: toolCall.function.name
+                )]
+            }
         }
     }
 }
