@@ -183,7 +183,7 @@ struct ConversationInput: View {
         
         do {
             try conversationViewModel.generate(content, context: memories.map { $0.content })
-        } catch let error as HeatKitError {
+        } catch let error as KitError {
             conversationViewModel.error = error
         } catch {
             logger.warning("failed to submit: \(error)")
@@ -198,7 +198,7 @@ struct ConversationInput: View {
                 $0.image?.resize(to: .init(width: 512, height: 512))
             }.compactMap { $0 }
             try conversationViewModel.generate(content, images: images)
-        } catch let error as HeatKitError {
+        } catch let error as KitError {
             conversationViewModel.error = error
         } catch {
             logger.warning("failed to submit: \(error)")
@@ -209,7 +209,7 @@ struct ConversationInput: View {
     func handleImagine(_ content: String) {
         do {
             try conversationViewModel.generateImage(content)
-        } catch let error as HeatKitError {
+        } catch let error as KitError {
             conversationViewModel.error = error
         } catch {
             logger.warning("failed to submit: \(error)")
@@ -225,7 +225,7 @@ struct ConversationInput: View {
                 } else {
                     logger.error("Failed to generate markdown")
                 }
-            } catch let error as HeatKitError {
+            } catch let error as KitError {
                 conversationViewModel.error = error
             } catch {
                 logger.error("Failed to fetch: \(error)")

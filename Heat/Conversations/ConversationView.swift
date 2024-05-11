@@ -76,7 +76,7 @@ struct ConversationView: View {
         }
         do {
             try conversationViewModel.generate(suggestion)
-        } catch let error as HeatKitError {
+        } catch let error as KitError {
             conversationViewModel.error = error
         } catch {
             logger.warning("failed to submit: \(error)")

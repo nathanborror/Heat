@@ -9,7 +9,7 @@ private let logger = Logger(subsystem: "LauncherViewModel", category: "Heat")
 final class LauncherViewModel {
     var store: Store
     var conversationID: String?
-    var error: HeatKitError?
+    var error: KitError?
     
     private var generateTask: Task<(), Error>? = nil
     
@@ -38,7 +38,7 @@ final class LauncherViewModel {
     func generate(_ content: String, context: [String] = []) throws {
         guard !content.isEmpty else { return }
         guard let conversation else {
-            throw HeatKitError.missingConversation
+            throw KitError.missingConversation
         }
         
         let chatService = try store.preferredChatService()

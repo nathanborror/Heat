@@ -183,56 +183,56 @@ public final class Store {
     
     public func preferredChatService() throws -> ChatService {
         guard let service = get(serviceID: preferences.preferredChatServiceID) else {
-            throw HeatKitError.missingService("Chat")
+            throw KitError.missingService("Chat")
         }
         return try service.chatService()
     }
     
     public func preferredImageService() throws -> ImageService {
         guard let service = get(serviceID: preferences.preferredImageServiceID) else {
-            throw HeatKitError.missingService("Image")
+            throw KitError.missingService("Image")
         }
         return try service.imageService()
     }
     
     public func preferredEmbeddingService() throws -> EmbeddingService {
         guard let service = get(serviceID: preferences.preferredEmbeddingServiceID) else {
-            throw HeatKitError.missingService("Embedding")
+            throw KitError.missingService("Embedding")
         }
         return try service.embeddingService()
     }
     
     public func preferredTranscriptionService() throws -> TranscriptionService {
         guard let service = get(serviceID: preferences.preferredTranscriptionServiceID) else {
-            throw HeatKitError.missingService("Transcription")
+            throw KitError.missingService("Transcription")
         }
         return try service.transcriptionService()
     }
     
     public func preferredToolService() throws -> ToolService {
         guard let service = get(serviceID: preferences.preferredToolServiceID) else {
-            throw HeatKitError.missingService("Tool")
+            throw KitError.missingService("Tool")
         }
         return try service.toolService()
     }
     
     public func preferredVisionService() throws -> VisionService {
         guard let service = get(serviceID: preferences.preferredVisionServiceID) else {
-            throw HeatKitError.missingService("Vision")
+            throw KitError.missingService("Vision")
         }
         return try service.visionService()
     }
     
     public func preferredSpeechService() throws -> SpeechService {
         guard let service = get(serviceID: preferences.preferredSpeechServiceID) else {
-            throw HeatKitError.missingService("Speech")
+            throw KitError.missingService("Speech")
         }
         return try service.speechService()
     }
     
     public func preferredSummarizationService() throws -> ChatService {
         guard let service = get(serviceID: preferences.preferredSummarizationServiceID) else {
-            throw HeatKitError.missingService("Summarization")
+            throw KitError.missingService("Summarization")
         }
         return try service.summarizationService()
     }
@@ -242,7 +242,7 @@ public final class Store {
     public func preferredChatModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredChatServiceID),
               let model = service.preferredChatModel else {
-            throw HeatKitError.missingServiceModel("Chat")
+            throw KitError.missingServiceModel("Chat")
         }
         return model
     }
@@ -250,7 +250,7 @@ public final class Store {
     public func preferredImageModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredImageServiceID),
               let model = service.preferredImageModel else {
-            throw HeatKitError.missingServiceModel("Image")
+            throw KitError.missingServiceModel("Image")
         }
         return model
     }
@@ -258,7 +258,7 @@ public final class Store {
     public func preferredEmbeddingModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredEmbeddingServiceID),
               let model = service.preferredEmbeddingModel else {
-            throw HeatKitError.missingServiceModel("Embedding")
+            throw KitError.missingServiceModel("Embedding")
         }
         return model
     }
@@ -266,7 +266,7 @@ public final class Store {
     public func preferredTranscriptionModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredTranscriptionServiceID),
               let model = service.preferredTranscriptionModel else {
-            throw HeatKitError.missingServiceModel("Transcription")
+            throw KitError.missingServiceModel("Transcription")
         }
         return model
     }
@@ -274,7 +274,7 @@ public final class Store {
     public func preferredToolModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredToolServiceID),
               let model = service.preferredChatModel else {
-            throw HeatKitError.missingServiceModel("Tool")
+            throw KitError.missingServiceModel("Tool")
         }
         return model
     }
@@ -282,7 +282,7 @@ public final class Store {
     public func preferredVisionModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredVisionServiceID),
               let model = service.preferredVisionModel else {
-            throw HeatKitError.missingServiceModel("Vision")
+            throw KitError.missingServiceModel("Vision")
         }
         return model
     }
@@ -290,7 +290,7 @@ public final class Store {
     public func preferredSpeechModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredSpeechServiceID),
               let model = service.preferredSpeechModel else {
-            throw HeatKitError.missingServiceModel("Speech")
+            throw KitError.missingServiceModel("Speech")
         }
         return model
     }
@@ -298,7 +298,7 @@ public final class Store {
     public func preferredSummarizationModel() throws -> String {
         guard let service = get(serviceID: preferences.preferredSummarizationServiceID),
               let model = service.preferredSummarizationModel else {
-            throw HeatKitError.missingServiceModel("Summarization")
+            throw KitError.missingServiceModel("Summarization")
         }
         return model
     }
@@ -354,7 +354,7 @@ public final class Store {
     
     public func resetAgents() throws {
         guard let url = Bundle.module.url(forResource: "agents", withExtension: "yaml") else {
-            throw HeatKitError.missingResource
+            throw KitError.missingResource
         }
         let data = try Data(contentsOf: url)
         let response = try YAMLDecoder().decode(AgentsResource.self, from: data)

@@ -83,7 +83,7 @@ struct LauncherView: View {
             try launcherViewModel.generate(content, context: memories.map { $0.content })
             isShowingContent = true
             content = ""
-        } catch let error as HeatKitError {
+        } catch let error as KitError {
             launcherViewModel.error = error
         } catch {
             logger.warning("failed to submit: \(error)")

@@ -47,7 +47,7 @@ extension WebBrowseTool.Arguments {
     
     public init(_ arguments: String) throws {
         guard let data = arguments.data(using: .utf8) else {
-            throw HeatKitError.failedtoolDecoding
+            throw KitError.failedtoolDecoding
         }
         self = try JSONDecoder().decode(Self.self, from: data)
     }

@@ -1,6 +1,6 @@
 import Foundation
 
-public enum HeatKitError: LocalizedError, Equatable {
+public enum KitError: LocalizedError, Equatable {
     case failedGenerateResponse
     case failedtoolDecoding
     case failedSuggestions

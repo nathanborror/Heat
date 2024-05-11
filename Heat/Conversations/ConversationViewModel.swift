@@ -9,7 +9,7 @@ private let logger = Logger(subsystem: "ConversationViewModel", category: "Heat"
 final class ConversationViewModel {
     var store: Store
     var conversationID: String?
-    var error: HeatKitError?
+    var error: KitError?
     
     private var generateTask: Task<(), Error>? = nil
     
@@ -46,7 +46,7 @@ final class ConversationViewModel {
     func generate(_ content: String, context: [String] = []) throws {
         guard !content.isEmpty else { return }
         guard let conversation else {
-            throw HeatKitError.missingConversation
+            throw KitError.missingConversation
         }
         
         let chatService = try store.preferredChatService()
@@ -101,7 +101,7 @@ final class ConversationViewModel {
         let visionModel = try store.preferredVisionModel()
         
         guard let conversation else {
-            throw HeatKitError.missingConversation
+            throw KitError.missingConversation
         }
         let message = Message(role: .user, content: content, attachments: images.map {
             .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
@@ -140,7 +140,7 @@ final class ConversationViewModel {
         let toolModel = try store.preferredToolModel()
         
         guard let conversation else {
-            throw HeatKitError.missingConversation
+            throw KitError.missingConversation
         }
         generateTask = Task {
             await MessageManager()
@@ -178,7 +178,7 @@ final class ConversationViewModel {
         let imageModel = try store.preferredImageModel()
         
         guard let conversation else {
-            throw HeatKitError.missingConversation
+            throw KitError.missingConversation
         }
         generateTask = Task {
             await ImageSession.shared
@@ -202,7 +202,7 @@ final class ConversationViewModel {
         let model = try store.preferredToolModel()
         
         guard let conversation else {
-            throw HeatKitError.missingConversation
+            throw KitError.missingConversation
         }
         generateTask = Task {
             await MessageManager()
@@ -237,7 +237,7 @@ final class ConversationViewModel {
             let args = try SuggestTool.Arguments(toolCall.function.arguments)
             return Array(args.prompts.prefix(3))
         } catch {
-            self.error = HeatKitError.failedSuggestions
+            self.error = KitError.failedSuggestions
         }
         return []
     }
