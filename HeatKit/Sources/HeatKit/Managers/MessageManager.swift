@@ -12,20 +12,24 @@ public final class MessageManager {
     public typealias ProcessingCallback = @MainActor () -> Void
     public typealias ImagesCallback = @MainActor (String, [Data]) -> Void
     
-    public private(set) var messages: [Message]
-    public private(set) var error: Error?
+    public private(set) var messages: [Message] = []
+    public private(set) var error: Error? = nil
     
     private var filteredMessages: [Message] {
         messages.filter { ![.error, .local].contains($0.kind) }
     }
     
-    public init(messages: [Message] = []) {
-        self.messages = messages
-    }
+    public init() {}
     
     @discardableResult
     public func manage(callback: ManagerCallback) async -> Self {
         await callback(self)
+        return self
+    }
+    
+    @discardableResult
+    public func append(messages: [Message]) -> Self {
+        self.messages += messages
         return self
     }
     
@@ -250,20 +254,24 @@ public final class MessageManager {
     }
     
     private func prepareToolResponse(toolCall: ToolCall) async throws -> ([Message], Bool) {
-        if let tool = AgentTools(name: toolCall.function.name) {
+        if let tool = Toolbox(name: toolCall.function.name) {
             switch tool {
             case .generateImages:
-                return (await Tool.GenerateImages.call(toolCall), false)
+                return (await ImageGeneratorTool.handle(toolCall), false)
             case .generateMemory:
-                return (await Tool.GenerateMemory.call(toolCall), true)
+                return (await MemoryTool.handle(toolCall), true)
+            case .generateSuggestions:
+                return ([], true)
+            case .generateTitle:
+                return ([], true)
             case .searchFiles:
-                return (await Tool.SearchFiles.call(toolCall), true)
+                return (await FileSearchTool.handle(toolCall), true)
             case .searchCalendar:
-                return (await Tool.SearchCalendar.call(toolCall), true)
+                return (await CalendarSearchTool.handle(toolCall), true)
             case .searchWeb:
-                return (await Tool.SearchWeb.call(toolCall), true)
+                return (await WebSearchTool.handle(toolCall), true)
             case .browseWeb:
-                return (await Tool.GenerateWebBrowse.call(toolCall), true)
+                return (await WebBrowseTool.handle(toolCall), true)
             }
         } else {
             let toolResponse = Message(

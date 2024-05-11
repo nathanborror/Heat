@@ -220,7 +220,7 @@ struct ConversationInput: View {
     func handleSummarize(_ content: String) {
         Task {
             do {
-                if let markdown = try await BrowserManager().generateMarkdown(for: content) {
+                if let markdown = try await WebBrowserSession.shared.generateMarkdown(for: content) {
                     try conversationViewModel.generateSummary(url: content, markdown: markdown)
                 } else {
                     logger.error("Failed to generate markdown")
@@ -237,7 +237,7 @@ struct ConversationInput: View {
     func handleSearch(_ content: String) {
         Task {
             do {
-                let resp = try await SearchManager.shared.search(query: content)
+                let resp = try await WebSearchSession.shared.search(query: content)
                 print(resp)
             } catch {
                 logger.error("Failed to search: \(error)")

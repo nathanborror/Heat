@@ -1,14 +1,14 @@
 import Foundation
 import EventKit
 
-public class CalendarManager {
-    public static let shared = CalendarManager()
+public class CalendarSession {
+    public static let shared = CalendarSession()
     
-    public init() {}
+    private init() {}
     
     /// Returns events between two dates, a start date which is typically Date.now() and a future end date.
     public func events(between start: Date, end: Date) throws -> [EKEvent] {
-        guard hasAccess else { throw CalendarManagerError.missingAccess }
+        guard hasAccess else { throw CalendarSessionError.missingAccess }
         let eventStore = EKEventStore()
         let predicate = eventStore.predicateForEvents(withStart: start, end: end, calendars: nil)
         return eventStore.events(matching: predicate)
@@ -34,6 +34,6 @@ public class CalendarManager {
     }
 }
 
-enum CalendarManagerError: Error {
+enum CalendarSessionError: Error {
     case missingAccess
 }

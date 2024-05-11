@@ -100,7 +100,7 @@ extension Conversation {
                     toolCalls: [
                         .init(
                             function: .init(
-                                name: Tool.searchWeb.function.name,
+                                name: Toolbox.searchWeb.name,
                                 arguments: """
                                     {"query": "latest apple rumors"}
                                     """
@@ -112,7 +112,7 @@ extension Conversation {
                 .init(
                     role: .tool,
                     runID: "preview-run",
-                    name: Tool.searchWeb.function.name,
+                    name: Toolbox.searchWeb.name,
                     metadata: ["label": "Searched the web for 'latest apple rumors'"]
                 ),
                 .init(
@@ -120,7 +120,7 @@ extension Conversation {
                     toolCalls: [
                         .init(
                             function: .init(
-                                name: Tool.generateWebBrowse.function.name,
+                                name: Toolbox.browseWeb.name,
                                 arguments: """
                                     {"instructions": "Summarize the key rumors about apple products in 2024", "url": "https://macrumors.com"}
                                     """
@@ -128,7 +128,7 @@ extension Conversation {
                         ),
                         .init(
                             function: .init(
-                                name: Tool.generateWebBrowse.function.name,
+                                name: Toolbox.browseWeb.name,
                                 arguments: """
                                     {"instructions": "Summarize the key rumors about apple products in 2024", "url": "https://9to5mac.com"}
                                     """
@@ -136,7 +136,7 @@ extension Conversation {
                         ),
                         .init(
                             function: .init(
-                                name: Tool.generateWebBrowse.function.name,
+                                name: Toolbox.browseWeb.name,
                                 arguments: """
                                     {"instructions": "Summarize the key rumors about apple products in 2024", "url": "https://cnet.com"}
                                     """
@@ -151,7 +151,7 @@ extension Conversation {
                         {"url": "macrumors.com", "summary": "iPad Models: Updates are expected for the iPad Air and iPad Pro models around late March/Early April, with potential changes across all iPad models later in the year."}
                         """,
                     runID: "preview-run",
-                    name: Tool.generateWebBrowse.function.name,
+                    name: Toolbox.browseWeb.name,
                     metadata: ["label": "Read macrumors.com"]
                 ),
                 .init(
@@ -160,7 +160,7 @@ extension Conversation {
                         {"url": "9to5mac.com", "summary": "iPhone 16 and iPhone 16 Pro: These are anticipated for a September launch, with rumors of a new design and updated features."},
                         """,
                     runID: "preview-run",
-                    name: Tool.generateWebBrowse.function.name,
+                    name: Toolbox.browseWeb.name,
                     metadata: ["label": "Read 9to5mac.com"]
                 ),
                 .init(
@@ -169,7 +169,7 @@ extension Conversation {
                         {"url": "cnet.com", "summary": "AirPods: Updates might come to the AirPods lineup, including a new version of AirPods Max and a potential new set of AirPods with Active Noise Cancellation."}
                         """,
                     runID: "preview-run",
-                    name: Tool.generateWebBrowse.function.name,
+                    name: Toolbox.browseWeb.name,
                     metadata: ["label": "Read cnet.com"]
                 ),
                 .init(

@@ -41,7 +41,7 @@ public final class Store {
     }
     
     public func get(tools names: Set<String>) -> Set<Tool> {
-        let tools = AgentTools.allCases
+        let tools = Toolbox.allCases
             .filter { names.contains($0.tool.function.name) }
             .map { $0.tool }
         return Set(tools)

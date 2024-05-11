@@ -47,7 +47,8 @@ final class LauncherViewModel {
         let context = prepareContext(context)
         
         generateTask = Task {
-            await MessageManager(messages: messages)
+            await MessageManager()
+                .append(messages: messages)
                 .append(message: context)
                 .append(message: .init(role: .user, content: content)) { message in
                     self.store.upsert(suggestions: [], conversationID: conversation.id)

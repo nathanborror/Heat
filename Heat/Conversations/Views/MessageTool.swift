@@ -11,12 +11,12 @@ struct MessageTool: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            if let name = message.name, let tool = AgentTools(name: name) {
+            if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
                     MessageImagesComponent(attachments: message.attachments)
-                case .generateMemory, .searchFiles, .searchCalendar, .searchWeb, .browseWeb:
+                case .generateMemory, .searchFiles, .searchCalendar, .searchWeb, .browseWeb, .generateSuggestions, .generateTitle:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
                 }
             } else {
@@ -27,13 +27,13 @@ struct MessageTool: View {
             NavigationStack {
                 ScrollView {
                     switch message.name {
-                    case Tool.searchWeb.function.name:
+                    case Toolbox.searchWeb.name:
                         VStack {
                             Text(message.content ?? "None")
                                 .textSelection(.enabled)
                                 .padding()
                         }
-                    case Tool.generateWebBrowse.function.name:
+                    case Toolbox.browseWeb.name:
                         VStack {
                             Markdown(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
                                 .markdownTheme(.mate)

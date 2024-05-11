@@ -87,7 +87,7 @@ struct AgentsResource: Decodable {
         }
         
         var encodeTools: Set<String> {
-            Set(tools ?? AgentTools.allCases.map { $0.tool.function.name })
+            Set(tools ?? Toolbox.allCases.map { $0.tool.function.name })
         }
     }
 }

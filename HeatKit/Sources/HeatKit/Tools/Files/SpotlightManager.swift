@@ -1,8 +1,9 @@
 import Foundation
 
-class SpotlightManager {
+class SpotlightSession {
+    public static let shared = SpotlightSession()
     
-    public init() {}
+    private init() {}
     
     public enum Kind: String, CaseIterable {
         case application

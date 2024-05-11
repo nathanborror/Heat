@@ -58,7 +58,8 @@ final class ConversationViewModel {
         let context = prepareContext(context)
         
         generateTask = Task {
-            await MessageManager(messages: messages)
+            await MessageManager()
+                .append(messages: messages)
                 .append(message: context)
                 .append(message: .init(role: .user, content: content)) { message in
                     self.store.upsert(suggestions: [], conversationID: conversation.id)
@@ -75,7 +76,7 @@ final class ConversationViewModel {
                 .manage { _ in
                     self.store.upsert(state: .suggesting, conversationID: conversation.id)
                 }
-                .generate(service: toolService, model: toolModel, tool: .generateSuggestions) { message in
+                .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
                     let suggestions = self.prepareSuggestions(message)
                     self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
                     self.store.upsert(state: .none, conversationID: conversation.id)
@@ -106,7 +107,8 @@ final class ConversationViewModel {
             .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
         })
         generateTask = Task {
-            await MessageManager(messages: messages)
+            await MessageManager()
+                .append(messages: messages)
                 .append(message: message) { message in
                     self.store.upsert(suggestions: [], conversationID: conversation.id)
                     self.store.upsert(message: message, conversationID: conversation.id)
@@ -141,7 +143,8 @@ final class ConversationViewModel {
             throw HeatKitError.missingConversation
         }
         generateTask = Task {
-            await MessageManager(messages: messages)
+            await MessageManager()
+                .append(messages: messages)
                 .append(message: .init(kind: .instruction, role: .user, content: "Summarize:\n\n\(markdown)")) { message in
                     self.store.upsert(suggestions: [], conversationID: conversation.id)
                     self.store.upsert(message: message, conversationID: conversation.id)
@@ -157,7 +160,7 @@ final class ConversationViewModel {
                 .manage { _ in
                     self.store.upsert(state: .suggesting, conversationID: conversation.id)
                 }
-                .generate(service: toolService, model: toolModel, tool: .generateSuggestions) { message in
+                .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
                     let suggestions = self.prepareSuggestions(message)
                     self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
                     self.store.upsert(state: .none, conversationID: conversation.id)
@@ -178,7 +181,7 @@ final class ConversationViewModel {
             throw HeatKitError.missingConversation
         }
         generateTask = Task {
-            await MediaManager()
+            await ImageSession.shared
                 .manage { _ in
                     self.store.upsert(state: .processing, conversationID: conversation.id)
                     self.store.upsert(message: .init(role: .user, content: content), conversationID: conversation.id)
@@ -202,8 +205,9 @@ final class ConversationViewModel {
             throw HeatKitError.missingConversation
         }
         generateTask = Task {
-            await MessageManager(messages: messages)
-                .generate(service: service, model: model, tool: .generateTitle) { message in
+            await MessageManager()
+                .append(messages: messages)
+                .generate(service: service, model: model, tool: Toolbox.generateTitle.tool) { message in
                     guard let title = self.prepareTitle(message) else { return }
                     self.store.upsert(title: title, conversationID: conversation.id)
                 }
@@ -228,10 +232,10 @@ final class ConversationViewModel {
     
     private func prepareSuggestions(_ message: Message) -> [String] {
         guard let toolCalls = message.toolCalls else { return [] }
-        guard let toolCall = toolCalls.first(where: { $0.function.name == Tool.generateSuggestions.function.name }) else { return [] }
+        guard let toolCall = toolCalls.first(where: { $0.function.name == Toolbox.generateSuggestions.name }) else { return [] }
         do {
-            let obj = try Tool.GenerateSuggestions.decode(toolCall.function.arguments)
-            return Array(obj.prompts.prefix(3))
+            let args = try SuggestTool.Arguments(toolCall.function.arguments)
+            return Array(args.prompts.prefix(3))
         } catch {
             self.error = HeatKitError.failedSuggestions
         }
@@ -240,10 +244,10 @@ final class ConversationViewModel {
     
     private func prepareTitle(_ message: Message) -> String? {
         guard let toolCalls = message.toolCalls else { return nil }
-        guard let toolCall = toolCalls.first(where: { $0.function.name == Tool.generateTitle.function.name }) else { return nil }
+        guard let toolCall = toolCalls.first(where: { $0.function.name == Toolbox.generateTitle.name }) else { return nil }
         do {
-            let obj = try Tool.GenerateTitle.decode(toolCall.function.arguments)
-            return obj.title
+            let args = try TitleTool.Arguments(toolCall.function.arguments)
+            return args.title
         } catch {
             print(error)
         }

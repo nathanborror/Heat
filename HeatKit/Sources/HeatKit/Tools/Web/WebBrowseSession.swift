@@ -2,9 +2,10 @@ import Foundation
 import GenKit
 import Fuzi
 
-public class BrowserManager {
+public class WebBrowserSession {
+    public static let shared = WebBrowserSession()
     
-    public init() {}
+    private init() {}
     
     public func generateMarkdown(for url: String) async throws -> String? {
         guard let url = URL(string: url) else { return nil }
@@ -22,7 +23,8 @@ public class BrowserManager {
             """)
         
         var summary: String? = nil
-        await MessageManager(messages: [message])
+        await MessageManager()
+            .append(message: message)
             .generate(service: service, model: model) { message in
                 summary = message.content
             }

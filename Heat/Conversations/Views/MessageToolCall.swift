@@ -9,12 +9,16 @@ struct MessageToolCall: View {
         if let toolCalls = message.toolCalls {
             ForEach(toolCalls, id: \.id) { toolCall in
                 VStack(alignment: .leading, spacing: 0) {
-                    if let tool = AgentTools(name: toolCall.function.name) {
+                    if let tool = Toolbox(name: toolCall.function.name) {
                         switch tool {
                         case .generateImages:
                             MessageToolCallContent(label: "Generating images...", symbol: "circle")
                         case .generateMemory:
                             MessageToolCallContent(label: "Remembering...", symbol: "circle")
+                        case .generateSuggestions:
+                            MessageToolCallContent(label: "Generating suggestions...", symbol: "circle")
+                        case .generateTitle:
+                            MessageToolCallContent(label: "Generating title...", symbol: "circle")
                         case .searchFiles:
                             MessageToolCallContent(label: "Searching files...", symbol: "circle")
                         case .searchCalendar:

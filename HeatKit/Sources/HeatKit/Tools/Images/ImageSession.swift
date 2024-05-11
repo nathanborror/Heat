@@ -3,15 +3,17 @@ import OSLog
 import SharedKit
 import GenKit
 
-private let logger = Logger(subsystem: "MediaManager", category: "HeatKit")
+private let logger = Logger(subsystem: "ImageSession", category: "HeatKit")
 
-public final class MediaManager {
-    public typealias ManagerCallback = @MainActor (MediaManager) -> Void
+public final class ImageSession {
+    public typealias ManagerCallback = @MainActor (ImageSession) -> Void
     public typealias ImagesCallback = @MainActor ([Data]) -> Void
+    
+    public static let shared = ImageSession()
     
     public private(set) var error: Error?
 
-    public init() {}
+    private init() {}
     
     @discardableResult
     public func manage(callback: ManagerCallback) async -> Self {
@@ -36,7 +38,7 @@ public final class MediaManager {
     
     private func apply(error: Error?) {
         if let error = error {
-            logger.error("MediaManager Error: \(error, privacy: .public)")
+            logger.error("ImageSession Error: \(error, privacy: .public)")
             self.error = error
         }
     }
