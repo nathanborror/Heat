@@ -2,8 +2,8 @@ import Foundation
 import GenKit
 import Fuzi
 
-public class WebBrowserSession {
-    public static let shared = WebBrowserSession()
+public class WebBrowseSession {
+    public static let shared = WebBrowseSession()
     
     private init() {}
     

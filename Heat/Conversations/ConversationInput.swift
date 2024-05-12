@@ -220,7 +220,7 @@ struct ConversationInput: View {
     func handleSummarize(_ content: String) {
         Task {
             do {
-                if let markdown = try await WebBrowserSession.shared.generateMarkdown(for: content) {
+                if let markdown = try await WebBrowseSession.shared.generateMarkdown(for: content) {
                     try conversationViewModel.generateSummary(url: content, markdown: markdown)
                 } else {
                     logger.error("Failed to generate markdown")

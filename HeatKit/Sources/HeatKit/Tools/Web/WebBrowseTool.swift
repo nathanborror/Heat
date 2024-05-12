@@ -84,7 +84,7 @@ extension WebBrowseTool {
         let summarizationModel = try Store.shared.preferredSummarizationModel()
         
         do {
-            let summary = try await WebBrowserSession.shared.generateSummary(service: summarizationService, model: summarizationModel, url: args.url)
+            let summary = try await WebBrowseSession.shared.generateSummary(service: summarizationService, model: summarizationModel, url: args.url)
             return .init(
                 title: args.title,
                 url: args.url,

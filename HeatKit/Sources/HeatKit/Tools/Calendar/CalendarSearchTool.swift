@@ -5,8 +5,8 @@ import GenKit
 public struct CalendarSearchTool {
     
     public struct Arguments: Codable {
-        public var start: String
-        public var end: String
+        public var start: Date
+        public var end: Date
         public var query: String?
     }
     
@@ -20,13 +20,13 @@ public struct CalendarSearchTool {
             properties: [
                 "start": .init(
                     type: .string,
-                    description: "A start date. (Example: 2024-01-02)",
-                    format: "date"
+                    description: "A start date and time. (Example: 2024-01-02T00:00)",
+                    format: "date-time"
                 ),
                 "end": .init(
                     type: .string,
-                    description: "An end date. (Example: 2024-02-02)",
-                    format: "date"
+                    description: "An end date and time. (Example: 2024-02-02T23:59)",
+                    format: "date-time"
                 ),
                 "query": .init(
                     type: .string,
