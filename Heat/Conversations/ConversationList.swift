@@ -26,19 +26,7 @@ struct ConversationList: View {
         .scrollDismissesKeyboard(.interactively)
         .listStyle(.sidebar)
         .navigationTitle("History")
-        #if os(macOS)
-        .safeAreaInset(edge: .bottom) {
-            HStack(spacing: 0) {
-                Button(action: { conversationViewModel.conversationID = nil }) {
-                    Image(systemName: "plus")
-                        .padding(8)
-                }
-                .buttonStyle(.plain)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 2)
-        }
-        #else
+        #if !os(macOS)
         .onChange(of: conversationViewModel.conversationID) { _, _ in
             guard conversationViewModel.conversationID != nil else { return }
             dismiss()
