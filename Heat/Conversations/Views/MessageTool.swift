@@ -17,7 +17,7 @@ struct MessageTool: View {
                     MessageToolContent(message: message, symbol: "checkmark.circle")
                     MessageToolAttachments(message: message)
                 case .searchWeb:
-                    MessageToolSearchContent(message: message)
+                    MessageToolWebSearch(message: message)
                 case .generateMemory, .searchFiles, .searchCalendar, .browseWeb, .generateSuggestions, .generateTitle:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
                 }
@@ -107,7 +107,7 @@ struct MessageToolAttachments: View {
     }
 }
 
-struct MessageToolSearchContent: View {
+struct MessageToolWebSearch: View {
     let message: Message
     var response: WebSearchTool.Response? = nil
     
@@ -124,13 +124,13 @@ struct MessageToolSearchContent: View {
                 MessageToolContent(message: message)
             case .image:
                 MessageToolContent(message: message)
-                MessageSearchImages(images: response.results)
+                MessageToolWebSearchImages(images: response.results)
             }
         }
     }
 }
 
-struct MessageSearchImages: View {
+struct MessageToolWebSearchImages: View {
     let images: [WebSearchResult]
     
     var body: some View {

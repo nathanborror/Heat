@@ -12,21 +12,21 @@ struct MessageToolCall: View {
                     if let tool = Toolbox(name: toolCall.function.name) {
                         switch tool {
                         case .generateImages:
-                            MessageToolCallContent(label: "Generating images...", symbol: "circle")
+                            MessageToolCallContent(label: "Generating images...")
                         case .generateMemory:
-                            MessageToolCallContent(label: "Remembering...", symbol: "circle")
+                            MessageToolCallContent(label: "Remembering...")
                         case .generateSuggestions:
-                            MessageToolCallContent(label: "Generating suggestions...", symbol: "circle")
+                            MessageToolCallContent(label: "Generating suggestions...")
                         case .generateTitle:
-                            MessageToolCallContent(label: "Generating title...", symbol: "circle")
+                            MessageToolCallContent(label: "Generating title...")
                         case .searchFiles:
-                            MessageToolCallContent(label: "Searching files...", symbol: "circle")
+                            MessageToolCallContent(label: "Searching files...")
                         case .searchCalendar:
-                            MessageToolCallContent(label: "Searching calendar...", symbol: "circle")
+                            MessageToolCallContent(label: "Searching calendar...")
                         case .searchWeb:
-                            MessageToolCallContent(label: "Searching the web...", symbol: "circle")
+                            MessageToolCallContent(label: "Searching the web...")
                         case .browseWeb:
-                            MessageToolCallContent(label: "Browsing the web...", symbol: "circle")
+                            MessageToolCallContent(label: "Browsing the web...")
                         }
                     } else {
                         Text("Missing tool calls.")
@@ -44,8 +44,8 @@ struct MessageToolCall: View {
 }
 
 struct MessageToolCallContent: View {
-    let label: String
-    let symbol: String
+    var label: String
+    var symbol: String = "circle"
     
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
