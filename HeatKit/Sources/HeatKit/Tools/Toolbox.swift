@@ -61,4 +61,8 @@ public enum Toolbox: CaseIterable {
     public var name: String {
         tool.function.name
     }
+    
+    public static let ignore: [Toolbox] = [
+        .generateSuggestions,
+    ]
 }

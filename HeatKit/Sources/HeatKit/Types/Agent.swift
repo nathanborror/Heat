@@ -87,7 +87,8 @@ struct AgentsResource: Decodable {
         }
         
         var encodeTools: Set<String> {
-            Set(tools ?? Toolbox.allCases.map { $0.tool.function.name })
+            let defaultTools = Toolbox.allCases.filter { !Toolbox.ignore.contains($0) }
+            return Set(tools ?? defaultTools.map { $0.tool.function.name })
         }
     }
 }
