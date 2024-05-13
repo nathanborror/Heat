@@ -9,11 +9,6 @@ public struct Preferences: Codable {
     public var shouldStream: Bool
     public var debug: Bool
     
-    public var hasNotificationPermission: Bool
-    public var hasCalendarPermission: Bool
-    public var hasReminderPermission: Bool
-    public var hasLocationPermission: Bool
-    
     public var preferredChatServiceID: Service.ServiceID?
     public var preferredImageServiceID: Service.ServiceID?
     public var preferredEmbeddingServiceID: Service.ServiceID?
@@ -29,11 +24,6 @@ public struct Preferences: Codable {
         self.defaultAgentID = nil
         self.shouldStream = true
         self.debug = false
-        
-        self.hasNotificationPermission = false
-        self.hasCalendarPermission = false
-        self.hasReminderPermission = false
-        self.hasLocationPermission = false
 
         self.preferredChatServiceID = Constants.defaultChatServiceID
         self.preferredImageServiceID = Constants.defaultImageServiceID

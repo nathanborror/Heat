@@ -1,46 +1,53 @@
-/// Required Info.plist settings:
-///     - NSCalendarsFullAccessUsageDescription
-///     - NSRemindersFullAccessUsageDescription
-///     - NSLocationWhenInUseUsageDescription
-
 import SwiftUI
 import UserNotifications
 import EventKit
 import CoreLocation
+import MusicKit
 import HeatKit
 
 struct PermissionsList: View {
     @Environment(Store.self) private var store
     
+    @State var hasNotificationPermission = false    // NSLocationAlwaysAndWhenInUseUsageDescription
+    @State var hasLocationPermission = false        // NSLocationWhenInUseUsageDescription
+    @State var hasCalendarPermission = false        // NSCalendarsFullAccessUsageDescription
+    @State var hasReminderPermission = false        // NSRemindersFullAccessUsageDescription
+    @State var hasMusicPermission = false           // NSAppleMusicUsageDescription
+    
     @State var locationManager = LocationManager()
     
     var body: some View {
-        @Bindable var store = store
         Form {
             Toggle("Notifications", isOn: Binding(
-                get: { store.preferences.hasNotificationPermission },
+                get: { hasNotificationPermission },
                 set: { shouldGetPermission in
-                    if shouldGetPermission && !store.preferences.hasNotificationPermission {
+                    if shouldGetPermission && !hasNotificationPermission {
                         requestNotificationPermission()
                     }
                 }
             ))
             
-            Toggle("Location", isOn: Binding(get: { store.preferences.hasLocationPermission }, set: { shouldGetPermission in
-                if shouldGetPermission && !store.preferences.hasLocationPermission {
+            Toggle("Location", isOn: Binding(get: { hasLocationPermission }, set: { shouldGetPermission in
+                if shouldGetPermission && !hasLocationPermission {
                     requestLocationPermission()
                 }
             }))
             
-            Toggle("Calendar", isOn: Binding(get: { store.preferences.hasCalendarPermission }, set: { shouldGetPermission in
-                if shouldGetPermission && !store.preferences.hasCalendarPermission {
+            Toggle("Calendar", isOn: Binding(get: { hasCalendarPermission }, set: { shouldGetPermission in
+                if shouldGetPermission && !hasCalendarPermission {
                     requestCalendarPermission()
                 }
             }))
             
-            Toggle("Reminders", isOn: Binding(get: { store.preferences.hasReminderPermission }, set: { shouldGetPermission in
-                if shouldGetPermission && !store.preferences.hasReminderPermission {
+            Toggle("Reminders", isOn: Binding(get: { hasReminderPermission }, set: { shouldGetPermission in
+                if shouldGetPermission && !hasReminderPermission {
                     requestReminderPermission()
+                }
+            }))
+            
+            Toggle("Music", isOn: Binding(get: { hasMusicPermission }, set: { shouldGetPermission in
+                if shouldGetPermission && !hasMusicPermission {
+                    requestMusicPermission()
                 }
             }))
         }
@@ -49,6 +56,7 @@ struct PermissionsList: View {
             getLocationSettings()
             getCalendarSettings()
             getReminderSettings()
+            getMusicSettings()
         }
         .onChange(of: locationManager.authorizationStatus) { _, newValue in
             getLocationSettings()
@@ -60,53 +68,19 @@ struct PermissionsList: View {
     func getNotificationSettings() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             switch settings.authorizationStatus {
+            case .notDetermined, .denied:
+                hasNotificationPermission = false
             case .authorized, .provisional, .ephemeral:
-                store.preferences.hasNotificationPermission = true
-            default:
-                store.preferences.hasNotificationPermission = false
+                hasNotificationPermission = true
+            @unknown default:
+                hasNotificationPermission = false
             }
         }
     }
     
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            store.preferences.hasNotificationPermission = granted
-        }
-    }
-    
-    // Calendar
-    
-    func getCalendarSettings() {
-        let status = EKEventStore.authorizationStatus(for: .event)
-        switch status {
-        case .fullAccess, .writeOnly, .authorized:
-            store.preferences.hasCalendarPermission = true
-        default:
-            store.preferences.hasCalendarPermission = false
-        }
-    }
-    
-    func requestCalendarPermission() {
-        EKEventStore().requestFullAccessToEvents { granted, error in
-            store.preferences.hasCalendarPermission = granted
-        }
-    }
-    
-    // Reminders
-    
-    func getReminderSettings() {
-        let status = EKEventStore.authorizationStatus(for: .reminder)
-        switch status {
-        case .fullAccess, .writeOnly, .authorized:
-            store.preferences.hasReminderPermission = true
-        default:
-            store.preferences.hasReminderPermission = false
-        }
-    }
-    
-    func requestReminderPermission() {
-        EKEventStore().requestFullAccessToReminders { granted, error in
-            store.preferences.hasReminderPermission = granted
+            hasNotificationPermission = granted
         }
     }
     
@@ -116,16 +90,88 @@ struct PermissionsList: View {
         let status = locationManager.authorizationStatus
         switch status {
         case .authorizedAlways, .restricted, .authorized, .authorizedWhenInUse:
-            store.preferences.hasLocationPermission = true
+            hasLocationPermission = true
         case .notDetermined, .denied:
-            store.preferences.hasLocationPermission = false
-        default:
-            store.preferences.hasLocationPermission = false
+            hasLocationPermission = false
+        @unknown default:
+            hasLocationPermission = false
         }
     }
     
     func requestLocationPermission() {
         locationManager.requestAuthorization()
+    }
+    
+    // Calendar
+    
+    func getCalendarSettings() {
+        let status = EKEventStore.authorizationStatus(for: .event)
+        switch status {
+        case .notDetermined, .restricted, .denied:
+            hasCalendarPermission = false
+        case .fullAccess, .writeOnly, .authorized:
+            hasCalendarPermission = true
+        @unknown default:
+            hasCalendarPermission = false
+        }
+    }
+    
+    func requestCalendarPermission() {
+        EKEventStore().requestFullAccessToEvents { granted, error in
+            hasCalendarPermission = granted
+        }
+    }
+    
+    // Reminders
+    
+    func getReminderSettings() {
+        let status = EKEventStore.authorizationStatus(for: .reminder)
+        switch status {
+        case .notDetermined, .restricted, .denied:
+            hasReminderPermission = false
+        case .fullAccess, .writeOnly, .authorized:
+            hasReminderPermission = true
+        @unknown default:
+            hasReminderPermission = false
+        }
+    }
+    
+    func requestReminderPermission() {
+        EKEventStore().requestFullAccessToReminders { granted, error in
+            hasReminderPermission = granted
+        }
+    }
+    
+    // Music
+    
+    func getMusicSettings() {
+        switch MusicAuthorization.currentStatus {
+        case .notDetermined, .denied, .restricted:
+            hasMusicPermission = false
+        case .authorized:
+            hasMusicPermission = true
+        @unknown default:
+            hasMusicPermission = false
+        }
+    }
+    
+    func requestMusicPermission() {
+        switch MusicAuthorization.currentStatus {
+        case .authorized:
+            hasMusicPermission = true
+        default:
+            Task {
+                let status = await MusicAuthorization.request()
+                switch status {
+                case .notDetermined, .denied, .restricted:
+                    hasMusicPermission = false
+                case .authorized:
+                    hasMusicPermission = true
+                @unknown default:
+                    hasMusicPermission = false
+                }
+            }
+        }
     }
 }
 
