@@ -153,6 +153,8 @@ struct ConversationInput: View {
     }
     
     func handleSubmit() {
+        defer { clear() }
+        
         // Create conversation if one doesn't already exist
         if conversationViewModel.conversationID == nil {
             conversationViewModel.newConversation()
@@ -188,7 +190,6 @@ struct ConversationInput: View {
         } catch {
             logger.warning("failed to submit: \(error)")
         }
-        clear()
     }
     
     func handleVision(_ content: String) {
