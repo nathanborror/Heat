@@ -15,8 +15,10 @@ struct MessageTool: View {
                 switch tool {
                 case .generateImages:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
-                    MessageImagesComponent(attachments: message.attachments)
-                case .generateMemory, .searchFiles, .searchCalendar, .searchWeb, .browseWeb, .generateSuggestions, .generateTitle:
+                    MessageToolAttachments(message: message)
+                case .searchWeb:
+                    MessageToolSearchContent(message: message)
+                case .generateMemory, .searchFiles, .searchCalendar, .browseWeb, .generateSuggestions, .generateTitle:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
                 }
             } else {
@@ -59,8 +61,8 @@ struct MessageTool: View {
 struct MessageToolContent: View {
     @Environment(Store.self) var store
     
-    let message: Message
-    let symbol: String
+    var message: Message
+    var symbol: String = "checkmark.circle"
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -68,6 +70,7 @@ struct MessageToolContent: View {
                 Image(systemName: symbol)
                 Text(message.metadata.label)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(1)
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)
@@ -83,14 +86,14 @@ struct MessageToolContent: View {
     }
 }
 
-struct MessageImagesComponent: View {
-    let attachments: [Message.Attachment]
+struct MessageToolAttachments: View {
+    let message: Message
     
     var body: some View {
         ScrollView(.horizontal) {
             HStack {
-                ForEach(attachments.indices, id: \.self) { index in
-                    if case .asset(let asset) = attachments[index] {
+                ForEach(message.attachments.indices, id: \.self) { index in
+                    if case .asset(let asset) = message.attachments[index] {
                         PictureView(asset: asset)
                             .frame(width: 200, height: 200)
                             .clipShape(.rect(cornerRadius: 10))
@@ -101,5 +104,58 @@ struct MessageImagesComponent: View {
         }
         .scrollIndicators(.hidden)
         .scrollClipDisabled()
+    }
+}
+
+struct MessageToolSearchContent: View {
+    let message: Message
+    var response: WebSearchTool.Response? = nil
+    
+    init(message: Message) {
+        self.message = message
+        guard let content = message.content, let data = content.data(using: .utf8) else { return }
+        self.response = try? JSONDecoder().decode(WebSearchTool.Response.self, from: data)
+    }
+    
+    var body: some View {
+        if let response {
+            switch response.kind {
+            case .website, .news:
+                MessageToolContent(message: message)
+            case .image:
+                MessageToolContent(message: message)
+                MessageSearchImages(images: response.results)
+            }
+        }
+    }
+}
+
+struct MessageSearchImages: View {
+    let images: [WebSearchResult]
+    
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack {
+                ForEach(images.indices, id: \.self) { index in
+                    Button(action: {}) {
+                        AsyncImage(url: images[index].image) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            Color.primary
+                        }
+                        .frame(width: 200, height: 200)
+                        .clipShape(.rect(cornerRadius: 10))
+                    }
+                    .buttonStyle(.plain)
+                }
+                Spacer()
+            }
+        }
+        .scrollIndicators(.hidden)
+        .scrollClipDisabled()
+        .padding(.vertical, 8)
+        .padding(.leading, -12)
     }
 }

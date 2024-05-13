@@ -2,61 +2,44 @@ import Foundation
 import QuartzCore
 import Fuzi
 
-public struct WebSearchResponse: Codable {
-    public var query: String
-    public var results: [WebSearchResult]
-    public var infoBox: String?
-
-    public init(query: String, results: [WebSearchResult], infoBox: String? = nil) {
-        self.query = query
-        self.results = results
-        self.infoBox = infoBox
-    }
-}
-
-public struct WebSearchResult: Codable {
-    public var url: URL
-    public var title: String
-    public var description: String?
-
-    public init(url: URL, title: String, description: String?) {
-        self.url = url
-        self.title = title
-        self.description = description
-    }
-}
-
 public class WebSearchSession {
     public static var shared = WebSearchSession()
+    
+    private let engine = GoogleSearch()
     
     private init() {}
     
     public func search(query: String) async throws -> WebSearchResponse {
-        let engine = GoogleSearchEngine()
-        return try await engine.search(query: query)
+        try await engine.search(query: query)
+    }
+    
+    public func searchNews(query: String) async throws -> WebSearchResponse {
+        try await engine.searchNews(query: query)
+    }
+    
+    public func searchImages(query: String) async throws -> WebSearchResponse {
+        try await engine.searchImages(query: query)
     }
 }
 
 // Below from: https://github.com/nate-parrott/chattoys
 
-public protocol WebSearchEngine {
-    func search(query: String) async throws -> WebSearchResponse
-}
+public struct GoogleSearch {
 
-public struct GoogleSearchEngine: WebSearchEngine {
-
+    private let desktopUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+    private let mobileUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1"
+    
     public init() {}
 
     public func search(query: String) async throws -> WebSearchResponse {
         var urlComponents = URLComponents(string: "https://www.google.com/search")!
         urlComponents.queryItems = [
-            URLQueryItem(name: "q", value: query),
+            .init(name: "q", value: query),
         ]
         var request = URLRequest(url: urlComponents.url!)
         request.httpShouldHandleCookies = false
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        let userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue(desktopUserAgent, forHTTPHeaderField: "User-Agent")
         
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let html = String(data: data, encoding: .utf8) else {
@@ -64,39 +47,71 @@ public struct GoogleSearchEngine: WebSearchEngine {
         }
         let baseURL = response.url ?? urlComponents.url!
 
-        let t2 = CACurrentMediaTime()
-        let extracted = try extract(html: html, baseURL: baseURL, query: query)
-        print("[Timing] [GoogleSearch] Parsed at \(CACurrentMediaTime() - t2)")
+        let start = CACurrentMediaTime()
+        let resp = try extractResults(html: html, baseURL: baseURL, query: query)
+        print("[Timing] [GoogleSearch] Parsed at \(CACurrentMediaTime() - start)")
+        return resp
+    }
+    
+    public func searchNews(query: String) async throws -> WebSearchResponse {
+        var urlComponents = URLComponents(string: "https://www.google.com/search")!
+        urlComponents.queryItems = [
+            .init(name: "q", value: query),
+            .init(name: "tbm", value: "nws"),
+        ]
+        var request = URLRequest(url: urlComponents.url!)
+        request.httpShouldHandleCookies = false
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(desktopUserAgent, forHTTPHeaderField: "User-Agent")
         
-        return extracted
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let html = String(data: data, encoding: .utf8) else {
+            throw SearchError.invalidHTML
+        }
+        let baseURL = response.url ?? urlComponents.url!
+
+        let start = CACurrentMediaTime()
+        let resp = try extractNewsResults(html: html, baseURL: baseURL, query: query)
+        print("[Timing] [GoogleNewsSearch] Parsed at \(CACurrentMediaTime() - start)")
+        return resp
     }
 
-    private func extract(html: String, baseURL: URL, query: String) throws -> WebSearchResponse {
+    public func searchImages(query: String) async throws -> WebSearchResponse {
+        var urlComponents = URLComponents(string: "https://www.google.com/search")!
+        urlComponents.queryItems = [
+            .init(name: "q", value: query),
+            .init(name: "tbm", value: "isch"), // to be matched = image search
+            .init(name: "gbv", value: "1"), // google basic version = 1 (no js)
+        ]
+        var request = URLRequest(url: urlComponents.url!)
+        request.httpShouldHandleCookies = false
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(mobileUserAgent, forHTTPHeaderField: "User-Agent")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let html = String(data: data, encoding: .utf8) else {
+            throw SearchError.invalidHTML
+        }
+        let baseURL = response.url ?? urlComponents.url!
+        
+        let start = CACurrentMediaTime()
+        let resp = try extractImageResults(html: html, baseURL: baseURL, query: query)
+        print("[Timing] [GoogleImageSearch] Parsed at \(CACurrentMediaTime() - start)")
+        return resp
+    }
+    
+    // MARK: Private
+    
+    private func extractResults(html: String, baseURL: URL, query: String) throws -> WebSearchResponse {
         let doc = try Fuzi.HTMLDocument(string: html)
 
         guard let main = doc.css("#main").first else {
             throw SearchError.missingMainElement
         }
 
-        /*
-         In the Google search result DOM tree:
-         - #main contains all search results (but also some navigational stuff)
-         - Results are wrapped in many layers of divs
-         - Result links look like this: <a href=''>
-           - They contain (several layers deep):
-             - A url breadcrumbs view built out of divs
-             - An h3 containing the result title
-         - Result snippets can be found by:
-            - Starting at the <a>
-            - Going up three levels and selecting the _second_ div child
-            - Finding the first child of this div that contains text, and extracting all inner text
-         - Some results (e.g. youtube) may include multiple spans and <br> elements in their snippets.
-         */
-
         var results = [WebSearchResult]()
         // Exclude role=heading; this indicates an image section
         // Exclude aria-hidden=true; this indicates the 'more results' cell
-
         // a:has(h3:not([role=heading], [aria-hidden=true]))
         let anchors = main.css("a").filter { el in
             let h3s = el.css("h3")
@@ -113,9 +128,47 @@ public struct GoogleSearchEngine: WebSearchEngine {
         if let youtubeResults = try main.extractYouTubeResults() {
             results.insert(contentsOf: youtubeResults, at: min(1, results.count))
         }
-        return .init(query: query, results: results, infoBox: nil)
+        return .init(query: query, results: results)
+    }
+    
+    private func extractNewsResults(html: String, baseURL: URL, query: String) throws -> WebSearchResponse {
+        let doc = try Fuzi.HTMLDocument(string: html)
+
+        guard let main = doc.css("#main").first else {
+            throw SearchError.missingMainElement
+        }
+
+        let results = main.css("a").map { el in
+            let urls = el.xpath("//a[.//div[@role='heading']]/@href")
+            let headers = el.xpath("//div[@role='heading'][@aria-level='3']/text()")
+            let descriptions = el.xpath("//div[@role='heading'][@aria-level='3']/following-sibling::div[1]/text()")
+         
+            return zip(urls, zip(headers, descriptions)).map {
+                WebSearchResult(url: URL(string: $0.stringValue)!, title: $1.0.stringValue, description: $1.1.stringValue)
+            }
+        }.flatMap { $0 }
+        return .init(query: query, results: results)
     }
 
+    private func extractImageResults(html: String, baseURL: URL, query: String) throws -> WebSearchResponse {
+        let doc = try Fuzi.HTMLDocument(string: html)
+        let results = doc.css("a[href]")
+            .filter { $0.attr("href")?.starts(with: "/imgres") ?? false }
+            .compactMap { el -> WebSearchResult? in
+                guard let href = el.attr("href"),
+                      let comps = URLComponents(string: href),
+                      let imgUrlStr = comps.queryItems?.first(where: { $0.name == "imgurl" })?.value,
+                      let imgUrl = URL(string: imgUrlStr),
+                      let siteUrlStr = comps.queryItems?.first(where: { $0.name == "imgrefurl" })?.value,
+                      let siteUrl = URL(string: siteUrlStr)
+                else {
+                    return nil
+                }
+                return .init(url: siteUrl, image: imgUrl)
+        }
+        return WebSearchResponse(query: query, results: results)
+    }
+    
     enum SearchError: Error {
         case invalidHTML
         case missingMainElement
@@ -123,6 +176,7 @@ public struct GoogleSearchEngine: WebSearchEngine {
 }
 
 private extension Fuzi.XMLElement {
+    
     func extractYouTubeResults() throws -> [WebSearchResult]? {
         var results = [WebSearchResult]()
         // Search for elements with a href starting with https://www.youtube.com, which contain a div role=heading
@@ -191,5 +245,31 @@ private extension Fuzi.XMLElement {
             return self
         }
         return parent?.nthParent(n - 1)
+    }
+}
+
+// MARK: Types
+
+public struct WebSearchResponse: Codable {
+    public var query: String
+    public var results: [WebSearchResult]
+
+    public init(query: String, results: [WebSearchResult]) {
+        self.query = query
+        self.results = results
+    }
+}
+
+public struct WebSearchResult: Codable {
+    public var url: URL
+    public var title: String?
+    public var description: String?
+    public var image: URL?
+
+    public init(url: URL, title: String? = nil, description: String? = nil, image: URL? = nil) {
+        self.url = url
+        self.title = title
+        self.description = description
+        self.image = image
     }
 }
