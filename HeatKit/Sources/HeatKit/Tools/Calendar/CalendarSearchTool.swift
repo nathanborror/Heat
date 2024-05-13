@@ -36,6 +36,18 @@ public struct CalendarSearchTool {
             required: ["start", "end"]
         )
     )
+    
+    public static let dateFormat = "yyyy-MM-dd'T'HH:mm"
+    
+    public static let decoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .custom({ decoder in
+            let container = try decoder.singleValueContainer()
+            let string = try container.decode(String.self)
+            return Date(string: string, format: dateFormat) ?? .now
+        })
+        return decoder
+    }()
 }
 
 extension CalendarSearchTool.Arguments {
@@ -44,7 +56,7 @@ extension CalendarSearchTool.Arguments {
         guard let data = arguments.data(using: .utf8) else {
             throw KitError.failedtoolDecoding
         }
-        self = try JSONDecoder().decode(Self.self, from: data)
+        self = try CalendarSearchTool.decoder.decode(Self.self, from: data)
     }
 }
 
