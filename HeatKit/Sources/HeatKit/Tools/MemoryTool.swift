@@ -70,3 +70,23 @@ extension MemoryTool {
         }
     }
 }
+
+extension MemoryTool: ContextTool {
+    public static func prepareContext() -> Message? {
+        guard let container = try? ModelContainer(for: Memory.self) else { return nil }
+        let fetchRequest = FetchDescriptor<Memory>(sortBy: [SortDescriptor(\Memory.created, order: .forward)])
+        let context = ModelContext(container)
+        do {
+            let memories: [Memory] = try context.fetch(fetchRequest)
+            guard !memories.isEmpty else { return nil }
+            return Message(role: .system, content: """
+                Some things to remember about who the user is. Use these to better relate to the user when responding:
+
+                \(memories.map({ $0.content }).joined(separator: "\n"))
+                """)
+        } catch {
+            print("Failed to fetch memories: \(error)")
+            return nil
+        }
+    }
+}
