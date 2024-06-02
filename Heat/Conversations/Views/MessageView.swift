@@ -44,6 +44,7 @@ struct MessageView: View {
 }
 
 struct MessageViewText: View {
+    @Environment(Store.self) var store
     @Environment(\.colorScheme) private var colorScheme
     
     let message: Message
@@ -56,38 +57,45 @@ struct MessageViewText: View {
                 .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
                 .textSelection(.enabled)
         case .assistant:
-            Markdown(parsedText().restOfText)
-                .markdownTheme(.mate)
-                .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
-                .textSelection(.enabled)
+            VStack(alignment: .leading) {
+                if store.preferences.debug && !parsedText.taggedContent.isEmpty {
+                    Text(parsedText.taggedContent.map { "<\($0)>\($1)</\($0)>" }.joined(separator: "\n\n"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.bottom)
+                }
+                Markdown(parsedText.readableContent)
+                    .markdownTheme(.mate)
+                    .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
+                    .textSelection(.enabled)
+            }
         default:
             EmptyView()
         }
     }
     
-    func parsedText() -> ParsedText {
-        let text = message.content ?? ""
+    var parsedText: ParsedText {
+        let raw = message.content ?? ""
         let regex = /<(\w+)>[^<]*<\/\1>/
-        let matches = text.matches(of: regex)
+        let matches = raw.matches(of: regex)
         
-        var tagContents: [String: String] = [:]
-        var strippedText = text
+        var taggedContent: [String: String] = [:]
+        var strippedText = raw
         
         for match in matches {
             let tagName = String(match.output.1)
             let tagContent = match.output.0.replacingOccurrences(of: "<\\w+>|</\\w+>", with: "", options: .regularExpression)
             
-            tagContents[tagName] = tagContent
+            taggedContent[tagName] = tagContent
             strippedText = strippedText.replacingOccurrences(of: match.output.0, with: "")
         }
-        
-        let restOfText = strippedText.trimmingCharacters(in: .whitespacesAndNewlines)
-        return ParsedText(tagContents: tagContents, restOfText: restOfText)
+        let readableContent = strippedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return ParsedText(taggedContent: taggedContent, readableContent: readableContent)
     }
     
     struct ParsedText {
-        var tagContents: [String: String]
-        var restOfText: String
+        var taggedContent: [String: String]
+        var readableContent: String
     }
     
     #if os(macOS)
