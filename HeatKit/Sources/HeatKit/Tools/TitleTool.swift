@@ -24,6 +24,11 @@ public struct TitleTool {
             ]
         )
     )
+    
+    public static let message = Message(
+        role: .user,
+        content: "Provide a title for this conversation. Use the `\(function.name)` tool in your response."
+    )
 }
 
 extension TitleTool.Arguments {

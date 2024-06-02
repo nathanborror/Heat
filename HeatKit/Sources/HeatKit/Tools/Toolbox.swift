@@ -62,6 +62,17 @@ public enum Toolbox: CaseIterable {
         tool.function.name
     }
     
+    public var message: Message? {
+        switch self {
+        case .generateSuggestions:
+            SuggestTool.message
+        case .generateTitle:
+            TitleTool.message
+        default:
+            nil
+        }
+    }
+    
     public static let ignore: [Toolbox] = [
         .generateSuggestions,
     ]

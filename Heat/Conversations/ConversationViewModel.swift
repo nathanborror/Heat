@@ -76,6 +76,7 @@ final class ConversationViewModel {
                 .manage { _ in
                     self.store.upsert(state: .suggesting, conversationID: conversation.id)
                 }
+                .append(message: Toolbox.generateSuggestions.message)
                 .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
                     let suggestions = self.prepareSuggestions(message)
                     self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
@@ -160,6 +161,7 @@ final class ConversationViewModel {
                 .manage { _ in
                     self.store.upsert(state: .suggesting, conversationID: conversation.id)
                 }
+                .append(message: Toolbox.generateSuggestions.message)
                 .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
                     let suggestions = self.prepareSuggestions(message)
                     self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
@@ -207,6 +209,7 @@ final class ConversationViewModel {
         generateTask = Task {
             await MessageManager()
                 .append(messages: messages)
+                .append(message: Toolbox.generateTitle.message)
                 .generate(service: service, model: model, tool: Toolbox.generateTitle.tool) { message in
                     guard let title = self.prepareTitle(message) else { return }
                     self.store.upsert(title: title, conversationID: conversation.id)

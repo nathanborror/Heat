@@ -26,6 +26,11 @@ public struct SuggestTool {
             required: ["prompts"]
         )
     )
+    
+    public static let message = Message(
+        role: .user,
+        content: "Suggest followup replies. Use the `\(function.name)` tool in your response."
+    )
 }
 
 extension SuggestTool.Arguments {
