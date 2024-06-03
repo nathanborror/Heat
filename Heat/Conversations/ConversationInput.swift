@@ -11,8 +11,6 @@ struct ConversationInput: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.modelContext) private var modelContext
     
-    @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
-    
     @State var imagePickerViewModel: ImagePickerViewModel
     @State var content: String
     @State var command: String
@@ -184,7 +182,7 @@ struct ConversationInput: View {
         guard !content.isEmpty else { return }
         
         do {
-            try conversationViewModel.generate(content, context: memories.map { $0.content })
+            try conversationViewModel.generate(content)
         } catch let error as KitError {
             conversationViewModel.error = error
         } catch {

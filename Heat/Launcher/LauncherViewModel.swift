@@ -35,7 +35,7 @@ final class LauncherViewModel {
         conversationID = conversation.id
     }
     
-    func generate(_ content: String, context: [String] = []) throws {
+    func generate(_ content: String) throws {
         guard !content.isEmpty else { return }
         guard let conversation else {
             throw KitError.missingConversation
@@ -43,13 +43,12 @@ final class LauncherViewModel {
         
         let chatService = try store.preferredChatService()
         let chatModel = try store.preferredChatModel()
-        
-        let context = prepareContext(context)
+        let contextTools: [ContextTool.Type] = [MemoryTool.self]
         
         generateTask = Task {
             await MessageManager()
                 .append(messages: messages)
-                .append(message: context)
+                .append(messages: contextTools.compactMap({ $0.prepareContext() }))
                 .append(message: .init(role: .user, content: content)) { message in
                     self.store.upsert(suggestions: [], conversationID: conversation.id)
                     self.store.upsert(message: message, conversationID: conversation.id)
