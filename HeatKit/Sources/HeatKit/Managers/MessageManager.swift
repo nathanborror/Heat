@@ -56,25 +56,31 @@ public final class MessageManager {
     // MARK: Generators
     
     @discardableResult
-    public func generate(service: ChatService, model: String, tools: Set<Tool> = [], stream: Bool = true, callback: MessageCallback, processing: ProcessingCallback? = nil) async -> Self {
+    public func generate(service: ChatService, model: String, tools: Set<Tool> = [], toolChoice: Tool? = nil, stream: Bool = true, callback: MessageCallback, processing: ProcessingCallback? = nil) async -> Self {
         do {
             try Task.checkCancellation()
             
             let runID = String.id
+            var runLoopCount = 0
             var runShouldContinue = true
             
             while runShouldContinue {
                 var message: Message? = nil
                 
-                // Prepare chat request for service
-                let req = ChatServiceRequest(model: model, messages: filteredMessages, tools: tools)
+                // Prepare chat request for service, DO NOT include a tool choice on any subsequent runs, this will
+                // likely cause an expensive infinite loop of tool calls.
+                let req = ChatServiceRequest(
+                    model: model,
+                    messages: filteredMessages,
+                    tools: tools,
+                    toolChoice: (runLoopCount > 0) ? nil : toolChoice
+                )
                 
                 // Generate completion
                 if stream {
-                    try await service.completionStream(request: req) { delta in
-                        let messageDelta = apply(delta: delta, runID: runID)
-                        message = messageDelta
-                        await callback(messageDelta)
+                    try await service.completionStream(request: req) { update in
+                        message = apply(message: update, runID: runID)
+                        await callback(message!)
                     }
                 } else {
                     message = try await service.completion(request: req)
@@ -93,6 +99,7 @@ public final class MessageManager {
                     await callback(response)
                 }
                 runShouldContinue = shouldContinue
+                runLoopCount += 1
             }
         } catch {
             apply(error: error)
@@ -120,8 +127,8 @@ public final class MessageManager {
             try Task.checkCancellation()
             let req = VisionServiceRequest(model: model, messages: filteredMessages, maxTokens: 1000)
             if stream {
-                try await service.completionStream(request: req) { message in
-                    let message = apply(delta: message)
+                try await service.completionStream(request: req) { update in
+                    let message = apply(message: update)
                     await callback?(message)
                 }
             } else {
@@ -174,14 +181,13 @@ public final class MessageManager {
     
     // MARK: Appliers
     
-    private func apply(delta message: Message, runID: String? = nil) -> Message {
+    private func apply(message: Message, runID: String? = nil) -> Message {
         var message = message
         message.runID = runID
         
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
-            let newMessage = messages[index].apply(message)
-            messages[index] = newMessage
-            return newMessage
+            messages[index] = message
+            return message
         } else {
             messages.append(message)
             return message

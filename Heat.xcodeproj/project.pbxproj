@@ -610,10 +610,10 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		D4A2C5582B8BF8550004F27B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			repositoryURL = "https://github.com/electricsidecar-dev/swift-markdown-ui";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.3.0;
+				branch = recursive;
+				kind = branch;
 			};
 		};
 		D4A2C55B2B8BF89A0004F27B /* XCRemoteSwiftPackageReference "Splash" */ = {

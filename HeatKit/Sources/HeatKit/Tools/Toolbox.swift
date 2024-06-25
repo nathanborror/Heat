@@ -74,6 +74,7 @@ public enum Toolbox: CaseIterable {
     }
     
     public static let ignore: [Toolbox] = [
+        .generateTitle,
         .generateSuggestions,
     ]
 }

@@ -58,13 +58,7 @@ struct MessageViewText: View {
                 .textSelection(.enabled)
         case .assistant:
             VStack(alignment: .leading) {
-                if store.preferences.debug && !parsedText.taggedContent.isEmpty {
-                    Text(parsedText.taggedContent.map { "<\($0)>\($1)</\($0)>" }.joined(separator: "\n\n"))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom)
-                }
-                Markdown(parsedText.readableContent)
+                Markdown(message.content ?? "")
                     .markdownTheme(.mate)
                     .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
                     .textSelection(.enabled)
@@ -72,25 +66,6 @@ struct MessageViewText: View {
         default:
             EmptyView()
         }
-    }
-    
-    var parsedText: ParsedText {
-        let raw = message.content ?? ""
-        let regex = /<(\w+)>[^<]*<\/\1>/
-        let matches = raw.matches(of: regex)
-        
-        var taggedContent: [String: String] = [:]
-        var strippedText = raw
-        
-        for match in matches {
-            let tagName = String(match.output.1)
-            let tagContent = match.output.0.replacingOccurrences(of: "<\\w+>|</\\w+>", with: "", options: .regularExpression)
-            
-            taggedContent[tagName] = tagContent
-            strippedText = strippedText.replacingOccurrences(of: match.output.0, with: "")
-        }
-        let readableContent = strippedText.trimmingCharacters(in: .whitespacesAndNewlines)
-        return ParsedText(taggedContent: taggedContent, readableContent: readableContent)
     }
     
     struct ParsedText {

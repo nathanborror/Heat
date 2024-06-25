@@ -12,21 +12,21 @@ struct MessageToolCall: View {
                     if let tool = Toolbox(name: toolCall.function.name) {
                         switch tool {
                         case .generateImages:
-                            MessageToolCallContent(label: "Generating images...")
+                            content("Generating images...")
                         case .generateMemory:
-                            MessageToolCallContent(label: "Remembering...")
+                            content("Remembering...")
                         case .generateSuggestions:
-                            MessageToolCallContent(label: "Generating suggestions...")
+                            content("Generating suggestions...")
                         case .generateTitle:
-                            MessageToolCallContent(label: "Generating title...")
+                            content("Generating title...")
                         case .searchFiles:
-                            MessageToolCallContent(label: "Searching files...")
+                            content("Searching files...")
                         case .searchCalendar:
-                            MessageToolCallContent(label: "Searching calendar...")
+                            content("Searching calendar...")
                         case .searchWeb:
-                            MessageToolCallContent(label: "Searching the web...")
+                            content("Searching the web...")
                         case .browseWeb:
-                            MessageToolCallContent(label: "Browsing the web...")
+                            content("Browsing the web...")
                         }
                     } else {
                         Text("Missing tool calls.")
@@ -40,6 +40,10 @@ struct MessageToolCall: View {
         } else {
             Text("Missing tool calls.")
         }
+    }
+    
+    func content(_ label: String) -> MessageToolCallContent {
+        .init(label: label)
     }
 }
 

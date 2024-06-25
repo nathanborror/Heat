@@ -14,15 +14,16 @@ struct MessageTool: View {
             if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
-                    MessageToolContent(message: message, symbol: "checkmark.circle")
+                    content(message, symbol: "checkmark.circle")
                     MessageToolAttachments(message: message)
                 case .searchWeb:
+                    content(message, symbol: "checkmark.circle")
                     MessageToolWebSearch(message: message)
-                case .generateMemory, .searchFiles, .searchCalendar, .browseWeb, .generateSuggestions, .generateTitle:
-                    MessageToolContent(message: message, symbol: "checkmark.circle")
+                default:
+                    content(message, symbol: "checkmark.circle")
                 }
             } else {
-                MessageToolContent(message: message, symbol: "circle.badge.questionmark")
+                content(message, symbol: "circle.badge.questionmark")
             }
         }
         .sheet(isPresented: $isShowingContext) {
@@ -49,6 +50,10 @@ struct MessageTool: View {
                 }
             }
         }
+    }
+    
+    func content(_ message: Message, symbol: String) -> MessageToolContent {
+        .init(message: message, symbol: symbol)
     }
     
     #if os(macOS)
@@ -118,14 +123,8 @@ struct MessageToolWebSearch: View {
     }
     
     var body: some View {
-        if let response {
-            switch response.kind {
-            case .website, .news:
-                MessageToolContent(message: message)
-            case .image:
-                MessageToolContent(message: message)
-                MessageToolWebSearchImages(images: response.results)
-            }
+        if let response, case .image = response.kind {
+            MessageToolWebSearchImages(images: response.results)
         }
     }
 }

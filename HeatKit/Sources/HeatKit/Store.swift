@@ -106,9 +106,7 @@ public final class Store {
             return
         }
         if let index = conversation.messages.firstIndex(where: { $0.id == message.id }) {
-            var existing = conversation.messages[index]
-            existing = existing.apply(message)
-            conversation.messages[index] = existing
+            conversation.messages[index] = message
         } else {
             conversation.messages.append(message)
         }
@@ -152,21 +150,6 @@ public final class Store {
         } else {
             preferences.services.append(service)
         }
-    }
-    
-    // MARK: - Replace
-    
-    public func replace(message: Message, conversationID: String) {
-        guard var conversation = get(conversationID: conversationID) else {
-            logger.warning("missing conversation")
-            return
-        }
-        if let index = conversation.messages.firstIndex(where: { $0.id == message.id }) {
-            conversation.messages[index] = message
-        } else {
-            conversation.messages.append(message)
-        }
-        upsert(conversation: conversation)
     }
     
     // MARK: - Deletion

@@ -23,41 +23,36 @@ struct MainCompactView: View {
                 .toolbar {
                     ToolbarItem {
                         Menu {
-                            Button(action: { sheet = .conversationList }) {
-                                Label("History", systemImage: "clock")
-                            }
-                            Button(action: { sheet = .memories }) {
-                                Label("Memory", systemImage: "brain")
-                            }
+                            menuButton("History", symbol: "clock") { sheet = .conversationList }
+                            menuButton("Memory", symbol: "brain") { sheet = .memories }
                             Divider()
-                            Button(action: { sheet = .preferences }) {
-                                Label("Preferences", systemImage: "slider.horizontal.3")
-                            }
+                            menuButton("Preferences", symbol: "slider.horizontal.3") { sheet = .preferences }
                         } label: {
                             Label("Menu", systemImage: "ellipsis")
                         }
                     }
                     ToolbarItem {
-                        Button(action: { conversationViewModel.conversationID = nil }) {
-                            Label("New Conversation", systemImage: "plus")
-                        }
+                        menuButton("New Conversation", symbol: "plus") { conversationViewModel.conversationID = nil }
                     }
                 }
                 .sheet(item: $sheet) { sheet in
                     NavigationStack {
                         switch sheet {
-                        case .preferences:
-                            PreferencesForm()
-                        case .memories:
-                            MemoryList()
-                        case .conversationList:
-                            ConversationList()
+                        case .preferences:      PreferencesForm()
+                        case .memories:         MemoryList()
+                        case .conversationList: ConversationList()
                         }
                     }
                     .environment(store)
                     .environment(conversationViewModel)
                     .presentationDragIndicator(.visible)
                 }
+        }
+    }
+    
+    func menuButton(_ label: String, symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(label, systemImage: symbol)
         }
     }
 }

@@ -43,7 +43,7 @@ final class ConversationViewModel {
         conversationID = conversation.id
     }
     
-    func generate(_ content: String, context: [String] = []) throws {
+    func generate(_ content: String, context: [String] = [], toolChoice: Tool? = nil) throws {
         guard !content.isEmpty else { return }
         guard let conversation else {
             throw KitError.missingConversation
@@ -66,9 +66,9 @@ final class ConversationViewModel {
                     self.store.upsert(message: message, conversationID: conversation.id)
                     self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
-                .generate(service: chatService, model: chatModel, tools: conversation.tools, stream: store.preferences.shouldStream) { message in
+                .generate(service: chatService, model: chatModel, tools: conversation.tools, toolChoice: toolChoice, stream: store.preferences.shouldStream) { message in
                     self.store.upsert(state: .streaming, conversationID: conversation.id)
-                    self.store.replace(message: message, conversationID: conversation.id)
+                    self.store.upsert(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
                 } processing: {
                    self.store.upsert(state: .processing, conversationID: conversation.id)
@@ -117,7 +117,7 @@ final class ConversationViewModel {
                 }
                 .generate(service: visionService, model: visionModel) { message in
                     self.store.upsert(state: .streaming, conversationID: conversation.id)
-                    self.store.replace(message: message, conversationID: conversation.id)
+                    self.store.upsert(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
                 }
                 .manage { manager in
@@ -130,48 +130,6 @@ final class ConversationViewModel {
             if title == Conversation.titlePlaceholder {
                 try generateTitle()
             }
-        }
-    }
-    
-    func generateSummary(url: String, markdown: String) throws {
-        let chatService = try store.preferredChatService()
-        let chatModel = try store.preferredChatModel()
-        
-        let toolService = try store.preferredToolService()
-        let toolModel = try store.preferredToolModel()
-        
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
-        generateTask = Task {
-            await MessageManager()
-                .append(messages: messages)
-                .append(message: .init(kind: .instruction, role: .user, content: "Summarize:\n\n\(markdown)")) { message in
-                    self.store.upsert(suggestions: [], conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .processing, conversationID: conversation.id)
-                }
-                .append(message: .init(kind: .local, role: .user, content: "Summarize: \(url)")) { message in
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                }
-                .generate(service: chatService, model: chatModel, tools: conversation.tools) { message in
-                    self.store.replace(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .streaming, conversationID: conversation.id)
-                }
-                .manage { _ in
-                    self.store.upsert(state: .suggesting, conversationID: conversation.id)
-                }
-                .append(message: Toolbox.generateSuggestions.message)
-                .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
-                    let suggestions = self.prepareSuggestions(message)
-                    self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
-                    self.store.upsert(state: .none, conversationID: conversation.id)
-                }
-                .manage { manager in
-                    guard let error else { return }
-                    let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                }
         }
     }
     
