@@ -61,23 +61,23 @@ public struct Constants {
         Service(
             id: .openAI,
             name: "OpenAI",
-            preferredChatModel: "gpt-4-turbo",
+            preferredChatModel: "gpt-4o",
             preferredImageModel: "dall-e-3",
             preferredEmbeddingModel: "text-embedding-3-small",
             preferredTranscriptionModel: "whisper-1",
-            preferredToolModel: "gpt-4-turbo",
-            preferredVisionModel: "gpt-4-turbo",
+            preferredToolModel: "gpt-4o",
+            preferredVisionModel: "gpt-4o",
             preferredSpeechModel: "tts-1-hd",
-            preferredSummarizationModel: "gpt-3.5-turbo-16k"
+            preferredSummarizationModel: "gpt-4o"
         )
     
     public static var anthropicDefaults =
         Service(
             id: .anthropic,
             name: "Anthropic",
-            preferredChatModel: "claude-3-opus-20240229",
-            preferredToolModel: "claude-3-haiku-20240307",
-            preferredVisionModel: "claude-3-opus-20240229",
+            preferredChatModel: "claude-3-5-sonnet-20240620",
+            preferredToolModel: "claude-3-5-sonnet-20240620",
+            preferredVisionModel: "claude-3-5-sonnet-20240620",
             preferredSummarizationModel: "claude-3-haiku-20240307"
         )
     
