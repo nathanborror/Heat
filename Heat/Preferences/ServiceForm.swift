@@ -90,9 +90,6 @@ struct ServiceForm: View {
             handleLoadCredentials()
             handleLoadModels()
         }
-        .onDisappear {
-            handleSave()
-        }
     }
     
     var serviceModelPickerView: some View {
