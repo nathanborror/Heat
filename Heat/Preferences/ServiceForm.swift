@@ -100,9 +100,6 @@ struct ServiceForm: View {
             handleLoadCredentials()
             handleLoadModels()
         }
-        .onDisappear {
-            handleSave()
-        }
     }
     
     func handleSave() {
