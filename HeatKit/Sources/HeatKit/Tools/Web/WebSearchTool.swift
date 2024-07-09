@@ -54,14 +54,12 @@ extension WebSearchTool.Arguments {
 
 extension WebSearchTool {
     
-    public static func handle(_ toolCall: ToolCall) async -> [Message] {
+    public static func handle(_ toolCall: ToolCall, response: WebSearchResponse) async -> [Message] {
         do {
             let args = try Arguments(toolCall.function.arguments)
-            
             switch args.kind {
             case .website:
-                let searchResponse = try await WebSearchSession.shared.search(query: args.query)
-                let response = Response(
+                let content = Response(
                     kind: .website,
                     instructions: """
                         Pick three or more of the most relevant results to browse using the `\(Toolbox.browseWeb.name)` \
@@ -69,9 +67,9 @@ extension WebSearchTool {
                         prepare a response that compares and contrasts the information you've gathered. Use citations.
                         Always browse results.
                         """,
-                    results: searchResponse.results
+                    results: response.results
                 )
-                let data = try JSONEncoder().encode(response)
+                let data = try JSONEncoder().encode(content)
                 return [.init(
                     role: .tool,
                     content: String(data: data, encoding: .utf8),
@@ -80,8 +78,7 @@ extension WebSearchTool {
                     metadata: ["label": "Searched web for '\(args.query)'"]
                 )]
             case .news:
-                let searchResponse = try await WebSearchSession.shared.searchNews(query: args.query)
-                let response = Response(
+                let content = Response(
                     kind: .news,
                     instructions: """
                         Pick three or more of the most relevant results to browse using the `\(Toolbox.browseWeb.name)` \
@@ -89,9 +86,9 @@ extension WebSearchTool {
                         prepare a response that compares and contrasts the information you've gathered. Use citations.
                         Always browse results.
                         """,
-                    results: searchResponse.results
+                    results: response.results
                 )
-                let data = try JSONEncoder().encode(response)
+                let data = try JSONEncoder().encode(content)
                 return [.init(
                     role: .tool,
                     content: String(data: data, encoding: .utf8),
@@ -100,15 +97,14 @@ extension WebSearchTool {
                     metadata: ["label": "Searched web news for '\(args.query)'"]
                 )]
             case .image:
-                let searchResponse = try await WebSearchSession.shared.searchImages(query: args.query)
-                let response = Response(
+                let content = Response(
                     kind: .image,
                     instructions: """
                         DO NOT repeat these images in Markdown.
                         """,
-                    results: searchResponse.results
+                    results: response.results
                 )
-                let data = try JSONEncoder().encode(response)
+                let data = try JSONEncoder().encode(content)
                 return [.init(
                     role: .tool,
                     content: String(data: data, encoding: .utf8),

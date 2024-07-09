@@ -44,7 +44,19 @@ struct MainApp: App {
                 ConversationList()
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
-                ConversationView()
+                HSplitView {
+                    ConversationView()
+                    
+                    if !conversationViewModel.artifacts.isEmpty {
+                        TabView {
+                            ForEach(conversationViewModel.artifacts) { artifact in
+                                ArtifactView(viewModel: .init(artifact: artifact, kind: .source, userAgent: .desktop, completion: { source in
+                                    print(source)
+                                }))
+                            }
+                        }
+                    }
+                }
             }
             .environment(store)
             .environment(conversationViewModel)

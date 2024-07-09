@@ -42,17 +42,6 @@ public final class MessageManager {
         return self
     }
     
-    @discardableResult
-    public func upsert(message: Message, callback: MessageCallback? = nil) async -> Self {
-        if let index = messages.firstIndex(where: { $0.id == message.id }) {
-            messages[index] = message
-        } else {
-            messages.append(message)
-        }
-        await callback?(message)
-        return self
-    }
-    
     // MARK: Generators
     
     @discardableResult
@@ -61,46 +50,37 @@ public final class MessageManager {
             try Task.checkCancellation()
             
             let runID = String.id
-            var runLoopCount = 0
-            var runShouldContinue = true
+            var message: Message? = nil
             
-            while runShouldContinue {
-                var message: Message? = nil
-                
-                // Prepare chat request for service, DO NOT include a tool choice on any subsequent runs, this will
-                // likely cause an expensive infinite loop of tool calls.
-                let req = ChatServiceRequest(
-                    model: model,
-                    messages: filteredMessages,
-                    tools: tools,
-                    toolChoice: (runLoopCount > 0) ? nil : toolChoice
-                )
-                
-                // Generate completion
-                if stream {
-                    try await service.completionStream(request: req) { update in
-                        message = apply(message: update, runID: runID)
-                        await callback(message!)
-                    }
-                } else {
-                    message = try await service.completion(request: req)
-                    message?.runID = runID
-                    await append(message: message!)
+            // Prepare chat request for service, DO NOT include a tool choice on any subsequent runs, this will
+            // likely cause an expensive infinite loop of tool calls.
+            let req = ChatServiceRequest(
+                model: model,
+                messages: filteredMessages,
+                tools: tools,
+                toolChoice: toolChoice
+            )
+            
+            // Generate completion
+            if stream {
+                try await service.completionStream(request: req) { update in
+                    message = apply(message: update, runID: runID)
                     await callback(message!)
                 }
-                
-                // Prepare possible tool responses
-                await processing?()
-                
-                // Prepare possible tool responses
-                let (toolResponses, shouldContinue) = try await prepareToolsResponse(message: message, runID: runID)
-                for response in toolResponses {
-                    await self.upsert(message: response)
-                    await callback(response)
-                }
-                runShouldContinue = shouldContinue
-                runLoopCount += 1
+            } else {
+                message = try await service.completion(request: req)
+                message?.runID = runID
+                await append(message: message!)
+                await callback(message!)
             }
+
+// Prepare possible tool responses
+//                let (toolResponses, shouldContinue) = try await prepareToolsResponse(message: message, runID: runID)
+//                for response in toolResponses {
+//                    let message = apply(message: response, runID: runID)
+//                    await callback(message)
+//                }
+//            }
         } catch {
             apply(error: error)
         }
@@ -213,81 +193,6 @@ public final class MessageManager {
         if let error = error {
             logger.error("MessageManagerError: \(error, privacy: .public)")
             self.error = error
-        }
-    }
-    
-    // MARK: Preparers
-    
-    private func prepareToolsResponse(message: Message?, runID: String? = nil) async throws -> ([Message], Bool) {
-        guard let toolCalls = message?.toolCalls else { return ([], false) }
-        
-        struct TaskResponse {
-            var messages: [Message]
-            var shouldContinue: Bool
-        }
-        
-        // Parallelize tool calls.
-        var responses: [TaskResponse] = []
-        await withTaskGroup(of: TaskResponse.self) { group in
-            for toolCall in toolCalls {
-                group.addTask {
-                    do {
-                        let (messages, shouldContinue) = try await self.prepareToolResponse(toolCall: toolCall)
-                        return .init(messages: messages, shouldContinue: shouldContinue)
-                    } catch {
-                        return .init(messages: [], shouldContinue: true)
-                    }
-                }
-            }
-            for await response in group {
-                responses.append(response)
-            }
-        }
-        
-        // Flatten messages from task responses and annotate each message with a Run identifier.
-        let messages = responses
-            .flatMap { $0.messages }
-            .map {
-                var message = $0
-                message.runID = runID
-                return message
-            }
-        
-        // If any task response suggests the Run should stop, stop it.
-        let shouldContinue = !responses.contains(where: { $0.shouldContinue == false })
-        
-        return (messages, shouldContinue)
-    }
-    
-    private func prepareToolResponse(toolCall: ToolCall) async throws -> ([Message], Bool) {
-        if let tool = Toolbox(name: toolCall.function.name) {
-            switch tool {
-            case .generateImages:
-                return (await ImageGeneratorTool.handle(toolCall), false)
-            case .generateMemory:
-                return (await MemoryTool.handle(toolCall), true)
-            case .generateSuggestions:
-                return ([], true)
-            case .generateTitle:
-                return ([], true)
-            case .searchFiles:
-                return (await FileSearchTool.handle(toolCall), true)
-            case .searchCalendar:
-                return (await CalendarSearchTool.handle(toolCall), true)
-            case .searchWeb:
-                return (await WebSearchTool.handle(toolCall), true)
-            case .browseWeb:
-                return (await WebBrowseTool.handle(toolCall), true)
-            }
-        } else {
-            let toolResponse = Message(
-                role: .tool,
-                content: "Unknown tool.",
-                toolCallID: toolCall.id,
-                name: toolCall.function.name,
-                metadata: ["label": "Unknown tool"]
-            )
-            return ([toolResponse], true)
         }
     }
 }

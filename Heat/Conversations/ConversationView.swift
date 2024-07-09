@@ -13,11 +13,18 @@ struct ConversationView: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
                     
                     // Show message history
                     ForEach(conversationViewModel.messages) { message in
                         MessageView(message: message)
+                    }
+                    
+                    // Show continue button if last message has tool calls
+                    if let message = conversationViewModel.messages.last, message.toolCalls != nil {
+                        Button(action: { try? conversationViewModel.processToolCalls(message: message) }) {
+                            Text("Continue")
+                        }
                     }
                     
                     VStack(spacing: 0) {
@@ -67,6 +74,18 @@ struct ConversationView: View {
             }
         } message: {
             Text($0.recoverySuggestion)
+        }
+        .overlay(alignment: .bottom) {
+            if conversationViewModel.messages.isEmpty {
+                VStack {
+                    Button(action: { handleSuggestion("Latest Apple rumors") }) {
+                        Text("Latest Apple rumors")
+                    }
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.tint)
+                .padding(.bottom, 64)
+            }
         }
     }
     

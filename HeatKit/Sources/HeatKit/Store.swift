@@ -40,6 +40,10 @@ public final class Store {
         get(conversationID: conversationID)?.messages.first(where: { $0.id == messageID })
     }
     
+    public func get(artifactID: String, conversationID: String?) -> Artifact? {
+        get(conversationID: conversationID)?.artifacts.first(where: { $0.id == artifactID })
+    }
+    
     public func get(tools names: Set<String>) -> Set<Tool> {
         let tools = Toolbox.allCases
             .filter { names.contains($0.tool.function.name) }
@@ -109,6 +113,25 @@ public final class Store {
             conversation.messages[index] = message
         } else {
             conversation.messages.append(message)
+        }
+        upsert(conversation: conversation)
+    }
+    
+    public func upsert(artifacts: [Artifact], conversationID: String) {
+        for artifact in artifacts {
+            upsert(artifact: artifact, conversationID: conversationID)
+        }
+    }
+    
+    public func upsert(artifact: Artifact, conversationID: String) {
+        guard var conversation = get(conversationID: conversationID) else {
+            logger.warning("missing conversation")
+            return
+        }
+        if let index = conversation.artifacts.firstIndex(where: { $0.id == artifact.id }) {
+            conversation.artifacts[index] = artifact
+        } else {
+            conversation.artifacts.append(artifact)
         }
         upsert(conversation: conversation)
     }

@@ -11,6 +11,7 @@ public struct Conversation: Codable, Identifiable {
     public var subtitle: String?
     public var picture: Asset?
     public var messages: [Message]
+    public var artifacts: [Artifact]
     public var suggestions: [String]
     public var tools: Set<Tool>
     public var state: State
@@ -25,12 +26,14 @@ public struct Conversation: Codable, Identifiable {
     }
     
     public init(id: String = .id, title: String = Self.titlePlaceholder, subtitle: String? = nil, picture: Asset? = nil,
-                messages: [Message] = [], suggestions: [String] = [], tools: Set<Tool> = [], state: State = .none) {
+                messages: [Message] = [], artifacts: [Artifact] = [], suggestions: [String] = [], tools: Set<Tool> = [],
+                state: State = .none) {
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.picture = picture
         self.messages = messages
+        self.artifacts = artifacts
         self.suggestions = suggestions
         self.tools = tools
         self.state = state
@@ -43,6 +46,7 @@ public struct Conversation: Codable, Identifiable {
         self.subtitle = conversation.subtitle
         self.picture = conversation.picture
         self.messages = conversation.messages
+        self.artifacts = conversation.artifacts
         self.suggestions = conversation.suggestions
         self.tools = conversation.tools
         self.state = conversation.state

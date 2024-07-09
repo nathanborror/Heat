@@ -35,6 +35,14 @@ final class ConversationViewModel {
         conversation?.messages ?? []
     }
     
+    var artifacts: [Artifact] {
+        conversation?.artifacts ?? []
+    }
+    
+    var hasToolCalls: Bool {
+        return (messages.last?.toolCalls?.count ?? 0) > 0
+    }
+    
     func newConversation() {
         guard let agentID = store.preferences.defaultAgentID else { return }
         guard let agent = store.get(agentID: agentID) else { return }
@@ -73,10 +81,25 @@ final class ConversationViewModel {
                 } processing: {
                    self.store.upsert(state: .processing, conversationID: conversation.id)
                 }
+                .manage { manager in
+                    self.store.upsert(state: .none, conversationID: conversation.id)
+                    if let error = manager.error {
+                        let message = Message(kind: .error, role: .system, content: error.localizedDescription)
+                        self.store.upsert(message: message, conversationID: conversation.id)
+                    }
+                }
+            
+            // Stop generating if there are tool calls waiting
+            guard !hasToolCalls else { return }
+            
+            // Generate suggestions
+            await MessageManager()
+                .append(messages: messages)
+                .append(message: context)
+                .append(message: Toolbox.generateSuggestions.message)
                 .manage { _ in
                     self.store.upsert(state: .suggesting, conversationID: conversation.id)
                 }
-                .append(message: Toolbox.generateSuggestions.message)
                 .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
                     let suggestions = self.prepareSuggestions(message)
                     self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
@@ -89,6 +112,8 @@ final class ConversationViewModel {
                         self.store.upsert(message: message, conversationID: conversation.id)
                     }
                 }
+            
+            // Generate a title for the conversation if one doesn't exist
             if title == Conversation.titlePlaceholder {
                 try generateTitle()
             }
@@ -185,6 +210,36 @@ final class ConversationViewModel {
         store.upsert(state: .none, conversationID: conversationID)
     }
     
+    func processToolCalls(message: Message) throws {
+        guard let toolCalls = message.toolCalls else { return }
+        guard let conversationID else { return }
+        
+        // Parallelize tool calls.
+        generateTask = Task {
+            var messages: [Message] = []
+            var artifacts: [Artifact] = []
+            
+            await withTaskGroup(of: ToolResponse.self) { group in
+                for toolCall in toolCalls {
+                    group.addTask {
+                        do {
+                            return try await self.prepareToolResponse(toolCall: toolCall)
+                        } catch {
+                            logger.error("ProcessToolCalls Error: \(error, privacy: .public)")
+                            return .init()
+                        }
+                    }
+                }
+                for await resp in group {
+                    messages.append(contentsOf: resp.messages)
+                    artifacts.append(contentsOf: resp.artifacts)
+                }
+            }
+            store.upsert(messages: messages, conversationID: conversationID)
+            store.upsert(artifacts: artifacts, conversationID: conversationID)
+        }
+    }
+    
     // MARK: - Private
     
     private func hapticTap(style: HapticManager.FeedbackStyle) {
@@ -224,5 +279,62 @@ final class ConversationViewModel {
             \(context.joined(separator: "\n"))
             """)
     }
+    
+    private func prepareToolResponse(toolCall: ToolCall) async throws -> ToolResponse {
+        var resp = ToolResponse()
+        if let tool = Toolbox(name: toolCall.function.name) {
+            switch tool {
+            case .generateImages:
+                resp.messages = await ImageGeneratorTool.handle(toolCall)
+                return resp
+            case .generateMemory:
+                resp.messages = await MemoryTool.handle(toolCall)
+                return resp
+            case .generateSuggestions:
+                return resp
+            case .generateTitle:
+                return resp
+            case .searchFiles:
+                return resp
+            case .searchCalendar:
+                resp.messages = await CalendarSearchTool.handle(toolCall)
+                return resp
+            case .searchWeb:
+                let args = try WebSearchTool.Arguments(toolCall.function.arguments)
+                switch args.kind {
+                case .website:
+                    //let result = try await WebSearchSession.shared.search(query: args.query)
+                    //resp.messages = await WebSearchTool.handle(toolCall, response: result)
+                    resp.artifacts.append(.init(url: .init(string: "https://www.google.com/search?q=\(args.query)"), title: "Search"))
+                    return resp
+                case .news:
+                    //let result = try await WebSearchSession.shared.searchNews(query: args.query)
+                    //resp.messages = await WebSearchTool.handle(toolCall, response: result)
+                    resp.artifacts.append(.init(url: .init(string: "https://www.google.com/search?q=\(args.query)&tbm=nws"), title: "News Search"))
+                    return resp
+                case .image:
+                    let result = try await WebSearchSession.shared.searchImages(query: args.query)
+                    resp.messages = await WebSearchTool.handle(toolCall, response: result)
+                    return resp
+                }
+            case .browseWeb:
+                resp.messages = await WebBrowseTool.handle(toolCall)
+                return resp
+            }
+        } else {
+            resp.messages.append(.init(
+                role: .tool,
+                content: "Unknown tool.",
+                toolCallID: toolCall.id,
+                name: toolCall.function.name,
+                metadata: ["label": "Unknown tool"]
+            ))
+            return resp
+        }
+    }
 }
 
+struct ToolResponse {
+    var messages: [Message] = []
+    var artifacts: [Artifact] = []
+}
