@@ -51,7 +51,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "81ac87218685126f8ce971c025b68c2883bfa818"
+        "revision" : "6a7abc050b4504bc9a242af409f293e7454979b5"
       }
     },
     {
@@ -78,7 +78,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "f5ef3b28dfa3549f702dd3c6f3a5d2e0c47ca155"
+        "revision" : "ed332ce271db32059b906bacc69d3b88e2c595b9"
       }
     },
     {
@@ -105,7 +105,7 @@
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
-        "revision" : "ae1c820a2949ff12fa26b0347aefb27626975d8d"
+        "revision" : "b6f5aa9c310f50cd054d884bd4aa47115a72ba12"
       }
     },
     {
@@ -150,7 +150,7 @@
       "location" : "https://github.com/jpsim/Yams",
       "state" : {
         "branch" : "main",
-        "revision" : "9234124cff5e22e178988c18d8b95a8ae8007f76"
+        "revision" : "60be6ad5aa437fa492bee0110eda3bb660937a40"
       }
     }
   ],
