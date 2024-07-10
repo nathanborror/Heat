@@ -33,9 +33,8 @@ public struct ArtifactView: NSViewRepresentable {
 public struct ArtifactView: UIViewRepresentable {
     public typealias UIViewType = WKWebView
     
-    var artifact: Artifact
-    var viewModel = ArtifactViewModel()
-    var Artifactiew = WKWebView()
+    var viewModel: ArtifactViewModel
+    var view = WKWebView()
     
     public func makeUIView(context: Context) -> UIViewType {
         view.navigationDelegate = context.coordinator
@@ -43,13 +42,15 @@ public struct ArtifactView: UIViewRepresentable {
     }
     
     public func updateUIView(_ view: UIViewType, context: Context) {
-        if let request = viewModel.request {
-            view.customUserAgent = request.value(forHTTPHeaderField: "User-Agent")
+        if let url = viewModel.artifact.url {
+            var request = URLRequest(url: url)
+            request.httpShouldHandleCookies = false
+            request.setValue(viewModel.userAgent.rawValue, forHTTPHeaderField: "User-Agent")
             view.load(request)
         }
     }
     
-    public func makeCoordinator() -> WebViewCoordinator {
+    public func makeCoordinator() -> ArtifactViewCoordinator {
         ArtifactViewCoordinator(self, viewModel)
     }
 }
