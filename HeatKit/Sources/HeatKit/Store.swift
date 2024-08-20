@@ -3,16 +3,15 @@ import Observation
 import SharedKit
 import GenKit
 import OSLog
-import Yams
 
 private let logger = Logger(subsystem: "Store", category: "HeatKit")
 
 @Observable
+@MainActor
 public final class Store {
     
-    public static var shared = Store(persistence: DiskPersistence.shared)
+    public static let shared = Store(persistence: DiskPersistence.shared)
     
-    public private(set) var agents: [Agent] = []
     public private(set) var conversations: [Conversation] = []
     public var preferences: Preferences = .init()
     
@@ -22,15 +21,11 @@ public final class Store {
         preferences.preferredChatServiceID != nil
     }
     
-    init(persistence: Persistence) {
+    private init(persistence: Persistence) {
         self.persistence = persistence
     }
     
     // MARK: - Getters
-    
-    public func get(agentID: String?) -> Agent? {
-        agents.first(where: { $0.id == agentID })
-    }
     
     public func get(conversationID: String?) -> Conversation? {
         conversations.first(where: { $0.id == conversationID })
@@ -73,16 +68,6 @@ public final class Store {
     }
     
     // MARK: - Upsert
-    
-    public func upsert(agent: Agent) {
-        if let index = agents.firstIndex(where: { $0.id == agent.id }) {
-            var existing = agents[index]
-            existing.apply(agent: agent)
-            agents[index] = existing
-        } else {
-            agents.insert(agent, at: 0)
-        }
-    }
     
     public func upsert(conversation: Conversation) {
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
@@ -153,10 +138,6 @@ public final class Store {
     }
     
     // MARK: - Deletion
-    
-    public func delete(agentID: String?) {
-        agents.removeAll(where: { $0.id == agentID })
-    }
     
     public func delete(conversationID: String?) {
         conversations.removeAll(where: { $0.id == conversationID })
@@ -288,24 +269,17 @@ public final class Store {
     
     // MARK: - Persistence
     
-    static private var agentsJSON = "agents.json"
     static private var conversationsJSON = "conversations.json"
     static private var preferencesJSON = "preferences.json"
     
     public func restoreAll() async throws {
         do {
-            let agents: [Agent] = try await persistence.load(objects: Self.agentsJSON)
             let conversations: [Conversation] = try await persistence.load(objects: Self.conversationsJSON)
             let preferences: Preferences? = try await persistence.load(object: Self.preferencesJSON)
             
             await MainActor.run {
-                self.agents = agents
                 self.conversations = conversations
                 self.preferences = preferences ?? self.preferences
-            }
-            
-            if self.agents.isEmpty {
-                try resetAgents()
             }
             logger.info("Persistence: all data restored")
         } catch {
@@ -315,7 +289,6 @@ public final class Store {
     }
     
     public func saveAll() async throws {
-        try await persistence.save(filename: Self.agentsJSON, objects: agents)
         try await persistence.save(filename: Self.conversationsJSON, objects: conversations)
         try await persistence.save(filename: Self.preferencesJSON, object: preferences)
         logger.info("Persistence: all data saved")
@@ -328,30 +301,8 @@ public final class Store {
     }
     
     public func resetAll() throws {
-        agents = []
         conversations = []
         preferences = .init()
-        try resetAgents()
         logger.info("Persistence: all data reset")
     }
-    
-    public func resetAgents() throws {
-        guard let url = Bundle.module.url(forResource: "agents", withExtension: "yaml") else {
-            throw KitError.missingResource
-        }
-        let data = try Data(contentsOf: url)
-        let response = try YAMLDecoder().decode(AgentsResource.self, from: data)
-        self.agents = response.agents.map { $0.encode }
-        self.preferences.defaultAgentID = Constants.defaultAgentID
-    }
-    
-    // MARK: - Preview
-    
-    public static var preview: Store = {
-        let store = Store(persistence: MemoryPersistence.shared)
-        store.agents = [.preview]
-        store.conversations = [.preview1, .preview2]
-        store.preferences.debug = true
-        return store
-    }()
 }

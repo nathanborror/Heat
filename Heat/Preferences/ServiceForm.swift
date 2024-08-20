@@ -112,7 +112,7 @@ struct ServiceForm: View {
             return
         }
         handleApplyCredentials()
-        store.upsert(service: service)
+        // TODO: store.upsert(service: service)
         dismiss()
     }
     
@@ -171,11 +171,4 @@ struct ServiceForm: View {
             service.credentials = nil
         }
     }
-}
-
-#Preview {
-    NavigationStack {
-        ServiceForm(service: .init(id: .mistral, name: "Mistral"))
-    }
-    .environment(Store.preview)
 }

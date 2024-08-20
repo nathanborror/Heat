@@ -41,8 +41,8 @@ extension ImageGeneratorTool {
         do {
             let args = try Arguments(toolCall.function.arguments)
             
-            let imageService = try Store.shared.preferredImageService()
-            let imageModel = try Store.shared.preferredImageModel()
+            let imageService = try await Store.shared.preferredImageService()
+            let imageModel = try await Store.shared.preferredImageModel()
             
             // Generate image attachments
             var attachments = [Message.Attachment]()

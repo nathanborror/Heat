@@ -118,28 +118,29 @@ struct ConversationBarrier: View {
     }
     
     func handleSubmit() {
-        guard !apiKey.isEmpty else { return }
-        guard var service = store.get(serviceID: .openAI) else { return }
-        
-        // Update service with token and preferred models
-        service.applyPreferredModels(Constants.openAIDefaults)
-        service.credentials = .token(apiKey)
-        store.upsert(service: service)
-        
-        // Update preferences with preferred services
-        store.preferences.preferredChatServiceID = .openAI
-        store.preferences.preferredImageServiceID = .openAI
-        store.preferences.preferredEmbeddingServiceID = .openAI
-        store.preferences.preferredTranscriptionServiceID = .openAI
-        store.preferences.preferredToolServiceID = .openAI
-        store.preferences.preferredVisionServiceID = .openAI
-        store.preferences.preferredSpeechServiceID = .openAI
-        store.preferences.preferredSummarizationServiceID = .openAI
-        
-        // Persist changes
-        Task { try await store.saveAll() }
-        
-        dismiss()
+        // TODO: 
+//        guard !apiKey.isEmpty else { return }
+//        guard var service = store.get(serviceID: .openAI) else { return }
+//        
+//        // Update service with token and preferred models
+//        service.applyPreferredModels(Constants.openAIDefaults)
+//        service.credentials = .token(apiKey)
+//        store.upsert(service: service)
+//        
+//        // Update preferences with preferred services
+//        store.preferences.preferredChatServiceID = .openAI
+//        store.preferences.preferredImageServiceID = .openAI
+//        store.preferences.preferredEmbeddingServiceID = .openAI
+//        store.preferences.preferredTranscriptionServiceID = .openAI
+//        store.preferences.preferredToolServiceID = .openAI
+//        store.preferences.preferredVisionServiceID = .openAI
+//        store.preferences.preferredSpeechServiceID = .openAI
+//        store.preferences.preferredSummarizationServiceID = .openAI
+//        
+//        // Persist changes
+//        Task { try await store.saveAll() }
+//        
+//        dismiss()
     }
     
     #if os(macOS)
@@ -157,11 +158,3 @@ struct ConversationBarrier: View {
     #endif
 }
 
-#Preview {
-    ConversationBarrier()
-        .environment(Store.preview)
-        #if os(macOS)
-        .frame(width: 310, height: 325)
-        #endif
-        .background(.white)
-}

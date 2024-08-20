@@ -6,6 +6,7 @@ import HeatKit
 private let logger = Logger(subsystem: "LauncherViewModel", category: "Heat")
 
 @Observable
+@MainActor
 final class LauncherViewModel {
     var store: Store
     var conversationID: String?
@@ -27,9 +28,10 @@ final class LauncherViewModel {
         conversation?.messages ?? []
     }
     
-    func newConversation() {
+    func newConversation() throws {
         guard let agentID = store.preferences.defaultAgentID else { return }
-        guard let agent = store.get(agentID: agentID) else { return }
+        let agent = try AgentStore.shared.get(agentID)
+        
         let conversation = store.createConversation(agent: agent)
         store.upsert(conversation: conversation)
         conversationID = conversation.id

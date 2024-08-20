@@ -68,10 +68,3 @@ struct MemoryList: View {
         modelContext.delete(memory)
     }
 }
-
-#Preview {
-    NavigationStack {
-        MemoryList()
-    }
-    .modelContainer(MemoryDataPreview.container)
-}

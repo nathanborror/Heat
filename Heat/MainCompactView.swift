@@ -56,9 +56,3 @@ struct MainCompactView: View {
         }
     }
 }
-
-#Preview {
-    MainCompactView()
-        .environment(Store.preview)
-        .environment(ConversationViewModel(store: Store.preview))
-}

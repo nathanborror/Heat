@@ -37,3 +37,30 @@ public struct Preferences: Codable {
         self.services = Constants.defaultServices
     }
 }
+
+actor PreferencesData {
+    private var preferences: Preferences = .init()
+    
+    func save(_ preferences: Preferences) throws {
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .binary
+        
+        let data = try encoder.encode(preferences)
+        try data.write(to: self.dataURL, options: [.atomic])
+        self.preferences = preferences
+    }
+    
+    func load() throws -> Preferences {
+        let data = try Data(contentsOf: dataURL)
+        let decoder = PropertyListDecoder()
+        preferences = try decoder.decode(Preferences.self, from: data)
+        return preferences
+    }
+    
+    private var dataURL: URL {
+        get throws {
+            try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                    .appendingPathComponent("PreferencesData.plist")
+        }
+    }
+}

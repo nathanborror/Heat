@@ -34,11 +34,3 @@ struct ConversationList: View {
         #endif
     }
 }
-
-#Preview {
-    NavigationStack {
-        ConversationList()
-    }
-    .environment(Store.preview)
-    .environment(ConversationViewModel(store: Store.preview))
-}

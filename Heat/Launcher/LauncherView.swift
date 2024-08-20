@@ -66,28 +66,29 @@ struct LauncherView: View {
         }
     }
     
-    func handleInit() {
+    @MainActor func handleInit() {
         guard launcherViewModel.conversationID != nil else { return }
         isShowingContent = true
     }
     
     func handleSubmit() {
-        // Create conversation if one doesn't already exist
-        if launcherViewModel.conversationID == nil {
-            launcherViewModel.newConversation()
-        }
-        // Ignore empty content
-        guard !content.isEmpty else { return }
-        
-        do {
-            try launcherViewModel.generate(content, context: memories.map { $0.content })
-            isShowingContent = true
-            content = ""
-        } catch let error as KitError {
-            launcherViewModel.error = error
-        } catch {
-            logger.warning("failed to submit: \(error)")
-        }
+        // TODO: 
+//        // Create conversation if one doesn't already exist
+//        if launcherViewModel.conversationID == nil {
+//            launcherViewModel.newConversation()
+//        }
+//        // Ignore empty content
+//        guard !content.isEmpty else { return }
+//        
+//        do {
+//            try launcherViewModel.generate(content, context: memories.map { $0.content })
+//            isShowingContent = true
+//            content = ""
+//        } catch let error as KitError {
+//            launcherViewModel.error = error
+//        } catch {
+//            logger.warning("failed to submit: \(error)")
+//        }
     }
 }
 
@@ -122,21 +123,5 @@ struct LauncherPanel<Toolbar: View, Content: View>: View {
     }
     
     private let toolbarHeight: CGFloat = 60
-}
-
-#Preview {
-    let store = Store.preview
-    let launcherViewModel = LauncherViewModel(store: store)
-    launcherViewModel.conversationID = Conversation.preview1.id
-    
-    return NavigationStack {
-        LauncherView()
-    }
-    .environment(store)
-    .environment(launcherViewModel)
-    .modelContainer(for: Memory.self)
-    .padding(32)
-    .frame(minHeight: 600)
-    .background(.white)
 }
 #endif

@@ -153,69 +153,72 @@ struct ConversationInput: View {
     }
     
     func handleSubmit() {
-        defer { clear() }
-        
-        // Create conversation if one doesn't already exist
-        if conversationViewModel.conversationID == nil {
-            conversationViewModel.newConversation()
-        }
-        
-        // Check for command
-        switch command {
-        case "imagine":
-            handleImagine(content)
-            return
-        case "summarize":
-            handleSummarize(content)
-            return
-        case "search":
-            handleSearch(content)
-            return
-        default:
-            break
-        }
-        
-        // Handle vision prompt if exists
-        if hasVisionAsset || !imagePickerViewModel.imagesSelected.isEmpty {
-            handleVision(content); return
-        }
-        
-        // Ignore empty content
-        guard !content.isEmpty else { return }
-        
-        do {
-            try conversationViewModel.generate(content, context: memories.map { $0.content })
-        } catch let error as KitError {
-            conversationViewModel.error = error
-        } catch {
-            logger.warning("failed to submit: \(error)")
-        }
+        // TODO:
+//        defer { clear() }
+//        
+//        // Create conversation if one doesn't already exist
+//        if conversationViewModel.conversationID == nil {
+//            conversationViewModel.newConversation()
+//        }
+//        
+//        // Check for command
+//        switch command {
+//        case "imagine":
+//            handleImagine(content)
+//            return
+//        case "summarize":
+//            handleSummarize(content)
+//            return
+//        case "search":
+//            handleSearch(content)
+//            return
+//        default:
+//            break
+//        }
+//        
+//        // Handle vision prompt if exists
+//        if hasVisionAsset || !imagePickerViewModel.imagesSelected.isEmpty {
+//            handleVision(content); return
+//        }
+//        
+//        // Ignore empty content
+//        guard !content.isEmpty else { return }
+//        
+//        do {
+//            try conversationViewModel.generate(content, context: memories.map { $0.content })
+//        } catch let error as KitError {
+//            conversationViewModel.error = error
+//        } catch {
+//            logger.warning("failed to submit: \(error)")
+//        }
     }
     
     func handleVision(_ content: String) {
-        do {
-            let images = imagePickerViewModel.imagesSelected.map {
-                // Resize image so we're not sending huge amounts of data to the services.
-                $0.image?.resize(to: .init(width: 512, height: 512))
-            }.compactMap { $0 }
-            try conversationViewModel.generate(content, images: images)
-        } catch let error as KitError {
-            conversationViewModel.error = error
-        } catch {
-            logger.warning("failed to submit: \(error)")
-        }
-        clear()
+        // TODO:
+//        do {
+//            let images = imagePickerViewModel.imagesSelected.map {
+//                // Resize image so we're not sending huge amounts of data to the services.
+//                $0.image?.resize(to: .init(width: 512, height: 512))
+//            }.compactMap { $0 }
+//            try conversationViewModel.generate(content, images: images)
+//        } catch let error as KitError {
+//            conversationViewModel.error = error
+//        } catch {
+//            logger.warning("failed to submit: \(error)")
+//        }
+//        clear()
     }
     
     func handleImagine(_ content: String) {
-        do {
-            try conversationViewModel.generateImage(content)
-        } catch let error as KitError {
-            conversationViewModel.error = error
-        } catch {
-            logger.warning("failed to submit: \(error)")
-        }
-        clear()
+        // TODO:
+//        do {
+//            try conversationViewModel.generateImage(content)
+//        } catch let error as KitError {
+//            conversationViewModel.error = error
+//        } catch {
+//            logger.warning("failed to submit: \(error)")
+//        }
+//        clear()
     }
     
     func handleSummarize(_ content: String) {
@@ -252,7 +255,8 @@ struct ConversationInput: View {
     }
     
     func handleStop() {
-        conversationViewModel.generateStop()
+        // TODO:
+//        conversationViewModel.generateStop()
     }
     
     private func clear() {
@@ -262,24 +266,28 @@ struct ConversationInput: View {
     }
     
     private var hasVisionAsset: Bool {
-        let visible = conversationViewModel.messages.filter { $0.kind != .instruction }
-        let message = visible.first { message in
-            let attachment = message.attachments.first { attachment in
-                switch attachment {
-                case .agent, .automation, .component:
-                    return false
-                case .asset(let asset):
-                    return asset.noop == false
-                }
-            }
-            return attachment != nil
-        }
-        return message != nil
+        return false
+        // TODO:
+//        let visible = conversationViewModel.messages.filter { $0.kind != .instruction }
+//        let message = visible.first { message in
+//            let attachment = message.attachments.first { attachment in
+//                switch attachment {
+//                case .agent, .automation, .component, .file:
+//                    return false
+//                case .asset(let asset):
+//                    return asset.noop == false
+//                }
+//            }
+//            return attachment != nil
+//        }
+//        return message != nil
     }
     
     private var showInlineControls: Bool    { content.isEmpty }
     private var showInputPadding: Bool      { !content.isEmpty }
-    private var showStopGenerating: Bool    { (conversationViewModel.conversation?.state ?? .none) != .none }
+    // TODO: 
+//    private var showStopGenerating: Bool    { (conversationViewModel.conversation?.state ?? .none) != .none }
+    private var showStopGenerating = false
     private var showSubmit: Bool            { !content.isEmpty }
     
     #if os(macOS)
@@ -372,17 +380,4 @@ struct ConversationInputImage: View {
             .shadow(color: .primary.opacity(0.25), radius: 5)
         }
     }
-}
-
-#Preview("Conversation Input") {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: store)
-    
-    return VStack {
-        ConversationInput()
-        ConversationInput(content: "Hello, world")
-        ConversationInput(command: "imagine")
-    }
-    .padding()
-    .environment(viewModel)
 }

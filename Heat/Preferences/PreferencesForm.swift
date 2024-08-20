@@ -3,28 +3,6 @@ import SharedKit
 import GenKit
 import HeatKit
 
-enum PreferencesError: LocalizedError {
-    case missingID
-    case missingName
-    case unsavedChanges
-    
-    var errorDescription: String? {
-        switch self {
-        case .missingID: "Missing ID"
-        case .missingName: "Missing name"
-        case .unsavedChanges: "Unsaved changes"
-        }
-    }
-    
-    var recoverySuggestion: String {
-        switch self {
-        case .missingID: "Enter an identifier for the service."
-        case .missingName: "Enter a name for the service."
-        case .unsavedChanges: "You have unsaved changes, do you want to discard them?"
-        }
-    }
-}
-
 struct PreferencesForm: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
@@ -51,7 +29,7 @@ struct PreferencesForm: View {
                 }
                 #endif
                 Picker("Default Agent", selection: $store.preferences.defaultAgentID ?? "") {
-                    ForEach(store.agents) { agent in
+                    ForEach(AgentStore.shared.agents) { agent in
                         Text(agent.name).tag(agent.id)
                     }
                 }
@@ -177,31 +155,34 @@ struct PreferencesForm: View {
     }
     
     func handleAgentReset() {
-        do {
-            try store.resetAgents()
-            handleSave()
-            dismiss()
-        } catch {
-            print(error)
-        }
+        // TODO:
+//        do {
+//            try store.resetAgents()
+//            handleSave()
+//            dismiss()
+//        } catch {
+//            print(error)
+//        }
     }
     
     func handleServicesReset() {
-        store.preferences.preferredChatServiceID = .openAI
-        store.preferences.preferredImageServiceID = .openAI
-        store.preferences.preferredEmbeddingServiceID = .openAI
-        store.preferences.preferredTranscriptionServiceID = .openAI
-        store.preferences.preferredToolServiceID = .openAI
-        store.preferences.preferredVisionServiceID = .openAI
-        store.preferences.preferredSpeechServiceID = .openAI
-        store.preferences.preferredSummarizationServiceID = .openAI
-        handleSave()
+        // TODO:
+//        store.preferences.preferredChatServiceID = .openAI
+//        store.preferences.preferredImageServiceID = .openAI
+//        store.preferences.preferredEmbeddingServiceID = .openAI
+//        store.preferences.preferredTranscriptionServiceID = .openAI
+//        store.preferences.preferredToolServiceID = .openAI
+//        store.preferences.preferredVisionServiceID = .openAI
+//        store.preferences.preferredSpeechServiceID = .openAI
+//        store.preferences.preferredSummarizationServiceID = .openAI
+//        handleSave()
     }
     
     func handleDeleteAll() {
-        try? store.deleteAll()
-        handleSave()
-        dismiss()
+        // TODO: 
+//        try? store.deleteAll()
+//        handleSave()
+//        dismiss()
     }
     
     func handleSave() {
@@ -252,16 +233,24 @@ struct PreferencesWindow: View {
     }
 }
 
-#Preview("Form") {
-    NavigationStack {
-        PreferencesForm()
+enum PreferencesError: LocalizedError {
+    case missingID
+    case missingName
+    case unsavedChanges
+    
+    var errorDescription: String? {
+        switch self {
+        case .missingID: "Missing ID"
+        case .missingName: "Missing name"
+        case .unsavedChanges: "Unsaved changes"
+        }
     }
-    .environment(Store.preview)
-}
-
-#Preview("Window") {
-    NavigationStack {
-        PreferencesWindow()
+    
+    var recoverySuggestion: String {
+        switch self {
+        case .missingID: "Enter an identifier for the service."
+        case .missingName: "Enter a name for the service."
+        case .unsavedChanges: "You have unsaved changes, do you want to discard them?"
+        }
     }
-    .environment(Store.preview)
 }

@@ -75,7 +75,8 @@ struct AgentForm: View {
             .map {
                 Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
             }
-        store.upsert(agent: agent)
+        
+        Task { try await AgentStore.shared.upsert(agent:agent ) }
         dismiss()
     }
     
@@ -116,19 +117,4 @@ struct AgentPicture: View {
         }
         .frame(maxWidth: .infinity)
     }
-}
-
-#Preview("Create Agent") {
-    NavigationStack {
-        AgentForm(agent: .empty)
-    }.environment(Store.preview)
-}
-
-#Preview("Edit Agent") {
-    let store = Store.preview
-    let agent = Agent.preview
-    
-    return NavigationStack {
-        AgentForm(agent: agent)
-    }.environment(store)
 }

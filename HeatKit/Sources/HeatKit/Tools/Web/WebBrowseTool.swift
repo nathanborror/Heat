@@ -80,8 +80,8 @@ extension WebBrowseTool {
     }
     
     private static func summarize(_ args: Arguments) async throws -> Response {
-        let summarizationService = try Store.shared.preferredSummarizationService()
-        let summarizationModel = try Store.shared.preferredSummarizationModel()
+        let summarizationService = try await Store.shared.preferredSummarizationService()
+        let summarizationModel = try await Store.shared.preferredSummarizationModel()
         
         do {
             let summary = try await WebBrowseSession.shared.generateSummary(service: summarizationService, model: summarizationModel, url: args.url)

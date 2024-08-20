@@ -25,9 +25,10 @@ struct MainApp: App {
     @Environment(\.openWindow) private var openWindow
     #endif
     
-    @State private var store = Store.shared
-    @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
-    @State private var launcherViewModel = LauncherViewModel(store: Store.shared)
+    let store: Store
+    let conversationViewModel: ConversationViewModel
+    let launcherViewModel: LauncherViewModel
+    
     @State private var searchInput = ""
     @State private var showingLauncher = false
     @State private var showingBarrier = false
@@ -36,6 +37,12 @@ struct MainApp: App {
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.shift, .control])
     #endif
+    
+    init() {
+        self.store = Store.shared
+        self.conversationViewModel = ConversationViewModel(store: store)
+        self.launcherViewModel = LauncherViewModel(store: store)
+    }
     
     var body: some Scene {
         #if os(macOS)
@@ -122,14 +129,16 @@ struct MainApp: App {
     
     func handleAvailabilityChange() {
         guard !isRestoring else { return }
-        showingBarrier = !store.isChatAvailable
+        // TODO:
+//        showingBarrier = !store.isChatAvailable
     }
     
     func handleRestore() async {
         do {
             isRestoring = true
             try await store.restoreAll()
-            showingBarrier = !store.isChatAvailable
+            // TODO:
+//            showingBarrier = !store.isChatAvailable
             isRestoring = false
         } catch {
             logger.warning("failed to restore: \(error)")
@@ -141,7 +150,8 @@ struct MainApp: App {
     }
     
     func handleNewConversation() {
-        conversationViewModel.conversationID = nil
+        // TODO: 
+//        conversationViewModel.conversationID = nil
     }
     
     func handleHotKeySetup() {

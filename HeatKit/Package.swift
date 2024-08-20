@@ -17,7 +17,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/nathanborror/swift-shared-kit", branch: "main"),
         .package(url: "https://github.com/nathanborror/swift-gen-kit", branch: "main"),
-        .package(url: "https://github.com/jpsim/Yams", branch: "main"),
         .package(url: "https://github.com/cezheng/Fuzi", branch: "master"),
     ],
     targets: [
@@ -26,11 +25,7 @@ let package = Package(
             dependencies: [
                 .product(name: "SharedKit", package: "swift-shared-kit"),
                 .product(name: "GenKit", package: "swift-gen-kit"),
-                .product(name: "Yams", package: "Yams"),
                 .product(name: "Fuzi", package: "Fuzi"),
-            ],
-            resources: [
-                .process("Resources"),
             ]
         ),
         .testTarget(name: "HeatKitTests", dependencies: ["HeatKit"]),

@@ -174,9 +174,3 @@ struct PermissionsList: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        PermissionsList()
-    }
-}

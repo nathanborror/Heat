@@ -71,50 +71,16 @@ struct ConversationView: View {
     }
     
     func handleSuggestion(_ suggestion: String) {
-        if conversationViewModel.conversationID == nil {
-            conversationViewModel.newConversation()
-        }
-        do {
-            try conversationViewModel.generate(suggestion)
-        } catch let error as KitError {
-            conversationViewModel.error = error
-        } catch {
-            logger.warning("failed to submit: \(error)")
-        }
+        // TODO: 
+//        if conversationViewModel.conversationID == nil {
+//            try? conversationViewModel.newConversation()
+//        }
+//        do {
+//            try conversationViewModel.generate(suggestion)
+//        } catch let error as KitError {
+//            conversationViewModel.error = error
+//        } catch {
+//            logger.warning("failed to submit: \(error)")
+//        }
     }
-}
-
-#Preview("New") {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: Store.preview)
-    
-    return NavigationStack {
-        ConversationView()
-    }
-    .environment(store)
-    .environment(viewModel)
-}
-
-#Preview("Active") {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: Store.preview)
-    viewModel.conversationID = Conversation.preview1.id
-    
-    return NavigationStack {
-        ConversationView()
-    }
-    .environment(store)
-    .environment(viewModel)
-}
-
-#Preview("Tool Use") {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: Store.preview)
-    viewModel.conversationID = Conversation.preview2.id
-    
-    return NavigationStack {
-        ConversationView()
-    }
-    .environment(store)
-    .environment(viewModel)
 }

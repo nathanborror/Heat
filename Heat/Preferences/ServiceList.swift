@@ -30,10 +30,3 @@ struct ServiceList: View {
         }
     }
 }
-
-#Preview("Services") {
-    NavigationStack {
-        ServiceList()
-    }
-    .environment(Store.preview)
-}

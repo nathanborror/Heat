@@ -17,7 +17,7 @@ struct AgentList: View {
                 }
             }
             Section {
-                ForEach(store.agents) { agent in
+                ForEach(AgentStore.shared.agents) { agent in
                     HStack {
                         Text(agent.name)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -51,12 +51,6 @@ struct AgentList: View {
     }
     
     func handleDeleteAgent(_ agent: Agent) {
-        store.delete(agentID: agent.id)
+        Task { try await AgentStore.shared.delete(agent.id)}
     }
-}
-
-#Preview {
-    NavigationStack {
-        AgentList()
-    }.environment(Store.preview)
 }
