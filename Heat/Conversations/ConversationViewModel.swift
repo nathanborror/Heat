@@ -63,43 +63,73 @@ final class ConversationViewModel {
         let chatService = try PreferencesProvider.shared.preferredChatService()
         let chatModel = try PreferencesProvider.shared.preferredChatModel()
         
-        let toolService = try PreferencesProvider.shared.preferredToolService()
-        let toolModel = try PreferencesProvider.shared.preferredToolModel()
-        
-        let context = prepareContext(context)
+        //let context = prepareContext(context)
         
         generateTask = Task {
-            try await MessageManager()
-                .append(messages: messages)
-                .append(message: context)
-                .append(message: .init(role: .user, content: content)) { message in
-                    try await ConversationProvider.shared.upsert(suggestions: [], conversationID: conversation.id)
-                    try await ConversationProvider.shared.upsert(message: message, conversationID: conversation.id)
-                    try await ConversationProvider.shared.upsert(state: .processing, conversationID: conversation.id)
-                }
-                .generate(service: chatService, model: chatModel, tools: conversation.tools, toolChoice: toolChoice, stream: PreferencesProvider.shared.preferences.shouldStream) { message in
-                    try await ConversationProvider.shared.upsert(state: .streaming, conversationID: conversation.id)
-                    try await ConversationProvider.shared.upsert(message: message, conversationID: conversation.id)
-                    self.hapticTap(style: .light)
-                } processing: {
-                    try await ConversationProvider.shared.upsert(state: .processing, conversationID: conversation.id)
-                }
-                .manage {
-                    try await ConversationProvider.shared.upsert(state: .suggesting, conversationID: conversation.id)
-                }
-                .append(message: Toolbox.generateSuggestions.message)
-                .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
-                    let suggestions = self.prepareSuggestions(message)
-                    try await ConversationProvider.shared.upsert(suggestions: suggestions, conversationID: conversation.id)
-                    try await ConversationProvider.shared.upsert(state: .none, conversationID: conversation.id)
-                }
-                .manage {
-                    try await ConversationProvider.shared.upsert(state: .none, conversationID: conversation.id)
-                }
-            if title == "New Conversation" {
-                try generateTitle()
+            try await ConversationProvider.shared.upsert(message: .init(role: .user, content: content), conversationID: conversation.id)
+            
+            var conversation = try ConversationProvider.shared.get(conversation.id)
+            
+            // Initial request
+            var req = ModelRequest(service: chatService, model: chatModel)
+            req.with(messages: conversation.messages)
+            req.with(tools: conversation.tools)
+            
+            // Generate response stream
+            let stream = ModelSession.shared.chatCompletionStream(req)
+            for try await message in stream {
+                try await ConversationProvider.shared.upsert(suggestions: [], conversationID: conversation.id)
+                try await ConversationProvider.shared.upsert(message: message, conversationID: conversation.id)
+                try await ConversationProvider.shared.upsert(state: .processing, conversationID: conversation.id)
             }
+            
+            // Refresh conversation
+            conversation = try ConversationProvider.shared.get(conversation.id)
+            
+            // Generate suggestions
+            try await ConversationProvider.shared.upsert(state: .suggesting, conversationID: conversation.id)
+            
+            req.with(tool: Toolbox.generateSuggestions.tool)
+            req.with(messages: conversation.messages)
+            
+            let resp = try await ModelSession.shared.chatCompletion(req)
+            let suggestions = try resp.extractTool(name: SuggestTool.function.name, type: SuggestTool.Arguments.self)
+            try await ConversationProvider.shared.upsert(suggestions: suggestions.prompts, conversationID: conversation.id)
+            try await ConversationProvider.shared.upsert(state: .none, conversationID: conversation.id)
         }
+        
+//        generateTask = Task {
+//            try await MessageManager()
+//                .append(messages: messages)
+//                .append(message: context)
+//                .append(message: .init(role: .user, content: content)) { message in
+//                    try await ConversationProvider.shared.upsert(suggestions: [], conversationID: conversation.id)
+//                    try await ConversationProvider.shared.upsert(message: message, conversationID: conversation.id)
+//                    try await ConversationProvider.shared.upsert(state: .processing, conversationID: conversation.id)
+//                }
+//                .generate(service: chatService, model: chatModel, tools: conversation.tools, toolChoice: toolChoice, stream: PreferencesProvider.shared.preferences.shouldStream) { message in
+//                    try await ConversationProvider.shared.upsert(state: .streaming, conversationID: conversation.id)
+//                    try await ConversationProvider.shared.upsert(message: message, conversationID: conversation.id)
+//                    self.hapticTap(style: .light)
+//                } processing: {
+//                    try await ConversationProvider.shared.upsert(state: .processing, conversationID: conversation.id)
+//                }
+//                .manage {
+//                    try await ConversationProvider.shared.upsert(state: .suggesting, conversationID: conversation.id)
+//                }
+//                .append(message: Toolbox.generateSuggestions.message)
+//                .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
+//                    let suggestions = self.prepareSuggestions(message)
+//                    try await ConversationProvider.shared.upsert(suggestions: suggestions, conversationID: conversation.id)
+//                    try await ConversationProvider.shared.upsert(state: .none, conversationID: conversation.id)
+//                }
+//                .manage {
+//                    try await ConversationProvider.shared.upsert(state: .none, conversationID: conversation.id)
+//                }
+//            if title == "New Conversation" {
+//                try generateTitle()
+//            }
+//        }
     }
     
     func generate(_ content: String, images: [Data]) throws {
