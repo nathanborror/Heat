@@ -6,8 +6,8 @@ import GenKit
 private let logger = Logger(subsystem: "ImageSession", category: "HeatKit")
 
 public final class ImageSession {
-    public typealias SessionCallback = @MainActor (ImageSession) -> Void
-    public typealias ImagesCallback = @MainActor ([Data]) -> Void
+    public typealias SessionCallback = (ImageSession) async throws -> Void
+    public typealias ImagesCallback = ([Data]) async throws -> Void
     
     public static let shared = ImageSession()
     
@@ -16,18 +16,18 @@ public final class ImageSession {
     private init() {}
     
     @discardableResult
-    public func manage(callback: SessionCallback) async -> Self {
-        await callback(self)
+    public func manage(callback: SessionCallback) async throws -> Self {
+        try await callback(self)
         return self
     }
     
     @discardableResult
-    public func generate(service: ImageService, model: String, prompt: String, callback: ImagesCallback) async -> Self {
+    public func generate(service: ImageService, model: String, prompt: String, callback: ImagesCallback) async throws -> Self {
         do {
             try Task.checkCancellation()
             let req = ImagineServiceRequest(model: model, prompt: prompt)
             let images = try await service.imagine(request: req)
-            await callback(images)
+            try await callback(images)
         } catch {
             apply(error: error)
         }

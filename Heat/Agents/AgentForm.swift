@@ -76,7 +76,7 @@ struct AgentForm: View {
                 Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
             }
         
-        Task { try await AgentStore.shared.upsert(agent:agent ) }
+        Task { try await AgentStore.shared.upsert(agent) }
         dismiss()
     }
     

@@ -21,7 +21,7 @@ public struct Preferences: Codable {
     public init() {
         self.services = []
         self.instructions = nil
-        self.defaultAgentID = nil
+        self.defaultAgentID = Constants.defaultAgentID
         self.shouldStream = true
         self.debug = false
 
@@ -63,4 +63,167 @@ actor PreferencesData {
                     .appendingPathComponent("PreferencesData.plist")
         }
     }
+}
+
+@MainActor
+@Observable
+public class PreferencesStore {
+    public static let shared = PreferencesStore()
+    
+    public private(set) var preferences: Preferences = .init()
+    
+    public func get(serviceID: Service.ServiceID?) throws -> Service {
+        guard let service = preferences.services.first(where: { $0.id == serviceID }) else {
+            throw PreferencesStoreError.serviceNotFound
+        }
+        return service
+    }
+    
+    public func upsert(_ preferences: Preferences) async throws {
+        self.preferences = preferences
+        try await save()
+    }
+    
+    public func upsert(service: Service) async throws {
+        if let index = preferences.services.firstIndex(where: { $0.id == service.id }) {
+            preferences.services[index] = service
+        } else {
+            preferences.services.append(service)
+        }
+        try await save()
+    }
+    
+    public func delete() async throws {
+        self.preferences = .init()
+        try await save()
+    }
+    
+    // MARK: - Service Preferences
+    
+    public func preferredChatService() throws -> ChatService {
+        let service = try get(serviceID: preferences.preferredChatServiceID)
+        return try service.chatService()
+    }
+    
+    public func preferredImageService() throws -> ImageService {
+        let service = try get(serviceID: preferences.preferredImageServiceID)
+        return try service.imageService()
+    }
+    
+    public func preferredEmbeddingService() throws -> EmbeddingService {
+        let service = try get(serviceID: preferences.preferredEmbeddingServiceID)
+        return try service.embeddingService()
+    }
+    
+    public func preferredTranscriptionService() throws -> TranscriptionService {
+        let service = try get(serviceID: preferences.preferredTranscriptionServiceID)
+        return try service.transcriptionService()
+    }
+    
+    public func preferredToolService() throws -> ToolService {
+        let service = try get(serviceID: preferences.preferredToolServiceID)
+        return try service.toolService()
+    }
+    
+    public func preferredVisionService() throws -> VisionService {
+        let service = try get(serviceID: preferences.preferredVisionServiceID)
+        return try service.visionService()
+    }
+    
+    public func preferredSpeechService() throws -> SpeechService {
+        let service = try get(serviceID: preferences.preferredSpeechServiceID)
+        return try service.speechService()
+    }
+    
+    public func preferredSummarizationService() throws -> ChatService {
+        let service = try get(serviceID: preferences.preferredSummarizationServiceID)
+        return try service.summarizationService()
+    }
+    
+    // MARK: - Model Preferences
+    
+    public func preferredChatModel() throws -> String {
+        let service = try get(serviceID: preferences.preferredChatServiceID)
+        guard let model = service.preferredChatModel else {
+            throw PreferencesStoreError.modelNotFound
+        }
+        return model
+    }
+    
+    public func preferredImageModel() throws -> String {
+        let service = try get(serviceID: preferences.preferredImageServiceID)
+        guard let model = service.preferredImageModel else {
+            throw PreferencesStoreError.modelNotFound
+        }
+        return model
+    }
+    
+    public func preferredEmbeddingModel() throws -> String {
+        let service = try get(serviceID: preferences.preferredEmbeddingServiceID)
+        guard let model = service.preferredEmbeddingModel else {
+            throw PreferencesStoreError.modelNotFound
+        }
+        return model
+    }
+    
+    public func preferredTranscriptionModel() throws -> String {
+        let service = try get(serviceID: preferences.preferredTranscriptionServiceID)
+        guard let model = service.preferredTranscriptionModel else {
+            throw PreferencesStoreError.modelNotFound
+        }
+        return model
+    }
+    
+    public func preferredToolModel() throws -> String {
+        let service = try get(serviceID: preferences.preferredToolServiceID)
+        guard let model = service.preferredChatModel else {
+            throw PreferencesStoreError.modelNotFound
+        }
+        return model
+    }
+    
+    public func preferredVisionModel() throws -> String {
+        let service = try get(serviceID: preferences.preferredVisionServiceID)
+        guard let model = service.preferredVisionModel else {
+            throw PreferencesStoreError.modelNotFound
+        }
+        return model
+    }
+    
+    public func preferredSpeechModel() throws -> String {
+        let service = try get(serviceID: preferences.preferredSpeechServiceID)
+        guard let model = service.preferredSpeechModel else {
+            throw PreferencesStoreError.modelNotFound
+        }
+        return model
+    }
+    
+    public func preferredSummarizationModel() throws -> String {
+        let service = try get(serviceID: preferences.preferredSummarizationServiceID)
+        guard let model = service.preferredSummarizationModel else {
+            throw PreferencesStoreError.modelNotFound
+        }
+        return model
+    }
+    
+    // MARK: - Private
+    
+    private let data = PreferencesData()
+    
+    private init() {
+        Task { try await load() }
+    }
+    
+    private func load() async throws {
+        self.preferences = try await data.load()
+    }
+    
+    private func save() async throws {
+        try await data.save(preferences)
+    }
+}
+
+enum PreferencesStoreError: Error {
+    case serviceNotFound
+    case modelNotFound
 }

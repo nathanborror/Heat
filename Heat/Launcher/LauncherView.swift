@@ -72,23 +72,22 @@ struct LauncherView: View {
     }
     
     func handleSubmit() {
-        // TODO: 
-//        // Create conversation if one doesn't already exist
-//        if launcherViewModel.conversationID == nil {
-//            launcherViewModel.newConversation()
-//        }
-//        // Ignore empty content
-//        guard !content.isEmpty else { return }
-//        
-//        do {
-//            try launcherViewModel.generate(content, context: memories.map { $0.content })
-//            isShowingContent = true
-//            content = ""
-//        } catch let error as KitError {
-//            launcherViewModel.error = error
-//        } catch {
-//            logger.warning("failed to submit: \(error)")
-//        }
+        // Create conversation if one doesn't already exist
+        if launcherViewModel.conversationID == nil {
+            try? launcherViewModel.newConversation()
+        }
+        // Ignore empty content
+        guard !content.isEmpty else { return }
+        
+        do {
+            try launcherViewModel.generate(content, context: memories.map { $0.content })
+            isShowingContent = true
+            content = ""
+        } catch let error as KitError {
+            launcherViewModel.error = error
+        } catch {
+            logger.warning("failed to submit: \(error)")
+        }
     }
 }
 

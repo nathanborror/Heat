@@ -7,16 +7,17 @@ struct PreferencesForm: View {
     @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
+    @State var preferences: Preferences
+    
     @State private var models: [Model] = []
     @State private var isShowingDeleteConfirmation = false
     
     var body: some View {
-        @Bindable var store = store
         Form {
             Section {
                 TextField("Introduction", text: Binding(
-                    get: { store.preferences.instructions ?? "" },
-                    set: { store.preferences.instructions = $0.isEmpty ? nil : $0 }
+                    get: { preferences.instructions ?? "" },
+                    set: { preferences.instructions = $0.isEmpty ? nil : $0 }
                 ), axis: .vertical)
             } footer: {
                 Text("Personalize your experience by describing who you are.")
@@ -28,7 +29,7 @@ struct PreferencesForm: View {
                     AgentList()
                 }
                 #endif
-                Picker("Default Agent", selection: $store.preferences.defaultAgentID ?? "") {
+                Picker("Default Agent", selection: $preferences.defaultAgentID ?? "") {
                     ForEach(AgentStore.shared.agents) { agent in
                         Text(agent.name).tag(agent.id)
                     }
@@ -51,88 +52,88 @@ struct PreferencesForm: View {
             #endif
             
             Section {
-                Toggle("Stream responses", isOn: $store.preferences.shouldStream)
-                Toggle("Debug", isOn: $store.preferences.debug)
+                Toggle("Stream responses", isOn: $preferences.shouldStream)
+                Toggle("Debug", isOn: $preferences.debug)
             }
             
             Section {
                 Picker("Chats", selection: Binding(
-                    get: { store.preferences.preferredChatServiceID?.rawValue ?? "" },
-                    set: { store.preferences.preferredChatServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferredChatServiceID?.rawValue ?? "" },
+                    set: { preferences.preferredChatServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services.filter { $0.supportsChats }) { service in
+                    ForEach(preferences.services.filter { $0.supportsChats }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Images", selection: Binding(
-                    get: { store.preferences.preferredImageServiceID?.rawValue ?? "" },
-                    set: { store.preferences.preferredImageServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferredImageServiceID?.rawValue ?? "" },
+                    set: { preferences.preferredImageServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services.filter { $0.supportsImages }) { service in
+                    ForEach(preferences.services.filter { $0.supportsImages }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Embeddings", selection: Binding(
-                    get: { store.preferences.preferredEmbeddingServiceID?.rawValue ?? "" },
-                    set: { store.preferences.preferredEmbeddingServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferredEmbeddingServiceID?.rawValue ?? "" },
+                    set: { preferences.preferredEmbeddingServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services.filter { $0.supportsEmbeddings }) { service in
+                    ForEach(preferences.services.filter { $0.supportsEmbeddings }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Transcriptions", selection: Binding(
-                    get: { store.preferences.preferredTranscriptionServiceID?.rawValue ?? "" },
-                    set: { store.preferences.preferredTranscriptionServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferredTranscriptionServiceID?.rawValue ?? "" },
+                    set: { preferences.preferredTranscriptionServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services.filter { $0.supportsTranscriptions }) { service in
+                    ForEach(preferences.services.filter { $0.supportsTranscriptions }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Tools", selection: Binding(
-                    get: { store.preferences.preferredToolServiceID?.rawValue ?? "" },
-                    set: { store.preferences.preferredToolServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferredToolServiceID?.rawValue ?? "" },
+                    set: { preferences.preferredToolServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services.filter { $0.supportsTools }) { service in
+                    ForEach(preferences.services.filter { $0.supportsTools }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Vision", selection: Binding(
-                    get: { store.preferences.preferredVisionServiceID?.rawValue ?? "" },
-                    set: { store.preferences.preferredVisionServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferredVisionServiceID?.rawValue ?? "" },
+                    set: { preferences.preferredVisionServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services.filter { $0.supportsVision }) { service in
+                    ForEach(preferences.services.filter { $0.supportsVision }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Speech", selection: Binding(
-                    get: { store.preferences.preferredSpeechServiceID?.rawValue ?? "" },
-                    set: { store.preferences.preferredSpeechServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferredSpeechServiceID?.rawValue ?? "" },
+                    set: { preferences.preferredSpeechServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services.filter { $0.supportsSpeech }) { service in
+                    ForEach(preferences.services.filter { $0.supportsSpeech }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Summarization", selection: Binding(
-                    get: { store.preferences.preferredSummarizationServiceID?.rawValue ?? "" },
-                    set: { store.preferences.preferredSummarizationServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferredSummarizationServiceID?.rawValue ?? "" },
+                    set: { preferences.preferredSummarizationServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(store.preferences.services.filter { $0.supportsSummarization }) { service in
+                    ForEach(preferences.services.filter { $0.supportsSummarization }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -155,34 +156,23 @@ struct PreferencesForm: View {
     }
     
     func handleAgentReset() {
-        // TODO:
-//        do {
-//            try store.resetAgents()
-//            handleSave()
-//            dismiss()
-//        } catch {
-//            print(error)
-//        }
+        print("not implemented")
     }
     
     func handleServicesReset() {
-        // TODO:
-//        store.preferences.preferredChatServiceID = .openAI
-//        store.preferences.preferredImageServiceID = .openAI
-//        store.preferences.preferredEmbeddingServiceID = .openAI
-//        store.preferences.preferredTranscriptionServiceID = .openAI
-//        store.preferences.preferredToolServiceID = .openAI
-//        store.preferences.preferredVisionServiceID = .openAI
-//        store.preferences.preferredSpeechServiceID = .openAI
-//        store.preferences.preferredSummarizationServiceID = .openAI
-//        handleSave()
+        preferences.preferredChatServiceID = .openAI
+        preferences.preferredImageServiceID = .openAI
+        preferences.preferredEmbeddingServiceID = .openAI
+        preferences.preferredTranscriptionServiceID = .openAI
+        preferences.preferredToolServiceID = .openAI
+        preferences.preferredVisionServiceID = .openAI
+        preferences.preferredSpeechServiceID = .openAI
+        preferences.preferredSummarizationServiceID = .openAI
+        handleSave()
     }
     
     func handleDeleteAll() {
-        // TODO: 
-//        try? store.deleteAll()
-//        handleSave()
-//        dismiss()
+        print("not implemented")
     }
     
     func handleSave() {
@@ -201,7 +191,7 @@ struct PreferencesWindow: View {
     
     var body: some View {
         TabView(selection: $selection) {
-            PreferencesForm()
+            PreferencesForm(preferences: PreferencesStore.shared.preferences)
                 .padding(20)
                 .frame(width: 400)
                 .tag(Tabs.general)

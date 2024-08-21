@@ -7,10 +7,10 @@ import GenKit
 private let logger = Logger(subsystem: "MessageManager", category: "HeatKit")
 
 public final class MessageManager {
-    public typealias ManagerCallback = @MainActor (MessageManager) -> Void
-    public typealias MessageCallback = @MainActor (Message) -> Void
-    public typealias ProcessingCallback = @MainActor () -> Void
-    public typealias ImagesCallback = @MainActor (String, [Data]) -> Void
+    public typealias ManagerCallback = (MessageManager) async throws -> Void
+    public typealias MessageCallback = (Message) async throws -> Void
+    public typealias ProcessingCallback = () async throws -> Void
+    public typealias ImagesCallback = (String, [Data]) async throws -> Void
     
     public private(set) var messages: [Message] = []
     public private(set) var error: Error? = nil
@@ -22,8 +22,8 @@ public final class MessageManager {
     public init() {}
     
     @discardableResult
-    public func manage(callback: ManagerCallback) async -> Self {
-        await callback(self)
+    public func manage(callback: ManagerCallback) async throws -> Self {
+        try await callback(self)
         return self
     }
     
@@ -34,22 +34,22 @@ public final class MessageManager {
     }
     
     @discardableResult
-    public func append(message: Message?, context: [String: any StringProtocol]? = nil, callback: MessageCallback? = nil) async -> Self {
+    public func append(message: Message?, context: [String: any StringProtocol]? = nil, callback: MessageCallback? = nil) async throws -> Self {
         guard var message else { return self }
         message.content = message.content?.apply(context: context ?? [:])
         messages.append(message)
-        await callback?(message)
+        try await callback?(message)
         return self
     }
     
     @discardableResult
-    public func upsert(message: Message, callback: MessageCallback? = nil) async -> Self {
+    public func upsert(message: Message, callback: MessageCallback? = nil) async throws -> Self {
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
             messages[index] = message
         } else {
             messages.append(message)
         }
-        await callback?(message)
+        try await callback?(message)
         return self
     }
     
@@ -80,23 +80,23 @@ public final class MessageManager {
                 if stream {
                     try await service.completionStream(request: req) { update in
                         message = apply(message: update, runID: runID)
-                        await callback(message!)
+                        try await callback(message!)
                     }
                 } else {
                     message = try await service.completion(request: req)
                     message?.runID = runID
-                    await append(message: message!)
-                    await callback(message!)
+                    try await append(message: message!)
+                    try await callback(message!)
                 }
                 
                 // Prepare possible tool responses
-                await processing?()
+                try await processing?()
                 
                 // Prepare possible tool responses
                 let (toolResponses, shouldContinue) = try await prepareToolsResponse(message: message, runID: runID)
                 for response in toolResponses {
-                    await self.upsert(message: response)
-                    await callback(response)
+                    try await self.upsert(message: response)
+                    try await callback(response)
                 }
                 runShouldContinue = shouldContinue
                 runLoopCount += 1
@@ -113,8 +113,8 @@ public final class MessageManager {
             try Task.checkCancellation()
             let req = ToolServiceRequest(model: model, messages: filteredMessages, tool: tool)
             let message = try await service.completion(request: req)
-            await append(message: message)
-            await callback?(message)
+            try await append(message: message)
+            try await callback?(message)
         } catch {
             apply(error: error)
         }
@@ -129,12 +129,12 @@ public final class MessageManager {
             if stream {
                 try await service.completionStream(request: req) { update in
                     let message = apply(message: update)
-                    await callback?(message)
+                    try await callback?(message)
                 }
             } else {
                 let message = try await service.completion(request: req)
-                await append(message: message)
-                await callback?(message)
+                try await append(message: message)
+                try await callback?(message)
             }
         } catch {
             apply(error: error)
@@ -149,7 +149,7 @@ public final class MessageManager {
             let prompt = prompt ?? ""
             let req = ImagineServiceRequest(model: model, prompt: prompt)
             let images = try await service.imagine(request: req)
-            await callback(prompt, images)
+            try await callback(prompt, images)
         } catch {
             apply(error: error)
         }
@@ -172,7 +172,7 @@ public final class MessageManager {
             
             let attachment = Message.Attachment.asset(.init(name: resource.name, kind: .audio, location: .filesystem))
             let newMessage = apply(attachment: attachment, message: message)
-            await callback(newMessage)
+            try await callback(newMessage)
         } catch {
             apply(error: error)
         }

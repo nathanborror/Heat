@@ -34,7 +34,9 @@ struct ConversationView: View {
                         // Show suggestions when they are available
                         if !conversationViewModel.suggestions.isEmpty {
                             SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
-                                SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
+                                SuggestionView(suggestion: suggestion) { suggestion in
+                                    Task { try await handleSuggestion(suggestion) }
+                                }
                             }
                             .padding(.vertical, 8)
                         }
@@ -70,17 +72,16 @@ struct ConversationView: View {
         }
     }
     
-    func handleSuggestion(_ suggestion: String) {
-        // TODO: 
-//        if conversationViewModel.conversationID == nil {
-//            try? conversationViewModel.newConversation()
-//        }
-//        do {
-//            try conversationViewModel.generate(suggestion)
-//        } catch let error as KitError {
-//            conversationViewModel.error = error
-//        } catch {
-//            logger.warning("failed to submit: \(error)")
-//        }
+    func handleSuggestion(_ suggestion: String) async throws {
+        if conversationViewModel.conversationID == nil {
+            try await conversationViewModel.newConversation()
+        }
+        do {
+            try conversationViewModel.generate(suggestion)
+        } catch let error as KitError {
+            conversationViewModel.error = error
+        } catch {
+            logger.warning("failed to submit: \(error)")
+        }
     }
 }

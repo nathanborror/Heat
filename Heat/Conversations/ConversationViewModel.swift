@@ -21,11 +21,12 @@ final class ConversationViewModel {
     }
     
     var conversation: Conversation? {
-        store.get(conversationID: conversationID)
+        guard let conversationID else { return nil }
+        return try? ConversationStore.shared.get(conversationID)
     }
     
     var title: String {
-        conversation?.title ?? Conversation.titlePlaceholder
+        conversation?.title ?? "New Conversation"
     }
     
     var suggestions: [String] {
@@ -36,12 +37,20 @@ final class ConversationViewModel {
         conversation?.messages ?? []
     }
     
-    func newConversation() throws {
-        guard let agentID = store.preferences.defaultAgentID else { return }
+    func newConversation() async throws {
+        guard let agentID = PreferencesStore.shared.preferences.defaultAgentID else {
+            return
+        }
         let agent = try AgentStore.shared.get(agentID)
-        
-        let conversation = store.createConversation(agent: agent)
-        store.upsert(conversation: conversation)
+        let instructions = agent.instructions.map {
+            var message = $0
+            message.content = message.content?.apply(context: [
+                "datetime": Date.now.format(as: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+            ])
+            return message
+        }
+        let tools = store.get(tools: agent.toolIDs)
+        let conversation = try await ConversationStore.shared.create(instructions: instructions, tools: tools)
         conversationID = conversation.id
     }
     
@@ -51,47 +60,47 @@ final class ConversationViewModel {
             throw KitError.missingConversation
         }
         
-        let chatService = try store.preferredChatService()
-        let chatModel = try store.preferredChatModel()
+        let chatService = try PreferencesStore.shared.preferredChatService()
+        let chatModel = try PreferencesStore.shared.preferredChatModel()
         
-        let toolService = try store.preferredToolService()
-        let toolModel = try store.preferredToolModel()
+        let toolService = try PreferencesStore.shared.preferredToolService()
+        let toolModel = try PreferencesStore.shared.preferredToolModel()
         
         let context = prepareContext(context)
         
         generateTask = Task {
-            await MessageManager()
+            try await MessageManager()
                 .append(messages: messages)
                 .append(message: context)
                 .append(message: .init(role: .user, content: content)) { message in
-                    self.store.upsert(suggestions: [], conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .processing, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(suggestions: [], conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .processing, conversationID: conversation.id)
                 }
-                .generate(service: chatService, model: chatModel, tools: conversation.tools, toolChoice: toolChoice, stream: store.preferences.shouldStream) { message in
-                    self.store.upsert(state: .streaming, conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
+                .generate(service: chatService, model: chatModel, tools: conversation.tools, toolChoice: toolChoice, stream: PreferencesStore.shared.preferences.shouldStream) { message in
+                    try await ConversationStore.shared.upsert(state: .streaming, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
                 } processing: {
-                   self.store.upsert(state: .processing, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .processing, conversationID: conversation.id)
                 }
                 .manage { _ in
-                    self.store.upsert(state: .suggesting, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .suggesting, conversationID: conversation.id)
                 }
                 .append(message: Toolbox.generateSuggestions.message)
                 .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
                     let suggestions = self.prepareSuggestions(message)
-                    self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
-                    self.store.upsert(state: .none, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(suggestions: suggestions, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .none, conversationID: conversation.id)
                 }
                 .manage { manager in
-                    self.store.upsert(state: .none, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .none, conversationID: conversation.id)
                     if let error = manager.error {
                         let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                        self.store.upsert(message: message, conversationID: conversation.id)
+                        try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
                     }
                 }
-            if title == Conversation.titlePlaceholder {
+            if title == "New Conversation" {
                 try generateTitle()
             }
         }
@@ -100,8 +109,8 @@ final class ConversationViewModel {
     func generate(_ content: String, images: [Data]) throws {
         guard !content.isEmpty else { return }
         
-        let visionService = try store.preferredVisionService()
-        let visionModel = try store.preferredVisionModel()
+        let visionService = try PreferencesStore.shared.preferredVisionService()
+        let visionModel = try PreferencesStore.shared.preferredVisionModel()
         
         guard let conversation else {
             throw KitError.missingConversation
@@ -110,69 +119,69 @@ final class ConversationViewModel {
             .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
         })
         generateTask = Task {
-            await MessageManager()
+            try await MessageManager()
                 .append(messages: messages)
                 .append(message: message) { message in
-                    self.store.upsert(suggestions: [], conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .processing, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(suggestions: [], conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .processing, conversationID: conversation.id)
                 }
                 .generate(service: visionService, model: visionModel) { message in
-                    self.store.upsert(state: .streaming, conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .streaming, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
                 }
                 .manage { manager in
-                    self.store.upsert(state: .none, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .none, conversationID: conversation.id)
                     if let error = manager.error {
                         let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                        self.store.upsert(message: message, conversationID: conversation.id)
+                        try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
                     }
                 }
-            if title == Conversation.titlePlaceholder {
+            if title == "New Conversation" {
                 try generateTitle()
             }
         }
     }
     
     func generateImage(_ content: String) throws {
-        let imageService = try store.preferredImageService()
-        let imageModel = try store.preferredImageModel()
+        let imageService = try PreferencesStore.shared.preferredImageService()
+        let imageModel = try PreferencesStore.shared.preferredImageModel()
         
         guard let conversation else {
             throw KitError.missingConversation
         }
         generateTask = Task {
-            await ImageSession.shared
+            try await ImageSession.shared
                 .manage { _ in
-                    self.store.upsert(state: .processing, conversationID: conversation.id)
-                    self.store.upsert(message: .init(role: .user, content: content), conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .processing, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(message: .init(role: .user, content: content), conversationID: conversation.id)
                 }
                 .generate(service: imageService, model: imageModel, prompt: content) { images in
                     let attachments = images.map {
                         Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: content))
                     }
                     let message = Message(role: .assistant, content: "A generated image using the prompt:\n\(content)", attachments: attachments)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .none, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .none, conversationID: conversation.id)
                 }
         }
     }
     
     func generateTitle() throws {
-        let service = try store.preferredToolService()
-        let model = try store.preferredToolModel()
+        let service = try PreferencesStore.shared.preferredToolService()
+        let model = try PreferencesStore.shared.preferredToolModel()
         
         guard let conversation else {
             throw KitError.missingConversation
         }
         generateTask = Task {
-            await MessageManager()
+            try await MessageManager()
                 .append(messages: messages)
                 .append(message: Toolbox.generateTitle.message)
                 .generate(service: service, model: model, tool: Toolbox.generateTitle.tool) { message in
                     guard let title = self.prepareTitle(message) else { return }
-                    self.store.upsert(title: title, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(title: title, conversationID: conversation.id)
                 }
                 .manage { manager in
                     guard let error = manager.error else { return }
@@ -184,7 +193,7 @@ final class ConversationViewModel {
     func generateStop() {
         generateTask?.cancel()
         guard let conversationID else { return }
-        store.upsert(state: .none, conversationID: conversationID)
+        Task { try await ConversationStore.shared.upsert(state: .none, conversationID: conversationID) }
     }
     
     // MARK: - Private

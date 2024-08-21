@@ -47,9 +47,15 @@ actor AgentData {
     }
     
     func load() throws -> [Agent] {
-        let data = try Data(contentsOf: dataURL)
-        let decoder = PropertyListDecoder()
-        agents = try decoder.decode([Agent].self, from: data)
+        do {
+            let data = try Data(contentsOf: dataURL)
+            let decoder = PropertyListDecoder()
+            agents = try decoder.decode([Agent].self, from: data)
+        } catch {
+            print(error)
+            let defaultAgent = Agent(id: Constants.defaultAgentID, name: "Assistant", instructions: [.init(role: .system, content: "You are a helpful assistant.")])
+            try save([defaultAgent])
+        }
         return agents
     }
     
@@ -75,7 +81,7 @@ public class AgentStore {
         return agent
     }
     
-    public func upsert(agent: Agent) async throws {
+    public func upsert(_ agent: Agent) async throws {
         var agents = self.agents
         if let index = agents.firstIndex(where: { $0.id == agent.id }) {
             var existing = agents[index]

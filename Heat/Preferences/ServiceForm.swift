@@ -112,7 +112,7 @@ struct ServiceForm: View {
             return
         }
         handleApplyCredentials()
-        // TODO: store.upsert(service: service)
+        Task { try await PreferencesStore.shared.upsert(service: service) }
         dismiss()
     }
     

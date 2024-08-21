@@ -10,13 +10,15 @@ struct ConversationList: View {
         @Bindable var conversationViewModel = conversationViewModel
         List(selection: $conversationViewModel.conversationID) {
             Section {
-                ForEach(store.conversations) { conversation in
+                ForEach(ConversationStore.shared.conversations) { conversation in
                     VStack(alignment: .leading) {
                         Text(conversation.title)
                     }
                     .tag(conversation.id)
                     .swipeActions {
-                        Button(role: .destructive, action: { store.delete(conversationID: conversation.id) }) {
+                        Button(role: .destructive) {
+                            Task { try await ConversationStore.shared.delete(conversation.id) }
+                        } label: {
                             Label("Trash", systemImage: "trash")
                         }
                     }

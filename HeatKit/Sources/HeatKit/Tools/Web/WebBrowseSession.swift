@@ -23,7 +23,7 @@ public class WebBrowseSession {
             """)
         
         var summary: String? = nil
-        await MessageManager()
+        try await MessageManager()
             .append(message: message)
             .generate(service: service, model: model) { message in
                 summary = message.content

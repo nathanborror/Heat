@@ -32,13 +32,15 @@ struct MainCompactView: View {
                         }
                     }
                     ToolbarItem {
-                        menuButton("New Conversation", symbol: "plus") { conversationViewModel.conversationID = nil }
+                        menuButton("New Conversation", symbol: "plus") {
+                            Task { try await conversationViewModel.newConversation() }
+                        }
                     }
                 }
                 .sheet(item: $sheet) { sheet in
                     NavigationStack {
                         switch sheet {
-                        case .preferences:      PreferencesForm()
+                        case .preferences:      PreferencesForm(preferences: PreferencesStore.shared.preferences)
                         case .memories:         MemoryList()
                         case .conversationList: ConversationList()
                         }

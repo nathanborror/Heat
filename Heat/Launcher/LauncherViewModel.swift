@@ -21,57 +21,67 @@ final class LauncherViewModel {
     }
     
     var conversation: Conversation? {
-        store.get(conversationID: conversationID)
+        guard let conversationID else { return nil }
+        return try? ConversationStore.shared.get(conversationID)
     }
     
     var messages: [Message] {
         conversation?.messages ?? []
     }
     
-    func newConversation() throws {
-        guard let agentID = store.preferences.defaultAgentID else { return }
+    func newConversation() async throws {
+        guard let agentID = PreferencesStore.shared.preferences.defaultAgentID else {
+            return
+        }
         let agent = try AgentStore.shared.get(agentID)
-        
-        let conversation = store.createConversation(agent: agent)
-        store.upsert(conversation: conversation)
+        let instructions = agent.instructions.map {
+            var message = $0
+            message.content = message.content?.apply(context: [
+                "datetime": Date.now.format(as: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+            ])
+            return message
+        }
+        let tools = store.get(tools: agent.toolIDs)
+        let conversation = try await ConversationStore.shared.create(instructions: instructions, tools: tools)
         conversationID = conversation.id
     }
     
-    func generate(_ content: String, context: [String] = []) throws {
+    func generate(_ content: String, context: [String] = [], toolChoice: Tool? = nil) throws {
         guard !content.isEmpty else { return }
         guard let conversation else {
             throw KitError.missingConversation
         }
         
-        let chatService = try store.preferredChatService()
-        let chatModel = try store.preferredChatModel()
+        let chatService = try PreferencesStore.shared.preferredChatService()
+        let chatModel = try PreferencesStore.shared.preferredChatModel()
         
         let context = prepareContext(context)
         
         generateTask = Task {
-            await MessageManager()
+            try await MessageManager()
                 .append(messages: messages)
                 .append(message: context)
                 .append(message: .init(role: .user, content: content)) { message in
-                    self.store.upsert(suggestions: [], conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .processing, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(suggestions: [], conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .processing, conversationID: conversation.id)
                 }
-                .generate(service: chatService, model: chatModel, tools: conversation.tools, stream: store.preferences.shouldStream) { message in
-                    self.store.upsert(state: .streaming, conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
+                .generate(service: chatService, model: chatModel, tools: conversation.tools, toolChoice: toolChoice, stream: PreferencesStore.shared.preferences.shouldStream) { message in
+                    try await ConversationStore.shared.upsert(state: .streaming, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
                     self.hapticTap(style: .light)
                 } processing: {
-                   self.store.upsert(state: .processing, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .processing, conversationID: conversation.id)
                 }
                 .manage { _ in
-                    self.store.upsert(state: .suggesting, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .suggesting, conversationID: conversation.id)
                 }
+                .append(message: Toolbox.generateSuggestions.message)
                 .manage { manager in
-                    self.store.upsert(state: .none, conversationID: conversation.id)
+                    try await ConversationStore.shared.upsert(state: .none, conversationID: conversation.id)
                     if let error = manager.error {
                         let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                        self.store.upsert(message: message, conversationID: conversation.id)
+                        try await ConversationStore.shared.upsert(message: message, conversationID: conversation.id)
                     }
                 }
         }
@@ -80,7 +90,7 @@ final class LauncherViewModel {
     func generateStop() {
         generateTask?.cancel()
         guard let conversationID else { return }
-        store.upsert(state: .none, conversationID: conversationID)
+        Task { try await ConversationStore.shared.upsert(state: .none, conversationID: conversationID) }
     }
     
     // MARK: - Private

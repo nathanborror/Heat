@@ -37,7 +37,7 @@ struct ConversationBarrier: View {
                     .textFieldStyle(.plain)
                     .frame(maxWidth: .infinity)
                     .onSubmit {
-                        handleSubmit()
+                        Task { try await handleSubmit() }
                     }
                 if hasPaseboardString {
                     Button(action: handleLoadPasteboard) {
@@ -79,7 +79,9 @@ struct ConversationBarrier: View {
                 }
                 #else
                 VStack(spacing: 8) {
-                    Button(action: handleSubmit) {
+                    Button {
+                        Task { try await handleSubmit() }
+                    } label: {
                         Text("Submit")
                             .padding(.vertical, verticalPadding)
                             .frame(maxWidth: .infinity)
@@ -117,30 +119,28 @@ struct ConversationBarrier: View {
         apiKey = contents.hasPrefix("sk-") ? contents : ""
     }
     
-    func handleSubmit() {
-        // TODO: 
-//        guard !apiKey.isEmpty else { return }
-//        guard var service = store.get(serviceID: .openAI) else { return }
-//        
-//        // Update service with token and preferred models
-//        service.applyPreferredModels(Constants.openAIDefaults)
-//        service.credentials = .token(apiKey)
-//        store.upsert(service: service)
-//        
-//        // Update preferences with preferred services
-//        store.preferences.preferredChatServiceID = .openAI
-//        store.preferences.preferredImageServiceID = .openAI
-//        store.preferences.preferredEmbeddingServiceID = .openAI
-//        store.preferences.preferredTranscriptionServiceID = .openAI
-//        store.preferences.preferredToolServiceID = .openAI
-//        store.preferences.preferredVisionServiceID = .openAI
-//        store.preferences.preferredSpeechServiceID = .openAI
-//        store.preferences.preferredSummarizationServiceID = .openAI
-//        
-//        // Persist changes
-//        Task { try await store.saveAll() }
-//        
-//        dismiss()
+    func handleSubmit() async throws {
+        guard !apiKey.isEmpty else { return }
+        
+        // Update service with token and preferred models
+        var service = try PreferencesStore.shared.get(serviceID: .openAI)
+        service.applyPreferredModels(Constants.openAIDefaults)
+        service.credentials = .token(apiKey)
+        try await PreferencesStore.shared.upsert(service: service)
+        
+        // Update preferences with preferred services
+        var preferences = PreferencesStore.shared.preferences
+        preferences.preferredChatServiceID = .openAI
+        preferences.preferredImageServiceID = .openAI
+        preferences.preferredEmbeddingServiceID = .openAI
+        preferences.preferredTranscriptionServiceID = .openAI
+        preferences.preferredToolServiceID = .openAI
+        preferences.preferredVisionServiceID = .openAI
+        preferences.preferredSpeechServiceID = .openAI
+        preferences.preferredSummarizationServiceID = .openAI
+        try await PreferencesStore.shared.upsert(preferences)
+        
+        dismiss()
     }
     
     #if os(macOS)

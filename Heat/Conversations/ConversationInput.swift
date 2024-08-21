@@ -116,7 +116,15 @@ struct ConversationInput: View {
                         .frame(minHeight: minHeight)
                         .focused($isFocused)
                         #if os(macOS)
-                        .onSubmit(handleSubmit)
+                        .onSubmit {
+                            Task {
+                                do {
+                                    try await handleSubmit()
+                                } catch {
+                                    print(error)
+                                }
+                            }
+                        }
                         #endif
                     
                     // Speech to text
@@ -139,7 +147,15 @@ struct ConversationInput: View {
                 }
                 .buttonStyle(.plain)
             } else if showSubmit {
-                Button(action: handleSubmit) {
+                Button {
+                    Task {
+                        do {
+                            try await handleSubmit()
+                        } catch {
+                            print(error)
+                        }
+                    }
+                } label: {
                     Image(systemName: "arrow.up")
                         .modifier(ConversationButtonModifier())
                 }
@@ -152,73 +168,70 @@ struct ConversationInput: View {
         #endif
     }
     
-    func handleSubmit() {
-        // TODO:
-//        defer { clear() }
-//        
-//        // Create conversation if one doesn't already exist
-//        if conversationViewModel.conversationID == nil {
-//            conversationViewModel.newConversation()
-//        }
-//        
-//        // Check for command
-//        switch command {
-//        case "imagine":
-//            handleImagine(content)
-//            return
-//        case "summarize":
-//            handleSummarize(content)
-//            return
-//        case "search":
-//            handleSearch(content)
-//            return
-//        default:
-//            break
-//        }
-//        
-//        // Handle vision prompt if exists
-//        if hasVisionAsset || !imagePickerViewModel.imagesSelected.isEmpty {
-//            handleVision(content); return
-//        }
-//        
-//        // Ignore empty content
-//        guard !content.isEmpty else { return }
-//        
-//        do {
-//            try conversationViewModel.generate(content, context: memories.map { $0.content })
-//        } catch let error as KitError {
-//            conversationViewModel.error = error
-//        } catch {
-//            logger.warning("failed to submit: \(error)")
-//        }
+    func handleSubmit() async throws {
+        defer { clear() }
+        
+        // Create conversation if one doesn't already exist
+        if conversationViewModel.conversationID == nil {
+            try await conversationViewModel.newConversation()
+        }
+        
+        // Check for command
+        switch command {
+        case "imagine":
+            handleImagine(content)
+            return
+        case "summarize":
+            handleSummarize(content)
+            return
+        case "search":
+            handleSearch(content)
+            return
+        default:
+            break
+        }
+        
+        // Handle vision prompt if exists
+        if hasVisionAsset || !imagePickerViewModel.imagesSelected.isEmpty {
+            handleVision(content); return
+        }
+        
+        // Ignore empty content
+        guard !content.isEmpty else { return }
+        
+        do {
+            try conversationViewModel.generate(content, context: memories.map { $0.content })
+        } catch let error as KitError {
+            conversationViewModel.error = error
+        } catch {
+            logger.warning("failed to submit: \(error)")
+        }
     }
     
     func handleVision(_ content: String) {
-        // TODO:
-//        do {
-//            let images = imagePickerViewModel.imagesSelected.map {
-//                // Resize image so we're not sending huge amounts of data to the services.
-//                $0.image?.resize(to: .init(width: 512, height: 512))
-//            }.compactMap { $0 }
-//            try conversationViewModel.generate(content, images: images)
-//        } catch let error as KitError {
-//            conversationViewModel.error = error
-//        } catch {
-//            logger.warning("failed to submit: \(error)")
-//        }
-//        clear()
+        do {
+            let images = imagePickerViewModel.imagesSelected.map {
+                // Resize image so we're not sending huge amounts of data to the services.
+                $0.image?.resize(to: .init(width: 512, height: 512))
+            }.compactMap { $0 }
+            try conversationViewModel.generate(content, images: images)
+        } catch let error as KitError {
+            conversationViewModel.error = error
+        } catch {
+            logger.warning("failed to submit: \(error)")
+        }
+        clear()
     }
     
     func handleImagine(_ content: String) {
-        // TODO:
-//        do {
-//            try conversationViewModel.generateImage(content)
-//        } catch let error as KitError {
-//            conversationViewModel.error = error
-//        } catch {
-//            logger.warning("failed to submit: \(error)")
-//        }
-//        clear()
+        do {
+            try conversationViewModel.generateImage(content)
+        } catch let error as KitError {
+            conversationViewModel.error = error
+        } catch {
+            logger.warning("failed to submit: \(error)")
+        }
+        clear()
     }
     
     func handleSummarize(_ content: String) {
@@ -255,8 +268,7 @@ struct ConversationInput: View {
     }
     
     func handleStop() {
-        // TODO:
-//        conversationViewModel.generateStop()
+        conversationViewModel.generateStop()
     }
     
     private func clear() {
@@ -266,28 +278,25 @@ struct ConversationInput: View {
     }
     
     private var hasVisionAsset: Bool {
-        return false
-        // TODO:
-//        let visible = conversationViewModel.messages.filter { $0.kind != .instruction }
-//        let message = visible.first { message in
-//            let attachment = message.attachments.first { attachment in
-//                switch attachment {
-//                case .agent, .automation, .component, .file:
-//                    return false
-//                case .asset(let asset):
-//                    return asset.noop == false
-//                }
-//            }
-//            return attachment != nil
-//        }
-//        return message != nil
+        let visible = conversationViewModel.messages.filter { $0.kind != .instruction }
+        let message = visible.first { message in
+            let attachment = message.attachments.first { attachment in
+                switch attachment {
+                case .agent, .automation, .component, .file:
+                    return false
+                case .asset(let asset):
+                    return asset.noop == false
+                }
+            }
+            return attachment != nil
+        }
+        return message != nil
     }
     
     private var showInlineControls: Bool    { content.isEmpty }
     private var showInputPadding: Bool      { !content.isEmpty }
-    // TODO: 
-//    private var showStopGenerating: Bool    { (conversationViewModel.conversation?.state ?? .none) != .none }
-    private var showStopGenerating = false
+    
+    private var showStopGenerating: Bool    { (conversationViewModel.conversation?.state ?? .none) != .none }
     private var showSubmit: Bool            { !content.isEmpty }
     
     #if os(macOS)
