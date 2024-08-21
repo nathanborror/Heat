@@ -34,7 +34,7 @@ public struct Agent: Codable, Identifiable, Hashable, Sendable {
     }
 }
 
-actor AgentData {
+actor AgentStore {
     private var agents: [Agent] = []
     
     func save(_ agents: [Agent]) throws {
@@ -69,14 +69,14 @@ actor AgentData {
 
 @MainActor
 @Observable
-public class AgentStore {
-    public static let shared = AgentStore()
+public final class AgentProvider {
+    public static let shared = AgentProvider()
     
     public private(set) var agents: [Agent] = []
     
     public func get(_ id: String) throws -> Agent {
         guard let agent = agents.first(where: { $0.id == id }) else {
-            throw AgentStoreError.notFound
+            throw AgentProviderError.notFound
         }
         return agent
     }
@@ -102,7 +102,7 @@ public class AgentStore {
     
     // MARK: - Private
     
-    private let data = AgentData()
+    private let data = AgentStore()
     
     private init() {
         Task { try await load() }
@@ -117,6 +117,6 @@ public class AgentStore {
     }
 }
 
-public enum AgentStoreError: Error {
+public enum AgentProviderError: Error {
     case notFound
 }

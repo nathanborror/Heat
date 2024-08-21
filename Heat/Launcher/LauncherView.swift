@@ -31,7 +31,7 @@ struct LauncherView: View {
                     .textFieldStyle(.plain)
                     .font(.title)
                     .onSubmit {
-                        handleSubmit()
+                        Task { try await handleSubmit() }
                     }
             }
             .padding()
@@ -71,10 +71,10 @@ struct LauncherView: View {
         isShowingContent = true
     }
     
-    func handleSubmit() {
+    func handleSubmit() async throws {
         // Create conversation if one doesn't already exist
         if launcherViewModel.conversationID == nil {
-            try? launcherViewModel.newConversation()
+            try await launcherViewModel.newConversation()
         }
         // Ignore empty content
         guard !content.isEmpty else { return }

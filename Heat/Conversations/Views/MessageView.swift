@@ -11,7 +11,7 @@ struct MessageView: View {
     
     var body: some View {
         Group {
-            if message.role == .system && PreferencesStore.shared.preferences.debug {
+            if message.role == .system && PreferencesProvider.shared.preferences.debug {
                 MessageSystemView(message: message)
             }
             if message.role == .user {
@@ -32,7 +32,7 @@ struct MessageView: View {
                         .messageSpacing(message)
                         .padding(.vertical, 8)
                 }
-                if PreferencesStore.shared.preferences.debug {
+                if PreferencesProvider.shared.preferences.debug {
                     MessageToolCall(message: message)
                 }
             }

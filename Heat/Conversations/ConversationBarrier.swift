@@ -66,7 +66,9 @@ struct ConversationBarrier: View {
                     }
                     .buttonStyle(.plain)
                     
-                    Button(action: handleSubmit) {
+                    Button {
+                        Task { try await handleSubmit() }
+                    } label: {
                         Text("Submit")
                             .padding(.vertical, verticalPadding)
                             .frame(maxWidth: .infinity)
@@ -123,13 +125,13 @@ struct ConversationBarrier: View {
         guard !apiKey.isEmpty else { return }
         
         // Update service with token and preferred models
-        var service = try PreferencesStore.shared.get(serviceID: .openAI)
+        var service = try PreferencesProvider.shared.get(serviceID: .openAI)
         service.applyPreferredModels(Constants.openAIDefaults)
         service.credentials = .token(apiKey)
-        try await PreferencesStore.shared.upsert(service: service)
+        try await PreferencesProvider.shared.upsert(service: service)
         
         // Update preferences with preferred services
-        var preferences = PreferencesStore.shared.preferences
+        var preferences = PreferencesProvider.shared.preferences
         preferences.preferredChatServiceID = .openAI
         preferences.preferredImageServiceID = .openAI
         preferences.preferredEmbeddingServiceID = .openAI
@@ -138,7 +140,7 @@ struct ConversationBarrier: View {
         preferences.preferredVisionServiceID = .openAI
         preferences.preferredSpeechServiceID = .openAI
         preferences.preferredSummarizationServiceID = .openAI
-        try await PreferencesStore.shared.upsert(preferences)
+        try await PreferencesProvider.shared.upsert(preferences)
         
         dismiss()
     }

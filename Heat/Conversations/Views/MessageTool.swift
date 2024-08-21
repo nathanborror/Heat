@@ -80,7 +80,7 @@ struct MessageToolContent: View {
             .font(.subheadline)
             .foregroundStyle(.secondary)
             
-            if PreferencesStore.shared.preferences.debug, let content = message.content {
+            if PreferencesProvider.shared.preferences.debug, let content = message.content {
                 Text(content)
                     .font(.footnote)
                     .foregroundStyle(.secondary.opacity(0.5))

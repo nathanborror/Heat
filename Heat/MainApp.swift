@@ -51,11 +51,7 @@ struct MainApp: App {
             .environment(conversationViewModel)
             .modelContainer(for: Memory.self)
             .task {
-                await handleRestore()
                 handleHotKeySetup()
-            }
-            .task(id: scenePhase) {
-                handlePhaseChange()
             }
             .task(id: store.isChatAvailable) {
                 handleAvailabilityChange()
@@ -94,14 +90,8 @@ struct MainApp: App {
                 .environment(store)
                 .environment(conversationViewModel)
                 .modelContainer(for: Memory.self)
-                .task(id: scenePhase) {
-                    handlePhaseChange()
-                }
                 .task(id: store.isChatAvailable) {
                     handleAvailabilityChange()
-                }
-                .task {
-                    await handleRestore()
                 }
                 .sheet(isPresented: $showingBarrier) {
                     ConversationBarrier()
@@ -111,34 +101,9 @@ struct MainApp: App {
         #endif
     }
     
-    func handlePhaseChange() {
-        guard !isRestoring else { return }
-        #if os(macOS)
-        guard scenePhase == .inactive else { return }
-        #else
-        guard scenePhase == .background else { return }
-        #endif
-        handleSave()
-    }
-    
     func handleAvailabilityChange() {
         guard !isRestoring else { return }
         showingBarrier = !store.isChatAvailable
-    }
-    
-    func handleRestore() async {
-        do {
-            isRestoring = true
-            try await store.restoreAll()
-            showingBarrier = !store.isChatAvailable
-            isRestoring = false
-        } catch {
-            logger.warning("failed to restore: \(error)")
-        }
-    }
-    
-    func handleSave() {
-        Task { try await store.saveAll() }
     }
     
     func handleNewConversation() {

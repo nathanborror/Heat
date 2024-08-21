@@ -30,7 +30,7 @@ struct PreferencesForm: View {
                 }
                 #endif
                 Picker("Default Agent", selection: $preferences.defaultAgentID ?? "") {
-                    ForEach(AgentStore.shared.agents) { agent in
+                    ForEach(AgentProvider.shared.agents) { agent in
                         Text(agent.name).tag(agent.id)
                     }
                 }
@@ -176,7 +176,7 @@ struct PreferencesForm: View {
     }
     
     func handleSave() {
-        Task { try await store.saveAll() }
+        print("not implemented")
     }
 }
 
@@ -191,7 +191,7 @@ struct PreferencesWindow: View {
     
     var body: some View {
         TabView(selection: $selection) {
-            PreferencesForm(preferences: PreferencesStore.shared.preferences)
+            PreferencesForm(preferences: PreferencesProvider.shared.preferences)
                 .padding(20)
                 .frame(width: 400)
                 .tag(Tabs.general)

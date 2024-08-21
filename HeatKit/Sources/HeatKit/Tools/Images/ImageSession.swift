@@ -6,7 +6,7 @@ import GenKit
 private let logger = Logger(subsystem: "ImageSession", category: "HeatKit")
 
 public final class ImageSession {
-    public typealias SessionCallback = (ImageSession) async throws -> Void
+    public typealias SessionCallback = () async throws -> Void
     public typealias ImagesCallback = ([Data]) async throws -> Void
     
     public static let shared = ImageSession()
@@ -17,7 +17,7 @@ public final class ImageSession {
     
     @discardableResult
     public func manage(callback: SessionCallback) async throws -> Self {
-        try await callback(self)
+        try await callback()
         return self
     }
     

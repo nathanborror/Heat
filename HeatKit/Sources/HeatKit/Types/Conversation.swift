@@ -54,7 +54,7 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
     }
 }
 
-actor ConversationData {
+actor ConversationStore {
     private var conversations: [Conversation] = []
     
     func save(_ conversations: [Conversation]) throws {
@@ -83,14 +83,14 @@ actor ConversationData {
 
 @MainActor
 @Observable
-public class ConversationStore {
-    public static let shared = ConversationStore()
+public final class ConversationProvider {
+    public static let shared = ConversationProvider()
     
     public private(set) var conversations: [Conversation] = []
     
     public func get(_ id: String) throws -> Conversation {
         guard let conversation = conversations.first(where: { $0.id == id }) else {
-            throw ConversationStoreError.notFound
+            throw ConversationProviderError.notFound
         }
         return conversation
     }
@@ -98,7 +98,7 @@ public class ConversationStore {
     public func get(messageID: String, conversationID: String) throws -> Message {
         let conversation = try get(conversationID)
         guard let message = conversation.messages.first(where: { $0.id == messageID }) else {
-            throw ConversationStoreError.messageNotFound
+            throw ConversationProviderError.messageNotFound
         }
         return message
     }
@@ -164,7 +164,7 @@ public class ConversationStore {
     
     // MARK: - Private
     
-    private let data = ConversationData()
+    private let data = ConversationStore()
     
     private init() {
         Task { try await load() }
@@ -179,7 +179,7 @@ public class ConversationStore {
     }
 }
 
-public enum ConversationStoreError: Error {
+public enum ConversationProviderError: Error {
     case notFound
     case messageNotFound
 }

@@ -40,7 +40,7 @@ struct MainCompactView: View {
                 .sheet(item: $sheet) { sheet in
                     NavigationStack {
                         switch sheet {
-                        case .preferences:      PreferencesForm(preferences: PreferencesStore.shared.preferences)
+                        case .preferences:      PreferencesForm(preferences: PreferencesProvider.shared.preferences)
                         case .memories:         MemoryList()
                         case .conversationList: ConversationList()
                         }

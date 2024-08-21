@@ -38,7 +38,7 @@ public struct Preferences: Codable {
     }
 }
 
-actor PreferencesData {
+actor PreferencesStore {
     private var preferences: Preferences = .init()
     
     func save(_ preferences: Preferences) throws {
@@ -67,14 +67,14 @@ actor PreferencesData {
 
 @MainActor
 @Observable
-public class PreferencesStore {
-    public static let shared = PreferencesStore()
+public final class PreferencesProvider {
+    public static let shared = PreferencesProvider()
     
     public private(set) var preferences: Preferences = .init()
     
     public func get(serviceID: Service.ServiceID?) throws -> Service {
         guard let service = preferences.services.first(where: { $0.id == serviceID }) else {
-            throw PreferencesStoreError.serviceNotFound
+            throw PreferencesProviderError.serviceNotFound
         }
         return service
     }
@@ -145,7 +145,7 @@ public class PreferencesStore {
     public func preferredChatModel() throws -> String {
         let service = try get(serviceID: preferences.preferredChatServiceID)
         guard let model = service.preferredChatModel else {
-            throw PreferencesStoreError.modelNotFound
+            throw PreferencesProviderError.modelNotFound
         }
         return model
     }
@@ -153,7 +153,7 @@ public class PreferencesStore {
     public func preferredImageModel() throws -> String {
         let service = try get(serviceID: preferences.preferredImageServiceID)
         guard let model = service.preferredImageModel else {
-            throw PreferencesStoreError.modelNotFound
+            throw PreferencesProviderError.modelNotFound
         }
         return model
     }
@@ -161,7 +161,7 @@ public class PreferencesStore {
     public func preferredEmbeddingModel() throws -> String {
         let service = try get(serviceID: preferences.preferredEmbeddingServiceID)
         guard let model = service.preferredEmbeddingModel else {
-            throw PreferencesStoreError.modelNotFound
+            throw PreferencesProviderError.modelNotFound
         }
         return model
     }
@@ -169,7 +169,7 @@ public class PreferencesStore {
     public func preferredTranscriptionModel() throws -> String {
         let service = try get(serviceID: preferences.preferredTranscriptionServiceID)
         guard let model = service.preferredTranscriptionModel else {
-            throw PreferencesStoreError.modelNotFound
+            throw PreferencesProviderError.modelNotFound
         }
         return model
     }
@@ -177,7 +177,7 @@ public class PreferencesStore {
     public func preferredToolModel() throws -> String {
         let service = try get(serviceID: preferences.preferredToolServiceID)
         guard let model = service.preferredChatModel else {
-            throw PreferencesStoreError.modelNotFound
+            throw PreferencesProviderError.modelNotFound
         }
         return model
     }
@@ -185,7 +185,7 @@ public class PreferencesStore {
     public func preferredVisionModel() throws -> String {
         let service = try get(serviceID: preferences.preferredVisionServiceID)
         guard let model = service.preferredVisionModel else {
-            throw PreferencesStoreError.modelNotFound
+            throw PreferencesProviderError.modelNotFound
         }
         return model
     }
@@ -193,7 +193,7 @@ public class PreferencesStore {
     public func preferredSpeechModel() throws -> String {
         let service = try get(serviceID: preferences.preferredSpeechServiceID)
         guard let model = service.preferredSpeechModel else {
-            throw PreferencesStoreError.modelNotFound
+            throw PreferencesProviderError.modelNotFound
         }
         return model
     }
@@ -201,29 +201,29 @@ public class PreferencesStore {
     public func preferredSummarizationModel() throws -> String {
         let service = try get(serviceID: preferences.preferredSummarizationServiceID)
         guard let model = service.preferredSummarizationModel else {
-            throw PreferencesStoreError.modelNotFound
+            throw PreferencesProviderError.modelNotFound
         }
         return model
     }
     
     // MARK: - Private
     
-    private let data = PreferencesData()
+    private let store = PreferencesStore()
     
     private init() {
         Task { try await load() }
     }
     
     private func load() async throws {
-        self.preferences = try await data.load()
+        self.preferences = try await store.load()
     }
     
     private func save() async throws {
-        try await data.save(preferences)
+        try await store.save(preferences)
     }
 }
 
-enum PreferencesStoreError: Error {
+enum PreferencesProviderError: Error {
     case serviceNotFound
     case modelNotFound
 }

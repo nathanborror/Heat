@@ -6,8 +6,8 @@ import GenKit
 
 private let logger = Logger(subsystem: "MessageManager", category: "HeatKit")
 
-public final class MessageManager {
-    public typealias ManagerCallback = (MessageManager) async throws -> Void
+public actor MessageManager {
+    public typealias ManagerCallback = () async throws -> Void
     public typealias MessageCallback = (Message) async throws -> Void
     public typealias ProcessingCallback = () async throws -> Void
     public typealias ImagesCallback = (String, [Data]) async throws -> Void
@@ -23,7 +23,7 @@ public final class MessageManager {
     
     @discardableResult
     public func manage(callback: ManagerCallback) async throws -> Self {
-        try await callback(self)
+        try await callback()
         return self
     }
     
