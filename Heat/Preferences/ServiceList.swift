@@ -3,8 +3,6 @@ import GenKit
 import HeatKit
 
 struct ServiceList: View {
-    @Environment(Store.self) private var store
-    
     @State private var selectedService: Service? = nil
     
     var body: some View {
@@ -26,7 +24,6 @@ struct ServiceList: View {
             NavigationStack {
                 ServiceForm(service: service)
             }
-            .environment(store)
         }
     }
 }

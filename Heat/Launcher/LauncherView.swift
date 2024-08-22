@@ -8,8 +8,7 @@ import HeatKit
 private let logger = Logger(subsystem: "LauncherView", category: "Heat")
 
 struct LauncherView: View {
-    @Environment(Store.self) var store
-    @Environment(LauncherViewModel.self) var launcherViewModel
+    @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.modelContext) private var modelContext
     
     @State private var content = ""
@@ -38,11 +37,11 @@ struct LauncherView: View {
         } content: {
             ScrollView {
                 VStack(spacing: 0) {
-                    if let message = launcherViewModel.messages.last, message.role == .assistant {
+                    if let message = conversationViewModel.messages.last, message.role == .assistant {
                         MessageView(message: message)
                             .font(.title2)
                     }
-                    if launcherViewModel.conversation?.state == .processing {
+                    if conversationViewModel.conversation?.state == .processing {
                         TypingIndicator()
                     }
                 }
@@ -53,40 +52,27 @@ struct LauncherView: View {
         .task {
             handleInit()
         }
-        .task(id: launcherViewModel.error) {
-            isShowingError = launcherViewModel.error != nil
-        }
-        .alert(isPresented: $isShowingError, error: launcherViewModel.error) { _ in
-            Button("Dismiss", role: .cancel) {
-                isShowingError = false
-                launcherViewModel.error = nil
-            }
-        } message: {
-            Text($0.recoverySuggestion)
-        }
     }
     
     @MainActor func handleInit() {
-        guard launcherViewModel.conversationID != nil else { return }
+        guard conversationViewModel.conversationID != nil else { return }
         isShowingContent = true
     }
     
     func handleSubmit() async throws {
         // Create conversation if one doesn't already exist
-        if launcherViewModel.conversationID == nil {
-            try await launcherViewModel.newConversation()
+        if conversationViewModel.conversationID == nil {
+            try await conversationViewModel.newConversation()
         }
         // Ignore empty content
         guard !content.isEmpty else { return }
         
         do {
-            try launcherViewModel.generate(content, context: memories.map { $0.content })
+            try conversationViewModel.generate(chat: content, memories: memories.map { $0.content })
             isShowingContent = true
             content = ""
-        } catch let error as KitError {
-            launcherViewModel.error = error
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
     }
 }

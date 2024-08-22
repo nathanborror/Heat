@@ -2,7 +2,6 @@ import SwiftUI
 import HeatKit
 
 struct ConversationList: View {
-    @Environment(Store.self) var store
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.dismiss) private var dismiss
     
@@ -12,7 +11,7 @@ struct ConversationList: View {
             Section {
                 ForEach(ConversationProvider.shared.conversations) { conversation in
                     VStack(alignment: .leading) {
-                        Text(conversation.title)
+                        Text(conversation.title ?? "Untitled")
                     }
                     .tag(conversation.id)
                     .swipeActions {

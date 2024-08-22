@@ -5,8 +5,6 @@ import MarkdownUI
 import Splash
 
 struct MessageView: View {
-    @Environment(Store.self) var store
-    
     let message: Message
     
     var body: some View {
@@ -44,7 +42,6 @@ struct MessageView: View {
 }
 
 struct MessageViewText: View {
-    @Environment(Store.self) var store
     @Environment(\.colorScheme) private var colorScheme
     
     let message: Message

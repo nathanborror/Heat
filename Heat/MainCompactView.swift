@@ -5,7 +5,6 @@ import HeatKit
 private let logger = Logger(subsystem: "MainCompactView", category: "Heat")
 
 struct MainCompactView: View {
-    @Environment(Store.self) var store
     @Environment(ConversationViewModel.self) var conversationViewModel
     
     @State private var sheet: Sheet? = nil
@@ -45,7 +44,6 @@ struct MainCompactView: View {
                         case .conversationList: ConversationList()
                         }
                     }
-                    .environment(store)
                     .environment(conversationViewModel)
                     .presentationDragIndicator(.visible)
                 }

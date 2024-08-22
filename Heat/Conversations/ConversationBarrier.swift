@@ -2,7 +2,6 @@ import SwiftUI
 import HeatKit
 
 struct ConversationBarrier: View {
-    @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
     @State var apiKey = ""

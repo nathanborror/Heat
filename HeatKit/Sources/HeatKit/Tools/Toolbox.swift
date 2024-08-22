@@ -73,6 +73,13 @@ public enum Toolbox: CaseIterable {
         }
     }
     
+    public static func get(tools names: Set<String>) -> Set<Tool> {
+        let tools = Toolbox.allCases
+            .filter { names.contains($0.tool.function.name) }
+            .map { $0.tool }
+        return Set(tools)
+    }
+    
     public static let ignore: [Toolbox] = [
         .generateTitle,
         .generateSuggestions,

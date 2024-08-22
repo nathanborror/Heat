@@ -21,7 +21,7 @@ public struct Preferences: Codable {
     public init() {
         self.services = []
         self.instructions = nil
-        self.defaultAgentID = Constants.defaultAgentID
+        self.defaultAgentID = Constants.defaultAgent.id
         self.shouldStream = true
         self.debug = false
 

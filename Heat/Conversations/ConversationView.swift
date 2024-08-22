@@ -5,7 +5,6 @@ import HeatKit
 private let logger = Logger(subsystem: "ConversationView", category: "Heat")
 
 struct ConversationView: View {
-    @Environment(Store.self) var store
     @Environment(ConversationViewModel.self) var conversationViewModel
     
     @State private var isShowingError = false
@@ -49,9 +48,6 @@ struct ConversationView: View {
             .task(id: conversationViewModel.conversation) {
                 proxy.scrollTo("bottom")
             }
-            .task(id: conversationViewModel.error) {
-                isShowingError = conversationViewModel.error != nil
-            }
         }
         .scrollDismissesKeyboard(.interactively)
         .scrollIndicators(.hidden)
@@ -62,14 +58,14 @@ struct ConversationView: View {
                 .padding(12)
                 .background(.background)
         }
-        .alert(isPresented: $isShowingError, error: conversationViewModel.error) { _ in
-            Button("Dismiss", role: .cancel) {
-                isShowingError = false
-                conversationViewModel.error = nil
-            }
-        } message: {
-            Text($0.recoverySuggestion)
-        }
+//        .alert(isPresented: $isShowingError, error: conversationViewModel.error) { _ in
+//            Button("Dismiss", role: .cancel) {
+//                isShowingError = false
+//                conversationViewModel.error = nil
+//            }
+//        } message: {
+//            Text($0.recoverySuggestion)
+//        }
     }
     
     func handleSuggestion(_ suggestion: String) async throws {
@@ -77,11 +73,9 @@ struct ConversationView: View {
             try await conversationViewModel.newConversation()
         }
         do {
-            try conversationViewModel.generate(suggestion)
-        } catch let error as KitError {
-            conversationViewModel.error = error
+            try conversationViewModel.generate(chat: suggestion)
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
     }
 }

@@ -25,10 +25,7 @@ struct MainApp: App {
     @Environment(\.openWindow) private var openWindow
     #endif
     
-    @State private var store = Store.shared
-    @State private var conversationViewModel = ConversationViewModel(store: .shared)
-    @State private var launcherViewModel = LauncherViewModel(store: .shared)
-    
+    @State private var conversationViewModel = ConversationViewModel()
     @State private var searchInput = ""
     @State private var showingLauncher = false
     @State private var showingBarrier = false
@@ -47,24 +44,18 @@ struct MainApp: App {
             } detail: {
                 ConversationView()
             }
-            .environment(store)
             .environment(conversationViewModel)
             .modelContainer(for: Memory.self)
             .task {
                 handleHotKeySetup()
             }
-            .task(id: store.isChatAvailable) {
-                handleAvailabilityChange()
-            }
             .sheet(isPresented: $showingBarrier) {
                 ConversationBarrier()
                     .frame(width: 300, height: 325)
-                    .environment(store)
             }
             .floatingPanel(isPresented: $showingLauncher) {
                 LauncherView()
-                    .environment(store)
-                    .environment(launcherViewModel)
+                    .environment(conversationViewModel)
                     .modelContainer(for: Memory.self)
             }
         }
@@ -82,7 +73,6 @@ struct MainApp: App {
                 PreferencesWindow()
             }
             .frame(width: 600)
-            .environment(store)
         }
         #else
         WindowGroup {
@@ -90,20 +80,12 @@ struct MainApp: App {
                 .environment(store)
                 .environment(conversationViewModel)
                 .modelContainer(for: Memory.self)
-                .task(id: store.isChatAvailable) {
-                    handleAvailabilityChange()
-                }
                 .sheet(isPresented: $showingBarrier) {
                     ConversationBarrier()
                         .environment(store)
                 }
         }
         #endif
-    }
-    
-    func handleAvailabilityChange() {
-        guard !isRestoring else { return }
-        showingBarrier = !store.isChatAvailable
     }
     
     func handleNewConversation() {

@@ -77,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
-        "branch" : "main",
-        "revision" : "e65b59974f7450ba5133427b21463ca195bbf911"
+        "branch" : "sessions",
+        "revision" : "c503365520035d8b62c49be6b79700d8b2671c84"
       }
     },
     {

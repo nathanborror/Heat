@@ -64,8 +64,6 @@ struct MessageTool: View {
 }
 
 struct MessageToolContent: View {
-    @Environment(Store.self) var store
-    
     var message: Message
     var symbol: String = "checkmark.circle"
     

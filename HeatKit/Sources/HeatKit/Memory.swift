@@ -19,13 +19,6 @@ public final class Memory {
 
 // MARK: - Preview
 
-extension Memory {
-    
-    static var preview: Self {
-        .init(content: "Lives in Nevada City, California")
-    }
-}
-
 public actor MemoryDataPreview {
     
     @MainActor
@@ -37,9 +30,7 @@ public actor MemoryDataPreview {
         let schema = Schema([Memory.self])
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: schema, configurations: [config])
-        let sample: [any PersistentModel] = [
-            Memory.preview
-        ]
+        let sample: [any PersistentModel] = []
         Task { @MainActor in
             sample.forEach {
                 container.mainContext.insert($0)

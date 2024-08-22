@@ -52,9 +52,7 @@ actor AgentStore {
             let decoder = PropertyListDecoder()
             agents = try decoder.decode([Agent].self, from: data)
         } catch {
-            print(error)
-            let defaultAgent = Agent(id: Constants.defaultAgentID, name: "Assistant", instructions: [.init(role: .system, content: "You are a helpful assistant.")])
-            try save([defaultAgent])
+            try save([Constants.defaultAgent])
         }
         return agents
     }
@@ -102,18 +100,18 @@ public final class AgentProvider {
     
     // MARK: - Private
     
-    private let data = AgentStore()
+    private let store = AgentStore()
     
     private init() {
         Task { try await load() }
     }
     
     private func load() async throws {
-        self.agents = try await data.load()
+        self.agents = try await store.load()
     }
     
     private func save() async throws {
-        try await data.save(agents)
+        try await store.save(agents)
     }
 }
 

@@ -6,8 +6,6 @@ import MusicKit
 import HeatKit
 
 struct PermissionsList: View {
-    @Environment(Store.self) private var store
-    
     @State var hasNotificationPermission = false    // NSLocationAlwaysAndWhenInUseUsageDescription
     @State var hasLocationPermission = false        // NSLocationWhenInUseUsageDescription
     @State var hasCalendarPermission = false        // NSCalendarsFullAccessUsageDescription

@@ -7,7 +7,7 @@ import SharedKit
 
 public struct Conversation: Codable, Identifiable, Hashable, Sendable {
     public var id: String
-    public var title: String
+    public var title: String?
     public var subtitle: String?
     public var picture: Asset?
     public var messages: [Message]
@@ -24,7 +24,7 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
         case none
     }
     
-    public init(id: String = .id, title: String = "New Conversation", subtitle: String? = nil, picture: Asset? = nil,
+    public init(id: String = .id, title: String? = nil, subtitle: String? = nil, picture: Asset? = nil,
                 messages: [Message] = [], suggestions: [String] = [], tools: Set<Tool> = [], state: State = .none) {
         self.id = id
         self.title = title
@@ -138,7 +138,7 @@ public final class ConversationProvider {
         try await upsert(conversation)
     }
     
-    public func upsert(title: String, conversationID: String) async throws {
+    public func upsert(title: String?, conversationID: String) async throws {
         var conversation = try get(conversationID)
         conversation.title = title
         try await upsert(conversation)
@@ -164,18 +164,18 @@ public final class ConversationProvider {
     
     // MARK: - Private
     
-    private let data = ConversationStore()
+    private let store = ConversationStore()
     
     private init() {
         Task { try await load() }
     }
     
     private func load() async throws {
-        self.conversations = try await data.load()
+        self.conversations = try await store.load()
     }
     
     private func save() async throws {
-        try await data.save(conversations)
+        try await store.save(conversations)
     }
 }
 

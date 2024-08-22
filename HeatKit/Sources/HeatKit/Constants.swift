@@ -3,7 +3,16 @@ import GenKit
 
 public struct Constants {
     
-    public static let defaultAgentID = "bundle-assistant"
+    public static let defaultAgent = Agent(
+        id: "bundle-assistant",
+        name: "Assistant",
+        instructions: [.init(role: .system, content: "You are a helpful assistant.")],
+        toolIDs: [
+            Toolbox.generateImages.name,
+            Toolbox.browseWeb.name,
+            Toolbox.searchWeb.name,
+        ]
+    )
     
     public static let defaultChatServiceID: Service.ServiceID? = nil
     public static let defaultImageServiceID: Service.ServiceID? = nil

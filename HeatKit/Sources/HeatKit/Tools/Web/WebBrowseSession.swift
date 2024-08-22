@@ -22,13 +22,11 @@ public class WebBrowseSession {
             \(markdown)
             """)
         
-        var summary: String? = nil
-        try await MessageManager()
-            .append(message: message)
-            .generate(service: service, model: model) { message in
-                summary = message.content
-            }
-        return summary
+        var req = ChatSessionRequest(service: service, model: model)
+        req.with(messages: [message])
+        
+        let resp = try await ChatSession.shared.completion(req)
+        return resp.messages.first?.content
     }
     
     // MARK: - Private

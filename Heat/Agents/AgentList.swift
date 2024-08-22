@@ -2,7 +2,6 @@ import SwiftUI
 import HeatKit
 
 struct AgentList: View {
-    @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
     @State private var selectedAgent: Agent = .empty
@@ -46,7 +45,6 @@ struct AgentList: View {
             NavigationStack {
                 AgentForm(agent: selectedAgent)
             }
-            .environment(store)
         }
     }
     

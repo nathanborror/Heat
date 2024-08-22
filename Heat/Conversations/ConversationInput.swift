@@ -200,7 +200,7 @@ struct ConversationInput: View {
         guard !content.isEmpty else { return }
         
         do {
-            try conversationViewModel.generate(content, context: memories.map { $0.content })
+            try conversationViewModel.generate(chat: content, memories: memories.map { $0.content })
         } catch let error as KitError {
             conversationViewModel.error = error
         } catch {
@@ -214,7 +214,7 @@ struct ConversationInput: View {
                 // Resize image so we're not sending huge amounts of data to the services.
                 $0.image?.resize(to: .init(width: 512, height: 512))
             }.compactMap { $0 }
-            try conversationViewModel.generate(content, images: images)
+            try conversationViewModel.generate(chat: content, images: images)
         } catch let error as KitError {
             conversationViewModel.error = error
         } catch {
@@ -223,9 +223,9 @@ struct ConversationInput: View {
         clear()
     }
     
-    func handleImagine(_ content: String) {
+    func handleImagine(_ prompt: String) {
         do {
-            try conversationViewModel.generateImage(content)
+            try conversationViewModel.generate(image: prompt)
         } catch let error as KitError {
             conversationViewModel.error = error
         } catch {
@@ -268,7 +268,7 @@ struct ConversationInput: View {
     }
     
     func handleStop() {
-        conversationViewModel.generateStop()
+        conversationViewModel.stop()
     }
     
     private func clear() {
