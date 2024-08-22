@@ -8,7 +8,7 @@ struct ServiceList: View {
     var body: some View {
         Form {
             Section {
-                ForEach(PreferencesProvider.shared.preferences.services) { service in
+                ForEach(PreferencesProvider.shared.services) { service in
                     HStack {
                         Text(service.name)
                             .frame(maxWidth: .infinity, alignment: .leading)

@@ -77,12 +77,10 @@ struct MainApp: App {
         #else
         WindowGroup {
             MainCompactView()
-                .environment(store)
                 .environment(conversationViewModel)
                 .modelContainer(for: Memory.self)
                 .sheet(isPresented: $showingBarrier) {
                     ConversationBarrier()
-                        .environment(store)
                 }
         }
         #endif

@@ -39,9 +39,15 @@ struct MainCompactView: View {
                 .sheet(item: $sheet) { sheet in
                     NavigationStack {
                         switch sheet {
-                        case .preferences:      PreferencesForm(preferences: PreferencesProvider.shared.preferences)
-                        case .memories:         MemoryList()
-                        case .conversationList: ConversationList()
+                        case .preferences:
+                            PreferencesForm(
+                                preferences: PreferencesProvider.shared.preferences,
+                                services: PreferencesProvider.shared.services
+                            )
+                        case .memories:
+                            MemoryList()
+                        case .conversationList:
+                            ConversationList()
                         }
                     }
                     .environment(conversationViewModel)

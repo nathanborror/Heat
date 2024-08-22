@@ -19,7 +19,8 @@ final class ConversationViewModel {
     }
     
     var suggestions: [String] {
-        Array((conversation?.suggestions ?? []).prefix(3))
+        //Array((conversation?.suggestions ?? []).prefix(3))
+        conversation?.suggestions ?? []
     }
     
     var messages: [Message] {
@@ -56,6 +57,7 @@ final class ConversationViewModel {
         generateTask = Task {
             // New user message
             let userMessage = Message(role: .user, content: prompt)
+            try await provider.upsert(suggestions: [], conversationID: conversation.id)
             try await provider.upsert(message: userMessage, conversationID: conversation.id)
             
             // Get updated conversation
@@ -70,16 +72,16 @@ final class ConversationViewModel {
             // Generate response stream
             let stream = ChatSession.shared.stream(req)
             for try await message in stream {
-                try await provider.upsert(suggestions: [], conversationID: conversation.id)
                 try await provider.upsert(message: message, conversationID: conversation.id)
-                try await provider.upsert(state: .processing, conversationID: conversation.id)
+                try await provider.upsert(state: .streaming, conversationID: conversation.id)
             }
             
-            // Generate suggestions
-            try await generateSuggestions()
-            
-            // Title conversation
-            try await generateTitle()
+            // Generate suggestions and title in parallel
+            Task {
+                async let suggestions = generateSuggestions()
+                async let title = generateTitle()
+                try await (_, _) = (suggestions, title)
+            }
         }
     }
     
@@ -98,6 +100,7 @@ final class ConversationViewModel {
             let userMessage = Message(role: .user, content: prompt, attachments: images.map {
                 .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
             })
+            try await provider.upsert(suggestions: [], conversationID: conversation.id)
             try await provider.upsert(message: userMessage, conversationID: conversation.id)
             
             // Get updated conversation
@@ -111,16 +114,16 @@ final class ConversationViewModel {
             // Generate response stream
             let stream = VisionSession.shared.stream(req)
             for try await message in stream {
-                try await provider.upsert(suggestions: [], conversationID: conversation.id)
                 try await provider.upsert(message: message, conversationID: conversation.id)
-                try await provider.upsert(state: .processing, conversationID: conversation.id)
+                try await provider.upsert(state: .streaming, conversationID: conversation.id)
             }
             
-            // Generate suggestions
-            try await generateSuggestions()
-            
-            // Title conversation
-            try await generateTitle()
+            // Generate suggestions and title in parallel
+            Task {
+                async let suggestions = generateSuggestions()
+                async let title = generateTitle()
+                try await (_, _) = (suggestions, title)
+            }
         }
     }
     
@@ -154,32 +157,44 @@ final class ConversationViewModel {
         }
     }
     
-    func generateTitle() async throws {
+    func generateTitle() async throws -> Bool {
         guard let conversation else {
             throw KitError.missingConversation
         }
         guard conversation.title == nil else {
-            return
+            return false
         }
         
         let provider = ConversationProvider.shared
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
-        generateTask = Task {
-            let conversation = try provider.get(conversation.id)
+        // Prepare messages
+        var messages = conversation.messages
+        messages.append(.init(role: .user, content: titlePrompt()))
+        
+        // Initial request
+        var req = ChatSessionRequest(service: service, model: model)
+        req.with(messages: messages)
+        
+        // Generate suggestions stream
+        let stream = ChatSession.shared.stream(req)
+        for try await message in stream {
+            guard let content = message.content else { return false }
             
-            var req = ChatSessionRequest(service: service, model: model)
-            req.with(messages: conversation.messages)
-            req.with(tool: Toolbox.generateTitle.tool)
-            
-            let titleResp = try await ChatSession.shared.completion(req)
-            let title = try titleResp.extractTool(name: TitleTool.function.name, type: TitleTool.Arguments.self)
-            try await provider.upsert(title: title.title, conversationID: conversation.id)
+            let regex = #/<title>(.*?)(?:</title>|</ti|</t|<\/|<|$)/#
+            if let match = content.prefixMatch(of: regex) {
+                let title = String(match.output.1)
+                guard !title.isEmpty else { continue }
+                try await provider.upsert(title: title, conversationID: conversation.id)
+            }
         }
+        
+        // Success
+        return true
     }
     
-    func generateSuggestions() async throws {
+    func generateSuggestions() async throws -> Bool {
         guard let conversation else {
             throw KitError.missingConversation
         }
@@ -188,20 +203,34 @@ final class ConversationViewModel {
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
-        generateTask = Task {
-            let conversation = try provider.get(conversation.id)
-            
-            var req = ChatSessionRequest(service: service, model: model)
-            req.with(messages: conversation.messages)
-            req.with(tool: Toolbox.generateSuggestions.tool)
-            
-            try await provider.upsert(state: .suggesting, conversationID: conversation.id)
-            
-            let resp = try await ChatSession.shared.completion(req)
-            let suggestions = try resp.extractTool(name: SuggestTool.function.name, type: SuggestTool.Arguments.self)
-            try await provider.upsert(suggestions: suggestions.prompts, conversationID: conversation.id)
-            try await provider.upsert(state: .none, conversationID: conversation.id)
+        // Prepare messages
+        var messages = conversation.messages
+        messages.append(.init(role: .user, content: suggestionsPrompt()))
+        
+        // Initial request
+        var req = ChatSessionRequest(service: service, model: model)
+        req.with(messages: messages)
+        
+        // Indicate we are suggesting
+        try await provider.upsert(state: .suggesting, conversationID: conversation.id)
+        
+        // Generate suggestions stream
+        let stream = ChatSession.shared.stream(req)
+        for try await message in stream {
+            guard let content = message.content else { return false }
+            let suggestions = content
+                .split(separator: "\n")
+                .map { String($0) }
+                .filter { !$0.hasPrefix("<") }
+                .map { String($0.trimmingPrefix(#/^-( )?/#)) }
+            try await provider.upsert(suggestions: suggestions, conversationID: conversation.id)
         }
+        
+        // Set conversation state
+        try await provider.upsert(state: .none, conversationID: conversation.id)
+        
+        // Success
+        return true
     }
     
     func stop() {

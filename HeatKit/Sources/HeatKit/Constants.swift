@@ -6,7 +6,9 @@ public struct Constants {
     public static let defaultAgent = Agent(
         id: "bundle-assistant",
         name: "Assistant",
-        instructions: [.init(role: .system, content: "You are a helpful assistant.")],
+        instructions: [
+            .init(role: .system, content: assistantSystemPrompt(name: "Heat", creator: "Nathan Borror"))
+        ],
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,

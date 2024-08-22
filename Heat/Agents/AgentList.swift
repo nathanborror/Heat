@@ -4,6 +4,8 @@ import HeatKit
 struct AgentList: View {
     @Environment(\.dismiss) private var dismiss
     
+    @State var agents: [Agent]
+    
     @State private var selectedAgent: Agent = .empty
     @State private var isShowingAgentForm = false
     
@@ -16,7 +18,7 @@ struct AgentList: View {
                 }
             }
             Section {
-                ForEach(AgentProvider.shared.agents) { agent in
+                ForEach(agents) { agent in
                     HStack {
                         Text(agent.name)
                             .frame(maxWidth: .infinity, alignment: .leading)

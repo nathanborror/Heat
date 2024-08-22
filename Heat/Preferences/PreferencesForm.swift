@@ -7,25 +7,16 @@ struct PreferencesForm: View {
     @Environment(\.dismiss) private var dismiss
     
     @State var preferences: Preferences
+    @State var services: [Service]
     
-    @State private var models: [Model] = []
     @State private var isShowingDeleteConfirmation = false
     
     var body: some View {
         Form {
             Section {
-                TextField("Introduction", text: Binding(
-                    get: { preferences.instructions ?? "" },
-                    set: { preferences.instructions = $0.isEmpty ? nil : $0 }
-                ), axis: .vertical)
-            } footer: {
-                Text("Personalize your experience by describing who you are.")
-            }
-            
-            Section {
                 #if !os(macOS)
                 NavigationLink("Agents") {
-                    AgentList()
+                    AgentList(agents: AgentProvider.shared.agents)
                 }
                 #endif
                 Picker("Default Agent", selection: $preferences.defaultAgentID ?? "") {
@@ -62,7 +53,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(preferences.services.filter { $0.supportsChats }) { service in
+                    ForEach(services.filter { $0.supportsChats }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -72,7 +63,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(preferences.services.filter { $0.supportsImages }) { service in
+                    ForEach(services.filter { $0.supportsImages }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -82,7 +73,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(preferences.services.filter { $0.supportsEmbeddings }) { service in
+                    ForEach(services.filter { $0.supportsEmbeddings }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -92,7 +83,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(preferences.services.filter { $0.supportsTranscriptions }) { service in
+                    ForEach(services.filter { $0.supportsTranscriptions }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -102,7 +93,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(preferences.services.filter { $0.supportsTools }) { service in
+                    ForEach(services.filter { $0.supportsTools }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -112,7 +103,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(preferences.services.filter { $0.supportsVision }) { service in
+                    ForEach(services.filter { $0.supportsVision }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -122,7 +113,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(preferences.services.filter { $0.supportsSpeech }) { service in
+                    ForEach(services.filter { $0.supportsSpeech }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -132,7 +123,7 @@ struct PreferencesForm: View {
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(preferences.services.filter { $0.supportsSummarization }) { service in
+                    ForEach(services.filter { $0.supportsSummarization }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -151,6 +142,9 @@ struct PreferencesForm: View {
             Button("Delete", role: .destructive, action: handleDeleteAll)
         } message: {
             Text("This will delete all app data and preferences.")
+        }
+        .onDisappear {
+            handleSave()
         }
     }
     
@@ -171,11 +165,15 @@ struct PreferencesForm: View {
     }
     
     func handleDeleteAll() {
-        print("not implemented")
+        Task {
+            try await PreferencesProvider.shared.delete()
+        }
     }
     
     func handleSave() {
-        print("not implemented")
+        Task {
+            try await PreferencesProvider.shared.upsert(preferences)
+        }
     }
 }
 
@@ -188,7 +186,7 @@ struct PreferencesWindow: View {
     
     var body: some View {
         TabView(selection: $selection) {
-            PreferencesForm(preferences: PreferencesProvider.shared.preferences)
+            PreferencesForm(preferences: PreferencesProvider.shared.preferences, services: PreferencesProvider.shared.services)
                 .padding(20)
                 .frame(width: 400)
                 .tag(Tabs.general)
@@ -202,7 +200,7 @@ struct PreferencesWindow: View {
                 .tabItem {
                     Label("Services", systemImage: "cloud")
                 }
-            AgentList()
+            AgentList(agents: AgentProvider.shared.agents)
                 .padding(20)
                 .frame(width: 400)
                 .tag(Tabs.agents)

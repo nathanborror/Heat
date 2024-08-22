@@ -3,8 +3,6 @@ import GenKit
 
 public struct Preferences: Codable {
     
-    public var services: [Service]
-    public var instructions: String?
     public var defaultAgentID: String?
     public var shouldStream: Bool
     public var debug: Bool
@@ -19,8 +17,6 @@ public struct Preferences: Codable {
     public var preferredSummarizationServiceID: Service.ServiceID?
     
     public init() {
-        self.services = []
-        self.instructions = nil
         self.defaultAgentID = Constants.defaultAgent.id
         self.shouldStream = true
         self.debug = false
@@ -33,8 +29,6 @@ public struct Preferences: Codable {
         self.preferredVisionServiceID = Constants.defaultVisionServiceID
         self.preferredSpeechServiceID = Constants.defaultSpeechServiceID
         self.preferredSummarizationServiceID = Constants.defaultSummarizationServiceID
-        
-        self.services = Constants.defaultServices
     }
 }
 
@@ -65,15 +59,43 @@ actor PreferencesStore {
     }
 }
 
+actor ServicesStore {
+    private var services: [Service] = Constants.defaultServices
+    
+    func save(_ services: [Service]) throws {
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .binary
+        
+        let data = try encoder.encode(services)
+        try data.write(to: self.dataURL, options: [.atomic])
+        self.services = services
+    }
+    
+    func load() throws -> [Service] {
+        let data = try Data(contentsOf: dataURL)
+        let decoder = PropertyListDecoder()
+        services = try decoder.decode([Service].self, from: data)
+        return services
+    }
+    
+    private var dataURL: URL {
+        get throws {
+            try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                    .appendingPathComponent("ServicesData.plist")
+        }
+    }
+}
+
 @MainActor
 @Observable
 public final class PreferencesProvider {
     public static let shared = PreferencesProvider()
     
     public private(set) var preferences: Preferences = .init()
+    public private(set) var services: [Service] = []
     
     public func get(serviceID: Service.ServiceID?) throws -> Service {
-        guard let service = preferences.services.first(where: { $0.id == serviceID }) else {
+        guard let service = services.first(where: { $0.id == serviceID }) else {
             throw PreferencesProviderError.serviceNotFound
         }
         return service
@@ -85,16 +107,17 @@ public final class PreferencesProvider {
     }
     
     public func upsert(service: Service) async throws {
-        if let index = preferences.services.firstIndex(where: { $0.id == service.id }) {
-            preferences.services[index] = service
+        if let index = services.firstIndex(where: { $0.id == service.id }) {
+            services[index] = service
         } else {
-            preferences.services.append(service)
+            services.append(service)
         }
         try await save()
     }
     
     public func delete() async throws {
         self.preferences = .init()
+        self.services = Constants.defaultServices
         try await save()
     }
     
@@ -208,18 +231,21 @@ public final class PreferencesProvider {
     
     // MARK: - Private
     
-    private let store = PreferencesStore()
+    private let preferencesStore = PreferencesStore()
+    private let servicesStore = ServicesStore()
     
     private init() {
         Task { try await load() }
     }
     
     private func load() async throws {
-        self.preferences = try await store.load()
+        self.preferences = try await preferencesStore.load()
+        self.services = try await servicesStore.load()
     }
     
     private func save() async throws {
-        try await store.save(preferences)
+        try await preferencesStore.save(preferences)
+        try await servicesStore.save(services)
     }
 }
 
