@@ -70,7 +70,7 @@ public final class AgentsProvider {
     
     public func get(_ id: String) throws -> Agent {
         guard let agent = agents.first(where: { $0.id == id }) else {
-            throw AgentProviderError.notFound
+            throw AgentsProviderError.notFound
         }
         return agent
     }
@@ -95,7 +95,6 @@ public final class AgentsProvider {
     }
     
     public func reset() async throws {
-        agents.removeAll()
         agents = [Constants.defaultAgent]
         try await save()
     }
@@ -105,11 +104,17 @@ public final class AgentsProvider {
     private let store = AgentStore()
     
     private init() {
-        Task { try await load() }
+        Task {
+            if BundleVersion.shared.isBundleVersionNew() {
+                try await reset()
+            } else {
+                try await load()
+            }
+        }
     }
     
     private func load() async throws {
-        self.agents = try await store.load()
+        agents = try await store.load()
     }
     
     private func save() async throws {
@@ -117,6 +122,6 @@ public final class AgentsProvider {
     }
 }
 
-public enum AgentProviderError: Error {
+public enum AgentsProviderError: Error {
     case notFound
 }

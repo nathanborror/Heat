@@ -1,4 +1,5 @@
 import Foundation
+import SharedKit
 import GenKit
 
 public struct Preferences: Codable, Hashable, Sendable {
@@ -223,12 +224,22 @@ public final class PreferencesProvider {
     private let servicesStore = ServicesStore()
     
     private init() {
-        Task { try await load() }
+        Task {
+            if BundleVersion.shared.isBundleVersionNew() {
+                try await reset()
+            } else {
+                try await load()
+            }
+        }
     }
     
     private func load() async throws {
         self.preferences = try await preferencesStore.load()
         self.services = try await servicesStore.load()
+        
+        if services.isEmpty {
+            try await reset()
+        }
     }
     
     private func save() async throws {

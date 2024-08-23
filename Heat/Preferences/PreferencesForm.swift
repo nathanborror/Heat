@@ -30,7 +30,9 @@ struct PreferencesForm: View {
                     AgentList()
                 }
                 #endif
-                Picker("Default Agent", selection: $preferences.defaultAgentID ?? "") {
+                Picker("Default Agent", selection: $preferences.defaultAgentID) {
+                    Text("None").tag(String?.none)
+                    Divider()
                     ForEach(agentsProvider.agents) { agent in
                         Text(agent.name).tag(agent.id)
                     }
@@ -58,85 +60,29 @@ struct PreferencesForm: View {
             }
             
             Section {
-                Picker("Chats", selection: Binding(
-                    get: { preferences.preferred.chatServiceID?.rawValue ?? "" },
-                    set: { preferences.preferred.chatServiceID = Service.ServiceID(rawValue: $0) }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(preferencesProvider.services.filter { $0.supportsChats }) { service in
-                        Text(service.name).tag(service.id.rawValue)
-                    }
+                Picker("Chats", selection: $preferences.preferred.chatServiceID) {
+                    servicePickerView(\.supportsChats)
                 }
-                Picker("Images", selection: Binding(
-                    get: { preferences.preferred.imageServiceID?.rawValue ?? "" },
-                    set: { preferences.preferred.imageServiceID = Service.ServiceID(rawValue: $0) }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(preferencesProvider.services.filter { $0.supportsImages }) { service in
-                        Text(service.name).tag(service.id.rawValue)
-                    }
+                Picker("Images", selection: $preferences.preferred.imageServiceID) {
+                    servicePickerView(\.supportsImages)
                 }
-                Picker("Embeddings", selection: Binding(
-                    get: { preferences.preferred.embeddingServiceID?.rawValue ?? "" },
-                    set: { preferences.preferred.embeddingServiceID = Service.ServiceID(rawValue: $0) }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(preferencesProvider.services.filter { $0.supportsEmbeddings }) { service in
-                        Text(service.name).tag(service.id.rawValue)
-                    }
+                Picker("Embeddings", selection: $preferences.preferred.embeddingServiceID) {
+                    servicePickerView(\.supportsEmbeddings)
                 }
-                Picker("Transcriptions", selection: Binding(
-                    get: { preferences.preferred.transcriptionServiceID?.rawValue ?? "" },
-                    set: { preferences.preferred.transcriptionServiceID = Service.ServiceID(rawValue: $0) }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(preferencesProvider.services.filter { $0.supportsTranscriptions }) { service in
-                        Text(service.name).tag(service.id.rawValue)
-                    }
+                Picker("Transcriptions", selection: $preferences.preferred.transcriptionServiceID) {
+                    servicePickerView(\.supportsTranscriptions)
                 }
-                Picker("Tools", selection: Binding(
-                    get: { preferences.preferred.toolServiceID?.rawValue ?? "" },
-                    set: { preferences.preferred.toolServiceID = Service.ServiceID(rawValue: $0) }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(preferencesProvider.services.filter { $0.supportsTools }) { service in
-                        Text(service.name).tag(service.id.rawValue)
-                    }
+                Picker("Tools", selection: $preferences.preferred.toolServiceID) {
+                    servicePickerView(\.supportsTools)
                 }
-                Picker("Vision", selection: Binding(
-                    get: { preferences.preferred.visionServiceID?.rawValue ?? "" },
-                    set: { preferences.preferred.visionServiceID = Service.ServiceID(rawValue: $0) }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(preferencesProvider.services.filter { $0.supportsVision }) { service in
-                        Text(service.name).tag(service.id.rawValue)
-                    }
+                Picker("Vision", selection: $preferences.preferred.visionServiceID) {
+                    servicePickerView(\.supportsVision)
                 }
-                Picker("Speech", selection: Binding(
-                    get: { preferences.preferred.speechServiceID?.rawValue ?? "" },
-                    set: { preferences.preferred.speechServiceID = Service.ServiceID(rawValue: $0) }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(preferencesProvider.services.filter { $0.supportsSpeech }) { service in
-                        Text(service.name).tag(service.id.rawValue)
-                    }
+                Picker("Speech", selection: $preferences.preferred.speechServiceID) {
+                    servicePickerView(\.supportsSpeech)
                 }
-                Picker("Summarization", selection: Binding(
-                    get: { preferences.preferred.summarizationServiceID?.rawValue ?? "" },
-                    set: { preferences.preferred.summarizationServiceID = Service.ServiceID(rawValue: $0) }
-                )) {
-                    Text("None").tag("")
-                    Divider()
-                    ForEach(preferencesProvider.services.filter { $0.supportsSummarization }) { service in
-                        Text(service.name).tag(service.id.rawValue)
-                    }
+                Picker("Summarization", selection: $preferences.preferred.summarizationServiceID) {
+                    servicePickerView(\.supportsSummarization)
                 }
             } footer: {
                 Text("Only services with preferred models selected to support the behavior will show up in the picker.")
@@ -155,6 +101,16 @@ struct PreferencesForm: View {
         }
         .onChange(of: preferences) { _, _ in
             handleSave()
+        }
+    }
+    
+    func servicePickerView(_ prop: KeyPath<Service, Bool>) -> some View {
+        Group {
+            Text("None").tag(Service.ServiceID?.none)
+            Divider()
+            ForEach(preferencesProvider.services.filter { $0[keyPath: prop] }) { service in
+                Text(service.name).tag(service.id)
+            }
         }
     }
     

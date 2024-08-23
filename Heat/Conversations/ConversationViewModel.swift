@@ -241,30 +241,6 @@ final class ConversationViewModel {
     
     // MARK: - Private
     
-    private func prepareSuggestions(_ message: Message) -> [String] {
-        guard let toolCalls = message.toolCalls else { return [] }
-        guard let toolCall = toolCalls.first(where: { $0.function.name == Toolbox.generateSuggestions.name }) else { return [] }
-        do {
-            let args = try SuggestTool.Arguments(toolCall.function.arguments)
-            return Array(args.prompts.prefix(3))
-        } catch {
-            self.error = KitError.failedSuggestions
-        }
-        return []
-    }
-    
-    private func prepareTitle(_ message: Message) -> String? {
-        guard let toolCalls = message.toolCalls else { return nil }
-        guard let toolCall = toolCalls.first(where: { $0.function.name == Toolbox.generateTitle.name }) else { return nil }
-        do {
-            let args = try TitleTool.Arguments(toolCall.function.arguments)
-            return args.title
-        } catch {
-            print(error)
-        }
-        return nil
-    }
-    
     private func prepareToolResponse(toolCall: ToolCall) async throws -> ToolCallResponse {
         if let tool = Toolbox(name: toolCall.function.name) {
             switch tool {

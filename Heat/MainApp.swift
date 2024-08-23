@@ -20,20 +20,19 @@ private let logger = Logger(subsystem: "MainApp", category: "Heat")
 
 @main
 struct MainApp: App {
-    @Environment(\.scenePhase) var scenePhase
     #if os(macOS)
     @Environment(\.openWindow) private var openWindow
     #endif
+    
+    private let agentsProvider = AgentsProvider.shared
+    private let conversationsProvider = ConversationsProvider.shared
+    private let preferencesProvider = PreferencesProvider.shared
     
     @State private var conversationViewModel = ConversationViewModel()
     @State private var searchInput = ""
     @State private var showingLauncher = false
     @State private var showingBarrier = false
     @State private var isRestoring = false
-    
-    let agentsProvider = AgentsProvider.shared
-    let conversationsProvider = ConversationsProvider.shared
-    let preferencesProvider = PreferencesProvider.shared
     
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.shift, .control])

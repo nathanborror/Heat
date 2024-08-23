@@ -13,16 +13,6 @@ struct ServiceForm: View {
     @State private var isShowingAlert = false
     @State private var error: PreferencesError? = nil
     
-    var servicePickerModels: some View {
-        Group {
-            Text("None").tag("")
-            Divider()
-            ForEach(service.models.sorted { $0.id < $1.id }) { model in
-                Text(model.id).tag(model.id)
-            }
-        }
-    }
-    
     var body: some View {
         Form {
             Section {
@@ -46,29 +36,29 @@ struct ServiceForm: View {
             }
             
             Section {
-                Picker("Chats", selection: $service.preferredChatModel ?? "") {
-                    servicePickerModels
+                Picker("Chats", selection: $service.preferredChatModel) {
+                    serviceModelPickerView
                 }
-                Picker("Images", selection: $service.preferredImageModel ?? "") {
-                    servicePickerModels
+                Picker("Images", selection: $service.preferredImageModel) {
+                    serviceModelPickerView
                 }
-                Picker("Embeddings", selection: $service.preferredEmbeddingModel ?? "") {
-                    servicePickerModels
+                Picker("Embeddings", selection: $service.preferredEmbeddingModel) {
+                    serviceModelPickerView
                 }
-                Picker("Transcriptions", selection: $service.preferredTranscriptionModel ?? "") {
-                    servicePickerModels
+                Picker("Transcriptions", selection: $service.preferredTranscriptionModel) {
+                    serviceModelPickerView
                 }
-                Picker("Tools", selection: $service.preferredToolModel ?? "") {
-                    servicePickerModels
+                Picker("Tools", selection: $service.preferredToolModel) {
+                    serviceModelPickerView
                 }
-                Picker("Vision", selection: $service.preferredVisionModel ?? "") {
-                    servicePickerModels
+                Picker("Vision", selection: $service.preferredVisionModel) {
+                    serviceModelPickerView
                 }
-                Picker("Speech", selection: $service.preferredSpeechModel ?? "") {
-                    servicePickerModels
+                Picker("Speech", selection: $service.preferredSpeechModel) {
+                    serviceModelPickerView
                 }
-                Picker("Summarization", selection: $service.preferredSummarizationModel ?? "") {
-                    servicePickerModels
+                Picker("Summarization", selection: $service.preferredSummarizationModel) {
+                    serviceModelPickerView
                 }
             } footer: {
                 Text("Preferred models to use.")
@@ -102,6 +92,16 @@ struct ServiceForm: View {
         }
         .onDisappear {
             handleSave()
+        }
+    }
+    
+    var serviceModelPickerView: some View {
+        Group {
+            Text("None").tag(String?.none)
+            Divider()
+            ForEach(service.models.sorted { $0.id < $1.id }) { model in
+                Text(model.id).tag(model.id)
+            }
         }
     }
     
