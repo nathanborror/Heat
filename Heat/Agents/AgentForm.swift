@@ -105,7 +105,9 @@ struct AgentTool: View {
     var body: some View {
         Form {
             TextField("Name", text: $text)
+                #if os(iOS)
                 .textInputAutocapitalization(.never)
+                #endif
                 .focused($isFocused)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
