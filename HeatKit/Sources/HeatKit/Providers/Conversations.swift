@@ -10,7 +10,8 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
     public var title: String?
     public var subtitle: String?
     public var picture: Asset?
-    public var messages: [Message]
+    public var instructions: String
+    public var history: [Message]
     public var suggestions: [String]
     public var tools: Set<Tool>
     public var state: State
@@ -25,17 +26,23 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
     }
     
     public init(id: String = .id, title: String? = nil, subtitle: String? = nil, picture: Asset? = nil,
-                messages: [Message] = [], suggestions: [String] = [], tools: Set<Tool> = [], state: State = .none) {
+                instructions: String = "", history: [Message] = [], suggestions: [String] = [],
+                tools: Set<Tool> = [], state: State = .none) {
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.picture = picture
-        self.messages = messages
+        self.instructions = instructions
+        self.history = history
         self.suggestions = suggestions
         self.tools = tools
         self.state = state
         self.created = .now
         self.modified = .now
+    }
+    
+    public var messages: [Message] {
+        [.init(role: .system, content: instructions)] + history
     }
     
     public static var empty: Self {
@@ -46,7 +53,8 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
         self.title = conversation.title
         self.subtitle = conversation.subtitle
         self.picture = conversation.picture
-        self.messages = conversation.messages
+        self.instructions = conversation.instructions
+        self.history = conversation.history
         self.suggestions = conversation.suggestions
         self.tools = conversation.tools
         self.state = conversation.state
@@ -83,8 +91,8 @@ actor ConversationStore {
 
 @MainActor
 @Observable
-public final class ConversationProvider {
-    public static let shared = ConversationProvider()
+public final class ConversationsProvider {
+    public static let shared = ConversationsProvider()
     
     public private(set) var conversations: [Conversation] = []
     
@@ -97,14 +105,14 @@ public final class ConversationProvider {
     
     public func get(messageID: String, conversationID: String) throws -> Message {
         let conversation = try get(conversationID)
-        guard let message = conversation.messages.first(where: { $0.id == messageID }) else {
+        guard let message = conversation.history.first(where: { $0.id == messageID }) else {
             throw ConversationProviderError.messageNotFound
         }
         return message
     }
     
-    public func create(instructions: [Message], tools: Set<Tool>, state: Conversation.State = .none) async throws -> Conversation {
-        let conversation = Conversation(messages: instructions, tools: tools, state: state)
+    public func create(instructions: String, tools: Set<Tool>, state: Conversation.State = .none) async throws -> Conversation {
+        let conversation = Conversation(instructions: instructions, tools: tools, state: state)
         try await upsert(conversation)
         return conversation
     }
@@ -130,10 +138,10 @@ public final class ConversationProvider {
     
     public func upsert(message: Message, conversationID: String) async throws {
         var conversation = try get(conversationID)
-        if let index = conversation.messages.firstIndex(where: { $0.id == message.id }) {
-            conversation.messages[index] = message
+        if let index = conversation.history.firstIndex(where: { $0.id == message.id }) {
+            conversation.history[index] = message
         } else {
-            conversation.messages.append(message)
+            conversation.history.append(message)
         }
         try await upsert(conversation)
     }
@@ -159,6 +167,11 @@ public final class ConversationProvider {
     public func delete(_ id: String) async throws {
         let conversation = try get(id)
         conversations.removeAll(where: { conversation == $0 })
+        try await save()
+    }
+    
+    public func reset() async throws {
+        conversations.removeAll()
         try await save()
     }
     

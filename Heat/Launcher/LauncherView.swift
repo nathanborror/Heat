@@ -60,13 +60,6 @@ struct LauncherView: View {
     }
     
     func handleSubmit() async throws {
-        // Create conversation if one doesn't already exist
-        if conversationViewModel.conversationID == nil {
-            try await conversationViewModel.newConversation()
-        }
-        // Ignore empty content
-        guard !content.isEmpty else { return }
-        
         do {
             try conversationViewModel.generate(chat: content, memories: memories.map { $0.content })
             isShowingContent = true

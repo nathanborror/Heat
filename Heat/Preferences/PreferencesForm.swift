@@ -4,23 +4,34 @@ import GenKit
 import HeatKit
 
 struct PreferencesForm: View {
+    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(ConversationsProvider.self) var conversationsProvider
+    @Environment(PreferencesProvider.self) var preferencesProvider
+    
     @Environment(\.dismiss) private var dismiss
     
     @State var preferences: Preferences
-    @State var services: [Service]
     
     @State private var isShowingDeleteConfirmation = false
     
     var body: some View {
         Form {
+            #if !os(macOS)
+            Section {
+                NavigationLink("Memories") {
+                    MemoryList()
+                }
+            }
+            #endif
+                        
             Section {
                 #if !os(macOS)
                 NavigationLink("Agents") {
-                    AgentList(agents: AgentProvider.shared.agents)
+                    AgentList()
                 }
                 #endif
                 Picker("Default Agent", selection: $preferences.defaultAgentID ?? "") {
-                    ForEach(AgentProvider.shared.agents) { agent in
+                    ForEach(agentsProvider.agents) { agent in
                         Text(agent.name).tag(agent.id)
                     }
                 }
@@ -48,82 +59,82 @@ struct PreferencesForm: View {
             
             Section {
                 Picker("Chats", selection: Binding(
-                    get: { preferences.preferredChatServiceID?.rawValue ?? "" },
-                    set: { preferences.preferredChatServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferred.chatServiceID?.rawValue ?? "" },
+                    set: { preferences.preferred.chatServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(services.filter { $0.supportsChats }) { service in
+                    ForEach(preferencesProvider.services.filter { $0.supportsChats }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Images", selection: Binding(
-                    get: { preferences.preferredImageServiceID?.rawValue ?? "" },
-                    set: { preferences.preferredImageServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferred.imageServiceID?.rawValue ?? "" },
+                    set: { preferences.preferred.imageServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(services.filter { $0.supportsImages }) { service in
+                    ForEach(preferencesProvider.services.filter { $0.supportsImages }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Embeddings", selection: Binding(
-                    get: { preferences.preferredEmbeddingServiceID?.rawValue ?? "" },
-                    set: { preferences.preferredEmbeddingServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferred.embeddingServiceID?.rawValue ?? "" },
+                    set: { preferences.preferred.embeddingServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(services.filter { $0.supportsEmbeddings }) { service in
+                    ForEach(preferencesProvider.services.filter { $0.supportsEmbeddings }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Transcriptions", selection: Binding(
-                    get: { preferences.preferredTranscriptionServiceID?.rawValue ?? "" },
-                    set: { preferences.preferredTranscriptionServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferred.transcriptionServiceID?.rawValue ?? "" },
+                    set: { preferences.preferred.transcriptionServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(services.filter { $0.supportsTranscriptions }) { service in
+                    ForEach(preferencesProvider.services.filter { $0.supportsTranscriptions }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Tools", selection: Binding(
-                    get: { preferences.preferredToolServiceID?.rawValue ?? "" },
-                    set: { preferences.preferredToolServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferred.toolServiceID?.rawValue ?? "" },
+                    set: { preferences.preferred.toolServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(services.filter { $0.supportsTools }) { service in
+                    ForEach(preferencesProvider.services.filter { $0.supportsTools }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Vision", selection: Binding(
-                    get: { preferences.preferredVisionServiceID?.rawValue ?? "" },
-                    set: { preferences.preferredVisionServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferred.visionServiceID?.rawValue ?? "" },
+                    set: { preferences.preferred.visionServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(services.filter { $0.supportsVision }) { service in
+                    ForEach(preferencesProvider.services.filter { $0.supportsVision }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Speech", selection: Binding(
-                    get: { preferences.preferredSpeechServiceID?.rawValue ?? "" },
-                    set: { preferences.preferredSpeechServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferred.speechServiceID?.rawValue ?? "" },
+                    set: { preferences.preferred.speechServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(services.filter { $0.supportsSpeech }) { service in
+                    ForEach(preferencesProvider.services.filter { $0.supportsSpeech }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
                 Picker("Summarization", selection: Binding(
-                    get: { preferences.preferredSummarizationServiceID?.rawValue ?? "" },
-                    set: { preferences.preferredSummarizationServiceID = Service.ServiceID(rawValue: $0) }
+                    get: { preferences.preferred.summarizationServiceID?.rawValue ?? "" },
+                    set: { preferences.preferred.summarizationServiceID = Service.ServiceID(rawValue: $0) }
                 )) {
                     Text("None").tag("")
                     Divider()
-                    ForEach(services.filter { $0.supportsSummarization }) { service in
+                    ForEach(preferencesProvider.services.filter { $0.supportsSummarization }) { service in
                         Text(service.name).tag(service.id.rawValue)
                     }
                 }
@@ -132,7 +143,6 @@ struct PreferencesForm: View {
             }
             
             Section {
-                Button("Reset Services", action: handleServicesReset)
                 Button("Reset Agents", action: handleAgentReset)
                 Button("Delete All Data", role: .destructive, action: { isShowingDeleteConfirmation = true })
             }
@@ -149,44 +159,42 @@ struct PreferencesForm: View {
     }
     
     func handleAgentReset() {
-        print("not implemented")
-    }
-    
-    func handleServicesReset() {
-        preferences.preferredChatServiceID = .openAI
-        preferences.preferredImageServiceID = .openAI
-        preferences.preferredEmbeddingServiceID = .openAI
-        preferences.preferredTranscriptionServiceID = .openAI
-        preferences.preferredToolServiceID = .openAI
-        preferences.preferredVisionServiceID = .openAI
-        preferences.preferredSpeechServiceID = .openAI
-        preferences.preferredSummarizationServiceID = .openAI
-        handleSave()
+        Task {
+            try await agentsProvider.reset()
+        }
     }
     
     func handleDeleteAll() {
         Task {
-            try await PreferencesProvider.shared.delete()
+            try await agentsProvider.reset()
+            try await conversationsProvider.reset()
+            try await preferencesProvider.reset()
+            
+            preferences = preferencesProvider.preferences
         }
     }
     
     func handleSave() {
         Task {
-            try await PreferencesProvider.shared.upsert(preferences)
+            try await preferencesProvider.upsert(preferences)
         }
     }
 }
 
 struct PreferencesWindow: View {
+    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(ConversationsProvider.self) var conversationsProvider
+    @Environment(PreferencesProvider.self) var preferencesProvider
+    
     @State var selection = Tabs.general
     
     enum Tabs: Hashable {
-        case general, services, agents, permissions
+        case general, services, agents, permissions, memories
     }
     
     var body: some View {
         TabView(selection: $selection) {
-            PreferencesForm(preferences: PreferencesProvider.shared.preferences, services: PreferencesProvider.shared.services)
+            PreferencesForm(preferences: preferencesProvider.preferences)
                 .padding(20)
                 .frame(width: 400)
                 .tag(Tabs.general)
@@ -200,7 +208,7 @@ struct PreferencesWindow: View {
                 .tabItem {
                     Label("Services", systemImage: "cloud")
                 }
-            AgentList(agents: AgentProvider.shared.agents)
+            AgentList()
                 .padding(20)
                 .frame(width: 400)
                 .tag(Tabs.agents)
@@ -214,7 +222,15 @@ struct PreferencesWindow: View {
                 .tabItem {
                     Label("Permissions", systemImage: "hand.raised")
                 }
+            MemoryList()
+                .padding(20)
+                .frame(width: 400)
+                .tag(Tabs.memories)
+                .tabItem {
+                    Label("Memories", systemImage: "brain")
+                }
         }
+        .frame(minHeight: 450, alignment: .top)
     }
 }
 

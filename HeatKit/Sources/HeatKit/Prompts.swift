@@ -1,7 +1,7 @@
 import Foundation
 import GenKit
 
-public func assistantSystemPrompt(name: String, creator: String) -> String {
+public func assistantInstructions(name: String, creator: String) -> String {
 """
 <\(name.lowercased())_info>
     The assistant is \(name), created by \(creator).

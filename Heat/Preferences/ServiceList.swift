@@ -3,12 +3,14 @@ import GenKit
 import HeatKit
 
 struct ServiceList: View {
-    @State private var selectedService: Service? = nil
+    @Environment(PreferencesProvider.self) var preferencesProvider
+    
+    @State var selectedService: Service?
     
     var body: some View {
         Form {
             Section {
-                ForEach(PreferencesProvider.shared.services) { service in
+                ForEach(preferencesProvider.services) { service in
                     HStack {
                         Text(service.name)
                             .frame(maxWidth: .infinity, alignment: .leading)

@@ -131,14 +131,16 @@ struct ConversationBarrier: View {
         
         // Update preferences with preferred services
         var preferences = PreferencesProvider.shared.preferences
-        preferences.preferredChatServiceID = .openAI
-        preferences.preferredImageServiceID = .openAI
-        preferences.preferredEmbeddingServiceID = .openAI
-        preferences.preferredTranscriptionServiceID = .openAI
-        preferences.preferredToolServiceID = .openAI
-        preferences.preferredVisionServiceID = .openAI
-        preferences.preferredSpeechServiceID = .openAI
-        preferences.preferredSummarizationServiceID = .openAI
+        preferences.preferred.chatServiceID = .openAI
+        preferences.preferred.imageServiceID = .openAI
+        preferences.preferred.embeddingServiceID = .openAI
+        preferences.preferred.transcriptionServiceID = .openAI
+        preferences.preferred.toolServiceID = .openAI
+        preferences.preferred.visionServiceID = .openAI
+        preferences.preferred.speechServiceID = .openAI
+        preferences.preferred.summarizationServiceID = .openAI
+        
+        // Upsert preference changes
         try await PreferencesProvider.shared.upsert(preferences)
         
         dismiss()

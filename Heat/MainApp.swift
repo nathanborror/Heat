@@ -31,6 +31,10 @@ struct MainApp: App {
     @State private var showingBarrier = false
     @State private var isRestoring = false
     
+    let agentsProvider = AgentsProvider.shared
+    let conversationsProvider = ConversationsProvider.shared
+    let preferencesProvider = PreferencesProvider.shared
+    
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.shift, .control])
     #endif
@@ -59,6 +63,9 @@ struct MainApp: App {
                     .modelContainer(for: Memory.self)
             }
         }
+        .environment(agentsProvider)
+        .environment(conversationsProvider)
+        .environment(preferencesProvider)
         .defaultSize(width: 600, height: 700)
         .defaultPosition(.center)
         .commands {
@@ -73,10 +80,16 @@ struct MainApp: App {
                 PreferencesWindow()
             }
             .frame(width: 600)
+            .environment(agentsProvider)
+            .environment(conversationsProvider)
+            .environment(preferencesProvider)
         }
         #else
         WindowGroup {
             MainCompactView()
+                .environment(agentsProvider)
+                .environment(conversationsProvider)
+                .environment(preferencesProvider)
                 .environment(conversationViewModel)
                 .modelContainer(for: Memory.self)
                 .sheet(isPresented: $showingBarrier) {

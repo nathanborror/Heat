@@ -8,12 +8,12 @@ import SharedKit
 public struct Agent: Codable, Identifiable, Hashable, Sendable {
     public var id: String
     public var name: String
-    public var instructions: [Message]
+    public var instructions: String
     public var toolIDs: Set<String>
     public var created: Date
     public var modified: Date
     
-    public init(id: String = .id, name: String, instructions: [Message] = [], toolIDs: Set<String> = []) {
+    public init(id: String = .id, name: String, instructions: String, toolIDs: Set<String> = []) {
         self.id = id
         self.name = name
         self.instructions = instructions
@@ -23,7 +23,7 @@ public struct Agent: Codable, Identifiable, Hashable, Sendable {
     }
     
     public static var empty: Self {
-        .init(name: "")
+        .init(name: "", instructions: "")
     }
     
     mutating func apply(agent: Agent) {
@@ -47,13 +47,9 @@ actor AgentStore {
     }
     
     func load() throws -> [Agent] {
-        do {
-            let data = try Data(contentsOf: dataURL)
-            let decoder = PropertyListDecoder()
-            agents = try decoder.decode([Agent].self, from: data)
-        } catch {
-            try save([Constants.defaultAgent])
-        }
+        let data = try Data(contentsOf: dataURL)
+        let decoder = PropertyListDecoder()
+        agents = try decoder.decode([Agent].self, from: data)
         return agents
     }
     
@@ -67,8 +63,8 @@ actor AgentStore {
 
 @MainActor
 @Observable
-public final class AgentProvider {
-    public static let shared = AgentProvider()
+public final class AgentsProvider {
+    public static let shared = AgentsProvider()
     
     public private(set) var agents: [Agent] = []
     
@@ -95,6 +91,12 @@ public final class AgentProvider {
     public func delete(_ id: String) async throws {
         let agent = try get(id)
         agents.removeAll(where: { agent == $0 })
+        try await save()
+    }
+    
+    public func reset() async throws {
+        agents.removeAll()
+        agents = [Constants.defaultAgent]
         try await save()
     }
     

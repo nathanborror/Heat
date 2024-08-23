@@ -2,33 +2,20 @@ import Foundation
 import GenKit
 
 public struct Preferences: Codable {
+    public var defaultAgentID: String? = Constants.defaultAgent.id
+    public var shouldStream = true
+    public var debug = false
+    public var preferred: Services = .init()
     
-    public var defaultAgentID: String?
-    public var shouldStream: Bool
-    public var debug: Bool
-    
-    public var preferredChatServiceID: Service.ServiceID?
-    public var preferredImageServiceID: Service.ServiceID?
-    public var preferredEmbeddingServiceID: Service.ServiceID?
-    public var preferredTranscriptionServiceID: Service.ServiceID?
-    public var preferredToolServiceID: Service.ServiceID?
-    public var preferredVisionServiceID: Service.ServiceID?
-    public var preferredSpeechServiceID: Service.ServiceID?
-    public var preferredSummarizationServiceID: Service.ServiceID?
-    
-    public init() {
-        self.defaultAgentID = Constants.defaultAgent.id
-        self.shouldStream = true
-        self.debug = false
-
-        self.preferredChatServiceID = Constants.defaultChatServiceID
-        self.preferredImageServiceID = Constants.defaultImageServiceID
-        self.preferredEmbeddingServiceID = Constants.defaultTranscriptionServiceID
-        self.preferredTranscriptionServiceID = Constants.defaultTranscriptionServiceID
-        self.preferredToolServiceID = Constants.defaultToolServiceID
-        self.preferredVisionServiceID = Constants.defaultVisionServiceID
-        self.preferredSpeechServiceID = Constants.defaultSpeechServiceID
-        self.preferredSummarizationServiceID = Constants.defaultSummarizationServiceID
+    public struct Services: Codable {
+        public var chatServiceID: Service.ServiceID? = nil
+        public var imageServiceID: Service.ServiceID? = nil
+        public var embeddingServiceID: Service.ServiceID? = nil
+        public var transcriptionServiceID: Service.ServiceID? = nil
+        public var toolServiceID: Service.ServiceID? = nil
+        public var visionServiceID: Service.ServiceID? = nil
+        public var speechServiceID: Service.ServiceID? = nil
+        public var summarizationServiceID: Service.ServiceID? = nil
     }
 }
 
@@ -53,8 +40,9 @@ actor PreferencesStore {
     
     private var dataURL: URL {
         get throws {
-            try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                    .appendingPathComponent("PreferencesData.plist")
+            try FileManager.default
+                .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+                .appendingPathComponent("PreferencesData.plist")
         }
     }
 }
@@ -115,7 +103,7 @@ public final class PreferencesProvider {
         try await save()
     }
     
-    public func delete() async throws {
+    public func reset() async throws {
         self.preferences = .init()
         self.services = Constants.defaultServices
         try await save()
@@ -124,49 +112,49 @@ public final class PreferencesProvider {
     // MARK: - Service Preferences
     
     public func preferredChatService() throws -> ChatService {
-        let service = try get(serviceID: preferences.preferredChatServiceID)
+        let service = try get(serviceID: preferences.preferred.chatServiceID)
         return try service.chatService()
     }
     
     public func preferredImageService() throws -> ImageService {
-        let service = try get(serviceID: preferences.preferredImageServiceID)
+        let service = try get(serviceID: preferences.preferred.imageServiceID)
         return try service.imageService()
     }
     
     public func preferredEmbeddingService() throws -> EmbeddingService {
-        let service = try get(serviceID: preferences.preferredEmbeddingServiceID)
+        let service = try get(serviceID: preferences.preferred.embeddingServiceID)
         return try service.embeddingService()
     }
     
     public func preferredTranscriptionService() throws -> TranscriptionService {
-        let service = try get(serviceID: preferences.preferredTranscriptionServiceID)
+        let service = try get(serviceID: preferences.preferred.transcriptionServiceID)
         return try service.transcriptionService()
     }
     
     public func preferredToolService() throws -> ToolService {
-        let service = try get(serviceID: preferences.preferredToolServiceID)
+        let service = try get(serviceID: preferences.preferred.toolServiceID)
         return try service.toolService()
     }
     
     public func preferredVisionService() throws -> VisionService {
-        let service = try get(serviceID: preferences.preferredVisionServiceID)
+        let service = try get(serviceID: preferences.preferred.visionServiceID)
         return try service.visionService()
     }
     
     public func preferredSpeechService() throws -> SpeechService {
-        let service = try get(serviceID: preferences.preferredSpeechServiceID)
+        let service = try get(serviceID: preferences.preferred.speechServiceID)
         return try service.speechService()
     }
     
     public func preferredSummarizationService() throws -> ChatService {
-        let service = try get(serviceID: preferences.preferredSummarizationServiceID)
+        let service = try get(serviceID: preferences.preferred.summarizationServiceID)
         return try service.summarizationService()
     }
     
     // MARK: - Model Preferences
     
     public func preferredChatModel() throws -> String {
-        let service = try get(serviceID: preferences.preferredChatServiceID)
+        let service = try get(serviceID: preferences.preferred.chatServiceID)
         guard let model = service.preferredChatModel else {
             throw PreferencesProviderError.modelNotFound
         }
@@ -174,7 +162,7 @@ public final class PreferencesProvider {
     }
     
     public func preferredImageModel() throws -> String {
-        let service = try get(serviceID: preferences.preferredImageServiceID)
+        let service = try get(serviceID: preferences.preferred.imageServiceID)
         guard let model = service.preferredImageModel else {
             throw PreferencesProviderError.modelNotFound
         }
@@ -182,7 +170,7 @@ public final class PreferencesProvider {
     }
     
     public func preferredEmbeddingModel() throws -> String {
-        let service = try get(serviceID: preferences.preferredEmbeddingServiceID)
+        let service = try get(serviceID: preferences.preferred.embeddingServiceID)
         guard let model = service.preferredEmbeddingModel else {
             throw PreferencesProviderError.modelNotFound
         }
@@ -190,7 +178,7 @@ public final class PreferencesProvider {
     }
     
     public func preferredTranscriptionModel() throws -> String {
-        let service = try get(serviceID: preferences.preferredTranscriptionServiceID)
+        let service = try get(serviceID: preferences.preferred.transcriptionServiceID)
         guard let model = service.preferredTranscriptionModel else {
             throw PreferencesProviderError.modelNotFound
         }
@@ -198,7 +186,7 @@ public final class PreferencesProvider {
     }
     
     public func preferredToolModel() throws -> String {
-        let service = try get(serviceID: preferences.preferredToolServiceID)
+        let service = try get(serviceID: preferences.preferred.toolServiceID)
         guard let model = service.preferredChatModel else {
             throw PreferencesProviderError.modelNotFound
         }
@@ -206,7 +194,7 @@ public final class PreferencesProvider {
     }
     
     public func preferredVisionModel() throws -> String {
-        let service = try get(serviceID: preferences.preferredVisionServiceID)
+        let service = try get(serviceID: preferences.preferred.visionServiceID)
         guard let model = service.preferredVisionModel else {
             throw PreferencesProviderError.modelNotFound
         }
@@ -214,7 +202,7 @@ public final class PreferencesProvider {
     }
     
     public func preferredSpeechModel() throws -> String {
-        let service = try get(serviceID: preferences.preferredSpeechServiceID)
+        let service = try get(serviceID: preferences.preferred.speechServiceID)
         guard let model = service.preferredSpeechModel else {
             throw PreferencesProviderError.modelNotFound
         }
@@ -222,7 +210,7 @@ public final class PreferencesProvider {
     }
     
     public func preferredSummarizationModel() throws -> String {
-        let service = try get(serviceID: preferences.preferredSummarizationServiceID)
+        let service = try get(serviceID: preferences.preferred.summarizationServiceID)
         guard let model = service.preferredSummarizationModel else {
             throw PreferencesProviderError.modelNotFound
         }

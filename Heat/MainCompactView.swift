@@ -5,13 +5,16 @@ import HeatKit
 private let logger = Logger(subsystem: "MainCompactView", category: "Heat")
 
 struct MainCompactView: View {
+    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(ConversationsProvider.self) var conversationsProvider
+    @Environment(PreferencesProvider.self) var preferencesProvider
+    
     @Environment(ConversationViewModel.self) var conversationViewModel
     
     @State private var sheet: Sheet? = nil
     
     enum Sheet: String, Identifiable {
         case conversationList
-        case memories
         case preferences
         var id: String { rawValue }
     }
@@ -23,7 +26,6 @@ struct MainCompactView: View {
                     ToolbarItem {
                         Menu {
                             menuButton("History", symbol: "clock") { sheet = .conversationList }
-                            menuButton("Memory", symbol: "brain") { sheet = .memories }
                             Divider()
                             menuButton("Preferences", symbol: "slider.horizontal.3") { sheet = .preferences }
                         } label: {
@@ -40,16 +42,14 @@ struct MainCompactView: View {
                     NavigationStack {
                         switch sheet {
                         case .preferences:
-                            PreferencesForm(
-                                preferences: PreferencesProvider.shared.preferences,
-                                services: PreferencesProvider.shared.services
-                            )
-                        case .memories:
-                            MemoryList()
+                            PreferencesForm(preferences: preferencesProvider.preferences)
                         case .conversationList:
                             ConversationList()
                         }
                     }
+                    .environment(agentsProvider)
+                    .environment(conversationsProvider)
+                    .environment(preferencesProvider)
                     .environment(conversationViewModel)
                     .presentationDragIndicator(.visible)
                 }

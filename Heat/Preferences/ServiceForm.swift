@@ -3,6 +3,7 @@ import GenKit
 import HeatKit
 
 struct ServiceForm: View {
+    @Environment(PreferencesProvider.self) var preferencesProvider
     @Environment(\.dismiss) private var dismiss
     
     @State var service: Service
@@ -111,7 +112,7 @@ struct ServiceForm: View {
             return
         }
         handleApplyCredentials()
-        Task { try await PreferencesProvider.shared.upsert(service: service) }
+        Task { try await preferencesProvider.upsert(service: service) }
         dismiss()
     }
     

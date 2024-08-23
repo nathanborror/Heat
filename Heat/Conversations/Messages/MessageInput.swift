@@ -7,7 +7,7 @@ import HeatKit
 
 private let logger = Logger(subsystem: "ConversationInput", category: "Heat")
 
-struct ConversationInput: View {
+struct MessageInput: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.modelContext) private var modelContext
     
@@ -171,11 +171,6 @@ struct ConversationInput: View {
     func handleSubmit() async throws {
         defer { clear() }
         
-        // Create conversation if one doesn't already exist
-        if conversationViewModel.conversationID == nil {
-            try await conversationViewModel.newConversation()
-        }
-        
         // Check for command
         switch command {
         case "imagine":
@@ -196,15 +191,10 @@ struct ConversationInput: View {
             handleVision(content); return
         }
         
-        // Ignore empty content
-        guard !content.isEmpty else { return }
-        
         do {
             try conversationViewModel.generate(chat: content, memories: memories.map { $0.content })
-        } catch let error as KitError {
-            conversationViewModel.error = error
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
     }
     
@@ -215,10 +205,8 @@ struct ConversationInput: View {
                 $0.image?.resize(to: .init(width: 512, height: 512))
             }.compactMap { $0 }
             try conversationViewModel.generate(chat: content, images: images)
-        } catch let error as KitError {
-            conversationViewModel.error = error
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
         clear()
     }
@@ -226,10 +214,8 @@ struct ConversationInput: View {
     func handleImagine(_ prompt: String) {
         do {
             try conversationViewModel.generate(image: prompt)
-        } catch let error as KitError {
-            conversationViewModel.error = error
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
         clear()
     }

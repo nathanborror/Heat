@@ -2,21 +2,23 @@ import SwiftUI
 import HeatKit
 
 struct ConversationList: View {
+    @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.dismiss) private var dismiss
     
+    @State var selected: String? = nil
+    
     var body: some View {
-        @Bindable var conversationViewModel = conversationViewModel
-        List(selection: $conversationViewModel.conversationID) {
+        List(selection: $selected) {
             Section {
-                ForEach(ConversationProvider.shared.conversations) { conversation in
+                ForEach(conversationsProvider.conversations) { conversation in
                     VStack(alignment: .leading) {
                         Text(conversation.title ?? "Untitled")
                     }
                     .tag(conversation.id)
                     .swipeActions {
                         Button(role: .destructive) {
-                            Task { try await ConversationProvider.shared.delete(conversation.id) }
+                            Task { try await conversationsProvider.delete(conversation.id) }
                         } label: {
                             Label("Trash", systemImage: "trash")
                         }
@@ -24,14 +26,24 @@ struct ConversationList: View {
                 }
             }
         }
-        .scrollDismissesKeyboard(.interactively)
         .listStyle(.sidebar)
+        .scrollDismissesKeyboard(.interactively)
         .navigationTitle("History")
-        #if !os(macOS)
-        .onChange(of: conversationViewModel.conversationID) { _, _ in
-            guard conversationViewModel.conversationID != nil else { return }
-            dismiss()
+        .onChange(of: selected) { _, newValue in
+            conversationViewModel.conversationID = newValue
+            
+            #if os(iOS)
+            if newValue != nil { dismiss() }
+            #endif
         }
-        #endif
+        .overlay {
+            if conversationsProvider.conversations.isEmpty {
+                ContentUnavailableView {
+                    Label("Conversation history", systemImage: "clock")
+                } description: {
+                    Text("Your history is empty.")
+                }
+            }
+        }
     }
 }

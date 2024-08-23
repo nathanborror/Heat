@@ -12,51 +12,71 @@ struct ConversationView: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(spacing: 0) {
-                    
-                    // Show message history
-                    ForEach(conversationViewModel.messages) { message in
-                        MessageView(message: message)
-                    }
-                    
+                HStack {
+                    Spacer()
                     VStack(spacing: 0) {
-                        // Assistant typing indicator when processing
-                        if conversationViewModel.conversation?.state == .processing {
-                            TypingIndicator()
+                        
+                        // Show message history
+                        ForEach(conversationViewModel.messages) { message in
+                            MessageView(message: message)
                         }
                         
-                        // Suggestions typing indicator when suggesting
-                        if conversationViewModel.conversation?.state == .suggesting {
-                            TypingIndicator(foregroundColor: .accentColor)
-                        }
-                        
-                        // Show suggestions when they are available
-                        if !conversationViewModel.suggestions.isEmpty {
-                            SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
-                                SuggestionView(suggestion: suggestion) { suggestion in
-                                    Task { try await handleSuggestion(suggestion) }
-                                }
+                        VStack(spacing: 0) {
+                            // Assistant typing indicator when processing
+                            if conversationViewModel.conversation?.state == .processing {
+                                TypingIndicator()
                             }
-                            .padding(.vertical, 8)
+                            
+                            // Suggestions typing indicator when suggesting
+                            if conversationViewModel.conversation?.state == .suggesting {
+                                TypingIndicator(foregroundColor: .accentColor)
+                            }
+                            
+                            // Show suggestions when they are available
+                            if !conversationViewModel.suggestions.isEmpty {
+                                SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
+                                    SuggestionView(suggestion: suggestion) { suggestion in
+                                        Task { try await handleSuggestion(suggestion) }
+                                    }
+                                }
+                                .padding(.vertical, 8)
+                            }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Rectangle()
+                            .fill(.background)
+                            .frame(height: 1)
+                            .id("bottom")
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .id("bottom")
+                    .frame(maxWidth: 800, alignment: .center)
+                    .padding()
+                    Spacer()
                 }
-                .padding(24)
             }
-            .task(id: conversationViewModel.conversation) {
+            .background(.background)
+            .onChange(of: conversationViewModel.conversation) { _, _ in
                 proxy.scrollTo("bottom")
             }
         }
+        .defaultScrollAnchor(.bottom)
+        .scrollClipDisabled()
         .scrollDismissesKeyboard(.interactively)
         .scrollIndicators(.hidden)
-        .background(.background)
         .safeAreaInset(edge: .bottom, alignment: .center) {
-            ConversationInput()
+            MessageInput()
                 .environment(conversationViewModel)
                 .padding(12)
                 .background(.background)
+        }
+        .overlay {
+            if conversationViewModel.messages.isEmpty {
+                ContentUnavailableView {
+                    Label("New conversation", systemImage: "bubble")
+                } description: {
+                    Text("Start a new conversation by typing a message.")
+                }
+            }
         }
 //        .alert(isPresented: $isShowingError, error: conversationViewModel.error) { _ in
 //            Button("Dismiss", role: .cancel) {
@@ -69,9 +89,6 @@ struct ConversationView: View {
     }
     
     func handleSuggestion(_ suggestion: String) async throws {
-        if conversationViewModel.conversationID == nil {
-            try await conversationViewModel.newConversation()
-        }
         do {
             try conversationViewModel.generate(chat: suggestion)
         } catch {

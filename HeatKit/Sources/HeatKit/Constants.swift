@@ -6,9 +6,7 @@ public struct Constants {
     public static let defaultAgent = Agent(
         id: "bundle-assistant",
         name: "Assistant",
-        instructions: [
-            .init(role: .system, content: assistantSystemPrompt(name: "Heat", creator: "Nathan Borror"))
-        ],
+        instructions: assistantInstructions(name: "Heat", creator: "Nathan Borror"),
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
@@ -79,7 +77,7 @@ public struct Constants {
             preferredToolModel: "gpt-4o",
             preferredVisionModel: "gpt-4o",
             preferredSpeechModel: "tts-1-hd",
-            preferredSummarizationModel: "gpt-4o"
+            preferredSummarizationModel: "gpt-4o-mini"
         )
     
     public static let anthropicDefaults =

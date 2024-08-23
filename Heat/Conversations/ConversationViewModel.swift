@@ -15,12 +15,11 @@ final class ConversationViewModel {
     
     var conversation: Conversation? {
         guard let conversationID else { return nil }
-        return try? ConversationProvider.shared.get(conversationID)
+        return try? ConversationsProvider.shared.get(conversationID)
     }
     
     var suggestions: [String] {
-        //Array((conversation?.suggestions ?? []).prefix(3))
-        conversation?.suggestions ?? []
+        Array((conversation?.suggestions ?? []).prefix(3))
     }
     
     var messages: [Message] {
@@ -31,37 +30,33 @@ final class ConversationViewModel {
         guard let agentID = PreferencesProvider.shared.preferences.defaultAgentID else {
             return
         }
-        let agent = try AgentProvider.shared.get(agentID)
-        let instructions = agent.instructions.map {
-            var message = $0
-            message.content = message.content?.apply(context: [
-                "datetime": Date.now.format(as: "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
-            ])
-            return message
-        }
+        let agent = try AgentsProvider.shared.get(agentID)
+        let instructions = agent.instructions
         let tools = Toolbox.get(tools: agent.toolIDs)
-        let conversation = try await ConversationProvider.shared.create(instructions: instructions, tools: tools)
+        let conversation = try await ConversationsProvider.shared.create(instructions: instructions, tools: tools)
         conversationID = conversation.id
     }
     
     func generate(chat prompt: String, memories: [String] = [], toolChoice: Tool? = nil) throws {
         guard !prompt.isEmpty else { return }
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
         
-        let provider = ConversationProvider.shared
+        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
         generateTask = Task {
+            if conversationID == nil {
+                try await newConversation()
+            }
+            guard var conversation else { return }
+            
             // New user message
             let userMessage = Message(role: .user, content: prompt)
             try await provider.upsert(suggestions: [], conversationID: conversation.id)
             try await provider.upsert(message: userMessage, conversationID: conversation.id)
             
-            // Get updated conversation
-            let conversation = try provider.get(conversation.id)
+            // Update conversation
+            conversation = try provider.get(conversation.id)
             
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
@@ -87,15 +82,17 @@ final class ConversationViewModel {
     
     func generate(chat prompt: String, images: [Data], memories: [String] = []) throws {
         guard !prompt.isEmpty else { return }
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
         
-        let provider = ConversationProvider.shared
+        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredVisionService()
         let model = try PreferencesProvider.shared.preferredVisionModel()
         
         generateTask = Task {
+            if conversationID == nil {
+                try await newConversation()
+            }
+            guard var conversation else { return }
+            
             // New user message
             let userMessage = Message(role: .user, content: prompt, attachments: images.map {
                 .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
@@ -103,8 +100,8 @@ final class ConversationViewModel {
             try await provider.upsert(suggestions: [], conversationID: conversation.id)
             try await provider.upsert(message: userMessage, conversationID: conversation.id)
             
-            // Get updated conversation
-            let conversation = try provider.get(conversation.id)
+            // Update conversation
+            conversation = try provider.get(conversation.id)
             
             // Initial request
             var req = VisionSessionRequest(service: service, model: model)
@@ -129,15 +126,17 @@ final class ConversationViewModel {
     
     func generate(image prompt: String) throws {
         guard !prompt.isEmpty else { return }
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
         
-        let provider = ConversationProvider.shared
+        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredImageService()
         let model = try PreferencesProvider.shared.preferredImageModel()
         
         generateTask = Task {
+            if conversationID == nil {
+                try await newConversation()
+            }
+            guard let conversation else { return }
+            
             // New user message
             let userMessage = Message(role: .user, content: prompt)
             try await provider.upsert(message: userMessage, conversationID: conversation.id)
@@ -165,7 +164,7 @@ final class ConversationViewModel {
             return false
         }
         
-        let provider = ConversationProvider.shared
+        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
@@ -199,7 +198,7 @@ final class ConversationViewModel {
             throw KitError.missingConversation
         }
         
-        let provider = ConversationProvider.shared
+        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
@@ -224,6 +223,7 @@ final class ConversationViewModel {
                 .filter { !$0.hasPrefix("<") }
                 .map { String($0.trimmingPrefix(#/^-( )?/#)) }
             try await provider.upsert(suggestions: suggestions, conversationID: conversation.id)
+            try await provider.upsert(state: .streaming, conversationID: conversation.id)
         }
         
         // Set conversation state
@@ -236,7 +236,7 @@ final class ConversationViewModel {
     func stop() {
         generateTask?.cancel()
         guard let conversationID else { return }
-        Task { try await ConversationProvider.shared.upsert(state: .none, conversationID: conversationID) }
+        Task { try await ConversationsProvider.shared.upsert(state: .none, conversationID: conversationID) }
     }
     
     // MARK: - Private
