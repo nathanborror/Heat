@@ -5,13 +5,11 @@ import MarkdownUI
 import Splash
 
 struct MessageView: View {
-    @Environment(Store.self) var store
-    
     let message: Message
     
     var body: some View {
         Group {
-            if message.role == .system && store.preferences.debug {
+            if message.role == .system && PreferencesProvider.shared.preferences.debug {
                 MessageSystemView(message: message)
             }
             if message.role == .user {
@@ -32,7 +30,7 @@ struct MessageView: View {
                         .messageSpacing(message)
                         .padding(.vertical, 8)
                 }
-                if store.preferences.debug {
+                if PreferencesProvider.shared.preferences.debug {
                     MessageToolCall(message: message)
                 }
             }
@@ -44,7 +42,6 @@ struct MessageView: View {
 }
 
 struct MessageViewText: View {
-    @Environment(Store.self) var store
     @Environment(\.colorScheme) private var colorScheme
     
     let message: Message

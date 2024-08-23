@@ -6,12 +6,14 @@ struct SuggestionList<Content: View>: View {
     var content: (String) -> Content
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            ForEach(suggestions, id: \.self) { suggestion in
-                content(suggestion)
+        if !suggestions.isEmpty {
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(suggestions, id: \.self) { suggestion in
+                    content(suggestion)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

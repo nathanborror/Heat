@@ -2,36 +2,20 @@ import SwiftUI
 import HeatKit
 
 struct AgentList: View {
-    @Environment(Store.self) private var store
+    @Environment(AgentsProvider.self) var agentsProvider
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var selectedAgent: Agent = .empty
-    @State private var isShowingAgentForm = false
     
     var body: some View {
         Form {
             Section {
-                Button("Create Agent") {
-                    selectedAgent = .empty
-                    isShowingAgentForm = true
+                NavigationLink("Add Agent") {
+                    AgentForm(agent: .empty)
                 }
             }
             Section {
-                ForEach(store.agents) { agent in
-                    HStack {
-                        Text(agent.name)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Button("Edit") {
-                            selectedAgent = agent
-                            isShowingAgentForm = true
-                        }
-                        #if os(macOS)
-                        Button(action: { handleDeleteAgent(agent) }) {
-                            Image(systemName: "trash")
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(.secondary)
-                        #endif
+                ForEach(agentsProvider.agents) { agent in
+                    NavigationLink(agent.name) {
+                        AgentForm(agent: agent)
                     }
                     .swipeActions {
                         Button(role: .destructive, action: { handleDeleteAgent(agent) }) {
@@ -42,21 +26,9 @@ struct AgentList: View {
             }
         }
         .navigationTitle("Agents")
-        .sheet(isPresented: $isShowingAgentForm) {
-            NavigationStack {
-                AgentForm(agent: selectedAgent)
-            }
-            .environment(store)
-        }
     }
     
     func handleDeleteAgent(_ agent: Agent) {
-        store.delete(agentID: agent.id)
+        Task { try await agentsProvider.delete(agent.id)}
     }
-}
-
-#Preview {
-    NavigationStack {
-        AgentList()
-    }.environment(Store.preview)
 }

@@ -7,7 +7,7 @@ import HeatKit
 
 private let logger = Logger(subsystem: "ConversationInput", category: "Heat")
 
-struct ConversationInput: View {
+struct MessageInput: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.modelContext) private var modelContext
     
@@ -116,7 +116,15 @@ struct ConversationInput: View {
                         .frame(minHeight: minHeight)
                         .focused($isFocused)
                         #if os(macOS)
-                        .onSubmit(handleSubmit)
+                        .onSubmit {
+                            Task {
+                                do {
+                                    try await handleSubmit()
+                                } catch {
+                                    print(error)
+                                }
+                            }
+                        }
                         #endif
                     
                     // Speech to text
@@ -139,7 +147,15 @@ struct ConversationInput: View {
                 }
                 .buttonStyle(.plain)
             } else if showSubmit {
-                Button(action: handleSubmit) {
+                Button {
+                    Task {
+                        do {
+                            try await handleSubmit()
+                        } catch {
+                            print(error)
+                        }
+                    }
+                } label: {
                     Image(systemName: "arrow.up")
                         .modifier(ConversationButtonModifier())
                 }
@@ -152,13 +168,8 @@ struct ConversationInput: View {
         #endif
     }
     
-    func handleSubmit() {
+    func handleSubmit() async throws {
         defer { clear() }
-        
-        // Create conversation if one doesn't already exist
-        if conversationViewModel.conversationID == nil {
-            conversationViewModel.newConversation()
-        }
         
         // Check for command
         switch command {
@@ -180,15 +191,10 @@ struct ConversationInput: View {
             handleVision(content); return
         }
         
-        // Ignore empty content
-        guard !content.isEmpty else { return }
-        
         do {
-            try conversationViewModel.generate(content, context: memories.map { $0.content })
-        } catch let error as KitError {
-            conversationViewModel.error = error
+            try conversationViewModel.generate(chat: content, memories: memories.map { $0.content })
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
     }
     
@@ -198,22 +204,18 @@ struct ConversationInput: View {
                 // Resize image so we're not sending huge amounts of data to the services.
                 $0.image?.resize(to: .init(width: 512, height: 512))
             }.compactMap { $0 }
-            try conversationViewModel.generate(content, images: images)
-        } catch let error as KitError {
-            conversationViewModel.error = error
+            try conversationViewModel.generate(chat: content, images: images)
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
         clear()
     }
     
-    func handleImagine(_ content: String) {
+    func handleImagine(_ prompt: String) {
         do {
-            try conversationViewModel.generateImage(content)
-        } catch let error as KitError {
-            conversationViewModel.error = error
+            try conversationViewModel.generate(image: prompt)
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
         clear()
     }
@@ -252,7 +254,7 @@ struct ConversationInput: View {
     }
     
     func handleStop() {
-        conversationViewModel.generateStop()
+        conversationViewModel.stop()
     }
     
     private func clear() {
@@ -266,7 +268,7 @@ struct ConversationInput: View {
         let message = visible.first { message in
             let attachment = message.attachments.first { attachment in
                 switch attachment {
-                case .agent, .automation, .component:
+                case .agent, .automation, .component, .file:
                     return false
                 case .asset(let asset):
                     return asset.noop == false
@@ -279,6 +281,7 @@ struct ConversationInput: View {
     
     private var showInlineControls: Bool    { content.isEmpty }
     private var showInputPadding: Bool      { !content.isEmpty }
+    
     private var showStopGenerating: Bool    { (conversationViewModel.conversation?.state ?? .none) != .none }
     private var showSubmit: Bool            { !content.isEmpty }
     
@@ -372,17 +375,4 @@ struct ConversationInputImage: View {
             .shadow(color: .primary.opacity(0.25), radius: 5)
         }
     }
-}
-
-#Preview("Conversation Input") {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: store)
-    
-    return VStack {
-        ConversationInput()
-        ConversationInput(content: "Hello, world")
-        ConversationInput(command: "imagine")
-    }
-    .padding()
-    .environment(viewModel)
 }

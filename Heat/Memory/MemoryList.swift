@@ -5,63 +5,42 @@ import HeatKit
 struct MemoryList: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
-
-    @State private var newMemoryContent = ""
-    @State private var isCreatingMemory = false
     
     var body: some View {
-        List {
-            ForEach(memories) { memory in
-                Text(memory.content)
-                    .swipeActions {
-                        Button(role: .destructive) {
-                            handleDelete(memory)
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+        Form {
+            Section {
+                NavigationLink("New Memory") {
+                    MemoryForm { handleSave($0) }
+                }
+            }
+            Section {
+                ForEach(memories) { memory in
+                    Text(memory.content)
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                handleDelete(memory)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
                         }
-                    }
+                }
             }
         }
         .navigationTitle("Memories")
-        .toolbar {
-            ToolbarItem {
-                Button(action: { isCreatingMemory = true }) {
-                    Label("Add", systemImage: "plus")
-                }
-            }
-        }
-        .sheet(isPresented: $isCreatingMemory) {
-            NavigationStack {
-                Form {
-                    TextField("Memory contents", text: $newMemoryContent, axis: .vertical)
-                }
-                .navigationTitle("New Memory")
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button(action: handleSave) {
-                            Text("Done")
-                        }
-                    }
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button(action: { isCreatingMemory = false }) {
-                            Text("Cancel")
-                        }
-                    }
+        .overlay {
+            if memories.isEmpty {
+                ContentUnavailableView {
+                    Label("Memories about you", systemImage: "brain")
+                } description: {
+                    Text("No memories yet.")
                 }
             }
         }
     }
     
-    func handleSave() {
-        guard !newMemoryContent.isEmpty else {
-            return
-        }
-        let memory = Memory(content: newMemoryContent)
+    func handleSave(_ text: String) {
+        let memory = Memory(content: text)
         modelContext.insert(memory)
-        
-        // Reset and dismiss
-        newMemoryContent = ""
-        isCreatingMemory = false
     }
     
     func handleDelete(_ memory: Memory) {
@@ -69,9 +48,37 @@ struct MemoryList: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        MemoryList()
+struct MemoryForm: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    @State var text: String = ""
+    
+    let action: (String) -> Void
+    
+    @FocusState private var isFocused: Bool
+    
+    var body: some View {
+        Form {
+            TextField("Content", text: $text)
+                .focused($isFocused)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button {
+                            handleSubmit()
+                        } label: {
+                            Text("Done")
+                        }
+                    }
+                }
+        }
+        .onAppear {
+            isFocused = true
+        }
     }
-    .modelContainer(MemoryDataPreview.container)
+    
+    func handleSubmit() {
+        action(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        text = ""
+        dismiss()
+    }
 }

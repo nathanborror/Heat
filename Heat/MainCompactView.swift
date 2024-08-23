@@ -5,14 +5,16 @@ import HeatKit
 private let logger = Logger(subsystem: "MainCompactView", category: "Heat")
 
 struct MainCompactView: View {
-    @Environment(Store.self) var store
+    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(ConversationsProvider.self) var conversationsProvider
+    @Environment(PreferencesProvider.self) var preferencesProvider
+    
     @Environment(ConversationViewModel.self) var conversationViewModel
     
     @State private var sheet: Sheet? = nil
     
     enum Sheet: String, Identifiable {
         case conversationList
-        case memories
         case preferences
         var id: String { rawValue }
     }
@@ -24,7 +26,6 @@ struct MainCompactView: View {
                     ToolbarItem {
                         Menu {
                             menuButton("History", symbol: "clock") { sheet = .conversationList }
-                            menuButton("Memory", symbol: "brain") { sheet = .memories }
                             Divider()
                             menuButton("Preferences", symbol: "slider.horizontal.3") { sheet = .preferences }
                         } label: {
@@ -32,18 +33,23 @@ struct MainCompactView: View {
                         }
                     }
                     ToolbarItem {
-                        menuButton("New Conversation", symbol: "plus") { conversationViewModel.conversationID = nil }
+                        menuButton("New Conversation", symbol: "plus") {
+                            Task { try await conversationViewModel.newConversation() }
+                        }
                     }
                 }
                 .sheet(item: $sheet) { sheet in
                     NavigationStack {
                         switch sheet {
-                        case .preferences:      PreferencesForm()
-                        case .memories:         MemoryList()
-                        case .conversationList: ConversationList()
+                        case .preferences:
+                            PreferencesForm(preferences: preferencesProvider.preferences)
+                        case .conversationList:
+                            ConversationList()
                         }
                     }
-                    .environment(store)
+                    .environment(agentsProvider)
+                    .environment(conversationsProvider)
+                    .environment(preferencesProvider)
                     .environment(conversationViewModel)
                     .presentationDragIndicator(.visible)
                 }
@@ -55,10 +61,4 @@ struct MainCompactView: View {
             Label(label, systemImage: symbol)
         }
     }
-}
-
-#Preview {
-    MainCompactView()
-        .environment(Store.preview)
-        .environment(ConversationViewModel(store: Store.preview))
 }

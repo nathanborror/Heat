@@ -3,18 +3,27 @@ import GenKit
 
 public struct Constants {
     
-    public static var defaultAgentID = "bundle-assistant"
+    public static let defaultAgent = Agent(
+        id: "bundle-assistant",
+        name: "Assistant",
+        instructions: assistantInstructions(name: "Heat", creator: "Nathan Borror"),
+        toolIDs: [
+            Toolbox.generateImages.name,
+            Toolbox.browseWeb.name,
+            Toolbox.searchWeb.name,
+        ]
+    )
     
-    public static var defaultChatServiceID: Service.ServiceID? = nil
-    public static var defaultImageServiceID: Service.ServiceID? = nil
-    public static var defaultEmbeddingServiceID: Service.ServiceID? = nil
-    public static var defaultTranscriptionServiceID: Service.ServiceID? = nil
-    public static var defaultToolServiceID: Service.ServiceID? = nil
-    public static var defaultVisionServiceID: Service.ServiceID? = nil
-    public static var defaultSpeechServiceID: Service.ServiceID? = nil
-    public static var defaultSummarizationServiceID: Service.ServiceID? = nil
+    public static let defaultChatServiceID: Service.ServiceID? = nil
+    public static let defaultImageServiceID: Service.ServiceID? = nil
+    public static let defaultEmbeddingServiceID: Service.ServiceID? = nil
+    public static let defaultTranscriptionServiceID: Service.ServiceID? = nil
+    public static let defaultToolServiceID: Service.ServiceID? = nil
+    public static let defaultVisionServiceID: Service.ServiceID? = nil
+    public static let defaultSpeechServiceID: Service.ServiceID? = nil
+    public static let defaultSummarizationServiceID: Service.ServiceID? = nil
     
-    public static var defaultServices: [Service] = [
+    public static let defaultServices: [Service] = [
         .init(
             id: .openAI,
             name: "OpenAI",
@@ -57,7 +66,7 @@ public struct Constants {
         )
     ]
     
-    public static var openAIDefaults =
+    public static let openAIDefaults =
         Service(
             id: .openAI,
             name: "OpenAI",
@@ -68,10 +77,10 @@ public struct Constants {
             preferredToolModel: "gpt-4o",
             preferredVisionModel: "gpt-4o",
             preferredSpeechModel: "tts-1-hd",
-            preferredSummarizationModel: "gpt-4o"
+            preferredSummarizationModel: "gpt-4o-mini"
         )
     
-    public static var anthropicDefaults =
+    public static let anthropicDefaults =
         Service(
             id: .anthropic,
             name: "Anthropic",
@@ -81,7 +90,7 @@ public struct Constants {
             preferredSummarizationModel: "claude-3-haiku-20240307"
         )
     
-    public static var mistralDefaults =
+    public static let mistralDefaults =
         Service(
             id: .mistral,
             name: "Mistral",
@@ -90,14 +99,14 @@ public struct Constants {
             preferredToolModel: "mistral-large-latest"
         )
     
-    public static var perplexityDefaults =
+    public static let perplexityDefaults =
         Service(
             id: .perplexity,
             name: "Perplexity",
             preferredChatModel: "pplx-70b-chat"
         )
     
-    public static var googleDefaults =
+    public static let googleDefaults =
         Service(
             id: .google,
             name: "Google",

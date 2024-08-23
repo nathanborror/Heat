@@ -5,7 +5,6 @@ import HeatKit
 private let logger = Logger(subsystem: "ConversationView", category: "Heat")
 
 struct ConversationView: View {
-    @Environment(Store.self) var store
     @Environment(ConversationViewModel.self) var conversationViewModel
     
     @State private var isShowingError = false
@@ -13,108 +12,87 @@ struct ConversationView: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(spacing: 0) {
-                    
-                    // Show message history
-                    ForEach(conversationViewModel.messages) { message in
-                        MessageView(message: message)
-                    }
-                    
+                HStack {
+                    Spacer()
                     VStack(spacing: 0) {
-                        // Assistant typing indicator when processing
-                        if conversationViewModel.conversation?.state == .processing {
-                            TypingIndicator()
+                        
+                        // Show message history
+                        ForEach(conversationViewModel.messages) { message in
+                            MessageView(message: message)
                         }
                         
-                        // Suggestions typing indicator when suggesting
-                        if conversationViewModel.conversation?.state == .suggesting {
-                            TypingIndicator(foregroundColor: .accentColor)
-                        }
-                        
-                        // Show suggestions when they are available
-                        if !conversationViewModel.suggestions.isEmpty {
-                            SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
-                                SuggestionView(suggestion: suggestion, action: { handleSuggestion(.init($0)) })
+                        VStack(spacing: 0) {
+                            // Assistant typing indicator when processing
+                            if conversationViewModel.conversation?.state == .processing {
+                                TypingIndicator()
                             }
-                            .padding(.vertical, 8)
+                            
+                            // Suggestions typing indicator when suggesting
+                            if conversationViewModel.conversation?.state == .suggesting {
+                                TypingIndicator(foregroundColor: .accentColor)
+                            }
+                            
+                            // Show suggestions when they are available
+                            if !conversationViewModel.suggestions.isEmpty {
+                                SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
+                                    SuggestionView(suggestion: suggestion) { suggestion in
+                                        Task { try await handleSuggestion(suggestion) }
+                                    }
+                                }
+                                .padding(.vertical, 8)
+                            }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Rectangle()
+                            .fill(.background)
+                            .frame(height: 1)
+                            .id("bottom")
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .id("bottom")
+                    .frame(maxWidth: 800, alignment: .center)
+                    .padding()
+                    Spacer()
                 }
-                .padding(24)
             }
-            .task(id: conversationViewModel.conversation) {
+            .background(.background)
+            .onChange(of: conversationViewModel.conversation) { _, _ in
                 proxy.scrollTo("bottom")
             }
-            .task(id: conversationViewModel.error) {
-                isShowingError = conversationViewModel.error != nil
-            }
         }
+        .defaultScrollAnchor(.bottom)
+        .scrollClipDisabled()
         .scrollDismissesKeyboard(.interactively)
         .scrollIndicators(.hidden)
-        .background(.background)
         .safeAreaInset(edge: .bottom, alignment: .center) {
-            ConversationInput()
+            MessageInput()
                 .environment(conversationViewModel)
                 .padding(12)
                 .background(.background)
         }
-        .alert(isPresented: $isShowingError, error: conversationViewModel.error) { _ in
-            Button("Dismiss", role: .cancel) {
-                isShowingError = false
-                conversationViewModel.error = nil
+        .overlay {
+            if conversationViewModel.messages.isEmpty {
+                ContentUnavailableView {
+                    Label("New conversation", systemImage: "bubble")
+                } description: {
+                    Text("Start a new conversation by typing a message.")
+                }
             }
-        } message: {
-            Text($0.recoverySuggestion)
         }
+//        .alert(isPresented: $isShowingError, error: conversationViewModel.error) { _ in
+//            Button("Dismiss", role: .cancel) {
+//                isShowingError = false
+//                conversationViewModel.error = nil
+//            }
+//        } message: {
+//            Text($0.recoverySuggestion)
+//        }
     }
     
-    func handleSuggestion(_ suggestion: String) {
-        if conversationViewModel.conversationID == nil {
-            conversationViewModel.newConversation()
-        }
+    func handleSuggestion(_ suggestion: String) async throws {
         do {
-            try conversationViewModel.generate(suggestion)
-        } catch let error as KitError {
-            conversationViewModel.error = error
+            try conversationViewModel.generate(chat: suggestion)
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
     }
-}
-
-#Preview("New") {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: Store.preview)
-    
-    return NavigationStack {
-        ConversationView()
-    }
-    .environment(store)
-    .environment(viewModel)
-}
-
-#Preview("Active") {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: Store.preview)
-    viewModel.conversationID = Conversation.preview1.id
-    
-    return NavigationStack {
-        ConversationView()
-    }
-    .environment(store)
-    .environment(viewModel)
-}
-
-#Preview("Tool Use") {
-    let store = Store.preview
-    let viewModel = ConversationViewModel(store: Store.preview)
-    viewModel.conversationID = Conversation.preview2.id
-    
-    return NavigationStack {
-        ConversationView()
-    }
-    .environment(store)
-    .environment(viewModel)
 }

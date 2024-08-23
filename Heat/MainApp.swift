@@ -25,13 +25,15 @@ struct MainApp: App {
     @Environment(\.openWindow) private var openWindow
     #endif
     
-    @State private var store = Store.shared
-    @State private var conversationViewModel = ConversationViewModel(store: Store.shared)
-    @State private var launcherViewModel = LauncherViewModel(store: Store.shared)
+    @State private var conversationViewModel = ConversationViewModel()
     @State private var searchInput = ""
     @State private var showingLauncher = false
     @State private var showingBarrier = false
     @State private var isRestoring = false
+    
+    let agentsProvider = AgentsProvider.shared
+    let conversationsProvider = ConversationsProvider.shared
+    let preferencesProvider = PreferencesProvider.shared
     
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.shift, .control])
@@ -46,31 +48,24 @@ struct MainApp: App {
             } detail: {
                 ConversationView()
             }
-            .environment(store)
             .environment(conversationViewModel)
             .modelContainer(for: Memory.self)
             .task {
-                await handleRestore()
                 handleHotKeySetup()
-            }
-            .task(id: scenePhase) {
-                handlePhaseChange()
-            }
-            .task(id: store.isChatAvailable) {
-                handleAvailabilityChange()
             }
             .sheet(isPresented: $showingBarrier) {
                 ConversationBarrier()
                     .frame(width: 300, height: 325)
-                    .environment(store)
             }
             .floatingPanel(isPresented: $showingLauncher) {
                 LauncherView()
-                    .environment(store)
-                    .environment(launcherViewModel)
+                    .environment(conversationViewModel)
                     .modelContainer(for: Memory.self)
             }
         }
+        .environment(agentsProvider)
+        .environment(conversationsProvider)
+        .environment(preferencesProvider)
         .defaultSize(width: 600, height: 700)
         .defaultPosition(.center)
         .commands {
@@ -85,59 +80,23 @@ struct MainApp: App {
                 PreferencesWindow()
             }
             .frame(width: 600)
-            .environment(store)
+            .environment(agentsProvider)
+            .environment(conversationsProvider)
+            .environment(preferencesProvider)
         }
         #else
         WindowGroup {
             MainCompactView()
-                .environment(store)
+                .environment(agentsProvider)
+                .environment(conversationsProvider)
+                .environment(preferencesProvider)
                 .environment(conversationViewModel)
                 .modelContainer(for: Memory.self)
-                .task(id: scenePhase) {
-                    handlePhaseChange()
-                }
-                .task(id: store.isChatAvailable) {
-                    handleAvailabilityChange()
-                }
-                .task {
-                    await handleRestore()
-                }
                 .sheet(isPresented: $showingBarrier) {
                     ConversationBarrier()
-                        .environment(store)
                 }
         }
         #endif
-    }
-    
-    func handlePhaseChange() {
-        guard !isRestoring else { return }
-        #if os(macOS)
-        guard scenePhase == .inactive else { return }
-        #else
-        guard scenePhase == .background else { return }
-        #endif
-        handleSave()
-    }
-    
-    func handleAvailabilityChange() {
-        guard !isRestoring else { return }
-        showingBarrier = !store.isChatAvailable
-    }
-    
-    func handleRestore() async {
-        do {
-            isRestoring = true
-            try await store.restoreAll()
-            showingBarrier = !store.isChatAvailable
-            isRestoring = false
-        } catch {
-            logger.warning("failed to restore: \(error)")
-        }
-    }
-    
-    func handleSave() {
-        Task { try await store.saveAll() }
     }
     
     func handleNewConversation() {

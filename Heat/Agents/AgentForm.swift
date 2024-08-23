@@ -7,39 +7,44 @@ import HeatKit
 private let logger = Logger(subsystem: "AgentForm", category: "Heat")
 
 struct AgentForm: View {
-    @Environment(Store.self) private var store
+    @Environment(AgentsProvider.self) var agentsProvider
     @Environment(\.dismiss) private var dismiss
     
     @State var agent: Agent
-    @State var instructions: [(String, String)] = []
     
+    @State private var newToolName: String = ""
     @State private var isShowingAlert = false
     @State private var error: ImagePickerError? = nil
     
     var body: some View {
         Form {
-            Section {
+            Section("Info") {
+                TextField("ID", text: $agent.id)
                 TextField("Name", text: $agent.name)
             }
-            
-            ForEach($instructions.indices, id: \.self) { index in
-                Section {
-                    Picker("Role", selection: $instructions[index].0) {
-                        Text("System").tag("system")
-                        Text("Assistant").tag("assistant")
-                        Text("User").tag("user")
-                    }
-                    TextField("Content", text: $instructions[index].1, axis: .vertical)
+            Section("Tools") {
+                ForEach(Array(agent.toolIDs.sorted(by: <)), id: \.self) { toolID in
+                    Text(toolID)
+                        .swipeActions {
+                            Button(role: .destructive) {
+                                agent.toolIDs.remove(toolID)
+                            } label: {
+                                Label("Trash", systemImage: "trash")
+                            }
+                        }
                 }
-                .swipeActions {
-                    Button(role: .destructive, action: { handleDeleteInstruction(index) }) {
-                        Label("Delete", systemImage: "trash")
+            }
+            Section {
+                NavigationLink("Add Tool") {
+                    AgentTool { name in
+                        guard !name.isEmpty else { return }
+                        agent.toolIDs.insert(name)
                     }
                 }
             }
-            
-            Section {
-                Button("Add Instruction", action: handleAddInstruction)
+            Section("Instructions") {
+                TextField("Instructions", text: $agent.instructions, axis: .vertical)
+                    .font(.system(size: 14, design: .monospaced))
             }
         }
         #if os(macOS)
@@ -53,9 +58,6 @@ struct AgentForm: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done", action: handleDone)
             }
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel", action: dismiss.callAsFunction)
-            }
         }
         .alert(isPresented: $isShowingAlert, error: error) { _ in
             Button("Dismiss", role: .cancel) {
@@ -64,38 +66,11 @@ struct AgentForm: View {
         } message: { error in
             Text(error.recoverySuggestion)
         }
-        .onAppear {
-            instructions = agent.instructions.map { ($0.role.rawValue, $0.content ?? "") }
-        }
     }
     
     private func handleDone() {
-        agent.instructions = instructions
-            .filter({ !$0.1.isEmpty })
-            .map {
-                Message(kind: .instruction, role: .init(rawValue: $0.0)!, content: $0.1)
-            }
-        store.upsert(agent: agent)
+        Task { try await agentsProvider.upsert(agent) }
         dismiss()
-    }
-    
-    private func handleAddInstruction() {
-        if let last = instructions.last {
-            switch last.0 {
-            case "system", "user":
-                instructions.append(("assistant", ""))
-            case "assistant":
-                instructions.append(("user", ""))
-            default:
-                instructions.append(("system", ""))
-            }
-        } else {
-            instructions.append(("system", ""))
-        }
-    }
-    
-    private func handleDeleteInstruction(_ index: Int) {
-        instructions.remove(at: index)
     }
 }
 
@@ -118,17 +93,40 @@ struct AgentPicture: View {
     }
 }
 
-#Preview("Create Agent") {
-    NavigationStack {
-        AgentForm(agent: .empty)
-    }.environment(Store.preview)
-}
-
-#Preview("Edit Agent") {
-    let store = Store.preview
-    let agent = Agent.preview
+struct AgentTool: View {
+    @Environment(\.dismiss) private var dismiss
     
-    return NavigationStack {
-        AgentForm(agent: agent)
-    }.environment(store)
+    @State var text: String = ""
+    
+    let action: (String) -> Void
+    
+    @FocusState private var isFocused: Bool
+    
+    var body: some View {
+        Form {
+            TextField("Name", text: $text)
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                #endif
+                .focused($isFocused)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button {
+                            handleSubmit()
+                        } label: {
+                            Text("Done")
+                        }
+                    }
+                }
+        }
+        .onAppear {
+            isFocused = true
+        }
+    }
+    
+    func handleSubmit() {
+        action(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        text = ""
+        dismiss()
+    }
 }

@@ -41,13 +41,13 @@ extension ImageGeneratorTool {
         do {
             let args = try Arguments(toolCall.function.arguments)
             
-            let imageService = try Store.shared.preferredImageService()
-            let imageModel = try Store.shared.preferredImageModel()
+            let imageService = try await PreferencesProvider.shared.preferredImageService()
+            let imageModel = try await PreferencesProvider.shared.preferredImageModel()
             
             // Generate image attachments
             var attachments = [Message.Attachment]()
             for prompt in args.prompts {
-                if let attachment = await makeImageAttachment(prompt: prompt, service: imageService, model: imageModel) {
+                if let attachment = try await makeImageAttachment(prompt: prompt, service: imageService, model: imageModel) {
                     attachments.append(attachment)
                 }
             }
@@ -69,9 +69,9 @@ extension ImageGeneratorTool {
         }
     }
     
-    private static func makeImageAttachment(prompt: String, service: ImageService, model: String) async -> Message.Attachment? {
+    private static func makeImageAttachment(prompt: String, service: ImageService, model: String) async throws -> Message.Attachment? {
         var attachments = [Message.Attachment]()
-        await ImageSession.shared
+        try await ImageSession.shared
             .generate(service: service, model: model, prompt: prompt) { images in
                 attachments = images.map {
                     Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: prompt))

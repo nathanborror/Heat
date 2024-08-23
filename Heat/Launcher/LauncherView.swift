@@ -8,8 +8,7 @@ import HeatKit
 private let logger = Logger(subsystem: "LauncherView", category: "Heat")
 
 struct LauncherView: View {
-    @Environment(Store.self) var store
-    @Environment(LauncherViewModel.self) var launcherViewModel
+    @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.modelContext) private var modelContext
     
     @State private var content = ""
@@ -31,18 +30,18 @@ struct LauncherView: View {
                     .textFieldStyle(.plain)
                     .font(.title)
                     .onSubmit {
-                        handleSubmit()
+                        Task { try await handleSubmit() }
                     }
             }
             .padding()
         } content: {
             ScrollView {
                 VStack(spacing: 0) {
-                    if let message = launcherViewModel.messages.last, message.role == .assistant {
+                    if let message = conversationViewModel.messages.last, message.role == .assistant {
                         MessageView(message: message)
                             .font(.title2)
                     }
-                    if launcherViewModel.conversation?.state == .processing {
+                    if conversationViewModel.conversation?.state == .processing {
                         TypingIndicator()
                     }
                 }
@@ -53,40 +52,20 @@ struct LauncherView: View {
         .task {
             handleInit()
         }
-        .task(id: launcherViewModel.error) {
-            isShowingError = launcherViewModel.error != nil
-        }
-        .alert(isPresented: $isShowingError, error: launcherViewModel.error) { _ in
-            Button("Dismiss", role: .cancel) {
-                isShowingError = false
-                launcherViewModel.error = nil
-            }
-        } message: {
-            Text($0.recoverySuggestion)
-        }
     }
     
-    func handleInit() {
-        guard launcherViewModel.conversationID != nil else { return }
+    @MainActor func handleInit() {
+        guard conversationViewModel.conversationID != nil else { return }
         isShowingContent = true
     }
     
-    func handleSubmit() {
-        // Create conversation if one doesn't already exist
-        if launcherViewModel.conversationID == nil {
-            launcherViewModel.newConversation()
-        }
-        // Ignore empty content
-        guard !content.isEmpty else { return }
-        
+    func handleSubmit() async throws {
         do {
-            try launcherViewModel.generate(content, context: memories.map { $0.content })
+            try conversationViewModel.generate(chat: content, memories: memories.map { $0.content })
             isShowingContent = true
             content = ""
-        } catch let error as KitError {
-            launcherViewModel.error = error
         } catch {
-            logger.warning("failed to submit: \(error)")
+            conversationViewModel.error = error
         }
     }
 }
@@ -122,21 +101,5 @@ struct LauncherPanel<Toolbar: View, Content: View>: View {
     }
     
     private let toolbarHeight: CGFloat = 60
-}
-
-#Preview {
-    let store = Store.preview
-    let launcherViewModel = LauncherViewModel(store: store)
-    launcherViewModel.conversationID = Conversation.preview1.id
-    
-    return NavigationStack {
-        LauncherView()
-    }
-    .environment(store)
-    .environment(launcherViewModel)
-    .modelContainer(for: Memory.self)
-    .padding(32)
-    .frame(minHeight: 600)
-    .background(.white)
 }
 #endif

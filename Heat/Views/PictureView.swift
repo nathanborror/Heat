@@ -94,9 +94,3 @@ struct PictureView: View {
             .frame(width: size.width, height: size.height)
     }
 }
-
-#Preview {
-    PictureView(asset: .init(name: "plus", kind: .symbol, location: .none))
-        .frame(width: 64, height: 64)
-        .clipShape(Squircle())
-}

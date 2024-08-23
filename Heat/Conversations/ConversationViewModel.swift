@@ -6,25 +6,16 @@ import HeatKit
 private let logger = Logger(subsystem: "ConversationViewModel", category: "Heat")
 
 @Observable
+@MainActor
 final class ConversationViewModel {
-    var store: Store
-    var conversationID: String?
-    var error: KitError?
+    var conversationID: String? = nil
+    var error: Error? = nil
     
     private var generateTask: Task<(), Error>? = nil
     
-    init(store: Store) {
-        self.store = store
-        self.conversationID = nil
-        self.error = nil
-    }
-    
     var conversation: Conversation? {
-        store.get(conversationID: conversationID)
-    }
-    
-    var title: String {
-        conversation?.title ?? Conversation.titlePlaceholder
+        guard let conversationID else { return nil }
+        return try? ConversationsProvider.shared.get(conversationID)
     }
     
     var suggestions: [String] {
@@ -35,161 +26,220 @@ final class ConversationViewModel {
         conversation?.messages ?? []
     }
     
-    func newConversation() {
-        guard let agentID = store.preferences.defaultAgentID else { return }
-        guard let agent = store.get(agentID: agentID) else { return }
-        let conversation = store.createConversation(agent: agent)
-        store.upsert(conversation: conversation)
+    func newConversation() async throws {
+        guard let agentID = PreferencesProvider.shared.preferences.defaultAgentID else {
+            return
+        }
+        let agent = try AgentsProvider.shared.get(agentID)
+        let instructions = agent.instructions
+        let tools = Toolbox.get(tools: agent.toolIDs)
+        let conversation = try await ConversationsProvider.shared.create(instructions: instructions, tools: tools)
         conversationID = conversation.id
     }
     
-    func generate(_ content: String, context: [String] = [], toolChoice: Tool? = nil) throws {
-        guard !content.isEmpty else { return }
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
+    func generate(chat prompt: String, memories: [String] = [], toolChoice: Tool? = nil) throws {
+        guard !prompt.isEmpty else { return }
         
-        let chatService = try store.preferredChatService()
-        let chatModel = try store.preferredChatModel()
-        
-        let toolService = try store.preferredToolService()
-        let toolModel = try store.preferredToolModel()
-        
-        let context = prepareContext(context)
+        let provider = ConversationsProvider.shared
+        let service = try PreferencesProvider.shared.preferredChatService()
+        let model = try PreferencesProvider.shared.preferredChatModel()
         
         generateTask = Task {
-            await MessageManager()
-                .append(messages: messages)
-                .append(message: context)
-                .append(message: .init(role: .user, content: content)) { message in
-                    self.store.upsert(suggestions: [], conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .processing, conversationID: conversation.id)
-                }
-                .generate(service: chatService, model: chatModel, tools: conversation.tools, toolChoice: toolChoice, stream: store.preferences.shouldStream) { message in
-                    self.store.upsert(state: .streaming, conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.hapticTap(style: .light)
-                } processing: {
-                   self.store.upsert(state: .processing, conversationID: conversation.id)
-                }
-                .manage { _ in
-                    self.store.upsert(state: .suggesting, conversationID: conversation.id)
-                }
-                .append(message: Toolbox.generateSuggestions.message)
-                .generate(service: toolService, model: toolModel, tool: Toolbox.generateSuggestions.tool) { message in
-                    let suggestions = self.prepareSuggestions(message)
-                    self.store.upsert(suggestions: suggestions, conversationID: conversation.id)
-                    self.store.upsert(state: .none, conversationID: conversation.id)
-                }
-                .manage { manager in
-                    self.store.upsert(state: .none, conversationID: conversation.id)
-                    if let error = manager.error {
-                        let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                        self.store.upsert(message: message, conversationID: conversation.id)
-                    }
-                }
-            if title == Conversation.titlePlaceholder {
-                try generateTitle()
+            if conversationID == nil {
+                try await newConversation()
+            }
+            guard var conversation else { return }
+            
+            // New user message
+            let userMessage = Message(role: .user, content: prompt)
+            try await provider.upsert(suggestions: [], conversationID: conversation.id)
+            try await provider.upsert(message: userMessage, conversationID: conversation.id)
+            
+            // Update conversation
+            conversation = try provider.get(conversation.id)
+            
+            // Initial request
+            var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
+            req.with(messages: conversation.messages)
+            req.with(tools: conversation.tools)
+            req.with(memories: memories)
+            
+            // Generate response stream
+            let stream = ChatSession.shared.stream(req)
+            for try await message in stream {
+                try await provider.upsert(message: message, conversationID: conversation.id)
+                try await provider.upsert(state: .streaming, conversationID: conversation.id)
+            }
+            
+            // Generate suggestions and title in parallel
+            Task {
+                async let suggestions = generateSuggestions()
+                async let title = generateTitle()
+                try await (_, _) = (suggestions, title)
             }
         }
     }
     
-    func generate(_ content: String, images: [Data]) throws {
-        guard !content.isEmpty else { return }
+    func generate(chat prompt: String, images: [Data], memories: [String] = []) throws {
+        guard !prompt.isEmpty else { return }
         
-        let visionService = try store.preferredVisionService()
-        let visionModel = try store.preferredVisionModel()
+        let provider = ConversationsProvider.shared
+        let service = try PreferencesProvider.shared.preferredVisionService()
+        let model = try PreferencesProvider.shared.preferredVisionModel()
         
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
-        let message = Message(role: .user, content: content, attachments: images.map {
-            .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
-        })
         generateTask = Task {
-            await MessageManager()
-                .append(messages: messages)
-                .append(message: message) { message in
-                    self.store.upsert(suggestions: [], conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .processing, conversationID: conversation.id)
-                }
-                .generate(service: visionService, model: visionModel) { message in
-                    self.store.upsert(state: .streaming, conversationID: conversation.id)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.hapticTap(style: .light)
-                }
-                .manage { manager in
-                    self.store.upsert(state: .none, conversationID: conversation.id)
-                    if let error = manager.error {
-                        let message = Message(kind: .error, role: .system, content: error.localizedDescription)
-                        self.store.upsert(message: message, conversationID: conversation.id)
-                    }
-                }
-            if title == Conversation.titlePlaceholder {
-                try generateTitle()
+            if conversationID == nil {
+                try await newConversation()
+            }
+            guard var conversation else { return }
+            
+            // New user message
+            let userMessage = Message(role: .user, content: prompt, attachments: images.map {
+                .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
+            })
+            try await provider.upsert(suggestions: [], conversationID: conversation.id)
+            try await provider.upsert(message: userMessage, conversationID: conversation.id)
+            
+            // Update conversation
+            conversation = try provider.get(conversation.id)
+            
+            // Initial request
+            var req = VisionSessionRequest(service: service, model: model)
+            req.with(messages: conversation.messages)
+            req.with(memories: memories)
+            
+            // Generate response stream
+            let stream = VisionSession.shared.stream(req)
+            for try await message in stream {
+                try await provider.upsert(message: message, conversationID: conversation.id)
+                try await provider.upsert(state: .streaming, conversationID: conversation.id)
+            }
+            
+            // Generate suggestions and title in parallel
+            Task {
+                async let suggestions = generateSuggestions()
+                async let title = generateTitle()
+                try await (_, _) = (suggestions, title)
             }
         }
     }
     
-    func generateImage(_ content: String) throws {
-        let imageService = try store.preferredImageService()
-        let imageModel = try store.preferredImageModel()
+    func generate(image prompt: String) throws {
+        guard !prompt.isEmpty else { return }
         
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
+        let provider = ConversationsProvider.shared
+        let service = try PreferencesProvider.shared.preferredImageService()
+        let model = try PreferencesProvider.shared.preferredImageModel()
+        
         generateTask = Task {
-            await ImageSession.shared
-                .manage { _ in
-                    self.store.upsert(state: .processing, conversationID: conversation.id)
-                    self.store.upsert(message: .init(role: .user, content: content), conversationID: conversation.id)
-                }
-                .generate(service: imageService, model: imageModel, prompt: content) { images in
-                    let attachments = images.map {
-                        Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: content))
-                    }
-                    let message = Message(role: .assistant, content: "A generated image using the prompt:\n\(content)", attachments: attachments)
-                    self.store.upsert(message: message, conversationID: conversation.id)
-                    self.store.upsert(state: .none, conversationID: conversation.id)
-                }
+            if conversationID == nil {
+                try await newConversation()
+            }
+            guard let conversation else { return }
+            
+            // New user message
+            let userMessage = Message(role: .user, content: prompt)
+            try await provider.upsert(message: userMessage, conversationID: conversation.id)
+            try await provider.upsert(state: .processing, conversationID: conversation.id)
+            
+            // Generate image
+            let req = ImagineServiceRequest(model: model, prompt: prompt)
+            let data = try await service.imagine(request: req)
+            
+            // Save images as assistant response
+            let attachments = data.map {
+                Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: prompt))
+            }
+            let message = Message(role: .assistant, content: "A generated image using the prompt:\n\(prompt)", attachments: attachments)
+            try await provider.upsert(message: message, conversationID: conversation.id)
+            try await provider.upsert(state: .none, conversationID: conversation.id)
         }
     }
     
-    func generateTitle() throws {
-        let service = try store.preferredToolService()
-        let model = try store.preferredToolModel()
-        
+    func generateTitle() async throws -> Bool {
         guard let conversation else {
             throw KitError.missingConversation
         }
-        generateTask = Task {
-            await MessageManager()
-                .append(messages: messages)
-                .append(message: Toolbox.generateTitle.message)
-                .generate(service: service, model: model, tool: Toolbox.generateTitle.tool) { message in
-                    guard let title = self.prepareTitle(message) else { return }
-                    self.store.upsert(title: title, conversationID: conversation.id)
-                }
-                .manage { manager in
-                    guard let error = manager.error else { return }
-                    logger.error("Failed to generate title: \(error)")
-                }
+        guard conversation.title == nil else {
+            return false
         }
+        
+        let provider = ConversationsProvider.shared
+        let service = try PreferencesProvider.shared.preferredChatService()
+        let model = try PreferencesProvider.shared.preferredChatModel()
+        
+        // Prepare messages
+        var messages = conversation.messages
+        messages.append(.init(role: .user, content: titlePrompt()))
+        
+        // Initial request
+        var req = ChatSessionRequest(service: service, model: model)
+        req.with(messages: messages)
+        
+        // Generate suggestions stream
+        let stream = ChatSession.shared.stream(req)
+        for try await message in stream {
+            guard let content = message.content else { return false }
+            
+            let regex = #/<title>(.*?)(?:</title>|</ti|</t|<\/|<|$)/#
+            if let match = content.prefixMatch(of: regex) {
+                let title = String(match.output.1)
+                guard !title.isEmpty else { continue }
+                try await provider.upsert(title: title, conversationID: conversation.id)
+            }
+        }
+        
+        // Success
+        return true
     }
     
-    func generateStop() {
+    func generateSuggestions() async throws -> Bool {
+        guard let conversation else {
+            throw KitError.missingConversation
+        }
+        
+        let provider = ConversationsProvider.shared
+        let service = try PreferencesProvider.shared.preferredChatService()
+        let model = try PreferencesProvider.shared.preferredChatModel()
+        
+        // Prepare messages
+        var messages = conversation.messages
+        messages.append(.init(role: .user, content: suggestionsPrompt()))
+        
+        // Initial request
+        var req = ChatSessionRequest(service: service, model: model)
+        req.with(messages: messages)
+        
+        // Indicate we are suggesting
+        try await provider.upsert(state: .suggesting, conversationID: conversation.id)
+        
+        // Generate suggestions stream
+        let stream = ChatSession.shared.stream(req)
+        for try await message in stream {
+            guard let content = message.content else { return false }
+            let suggestions = content
+                .split(separator: "\n")
+                .map { String($0) }
+                .filter { !$0.hasPrefix("<") }
+                .map { String($0.trimmingPrefix(#/^-( )?/#)) }
+            try await provider.upsert(suggestions: suggestions, conversationID: conversation.id)
+            try await provider.upsert(state: .streaming, conversationID: conversation.id)
+        }
+        
+        // Set conversation state
+        try await provider.upsert(state: .none, conversationID: conversation.id)
+        
+        // Success
+        return true
+    }
+    
+    func stop() {
         generateTask?.cancel()
         guard let conversationID else { return }
-        store.upsert(state: .none, conversationID: conversationID)
+        Task { try await ConversationsProvider.shared.upsert(state: .none, conversationID: conversationID) }
     }
     
     // MARK: - Private
-    
-    private func hapticTap(style: HapticManager.FeedbackStyle) {
-        HapticManager.shared.tap(style: style)
-    }
     
     private func prepareSuggestions(_ message: Message) -> [String] {
         guard let toolCalls = message.toolCalls else { return [] }
@@ -215,14 +265,45 @@ final class ConversationViewModel {
         return nil
     }
     
-    private func prepareContext(_ context: [String]) -> Message? {
-        guard !context.isEmpty else { return nil }
-        
-        return Message(role: .system, content: """
-            Some things to remember about who the user is. Use these to better relate to the user when responding:
-            
-            \(context.joined(separator: "\n"))
-            """)
+    private func prepareToolResponse(toolCall: ToolCall) async throws -> ToolCallResponse {
+        if let tool = Toolbox(name: toolCall.function.name) {
+            switch tool {
+            case .generateImages:
+                let messages = await ImageGeneratorTool.handle(toolCall)
+                return .init(messages: messages, shouldContinue: false)
+            case .generateMemory:
+                let messages = await MemoryTool.handle(toolCall)
+                return .init(messages: messages, shouldContinue: true)
+            case .generateSuggestions:
+                return .init(messages: [], shouldContinue: false)
+            case .generateTitle:
+                return .init(messages: [], shouldContinue: false)
+            case .searchFiles:
+                return .init(messages: [], shouldContinue: false)
+            case .searchCalendar:
+                let messages = await CalendarSearchTool.handle(toolCall)
+                return .init(messages: messages, shouldContinue: true)
+            case .searchWeb:
+                let messages = await WebSearchTool.handle(toolCall)
+                return .init(messages: messages, shouldContinue: true)
+            case .browseWeb:
+                let messages = await WebBrowseTool.handle(toolCall)
+                return .init(messages: messages, shouldContinue: true)
+            }
+        } else {
+            let toolResponse = Message(
+                role: .tool,
+                content: "Unknown tool.",
+                toolCallID: toolCall.id,
+                name: toolCall.function.name,
+                metadata: ["label": "Unknown tool"]
+            )
+            return .init(messages: [toolResponse], shouldContinue: false)
+        }
+    }
+    
+    private func hapticTap(style: HapticManager.FeedbackStyle) {
+        HapticManager.shared.tap(style: style)
     }
 }
 

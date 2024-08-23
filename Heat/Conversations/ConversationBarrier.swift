@@ -2,7 +2,6 @@ import SwiftUI
 import HeatKit
 
 struct ConversationBarrier: View {
-    @Environment(Store.self) private var store
     @Environment(\.dismiss) private var dismiss
     
     @State var apiKey = ""
@@ -37,7 +36,7 @@ struct ConversationBarrier: View {
                     .textFieldStyle(.plain)
                     .frame(maxWidth: .infinity)
                     .onSubmit {
-                        handleSubmit()
+                        Task { try await handleSubmit() }
                     }
                 if hasPaseboardString {
                     Button(action: handleLoadPasteboard) {
@@ -66,7 +65,9 @@ struct ConversationBarrier: View {
                     }
                     .buttonStyle(.plain)
                     
-                    Button(action: handleSubmit) {
+                    Button {
+                        Task { try await handleSubmit() }
+                    } label: {
                         Text("Submit")
                             .padding(.vertical, verticalPadding)
                             .frame(maxWidth: .infinity)
@@ -79,7 +80,9 @@ struct ConversationBarrier: View {
                 }
                 #else
                 VStack(spacing: 8) {
-                    Button(action: handleSubmit) {
+                    Button {
+                        Task { try await handleSubmit() }
+                    } label: {
                         Text("Submit")
                             .padding(.vertical, verticalPadding)
                             .frame(maxWidth: .infinity)
@@ -117,27 +120,28 @@ struct ConversationBarrier: View {
         apiKey = contents.hasPrefix("sk-") ? contents : ""
     }
     
-    func handleSubmit() {
+    func handleSubmit() async throws {
         guard !apiKey.isEmpty else { return }
-        guard var service = store.get(serviceID: .openAI) else { return }
         
         // Update service with token and preferred models
+        var service = try PreferencesProvider.shared.get(serviceID: .openAI)
         service.applyPreferredModels(Constants.openAIDefaults)
         service.credentials = .token(apiKey)
-        store.upsert(service: service)
+        try await PreferencesProvider.shared.upsert(service: service)
         
         // Update preferences with preferred services
-        store.preferences.preferredChatServiceID = .openAI
-        store.preferences.preferredImageServiceID = .openAI
-        store.preferences.preferredEmbeddingServiceID = .openAI
-        store.preferences.preferredTranscriptionServiceID = .openAI
-        store.preferences.preferredToolServiceID = .openAI
-        store.preferences.preferredVisionServiceID = .openAI
-        store.preferences.preferredSpeechServiceID = .openAI
-        store.preferences.preferredSummarizationServiceID = .openAI
+        var preferences = PreferencesProvider.shared.preferences
+        preferences.preferred.chatServiceID = .openAI
+        preferences.preferred.imageServiceID = .openAI
+        preferences.preferred.embeddingServiceID = .openAI
+        preferences.preferred.transcriptionServiceID = .openAI
+        preferences.preferred.toolServiceID = .openAI
+        preferences.preferred.visionServiceID = .openAI
+        preferences.preferred.speechServiceID = .openAI
+        preferences.preferred.summarizationServiceID = .openAI
         
-        // Persist changes
-        Task { try await store.saveAll() }
+        // Upsert preference changes
+        try await PreferencesProvider.shared.upsert(preferences)
         
         dismiss()
     }
@@ -157,11 +161,3 @@ struct ConversationBarrier: View {
     #endif
 }
 
-#Preview {
-    ConversationBarrier()
-        .environment(Store.preview)
-        #if os(macOS)
-        .frame(width: 310, height: 325)
-        #endif
-        .background(.white)
-}
