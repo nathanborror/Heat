@@ -36,6 +36,7 @@ struct ConversationList: View {
             if newValue != nil { dismiss() }
             #endif
         }
+        #if os(iOS)
         .overlay {
             if conversationsProvider.conversations.isEmpty {
                 ContentUnavailableView {
@@ -45,5 +46,6 @@ struct ConversationList: View {
                 }
             }
         }
+        #endif
     }
 }

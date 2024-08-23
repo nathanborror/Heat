@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/nathanborror/swift-shared-kit", branch: "main"),
-        .package(url: "https://github.com/nathanborror/swift-gen-kit", branch: "sessions"),
+        .package(url: "https://github.com/nathanborror/swift-gen-kit", branch: "main"),
         .package(url: "https://github.com/cezheng/Fuzi", branch: "master"),
     ],
     targets: [
