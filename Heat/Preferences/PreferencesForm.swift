@@ -55,7 +55,8 @@ struct PreferencesForm: View {
             #endif
             
             Section {
-                Toggle("Stream responses", isOn: $preferences.shouldStream)
+                Toggle("Stream", isOn: $preferences.shouldStream)
+                Toggle("Markdown", isOn: $preferences.shouldUseMarkdown)
                 Toggle("Debug", isOn: $preferences.debug)
             }
             

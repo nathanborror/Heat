@@ -5,11 +5,14 @@ import MarkdownUI
 import Splash
 
 struct MessageView: View {
+    @Environment(\.debug) private var debug
+    @Environment(\.useMarkdown) private var useMarkdown
+    
     let message: Message
     
     var body: some View {
         Group {
-            if message.role == .system && PreferencesProvider.shared.preferences.debug {
+            if message.role == .system && debug {
                 MessageSystemView(message: message)
             }
             if message.role == .user {
@@ -30,7 +33,7 @@ struct MessageView: View {
                         .messageSpacing(message)
                         .padding(.vertical, 8)
                 }
-                if PreferencesProvider.shared.preferences.debug {
+                if debug {
                     MessageToolCall(message: message)
                 }
             }
@@ -38,27 +41,33 @@ struct MessageView: View {
                 MessageTool(message: message)
             }
         }
+        .textSelection(.enabled)
     }
 }
 
 struct MessageViewText: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.useMarkdown) private var useMarkdown
     
     let message: Message
     
     var body: some View {
         switch message.role {
         case .user:
-            Markdown(message.content ?? "")
-                .markdownTheme(.mate)
-                .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
-                .textSelection(.enabled)
-        case .assistant:
-            VStack(alignment: .leading) {
+            if useMarkdown {
                 Markdown(message.content ?? "")
                     .markdownTheme(.mate)
                     .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
-                    .textSelection(.enabled)
+            } else {
+                Text(message.content ?? "")
+            }
+        case .assistant:
+            if useMarkdown {
+                Markdown(message.content ?? "")
+                    .markdownTheme(.mate)
+                    .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
+            } else {
+                Text(message.content ?? "")
             }
         default:
             EmptyView()

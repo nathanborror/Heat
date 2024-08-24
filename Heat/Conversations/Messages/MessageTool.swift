@@ -64,6 +64,8 @@ struct MessageTool: View {
 }
 
 struct MessageToolContent: View {
+    @Environment(\.debug) private var debug
+    
     var message: Message
     var symbol: String = "checkmark.circle"
     
@@ -78,7 +80,7 @@ struct MessageToolContent: View {
             .font(.subheadline)
             .foregroundStyle(.secondary)
             
-            if PreferencesProvider.shared.preferences.debug, let content = message.content {
+            if debug, let content = message.content {
                 Text(content)
                     .font(.footnote)
                     .foregroundStyle(.secondary.opacity(0.5))

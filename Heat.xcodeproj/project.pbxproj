@@ -36,6 +36,7 @@
 		D809F5A22BDABEFE00FD627B /* ConversationBarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D809F5A12BDABEFE00FD627B /* ConversationBarrier.swift */; };
 		D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698C2B9CF19000C53D4D /* MessageTool.swift */; };
 		D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */; };
+		D8271A572C7A4B2F008C345B /* Environment+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A562C7A4B2F008C345B /* Environment+.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
 		D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */; };
 		D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */; };
@@ -79,6 +80,7 @@
 		D809F5A12BDABEFE00FD627B /* ConversationBarrier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationBarrier.swift; sourceTree = "<group>"; };
 		D815698C2B9CF19000C53D4D /* MessageTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTool.swift; sourceTree = "<group>"; };
 		D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryList.swift; sourceTree = "<group>"; };
+		D8271A562C7A4B2F008C345B /* Environment+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+.swift"; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageToolCall.swift; sourceTree = "<group>"; };
 		D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSystemView.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 			children = (
 				D4017C8F2B6EEFB5001CE137 /* Asset+.swift */,
 				D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */,
+				D8271A562C7A4B2F008C345B /* Environment+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -354,6 +357,7 @@
 				D8FBB20D2AEDB60700783E9B /* AgentList.swift in Sources */,
 				D884AAF92BD7F54500B90E9B /* VisualEffectView.swift in Sources */,
 				D4A2C5672B8BF9CE0004F27B /* MarkdownUI+.swift in Sources */,
+				D8271A572C7A4B2F008C345B /* Environment+.swift in Sources */,
 				D884AAFE2BD9B40000B90E9B /* PermissionsList.swift in Sources */,
 				D4017C902B6EEFB5001CE137 /* Asset+.swift in Sources */,
 				D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */,

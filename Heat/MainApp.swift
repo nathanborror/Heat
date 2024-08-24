@@ -64,6 +64,8 @@ struct MainApp: App {
         .environment(agentsProvider)
         .environment(conversationsProvider)
         .environment(preferencesProvider)
+        .environment(\.debug, preferencesProvider.preferences.debug)
+        .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
         .defaultSize(width: 600, height: 700)
         .defaultPosition(.center)
         .commands {
@@ -89,6 +91,8 @@ struct MainApp: App {
                 .environment(conversationsProvider)
                 .environment(preferencesProvider)
                 .environment(conversationViewModel)
+                .environment(\.debug, preferencesProvider.preferences.debug)
+                .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
                 .modelContainer(for: Memory.self)
                 .sheet(isPresented: $showingBarrier) {
                     ConversationBarrier()
