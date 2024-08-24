@@ -5,14 +5,14 @@ import Foundation
 import GenKit
 import SharedKit
 
-public struct Conversation: Codable, Identifiable, Hashable, Sendable {
+public struct Conversation: Codable, Identifiable, Sendable {
     public var id: String
     public var title: String?
     public var subtitle: String?
     public var picture: Asset?
     public var instructions: String
     public var suggestions: [String]
-    public var tools: Set<Tool>
+    public var toolIDs: Set<String>
     public var state: State
     public var created: Date
     public var modified: Date
@@ -25,14 +25,14 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
     }
     
     public init(id: String = .id, title: String? = nil, subtitle: String? = nil, picture: Asset? = nil,
-                instructions: String = "", suggestions: [String] = [], tools: Set<Tool> = [], state: State = .none) {
+                instructions: String = "", suggestions: [String] = [], toolIDs: Set<String> = [], state: State = .none) {
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.picture = picture
         self.instructions = instructions
         self.suggestions = suggestions
-        self.tools = tools
+        self.toolIDs = toolIDs
         self.state = state
         self.created = .now
         self.modified = .now
@@ -44,7 +44,7 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
         self.picture = conversation.picture
         self.instructions = conversation.instructions
         self.suggestions = conversation.suggestions
-        self.tools = conversation.tools
+        self.toolIDs = conversation.toolIDs
         self.state = conversation.state
         self.modified = .now
     }
@@ -95,8 +95,8 @@ public final class ConversationsProvider {
         return conversation
     }
     
-    public func create(instructions: String, tools: Set<Tool>, state: Conversation.State = .none) async throws -> Conversation {
-        let conversation = Conversation(instructions: instructions, tools: tools, state: state)
+    public func create(instructions: String, toolIDs: Set<String>, state: Conversation.State = .none) async throws -> Conversation {
+        let conversation = Conversation(instructions: instructions, toolIDs: toolIDs, state: state)
         try await upsert(conversation)
         return conversation
     }

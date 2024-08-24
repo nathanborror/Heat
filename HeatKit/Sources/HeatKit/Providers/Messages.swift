@@ -64,7 +64,7 @@ public final class MessagesProvider {
         } else {
             messages.append(message)
         }
-        try await save()
+        // intentionally not saving here due to streaming
     }
     
     public func delete(id: String) async throws {
@@ -75,6 +75,14 @@ public final class MessagesProvider {
     public func delete(parentID: String) async throws {
         messages.removeAll(where: { $0.parent == parentID })
         try await save()
+    }
+    
+    public func load() async throws {
+        messages = try await messageStore.load()
+    }
+    
+    public func save() async throws {
+        try await messageStore.save(messages)
     }
     
     public func reset() async throws {
@@ -95,14 +103,6 @@ public final class MessagesProvider {
                 try await load()
             }
         }
-    }
-    
-    private func load() async throws {
-        self.messages = try await messageStore.load()
-    }
-    
-    private func save() async throws {
-        try await messageStore.save(messages)
     }
 }
 

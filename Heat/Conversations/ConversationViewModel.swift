@@ -42,8 +42,7 @@ final class ConversationViewModel {
         }
         let agent = try AgentsProvider.shared.get(agentID)
         let instructions = agent.instructions
-        let tools = Toolbox.get(tools: agent.toolIDs)
-        let conversation = try await ConversationsProvider.shared.create(instructions: instructions, tools: tools)
+        let conversation = try await ConversationsProvider.shared.create(instructions: instructions, toolIDs: agent.toolIDs)
         conversationID = conversation.id
     }
     
@@ -67,7 +66,7 @@ final class ConversationViewModel {
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
             req.with(messages: instructions + messages)
-            req.with(tools: conversation.tools)
+            req.with(tools: Toolbox.get(names: conversation.toolIDs))
             req.with(memories: memories)
             
             // Generate response stream
@@ -76,6 +75,9 @@ final class ConversationViewModel {
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             }
+            
+            // Save messages
+            try await messagesProvider.save()
             
             // Generate suggestions and title in parallel
             Task {
@@ -117,6 +119,9 @@ final class ConversationViewModel {
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             }
             
+            // Save messages
+            try await messagesProvider.save()
+            
             // Generate suggestions and title in parallel
             Task {
                 async let suggestions = generateSuggestions()
@@ -154,6 +159,7 @@ final class ConversationViewModel {
             let message = Message(role: .assistant, content: "A generated image using the prompt:\n\(prompt)", attachments: attachments)
             try await messagesProvider.upsert(message: message, parentID: conversation.id)
             try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
+            try await messagesProvider.save()
         }
     }
     

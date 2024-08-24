@@ -2,13 +2,14 @@ import Foundation
 import SharedKit
 import GenKit
 
-public struct Preferences: Codable, Hashable, Sendable {
+public struct Preferences: Codable, Sendable {
     public var defaultAgentID: String? = Constants.defaultAgent.id
     public var shouldStream = true
+    public var shouldUseMarkdown = true
     public var debug = false
     public var preferred: Services = .init()
     
-    public struct Services: Codable, Hashable, Sendable {
+    public struct Services: Codable, Sendable {
         public var chatServiceID: Service.ServiceID? = nil
         public var imageServiceID: Service.ServiceID? = nil
         public var embeddingServiceID: Service.ServiceID? = nil

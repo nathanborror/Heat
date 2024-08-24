@@ -5,7 +5,7 @@ import Foundation
 import GenKit
 import SharedKit
 
-public struct Agent: Codable, Identifiable, Hashable, Sendable {
+public struct Agent: Codable, Identifiable, Sendable {
     public var id: String
     public var name: String
     public var instructions: String
@@ -90,7 +90,7 @@ public final class AgentsProvider {
     
     public func delete(_ id: String) async throws {
         let agent = try get(id)
-        agents.removeAll(where: { agent == $0 })
+        agents.removeAll(where: { agent.id == $0.id })
         try await save()
     }
     

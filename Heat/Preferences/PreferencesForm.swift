@@ -99,7 +99,7 @@ struct PreferencesForm: View {
         } message: {
             Text("This will delete all app data and preferences.")
         }
-        .onChange(of: preferences) { _, _ in
+        .onDisappear {
             handleSave()
         }
     }
