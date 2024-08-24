@@ -7,8 +7,6 @@ private let logger = Logger(subsystem: "ConversationView", category: "Heat")
 struct ConversationView: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
     
-    @State private var isShowingError = false
-    
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -78,14 +76,6 @@ struct ConversationView: View {
                 }
             }
         }
-//        .alert(isPresented: $isShowingError, error: conversationViewModel.error) { _ in
-//            Button("Dismiss", role: .cancel) {
-//                isShowingError = false
-//                conversationViewModel.error = nil
-//            }
-//        } message: {
-//            Text($0.recoverySuggestion)
-//        }
     }
     
     func handleSuggestion(_ suggestion: String) async throws {

@@ -32,7 +32,6 @@ struct MainApp: App {
     @State private var searchInput = ""
     @State private var showingLauncher = false
     @State private var showingBarrier = false
-    @State private var isRestoring = false
     
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.shift, .control])
