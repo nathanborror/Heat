@@ -34,7 +34,7 @@ struct MainApp: App {
     @State private var showingBarrier = false
     
     #if os(macOS)
-    private let hotKey = HotKey(key: .space, modifiers: [.shift, .control])
+    private let hotKey = HotKey(key: .space, modifiers: [.option])
     #endif
     
     var body: some Scene {
