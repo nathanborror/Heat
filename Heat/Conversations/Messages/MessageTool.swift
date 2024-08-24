@@ -2,7 +2,6 @@ import SwiftUI
 import GenKit
 import HeatKit
 import MarkdownUI
-import Splash
 
 struct MessageTool: View {
     let message: Message
@@ -39,8 +38,8 @@ struct MessageTool: View {
                     case Toolbox.browseWeb.name:
                         VStack {
                             Markdown(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
-                                .markdownTheme(.mate)
-                                .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
+                                .markdownTheme(.app)
+                                .markdownCodeSyntaxHighlighter(.app)
                                 .textSelection(.enabled)
                                 .padding()
                         }

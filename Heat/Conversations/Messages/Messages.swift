@@ -2,7 +2,6 @@ import SwiftUI
 import GenKit
 import HeatKit
 import MarkdownUI
-import Splash
 
 struct MessageView: View {
     @Environment(\.debug) private var debug
@@ -56,16 +55,16 @@ struct MessageViewText: View {
         case .user:
             if useMarkdown {
                 Markdown(message.content ?? "")
-                    .markdownTheme(.mate)
-                    .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
+                    .markdownTheme(.app)
+                    .markdownCodeSyntaxHighlighter(.app)
             } else {
                 Text(message.content ?? "")
             }
         case .assistant:
             if useMarkdown {
                 Markdown(message.content ?? "")
-                    .markdownTheme(.mate)
-                    .markdownCodeSyntaxHighlighter(.splash(theme: .sunset(withFont: .init(size: monospaceFontSize))))
+                    .markdownTheme(.app)
+                    .markdownCodeSyntaxHighlighter(.app)
             } else {
                 Text(message.content ?? "")
             }
