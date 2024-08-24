@@ -11,6 +11,8 @@ final class ConversationViewModel {
     var conversationID: String? = nil
     var error: Error? = nil
     
+    private let conversationsProvider = ConversationsProvider.shared
+    private let messagesProvider = MessagesProvider.shared
     private var generateTask: Task<(), Error>? = nil
     
     var conversation: Conversation? {
@@ -22,8 +24,16 @@ final class ConversationViewModel {
         Array((conversation?.suggestions ?? []).prefix(3))
     }
     
+    var instructions: [Message] {
+        guard let conversation else { return [] }
+        let instructions = Message(role: .system, content: conversation.instructions)
+        return [instructions]
+    }
+    
     var messages: [Message] {
-        conversation?.messages ?? []
+        guard let conversationID else { return [] }
+        let history = try? MessagesProvider.shared.get(parentID: conversationID)
+        return history ?? []
     }
     
     func newConversation() async throws {
@@ -40,7 +50,6 @@ final class ConversationViewModel {
     func generate(chat prompt: String, memories: [String] = [], toolChoice: Tool? = nil) throws {
         guard !prompt.isEmpty else { return }
         
-        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
@@ -48,27 +57,24 @@ final class ConversationViewModel {
             if conversationID == nil {
                 try await newConversation()
             }
-            guard var conversation else { return }
+            guard let conversation else { return }
             
             // New user message
             let userMessage = Message(role: .user, content: prompt)
-            try await provider.upsert(suggestions: [], conversationID: conversation.id)
-            try await provider.upsert(message: userMessage, conversationID: conversation.id)
-            
-            // Update conversation
-            conversation = try provider.get(conversation.id)
+            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
+            try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
             
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
-            req.with(messages: conversation.messages)
+            req.with(messages: instructions + messages)
             req.with(tools: conversation.tools)
             req.with(memories: memories)
             
             // Generate response stream
             let stream = ChatSession.shared.stream(req)
             for try await message in stream {
-                try await provider.upsert(message: message, conversationID: conversation.id)
-                try await provider.upsert(state: .streaming, conversationID: conversation.id)
+                try await messagesProvider.upsert(message: message, parentID: conversation.id)
+                try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             }
             
             // Generate suggestions and title in parallel
@@ -83,7 +89,6 @@ final class ConversationViewModel {
     func generate(chat prompt: String, images: [Data], memories: [String] = []) throws {
         guard !prompt.isEmpty else { return }
         
-        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredVisionService()
         let model = try PreferencesProvider.shared.preferredVisionModel()
         
@@ -91,28 +96,25 @@ final class ConversationViewModel {
             if conversationID == nil {
                 try await newConversation()
             }
-            guard var conversation else { return }
+            guard let conversation else { return }
             
             // New user message
             let userMessage = Message(role: .user, content: prompt, attachments: images.map {
                 .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
             })
-            try await provider.upsert(suggestions: [], conversationID: conversation.id)
-            try await provider.upsert(message: userMessage, conversationID: conversation.id)
-            
-            // Update conversation
-            conversation = try provider.get(conversation.id)
+            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
+            try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
             
             // Initial request
             var req = VisionSessionRequest(service: service, model: model)
-            req.with(messages: conversation.messages)
+            req.with(messages: instructions + messages)
             req.with(memories: memories)
             
             // Generate response stream
             let stream = VisionSession.shared.stream(req)
             for try await message in stream {
-                try await provider.upsert(message: message, conversationID: conversation.id)
-                try await provider.upsert(state: .streaming, conversationID: conversation.id)
+                try await messagesProvider.upsert(message: message, parentID: conversation.id)
+                try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             }
             
             // Generate suggestions and title in parallel
@@ -127,7 +129,6 @@ final class ConversationViewModel {
     func generate(image prompt: String) throws {
         guard !prompt.isEmpty else { return }
         
-        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredImageService()
         let model = try PreferencesProvider.shared.preferredImageModel()
         
@@ -139,8 +140,8 @@ final class ConversationViewModel {
             
             // New user message
             let userMessage = Message(role: .user, content: prompt)
-            try await provider.upsert(message: userMessage, conversationID: conversation.id)
-            try await provider.upsert(state: .processing, conversationID: conversation.id)
+            try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
+            try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
             // Generate image
             let req = ImagineServiceRequest(model: model, prompt: prompt)
@@ -151,8 +152,8 @@ final class ConversationViewModel {
                 Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: prompt))
             }
             let message = Message(role: .assistant, content: "A generated image using the prompt:\n\(prompt)", attachments: attachments)
-            try await provider.upsert(message: message, conversationID: conversation.id)
-            try await provider.upsert(state: .none, conversationID: conversation.id)
+            try await messagesProvider.upsert(message: message, parentID: conversation.id)
+            try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
         }
     }
     
@@ -168,13 +169,12 @@ final class ConversationViewModel {
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
-        // Prepare messages
-        var messages = conversation.messages
-        messages.append(.init(role: .user, content: titlePrompt()))
+        // Prepare prompt
+        let prompt = Message(role: .user, content: titlePrompt())
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(messages: messages)
+        req.with(messages: instructions + messages + [prompt])
         
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
@@ -202,13 +202,12 @@ final class ConversationViewModel {
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
-        // Prepare messages
-        var messages = conversation.messages
-        messages.append(.init(role: .user, content: suggestionsPrompt()))
+        // Prepare prompt
+        let prompt = Message(role: .user, content: suggestionsPrompt())
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(messages: messages)
+        req.with(messages: instructions + messages + [prompt])
         
         // Indicate we are suggesting
         try await provider.upsert(state: .suggesting, conversationID: conversation.id)
@@ -276,6 +275,17 @@ final class ConversationViewModel {
             )
             return .init(messages: [toolResponse], shouldContinue: false)
         }
+    }
+    
+    private func prepareMemories(_ memories: [String]) -> Message? {
+        guard !memories.isEmpty else { return nil }
+        return Message(role: .system, content: """
+            <user_info>
+            This is what we know about the user to better relate to them:
+
+            \(memories.joined(separator: "\n"))
+            </user_info>
+            """)
     }
     
     private func hapticTap(style: HapticManager.FeedbackStyle) {

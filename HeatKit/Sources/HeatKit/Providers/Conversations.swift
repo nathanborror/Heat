@@ -11,7 +11,6 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
     public var subtitle: String?
     public var picture: Asset?
     public var instructions: String
-    public var history: [Message]
     public var suggestions: [String]
     public var tools: Set<Tool>
     public var state: State
@@ -26,14 +25,12 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
     }
     
     public init(id: String = .id, title: String? = nil, subtitle: String? = nil, picture: Asset? = nil,
-                instructions: String = "", history: [Message] = [], suggestions: [String] = [],
-                tools: Set<Tool> = [], state: State = .none) {
+                instructions: String = "", suggestions: [String] = [], tools: Set<Tool> = [], state: State = .none) {
         self.id = id
         self.title = title
         self.subtitle = subtitle
         self.picture = picture
         self.instructions = instructions
-        self.history = history
         self.suggestions = suggestions
         self.tools = tools
         self.state = state
@@ -41,16 +38,11 @@ public struct Conversation: Codable, Identifiable, Hashable, Sendable {
         self.modified = .now
     }
     
-    public var messages: [Message] {
-        [.init(role: .system, content: instructions)] + history
-    }
-    
     mutating func apply(conversation: Conversation) {
         self.title = conversation.title
         self.subtitle = conversation.subtitle
         self.picture = conversation.picture
         self.instructions = conversation.instructions
-        self.history = conversation.history
         self.suggestions = conversation.suggestions
         self.tools = conversation.tools
         self.state = conversation.state
@@ -103,14 +95,6 @@ public final class ConversationsProvider {
         return conversation
     }
     
-    public func get(messageID: String, conversationID: String) throws -> Message {
-        let conversation = try get(conversationID)
-        guard let message = conversation.history.first(where: { $0.id == messageID }) else {
-            throw ConversationsProviderError.messageNotFound
-        }
-        return message
-    }
-    
     public func create(instructions: String, tools: Set<Tool>, state: Conversation.State = .none) async throws -> Conversation {
         let conversation = Conversation(instructions: instructions, tools: tools, state: state)
         try await upsert(conversation)
@@ -128,22 +112,6 @@ public final class ConversationsProvider {
         }
         self.conversations = conversations
         try await save()
-    }
-    
-    public func upsert(messages: [Message], conversationID: String) async throws {
-        for message in messages {
-            try await upsert(message: message, conversationID: conversationID)
-        }
-    }
-    
-    public func upsert(message: Message, conversationID: String) async throws {
-        var conversation = try get(conversationID)
-        if let index = conversation.history.firstIndex(where: { $0.id == message.id }) {
-            conversation.history[index] = message
-        } else {
-            conversation.history.append(message)
-        }
-        try await upsert(conversation)
     }
     
     public func upsert(title: String?, conversationID: String) async throws {
@@ -165,17 +133,8 @@ public final class ConversationsProvider {
     }
     
     public func delete(_ id: String) async throws {
-        let conversation = try get(id)
-        conversations.removeAll(where: { conversation == $0 })
+        conversations.removeAll(where: { $0.id == id })
         try await save()
-    }
-    
-    public func delete(messageID: String, conversationID: String) async throws {
-        var conversation = try get(conversationID)
-        if let index = conversation.history.firstIndex(where: { $0.id == messageID }) {
-            conversation.history.remove(at: index)
-        }
-        try await upsert(conversation)
     }
     
     public func reset() async throws {
@@ -185,7 +144,7 @@ public final class ConversationsProvider {
     
     // MARK: - Private
     
-    private let store = ConversationStore()
+    private let conversationStore = ConversationStore()
     
     private init() {
         Task {
@@ -198,15 +157,14 @@ public final class ConversationsProvider {
     }
     
     private func load() async throws {
-        self.conversations = try await store.load()
+        self.conversations = try await conversationStore.load()
     }
     
     private func save() async throws {
-        try await store.save(conversations)
+        try await conversationStore.save(conversations)
     }
 }
 
 public enum ConversationsProviderError: Error {
     case notFound
-    case messageNotFound
 }
