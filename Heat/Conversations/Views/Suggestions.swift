@@ -26,6 +26,7 @@ struct SuggestionView: View {
     var body: some View {
         Button(action: { handleTap(suggestion) }) {
             Text(suggestion)
+                .font(.system(size: fontSize))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(.tint.opacity(0.05))
@@ -52,6 +53,6 @@ struct SuggestionView: View {
     #if os(macOS)
     private let fontSize: CGFloat = 14
     #else
-    private let fontSize: CGFloat = 17
+    private let fontSize: CGFloat = 16
     #endif
 }

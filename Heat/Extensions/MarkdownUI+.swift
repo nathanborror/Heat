@@ -8,13 +8,19 @@ class ThemeCache {
     private var cachedTheme: Theme?
     private var cachedCodeBlocks: [CodeBlockConfiguration: CodeBlockView] = [:]
     
+    #if os(macOS)
+    private static let fontSize: CGFloat = 14
+    #else
+    private static let fontSize: CGFloat = 16
+    #endif
+    
     func getTheme() -> Theme {
         if let existingTheme = cachedTheme {
             return existingTheme
         } else {
             let newTheme = Theme()
                 .text {
-                    FontSize(14)
+                    FontSize(Self.fontSize)
                 }
                 .paragraph { config in
                     config.label
@@ -23,7 +29,7 @@ class ThemeCache {
                 .heading1 { config in
                     config.label
                         .markdownTextStyle {
-                            FontSize(14)
+                            FontSize(Self.fontSize)
                             FontWeight(.bold)
                         }
                         .relativeLineSpacing(.em(0.25))
@@ -31,7 +37,7 @@ class ThemeCache {
                 .heading2 { config in
                     config.label
                         .markdownTextStyle {
-                            FontSize(14)
+                            FontSize(Self.fontSize)
                             FontWeight(.semibold)
                         }
                         .relativeLineSpacing(.em(0.25))
@@ -39,7 +45,7 @@ class ThemeCache {
                 .heading3 { config in
                     config.label
                         .markdownTextStyle {
-                            FontSize(14)
+                            FontSize(Self.fontSize)
                             FontWeight(.medium)
                         }
                         .relativeLineSpacing(.em(0.25))

@@ -162,6 +162,7 @@ struct MessageInput: View {
                 .buttonStyle(.plain)
             }
         }
+        .frame(maxWidth: 824, alignment: .center)
         .photosPicker(isPresented: $isShowingPhotos, selection: $imagePickerViewModel.imagesPicked, maxSelectionCount: 3, matching: .images, photoLibrary: .shared())
         #if !os(macOS)
         .background(.background)
