@@ -33,7 +33,7 @@ final class ConversationViewModel {
     
     var messages: [Message] {
         guard let conversationID else { return [] }
-        let history = try? MessagesProvider.shared.get(parentID: conversationID)
+        let history = try? messagesProvider.get(parentID: conversationID)
         return history ?? []
     }
     

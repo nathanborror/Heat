@@ -77,12 +77,6 @@ struct MessageViewText: View {
         var taggedContent: [String: String]
         var readableContent: String
     }
-    
-    #if os(macOS)
-    var monospaceFontSize: CGFloat = 11
-    #else
-    var monospaceFontSize: CGFloat = 12
-    #endif
 }
 
 // Modifiers
@@ -106,17 +100,6 @@ struct MessageViewSpacing: ViewModifier {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-    
-    #if os(macOS)
-    var roleFont = Font.body
-    var roleOpacity = 0.5
-    var roleSymbolOpacity = 0.5
-    #else
-    var roleFont = Font.system(size: 14)
-    var roleOpacity = 0.3
-    var userSymbolColor = Color.primary.opacity(0.3)
-    var assistantSymbolColor = Color.indigo
-    #endif
 }
 
 struct MessageViewAttachments: ViewModifier {

@@ -26,6 +26,7 @@ struct MainApp: App {
     
     private let agentsProvider = AgentsProvider.shared
     private let conversationsProvider = ConversationsProvider.shared
+    private let messagesProvider = MessagesProvider.shared
     private let preferencesProvider = PreferencesProvider.shared
     
     @State private var conversationViewModel = ConversationViewModel()
@@ -57,6 +58,7 @@ struct MainApp: App {
                 LauncherView()
                     .environment(agentsProvider)
                     .environment(conversationsProvider)
+                    .environment(messagesProvider)
                     .environment(preferencesProvider)
                     .environment(conversationViewModel)
                     .environment(\.debug, preferencesProvider.preferences.debug)
@@ -66,6 +68,7 @@ struct MainApp: App {
         }
         .environment(agentsProvider)
         .environment(conversationsProvider)
+        .environment(messagesProvider)
         .environment(preferencesProvider)
         .environment(conversationViewModel)
         .environment(\.debug, preferencesProvider.preferences.debug)
@@ -95,6 +98,7 @@ struct MainApp: App {
             MainCompactView()
                 .environment(agentsProvider)
                 .environment(conversationsProvider)
+                .environment(messagesProvider)
                 .environment(preferencesProvider)
                 .environment(conversationViewModel)
                 .environment(\.debug, preferencesProvider.preferences.debug)
