@@ -225,13 +225,7 @@ public final class PreferencesProvider {
     private let servicesStore = ServicesStore()
     
     private init() {
-        Task {
-            if BundleVersion.shared.isBundleVersionNew() {
-                try await reset()
-            } else {
-                try await load()
-            }
-        }
+        Task { try await load() }
     }
     
     private func load() async throws {

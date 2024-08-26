@@ -96,13 +96,7 @@ public final class MessagesProvider {
     private let messageStore = MessageStore()
     
     private init() {
-        Task {
-            if BundleVersion.shared.isBundleVersionNew() {
-                try await reset()
-            } else {
-                try await load()
-            }
-        }
+        Task { try await load() }
     }
 }
 

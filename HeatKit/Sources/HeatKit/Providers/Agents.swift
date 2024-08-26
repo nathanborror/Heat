@@ -104,13 +104,7 @@ public final class AgentsProvider {
     private let store = AgentStore()
     
     private init() {
-        Task {
-            if BundleVersion.shared.isBundleVersionNew() {
-                try await reset()
-            } else {
-                try await load()
-            }
-        }
+        Task { try await load() }
     }
     
     private func load() async throws {

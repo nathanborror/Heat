@@ -11,10 +11,11 @@
 import SwiftUI
 import SwiftData
 import OSLog
-import HeatKit
 import HotKey
 import CoreServices
 import EventKit
+import SharedKit
+import HeatKit
 
 private let logger = Logger(subsystem: "MainApp", category: "Heat")
 
@@ -47,8 +48,8 @@ struct MainApp: App {
             } detail: {
                 ConversationView()
             }
-            .task {
-                handleHotKeySetup()
+            .onAppear {
+                handleInit()
             }
             .sheet(isPresented: $showingBarrier) {
                 ConversationBarrier()
@@ -107,8 +108,27 @@ struct MainApp: App {
                 .sheet(isPresented: $showingBarrier) {
                     ConversationBarrier()
                 }
+                .onAppear {
+                    handleInit()
+                }
         }
         #endif
+    }
+    
+    func handleInit() {
+        handleReset()
+        handleHotKeySetup()
+    }
+    
+    func handleReset() {
+        if BundleVersion.shared.isBundleVersionNew() {
+            Task {
+                try await agentsProvider.reset()
+                try await conversationsProvider.reset()
+                try await messagesProvider.reset()
+                try await preferencesProvider.reset()
+            }
+        }
     }
     
     func handleNewConversation() {
