@@ -34,6 +34,7 @@
 		D8271A5A2C7A4E3E008C345B /* Highlightr in Frameworks */ = {isa = PBXBuildFile; productRef = D8271A592C7A4E3E008C345B /* Highlightr */; };
 		D8271A5C2C7A4E83008C345B /* CodeHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A5B2C7A4E83008C345B /* CodeHighlighter.swift */; };
 		D8271A5E2C7A4F64008C345B /* CodeBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A5D2C7A4F64008C345B /* CodeBlockView.swift */; };
+		D8271A602C7CD5C3008C345B /* MemoryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A5F2C7CD5C3008C345B /* MemoryForm.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
 		D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */; };
 		D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */; };
@@ -79,6 +80,7 @@
 		D8271A562C7A4B2F008C345B /* Environment+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+.swift"; sourceTree = "<group>"; };
 		D8271A5B2C7A4E83008C345B /* CodeHighlighter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeHighlighter.swift; sourceTree = "<group>"; };
 		D8271A5D2C7A4F64008C345B /* CodeBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeBlockView.swift; sourceTree = "<group>"; };
+		D8271A5F2C7CD5C3008C345B /* MemoryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryForm.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageToolCall.swift; sourceTree = "<group>"; };
 		D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSystemView.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 			isa = PBXGroup;
 			children = (
 				D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */,
+				D8271A5F2C7CD5C3008C345B /* MemoryForm.swift */,
 			);
 			path = Memory;
 			sourceTree = "<group>";
@@ -361,6 +364,7 @@
 				D4B2D2692B6563DB0017FB52 /* MessageInput.swift in Sources */,
 				D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */,
 				D8E1FC1A2B704CE3006C9366 /* ServiceList.swift in Sources */,
+				D8271A602C7CD5C3008C345B /* MemoryForm.swift in Sources */,
 				D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */,
 				D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */,
 				D4713D702AEAB9670005597E /* Operators.swift in Sources */,

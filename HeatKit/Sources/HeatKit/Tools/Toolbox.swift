@@ -74,10 +74,9 @@ public enum Toolbox: CaseIterable {
     }
     
     public static func get(names: Set<String>) -> [Tool] {
-        let tools = Toolbox.allCases
+        return Toolbox.allCases
             .filter { names.contains($0.tool.function.name) }
             .map { $0.tool }
-        return tools
     }
     
     public static let ignore: [Toolbox] = [

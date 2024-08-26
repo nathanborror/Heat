@@ -55,17 +55,22 @@ struct MainApp: App {
             }
             .floatingPanel(isPresented: $showingLauncher) {
                 LauncherView()
+                    .environment(agentsProvider)
+                    .environment(conversationsProvider)
+                    .environment(preferencesProvider)
                     .environment(conversationViewModel)
+                    .environment(\.debug, preferencesProvider.preferences.debug)
+                    .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
                     .modelContainer(for: Memory.self)
             }
         }
-        .modelContainer(for: Memory.self)
-        .environment(conversationViewModel)
         .environment(agentsProvider)
         .environment(conversationsProvider)
         .environment(preferencesProvider)
+        .environment(conversationViewModel)
         .environment(\.debug, preferencesProvider.preferences.debug)
         .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
+        .modelContainer(for: Memory.self)
         .defaultSize(width: 600, height: 700)
         .defaultPosition(.center)
         .commands {
@@ -80,10 +85,10 @@ struct MainApp: App {
                 PreferencesWindow()
             }
             .frame(width: 600)
-            .modelContainer(for: Memory.self)
             .environment(agentsProvider)
             .environment(conversationsProvider)
             .environment(preferencesProvider)
+            .modelContainer(for: Memory.self)
         }
         #else
         WindowGroup {

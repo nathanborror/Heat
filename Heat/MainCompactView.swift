@@ -51,6 +51,8 @@ struct MainCompactView: View {
                     .environment(conversationsProvider)
                     .environment(preferencesProvider)
                     .environment(conversationViewModel)
+                    .environment(\.debug, preferencesProvider.preferences.debug)
+                    .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
                     .presentationDragIndicator(.visible)
                 }
         }

@@ -184,7 +184,6 @@ final class ConversationViewModel {
             return false
         }
         
-        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
@@ -201,7 +200,7 @@ final class ConversationViewModel {
             let tag = result.tags.first(where: { $0.name == "title" })
             
             guard let title = tag?.content, !title.isEmpty else { continue }
-            try await provider.upsert(title: title, conversationID: conversation.id)
+            try await conversationsProvider.upsert(title: title, conversationID: conversation.id)
         }
         
         // Success
@@ -213,7 +212,6 @@ final class ConversationViewModel {
             throw KitError.missingConversation
         }
         
-        let provider = ConversationsProvider.shared
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
@@ -222,7 +220,7 @@ final class ConversationViewModel {
         req.with(system: suggestionsPrompt(history: messages))
         
         // Indicate we are suggesting
-        try await provider.upsert(state: .suggesting, conversationID: conversation.id)
+        try await conversationsProvider.upsert(state: .suggesting, conversationID: conversation.id)
         
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
@@ -235,14 +233,14 @@ final class ConversationViewModel {
             guard let content = tag?.content else { continue }
             let suggestions = content.split(separator: .newlineSequence).map { String($0) }
             
-            try await provider.upsert(suggestions: suggestions, conversationID: conversation.id)
-            try await provider.upsert(state: .streaming, conversationID: conversation.id)
+            try await conversationsProvider.upsert(suggestions: suggestions, conversationID: conversation.id)
+            try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             streamingTokens = message.content
         }
         streamingTokens = nil
         
         // Set conversation state
-        try await provider.upsert(state: .none, conversationID: conversation.id)
+        try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
         
         // Success
         return true
