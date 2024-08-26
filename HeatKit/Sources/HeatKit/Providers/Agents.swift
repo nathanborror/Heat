@@ -89,8 +89,7 @@ public final class AgentsProvider {
     }
     
     public func delete(_ id: String) async throws {
-        let agent = try get(id)
-        agents.removeAll(where: { agent.id == $0.id })
+        agents.removeAll(where: { $0.id == id })
         try await save()
     }
     
