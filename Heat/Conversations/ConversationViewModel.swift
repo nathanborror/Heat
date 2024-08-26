@@ -47,7 +47,7 @@ final class ConversationViewModel {
         conversationID = conversation.id
     }
     
-    func generate(chat prompt: String, memories: [String] = [], toolChoice: Tool? = nil) throws {
+    func generate(chat prompt: String, context: [String] = [], toolChoice: Tool? = nil) throws {
         guard !prompt.isEmpty else { return }
         
         let service = try PreferencesProvider.shared.preferredChatService()
@@ -61,14 +61,16 @@ final class ConversationViewModel {
             
             // New user message
             let userMessage = Message(role: .user, content: prompt)
-            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
+            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
+            try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
-            req.with(messages: instructions + messages)
+            req.with(system: conversation.instructions)
+            req.with(history: messages)
             req.with(tools: Toolbox.get(names: conversation.toolIDs))
-            req.with(memories: memories)
+            req.with(context: context)
             
             // Generate response stream
             let stream = ChatSession.shared.stream(req)
@@ -91,7 +93,7 @@ final class ConversationViewModel {
         }
     }
     
-    func generate(chat prompt: String, images: [Data], memories: [String] = []) throws {
+    func generate(chat prompt: String, images: [Data], context: [String] = []) throws {
         guard !prompt.isEmpty else { return }
         
         let service = try PreferencesProvider.shared.preferredVisionService()
@@ -107,13 +109,15 @@ final class ConversationViewModel {
             let userMessage = Message(role: .user, content: prompt, attachments: images.map {
                 .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
             })
-            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
+            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
+            try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
             // Initial request
             var req = VisionSessionRequest(service: service, model: model)
-            req.with(messages: instructions + messages)
-            req.with(memories: memories)
+            req.with(system: conversation.instructions)
+            req.with(history: messages)
+            req.with(context: context)
             
             // Generate response stream
             let stream = VisionSession.shared.stream(req)
@@ -151,6 +155,7 @@ final class ConversationViewModel {
             // New user message
             let userMessage = Message(role: .user, content: prompt)
             try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
+            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
             // Generate image
@@ -183,24 +188,20 @@ final class ConversationViewModel {
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
-        // Prepare prompt
-        let prompt = Message(role: .user, content: titlePrompt())
-        
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(messages: instructions + messages + [prompt])
+        req.with(system: titlePrompt(history: messages))
         
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
         for try await message in stream {
-            guard let content = message.content else { return false }
+            guard let content = message.content else { continue }
             
-            let regex = #/<title>(.*?)(?:</title>|</ti|</t|<\/|<|$)/#
-            if let match = content.prefixMatch(of: regex) {
-                let title = String(match.output.1)
-                guard !title.isEmpty else { continue }
-                try await provider.upsert(title: title, conversationID: conversation.id)
-            }
+            let result = try Parser.shared.parse(input: content, tags: ["title"])
+            let tag = result.tags.first(where: { $0.name == "title" })
+            
+            guard let title = tag?.content, !title.isEmpty else { continue }
+            try await provider.upsert(title: title, conversationID: conversation.id)
         }
         
         // Success
@@ -216,12 +217,9 @@ final class ConversationViewModel {
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
-        // Prepare prompt
-        let prompt = Message(role: .user, content: suggestionsPrompt())
-        
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(messages: instructions + messages + [prompt])
+        req.with(system: suggestionsPrompt(history: messages))
         
         // Indicate we are suggesting
         try await provider.upsert(state: .suggesting, conversationID: conversation.id)
@@ -229,12 +227,14 @@ final class ConversationViewModel {
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
         for try await message in stream {
-            guard let content = message.content else { return false }
-            let suggestions = content
-                .split(separator: "\n")
-                .map { String($0) }
-                .filter { !$0.hasPrefix("<") }
-                .map { String($0.trimmingPrefix(#/^-( )?/#)) }
+            guard let content = message.content else { continue }
+            
+            let result = try Parser.shared.parse(input: content, tags: ["suggested_replies"])
+            let tag = result.tags.first(where: { $0.name == "suggested_replies" })
+            
+            guard let content = tag?.content else { continue }
+            let suggestions = content.split(separator: .newlineSequence).map { String($0) }
+            
             try await provider.upsert(suggestions: suggestions, conversationID: conversation.id)
             try await provider.upsert(state: .streaming, conversationID: conversation.id)
             streamingTokens = message.content

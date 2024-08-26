@@ -16,14 +16,13 @@ public class WebBrowseSession {
         guard let url = URL(string: url) else { return nil }
         
         let markdown = try await fetch(url: url, urlMode: .omit, hideJSONLD: true, hideImages: true)
-        let message = Message(role: .user, content: """
+        
+        var req = ChatSessionRequest(service: service, model: model)
+        req.with(system: """
             Summarize the following:
             
             \(markdown)
             """)
-        
-        var req = ChatSessionRequest(service: service, model: model)
-        req.with(messages: [message])
         
         let resp = try await ChatSession.shared.completion(req)
         return resp.messages.first?.content

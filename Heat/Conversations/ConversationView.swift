@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import OSLog
 import HeatKit
 
@@ -6,6 +7,9 @@ private let logger = Logger(subsystem: "ConversationView", category: "Heat")
 
 struct ConversationView: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
     
     var body: some View {
         ScrollViewReader { proxy in
@@ -76,7 +80,7 @@ struct ConversationView: View {
     
     func handleSuggestion(_ suggestion: String) async throws {
         do {
-            try conversationViewModel.generate(chat: suggestion)
+            try conversationViewModel.generate(chat: suggestion, context: memories.map { $0.content })
         } catch {
             conversationViewModel.error = error
         }

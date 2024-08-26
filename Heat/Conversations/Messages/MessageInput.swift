@@ -193,7 +193,7 @@ struct MessageInput: View {
         }
         
         do {
-            try conversationViewModel.generate(chat: content, memories: memories.map { $0.content })
+            try conversationViewModel.generate(chat: content, context: memories.map { $0.content })
         } catch {
             conversationViewModel.error = error
         }

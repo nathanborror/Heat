@@ -26,52 +26,47 @@ The information above is provided to \(name) by \(creator). \(name) never mentio
 """
 }
 
-// Generated using the following prompt:
-// Return a list of brief suggested replies related to the conversation history. These are suggestions the user
-// will use to direct their next message to the assistant.
-public func suggestionsPrompt() -> String {
+public func suggestionsPrompt(history: [Message]) -> String {
 """
-You are tasked with generating a list of brief suggested replies based on the given conversation history. These \
-suggestions will be used to help the user quickly respond in the conversation. 
+You are tasked with generating a list of brief suggested replies based on a chat session between a user and an AI assistant. These suggestions should anticipate what the user might say next in the conversation. Here is the chat history:
 
-Your goal is to create a list of 3 brief, relevant suggested replies that the user could potentially send as their \
-next message in the conversation. These suggestions should be natural continuations of the conversation and provide \
-the user with easy options to keep the dialogue flowing.
+<chat_history>
+\(history.map { "\($0.role.rawValue): \($0.content ?? "Empty")" }.joined(separator: "\n\n"))
+</chat_history>
 
-Guidelines for creating suggestions:
-1. Keep suggestions brief (1-7 words) and conversational in tone.
-2. Ensure suggestions are relevant to the topic and context of the conversation.
-3. Vary the types of suggestions (e.g., questions, statements, requests for clarification).
-4. Avoid repetitive or overly similar suggestions.
+Your task is to create a list of suggested replies that the user might send next. Follow these guidelines when creating your suggestions:
 
-Format your output as a list, with each suggestion on a new line. Place your list of suggestions within \
-<suggestions> tags.
+1. Keep the suggestions brief and to the point.
+2. Ensure the suggestions are relevant to the current topic of conversation.
+3. Vary the types of responses (e.g., questions, statements, requests for clarification).
+4. Make the suggestions sound natural and conversational.
+5. Avoid repeating information already provided in the chat history.
+6. Do not include any inappropriate or offensive content.
 
-Here are examples of good and bad suggestions:
+Focus primarily on the most recent messages in the chat history, as these are most relevant to predicting the user's next response.
 
-Good examples:
-- Tell me more about that
-- How does that make you feel?
-- What happened next?
-- I agree completely
-- Can you clarify what you mean?
+Provide exactly 3 suggested replies. Format your output as a list, with each suggestion on a new line. Enclose your entire list of suggestions within <suggested_replies> tags.
 
-Bad examples:
-- OK (too vague and doesn't add to the conversation)
-- That's interesting, can you elaborate on that point you just made about the economic implications of the policy change? (too long and specific)
-- Let's change the subject (abrupt and doesn't follow conversation flow)
+For example:
 
-Before generating your suggestions, carefully analyze the conversation history to understand the context, tone, and \
-direction of the dialogue. Consider what would be most helpful or engaging for the user to say next.
+<suggested_replies>
+Could you explain that in more detail?
+That's interesting. How does it compare to [related topic]?
+I'd like to learn more about [specific aspect mentioned].
+</suggested_replies>
 
-Now, based on the provided conversation history, generate your list of suggested replies within <suggestions> tags.
+Remember, your goal is to anticipate plausible and helpful next messages from the user based on the context of the conversation.
 """
 }
 
-public func titlePrompt() -> String {
+public func titlePrompt(history: [Message]) -> String {
 """
 Based on the conversation transcript, your task is to determine if there is a clear topic of conversation and, if so, \
-return a concise title for it.
+return a concise title for it. Here is the chat history:
+
+<chat_history>
+\(history.map { "\($0.role.rawValue): \($0.content ?? "Empty")" }.joined(separator: "\n\n"))
+</chat_history>
 
 To determine if there is a clear topic:
 1. Read through the entire conversation.

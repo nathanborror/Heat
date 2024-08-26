@@ -61,7 +61,7 @@ struct LauncherView: View {
     
     func handleSubmit() async throws {
         do {
-            try conversationViewModel.generate(chat: content, memories: memories.map { $0.content })
+            try conversationViewModel.generate(chat: content, context: memories.map { $0.content })
             isShowingContent = true
             content = ""
         } catch {
