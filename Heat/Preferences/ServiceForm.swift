@@ -118,15 +118,15 @@ struct ServiceForm: View {
         
         switch service.id {
         case .openAI:
-            service.applyPreferredModels(Constants.openAIDefaults)
+            service.applyPreferredModels(Defaults.openAI)
         case .anthropic:
-            service.applyPreferredModels(Constants.anthropicDefaults)
+            service.applyPreferredModels(Defaults.anthropic)
         case .mistral:
-            service.applyPreferredModels(Constants.mistralDefaults)
+            service.applyPreferredModels(Defaults.mistral)
         case .perplexity:
-            service.applyPreferredModels(Constants.perplexityDefaults)
+            service.applyPreferredModels(Defaults.perplexity)
         case .google:
-            service.applyPreferredModels(Constants.googleDefaults)
+            service.applyPreferredModels(Defaults.google)
         default:
             break
         }

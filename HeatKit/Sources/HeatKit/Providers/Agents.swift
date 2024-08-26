@@ -95,7 +95,7 @@ public final class AgentsProvider {
     }
     
     public func reset() async throws {
-        agents = [Constants.defaultAgent]
+        agents = [Defaults.assistant]
         try await save()
     }
     

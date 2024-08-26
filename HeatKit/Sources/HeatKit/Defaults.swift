@@ -1,9 +1,9 @@
 import Foundation
 import GenKit
 
-public struct Constants {
+public struct Defaults {
     
-    public static let defaultAgent = Agent(
+    public static let assistant = Agent(
         id: "bundle-assistant",
         name: "Assistant",
         instructions: assistantInstructions(name: "Heat", creator: "Nathan Borror"),
@@ -14,16 +14,16 @@ public struct Constants {
         ]
     )
     
-    public static let defaultChatServiceID: Service.ServiceID? = nil
-    public static let defaultImageServiceID: Service.ServiceID? = nil
-    public static let defaultEmbeddingServiceID: Service.ServiceID? = nil
-    public static let defaultTranscriptionServiceID: Service.ServiceID? = nil
-    public static let defaultToolServiceID: Service.ServiceID? = nil
-    public static let defaultVisionServiceID: Service.ServiceID? = nil
-    public static let defaultSpeechServiceID: Service.ServiceID? = nil
-    public static let defaultSummarizationServiceID: Service.ServiceID? = nil
+    public static let chatServiceID: Service.ServiceID? = nil
+    public static let imageServiceID: Service.ServiceID? = nil
+    public static let embeddingServiceID: Service.ServiceID? = nil
+    public static let transcriptionServiceID: Service.ServiceID? = nil
+    public static let toolServiceID: Service.ServiceID? = nil
+    public static let visionServiceID: Service.ServiceID? = nil
+    public static let speechServiceID: Service.ServiceID? = nil
+    public static let summarizationServiceID: Service.ServiceID? = nil
     
-    public static let defaultServices: [Service] = [
+    public static let services: [Service] = [
         .init(
             id: .openAI,
             name: "OpenAI",
@@ -63,10 +63,15 @@ public struct Constants {
             id: .fal,
             name: "Fal",
             credentials: nil
-        )
+        ),
+        .init(
+            id: .groq,
+            name: "Groq",
+            credentials: nil
+        ),
     ]
     
-    public static let openAIDefaults =
+    public static let openAI =
         Service(
             id: .openAI,
             name: "OpenAI",
@@ -80,7 +85,7 @@ public struct Constants {
             preferredSummarizationModel: "gpt-4o-mini"
         )
     
-    public static let anthropicDefaults =
+    public static let anthropic =
         Service(
             id: .anthropic,
             name: "Anthropic",
@@ -90,7 +95,7 @@ public struct Constants {
             preferredSummarizationModel: "claude-3-haiku-20240307"
         )
     
-    public static let mistralDefaults =
+    public static let mistral =
         Service(
             id: .mistral,
             name: "Mistral",
@@ -99,14 +104,14 @@ public struct Constants {
             preferredToolModel: "mistral-large-latest"
         )
     
-    public static let perplexityDefaults =
+    public static let perplexity =
         Service(
             id: .perplexity,
             name: "Perplexity",
             preferredChatModel: "pplx-70b-chat"
         )
     
-    public static let googleDefaults =
+    public static let google =
         Service(
             id: .google,
             name: "Google",

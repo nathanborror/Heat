@@ -3,7 +3,7 @@ import SharedKit
 import GenKit
 
 public struct Preferences: Codable, Sendable {
-    public var defaultAgentID: String? = Constants.defaultAgent.id
+    public var defaultAgentID: String? = Defaults.assistant.id
     public var shouldStream = true
     public var shouldUseMarkdown = true
     public var debug = false
@@ -50,7 +50,7 @@ actor PreferencesStore {
 }
 
 actor ServicesStore {
-    private var services: [Service] = Constants.defaultServices
+    private var services: [Service] = Defaults.services
     
     func save(_ services: [Service]) throws {
         let encoder = PropertyListEncoder()
@@ -107,7 +107,7 @@ public final class PreferencesProvider {
     
     public func reset() async throws {
         self.preferences = .init()
-        self.services = Constants.defaultServices
+        self.services = Defaults.services
         try await save()
     }
     

@@ -125,7 +125,7 @@ struct ConversationBarrier: View {
         
         // Update service with token and preferred models
         var service = try PreferencesProvider.shared.get(serviceID: .openAI)
-        service.applyPreferredModels(Constants.openAIDefaults)
+        service.applyPreferredModels(Defaults.openAI)
         service.credentials = .token(apiKey)
         try await PreferencesProvider.shared.upsert(service: service)
         
