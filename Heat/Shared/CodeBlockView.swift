@@ -36,9 +36,15 @@ struct CodeBlockView: View {
     }
     
     private func copyCodeAction() {
+        #if os(macOS)
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(configuration.content, forType: .string)
+        #else
+        let pasteboard = UIPasteboard.general
+        pasteboard.string = configuration.content
+        #endif
+        
         isCopied = true
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
