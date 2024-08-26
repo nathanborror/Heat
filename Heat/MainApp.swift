@@ -46,8 +46,6 @@ struct MainApp: App {
             } detail: {
                 ConversationView()
             }
-            .environment(conversationViewModel)
-            .modelContainer(for: Memory.self)
             .task {
                 handleHotKeySetup()
             }
@@ -61,6 +59,8 @@ struct MainApp: App {
                     .modelContainer(for: Memory.self)
             }
         }
+        .modelContainer(for: Memory.self)
+        .environment(conversationViewModel)
         .environment(agentsProvider)
         .environment(conversationsProvider)
         .environment(preferencesProvider)
@@ -80,6 +80,7 @@ struct MainApp: App {
                 PreferencesWindow()
             }
             .frame(width: 600)
+            .modelContainer(for: Memory.self)
             .environment(agentsProvider)
             .environment(conversationsProvider)
             .environment(preferencesProvider)
