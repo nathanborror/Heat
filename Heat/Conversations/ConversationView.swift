@@ -41,11 +41,7 @@ struct ConversationView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        Rectangle()
-                            .fill(.background)
-                            .frame(height: 1)
-                            .id("bottom")
+                        .id("bottom")
                     }
                     .frame(maxWidth: 800, alignment: .center)
                     .padding()
@@ -53,7 +49,7 @@ struct ConversationView: View {
                 }
             }
             .background(.background)
-            .onChange(of: conversationViewModel.conversation) { _, _ in
+            .onChange(of: conversationViewModel.streamingTokens) { _, _ in
                 proxy.scrollTo("bottom")
             }
         }

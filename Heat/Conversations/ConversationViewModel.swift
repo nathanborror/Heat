@@ -9,6 +9,7 @@ private let logger = Logger(subsystem: "ConversationViewModel", category: "Heat"
 @MainActor
 final class ConversationViewModel {
     var conversationID: String? = nil
+    var streamingTokens: String? = nil
     var error: Error? = nil
     
     private let conversationsProvider = ConversationsProvider.shared
@@ -74,7 +75,9 @@ final class ConversationViewModel {
             for try await message in stream {
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
+                streamingTokens = message.content
             }
+            streamingTokens = nil
             
             // Save messages
             try await messagesProvider.save()
@@ -117,7 +120,9 @@ final class ConversationViewModel {
             for try await message in stream {
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
+                streamingTokens = message.content
             }
+            streamingTokens = nil
             
             // Save messages
             try await messagesProvider.save()
@@ -160,6 +165,9 @@ final class ConversationViewModel {
             try await messagesProvider.upsert(message: message, parentID: conversation.id)
             try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
             try await messagesProvider.save()
+            
+            streamingTokens = message.content
+            streamingTokens = nil
         }
     }
     
@@ -229,7 +237,9 @@ final class ConversationViewModel {
                 .map { String($0.trimmingPrefix(#/^-( )?/#)) }
             try await provider.upsert(suggestions: suggestions, conversationID: conversation.id)
             try await provider.upsert(state: .streaming, conversationID: conversation.id)
+            streamingTokens = message.content
         }
+        streamingTokens = nil
         
         // Set conversation state
         try await provider.upsert(state: .none, conversationID: conversation.id)
