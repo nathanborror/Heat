@@ -5,6 +5,7 @@ import PhotosUI
 
 private let logger = Logger(subsystem: "ImagePicker", category: "Heat")
 
+@MainActor
 @Observable
 final class ImagePickerViewModel {
 
@@ -75,18 +76,16 @@ final class ImagePickerViewModel {
     private func handleLoadTransferable(from item: PhotosPickerItem) -> Progress? {
         guard let id = item.itemIdentifier else { return nil }
         return item.loadTransferable(type: ImageTransfer.self) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let image?):
-                    let image = SelectedImage(id: id, state: .success, image: image.image)
-                    self.upsert(image: image)
-                case .success(nil):
-                    let image = SelectedImage(id: id, state: .empty)
-                    self.upsert(image: image)
-                case .failure:
-                    let image = SelectedImage(id: id, state: .failure(.transferFailed))
-                    self.upsert(image: image)
-                }
+            switch result {
+            case .success(let image?):
+                let image = SelectedImage(id: id, state: .success, image: image.image)
+                self.upsert(image: image)
+            case .success(nil):
+                let image = SelectedImage(id: id, state: .empty)
+                self.upsert(image: image)
+            case .failure:
+                let image = SelectedImage(id: id, state: .failure(.transferFailed))
+                self.upsert(image: image)
             }
         }
     }
