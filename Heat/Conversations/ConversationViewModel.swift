@@ -18,7 +18,7 @@ final class ConversationViewModel {
     
     var conversation: Conversation? {
         guard let conversationID else { return nil }
-        return try? ConversationsProvider.shared.get(conversationID)
+        return try? conversationsProvider.get(conversationID)
     }
     
     var suggestions: [String] {
@@ -78,6 +78,7 @@ final class ConversationViewModel {
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
                 streamingTokens = message.content
+                haptic(tap: .light)
             }
             streamingTokens = nil
             
@@ -125,6 +126,7 @@ final class ConversationViewModel {
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
                 streamingTokens = message.content
+                haptic(tap: .light)
             }
             streamingTokens = nil
             
@@ -170,6 +172,7 @@ final class ConversationViewModel {
             try await messagesProvider.upsert(message: message, parentID: conversation.id)
             try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
             try await messagesProvider.save()
+            haptic(tap: .heavy)
             
             streamingTokens = message.content
             streamingTokens = nil
@@ -238,6 +241,7 @@ final class ConversationViewModel {
             try await conversationsProvider.upsert(suggestions: suggestions, conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             streamingTokens = message.content
+            haptic(tap: .light)
         }
         streamingTokens = nil
         
@@ -261,25 +265,26 @@ final class ConversationViewModel {
             switch tool {
             case .generateImages:
                 let messages = await ImageGeneratorTool.handle(toolCall)
+                haptic(tap: .heavy)
                 return .init(messages: messages, shouldContinue: false)
             case .generateMemory:
                 let messages = await MemoryTool.handle(toolCall)
+                haptic(tap: .heavy)
                 return .init(messages: messages, shouldContinue: true)
-            case .generateSuggestions:
-                return .init(messages: [], shouldContinue: false)
-            case .generateTitle:
-                return .init(messages: [], shouldContinue: false)
-            case .searchFiles:
-                return .init(messages: [], shouldContinue: false)
             case .searchCalendar:
                 let messages = await CalendarSearchTool.handle(toolCall)
+                haptic(tap: .heavy)
                 return .init(messages: messages, shouldContinue: true)
             case .searchWeb:
                 let messages = await WebSearchTool.handle(toolCall)
+                haptic(tap: .heavy)
                 return .init(messages: messages, shouldContinue: true)
             case .browseWeb:
                 let messages = await WebBrowseTool.handle(toolCall)
+                haptic(tap: .heavy)
                 return .init(messages: messages, shouldContinue: true)
+            case .generateSuggestions, .generateTitle, .searchFiles:
+                return .init(messages: [], shouldContinue: false)
             }
         } else {
             let toolResponse = Message(
@@ -293,18 +298,8 @@ final class ConversationViewModel {
         }
     }
     
-    private func prepareMemories(_ memories: [String]) -> Message? {
-        guard !memories.isEmpty else { return nil }
-        return Message(role: .system, content: """
-            <user_info>
-            This is what we know about the user to better relate to them:
-
-            \(memories.joined(separator: "\n"))
-            </user_info>
-            """)
-    }
-    
-    private func hapticTap(style: HapticManager.FeedbackStyle) {
+    /// Execute a haptic tap.
+    private func haptic(tap style: HapticManager.FeedbackStyle) {
         HapticManager.shared.tap(style: style)
     }
 }
