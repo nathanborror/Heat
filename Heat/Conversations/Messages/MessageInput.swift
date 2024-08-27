@@ -255,7 +255,7 @@ struct MessageInput: View {
     }
     
     func handleStop() {
-        conversationViewModel.stop()
+        conversationViewModel.cancel()
     }
     
     private func clear() {

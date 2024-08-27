@@ -75,6 +75,7 @@ final class ConversationViewModel {
             // Generate response stream
             let stream = ChatSession.shared.stream(req)
             for try await message in stream {
+                try Task.checkCancellation()
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
                 streamingTokens = message.content
@@ -123,6 +124,7 @@ final class ConversationViewModel {
             // Generate response stream
             let stream = VisionSession.shared.stream(req)
             for try await message in stream {
+                try Task.checkCancellation()
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
                 streamingTokens = message.content
@@ -197,6 +199,7 @@ final class ConversationViewModel {
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
         for try await message in stream {
+            try Task.checkCancellation()
             guard let content = message.content else { continue }
             
             let name = "title"
@@ -229,6 +232,7 @@ final class ConversationViewModel {
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
         for try await message in stream {
+            try Task.checkCancellation()
             guard let content = message.content else { continue }
             
             let name = "suggested_replies"
@@ -252,10 +256,14 @@ final class ConversationViewModel {
         return true
     }
     
-    func stop() {
+    /// Cancel any of the generate tasks above.
+    func cancel() {
         generateTask?.cancel()
-        guard let conversationID else { return }
-        Task { try await ConversationsProvider.shared.upsert(state: .none, conversationID: conversationID) }
+        streamingTokens = nil
+        Task {
+            guard let conversationID else { return }
+            try await conversationsProvider.upsert(state: .none, conversationID: conversationID)
+        }
     }
     
     // MARK: - Private
