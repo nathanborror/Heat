@@ -76,4 +76,9 @@ public struct ParserResult {
         public var content: String? = nil
         public var params: [String: String] = [:]
     }
+    
+    /// Get a tag if it exists.
+    public func get(tag name: String) -> Tag? {
+        tags.first(where: { $0.name == name})
+    }
 }

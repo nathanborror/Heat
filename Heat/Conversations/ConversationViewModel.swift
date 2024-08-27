@@ -196,8 +196,9 @@ final class ConversationViewModel {
         for try await message in stream {
             guard let content = message.content else { continue }
             
-            let result = try Parser.shared.parse(input: content, tags: ["title"])
-            let tag = result.tags.first(where: { $0.name == "title" })
+            let name = "title"
+            let result = try Parser.shared.parse(input: content, tags: [name])
+            let tag = result.get(tag: name)
             
             guard let title = tag?.content, !title.isEmpty else { continue }
             try await conversationsProvider.upsert(title: title, conversationID: conversation.id)
@@ -227,8 +228,9 @@ final class ConversationViewModel {
         for try await message in stream {
             guard let content = message.content else { continue }
             
-            let result = try Parser.shared.parse(input: content, tags: ["suggested_replies"])
-            let tag = result.tags.first(where: { $0.name == "suggested_replies" })
+            let name = "suggested_replies"
+            let result = try Parser.shared.parse(input: content, tags: [name])
+            let tag = result.get(tag: name)
             
             guard let content = tag?.content else { continue }
             let suggestions = content.split(separator: .newlineSequence).map { String($0) }
