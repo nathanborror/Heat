@@ -104,7 +104,9 @@ extension WebSearchTool {
                 let response = Response(
                     kind: .image,
                     instructions: """
-                        DO NOT repeat these images in Markdown.
+                        Search complete. Showing \(searchResponse.results.count) images. DO NOT repeat any of the \
+                        image URLs here. Let the user know you found \(searchResponse.results.count) images, each
+                        one will take the user to the website it originates from. Do not respond with any more URLs.
                         """,
                     results: searchResponse.results
                 )
