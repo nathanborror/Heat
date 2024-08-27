@@ -21,22 +21,26 @@ final class ConversationViewModel {
         return try? conversationsProvider.get(conversationID)
     }
     
+    /// Suggested replies the user can use to respond.
     var suggestions: [String] {
         Array((conversation?.suggestions ?? []).prefix(3))
     }
     
+    /// The instructions (system prompt) that's sent with every request.'
     var instructions: [Message] {
         guard let conversation else { return [] }
         let instructions = Message(role: .system, content: conversation.instructions)
         return [instructions]
     }
     
+    /// The whole conversation history.
     var messages: [Message] {
         guard let conversationID else { return [] }
         let history = try? messagesProvider.get(parentID: conversationID)
         return history ?? []
     }
     
+    /// Create a new conversation with the default agent's instructions (system prompt) and tools.
     func newConversation() async throws {
         guard let agentID = PreferencesProvider.shared.preferences.defaultAgentID else {
             return
@@ -47,6 +51,7 @@ final class ConversationViewModel {
         conversationID = conversation.id
     }
     
+    /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
     func generate(chat prompt: String, context: [String] = [], toolChoice: Tool? = nil) throws {
         guard !prompt.isEmpty else { return }
         
@@ -95,6 +100,7 @@ final class ConversationViewModel {
         }
     }
     
+    /// Generate a response using images as inputs alongside text. This will eventually be combined with generate(chat: ...) above.
     func generate(chat prompt: String, images: [Data], context: [String] = []) throws {
         guard !prompt.isEmpty else { return }
         
@@ -144,6 +150,7 @@ final class ConversationViewModel {
         }
     }
     
+    /// Generate an image from a given prompt. This is an explicit way to generate an image, most happen through tool use.
     func generate(image prompt: String) throws {
         guard !prompt.isEmpty else { return }
         
@@ -181,6 +188,7 @@ final class ConversationViewModel {
         }
     }
     
+    /// Generate a title for the conversation.
     func generateTitle() async throws -> Bool {
         guard let conversation else {
             throw KitError.missingConversation
@@ -214,6 +222,7 @@ final class ConversationViewModel {
         return true
     }
     
+    /// Generate conversation suggestions related to what's being talked about.
     func generateSuggestions() async throws -> Bool {
         guard let conversation else {
             throw KitError.missingConversation
@@ -268,6 +277,7 @@ final class ConversationViewModel {
     
     // MARK: - Private
     
+    /// Determine which tool is being called, execute the tool request if needed and return a tool call response before another turn of the conversation happens.
     private func prepareToolResponse(toolCall: ToolCall) async throws -> ToolCallResponse {
         if let tool = Toolbox(name: toolCall.function.name) {
             switch tool {
