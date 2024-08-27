@@ -6,6 +6,7 @@ import HeatKit
 private let logger = Logger(subsystem: "ConversationView", category: "Heat")
 
 struct ConversationView: View {
+    @Environment(PreferencesProvider.self) var preferencesProvider
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.modelContext) private var modelContext
     
@@ -66,15 +67,6 @@ struct ConversationView: View {
                 .environment(conversationViewModel)
                 .padding(12)
                 .background(.background)
-        }
-        .overlay {
-            if conversationViewModel.messages.isEmpty {
-                ContentUnavailableView {
-                    Label("New conversation", systemImage: "bubble")
-                } description: {
-                    Text("Start a new conversation by typing a message.")
-                }
-            }
         }
     }
     

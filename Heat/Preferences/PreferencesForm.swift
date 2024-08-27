@@ -18,18 +18,19 @@ struct PreferencesForm: View {
         Form {
             #if !os(macOS)
             Section {
+                
+            }
+            #endif
+            
+            Section {
                 NavigationLink("Memories") {
                     MemoryList()
                 }
-            }
-            #endif
-                        
-            Section {
-                #if !os(macOS)
-                NavigationLink("Agents") {
-                    AgentList()
-                }
-                #endif
+                
+                Toggle("Response Streaming", isOn: $preferences.shouldStream)
+                Toggle("Markdown", isOn: $preferences.shouldUseMarkdown)
+                Toggle("Debug", isOn: $preferences.debug)
+                
                 Picker("Default Agent", selection: $preferences.defaultAgentID) {
                     Text("None").tag(String?.none)
                     Divider()
@@ -37,27 +38,8 @@ struct PreferencesForm: View {
                         Text(agent.name).tag(agent.id)
                     }
                 }
-            } footer: {
-                Text("Used to start new conversations.")
-            }
-            
-            #if !os(macOS)
-            Section {
-                NavigationLink("Model Services") {
-                    ServiceList()
-                }
-                NavigationLink("Permissions") {
-                    PermissionsList()
-                }
-            } footer: {
-                Text("Manage service configurations and permissions to external data sources.")
-            }
-            #endif
-            
-            Section {
-                Toggle("Stream", isOn: $preferences.shouldStream)
-                Toggle("Markdown", isOn: $preferences.shouldUseMarkdown)
-                Toggle("Debug", isOn: $preferences.debug)
+            } header: {
+                Text("Experience")
             }
             
             Section {
@@ -85,12 +67,39 @@ struct PreferencesForm: View {
                 Picker("Summarization", selection: $preferences.preferred.summarizationServiceID) {
                     servicePickerView(\.supportsSummarization)
                 }
+            } header: {
+                Text("Preferred Services")
             } footer: {
-                Text("Only services with preferred models selected to support the behavior will show up in the picker.")
+                Text("These are the services used when you start a new conversation.")
             }
+            
+            #if !os(macOS)
+            Section {
+                NavigationLink("Permissions") {
+                    PermissionsList()
+                }
+            } footer: {
+                Text("Manage permissions to third-party integrations.")
+            }
+            Section {
+                NavigationLink("Agents") {
+                    AgentList()
+                }
+            } footer: {
+                Text("Agents determine the behavior conversations.")
+            }
+            Section {
+                NavigationLink("Services") {
+                    ServiceList()
+                }
+            } footer: {
+                Text("Configure third-party services that offer model access.")
+            }
+            #endif
             
             Section {
                 Button("Reset Agents", action: handleAgentReset)
+                Button("Reset Conversations", action: handleConversationReset)
                 Button("Delete All Data", role: .destructive, action: { isShowingDeleteConfirmation = true })
             }
         }
@@ -118,6 +127,13 @@ struct PreferencesForm: View {
     func handleAgentReset() {
         Task {
             try await agentsProvider.reset()
+        }
+    }
+    
+    func handleConversationReset() {
+        Task {
+            try await conversationsProvider.reset()
+            try await MessagesProvider.shared.reset()
         }
     }
     

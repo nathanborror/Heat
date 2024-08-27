@@ -47,7 +47,7 @@ final class ConversationViewModel {
         }
         let agent = try AgentsProvider.shared.get(agentID)
         let instructions = agent.instructions
-        let conversation = try await ConversationsProvider.shared.create(instructions: instructions, toolIDs: agent.toolIDs)
+        let conversation = try await conversationsProvider.create(instructions: instructions, toolIDs: agent.toolIDs)
         conversationID = conversation.id
     }
     

@@ -27,47 +27,47 @@ public struct Defaults {
         .init(
             id: .openAI,
             name: "OpenAI",
-            credentials: nil
+            credentials: .hostAndToken(nil, nil)
         ),
         .init(
             id: .mistral,
             name: "Mistral",
-            credentials: nil
+            credentials: .hostAndToken(nil, nil)
         ),
         .init(
             id: .perplexity,
             name: "Perplexity",
-            credentials: nil
+            credentials: .hostAndToken(nil, nil)
         ),
         .init(
             id: .ollama,
             name: "Ollama",
-            credentials: .host(URL(string: "http://localhost:11434/api")!)
+            credentials: .hostAndToken(nil, nil)
         ),
         .init(
             id: .elevenLabs,
             name: "ElevenLabs",
-            credentials: nil
+            credentials: .hostAndToken(nil, nil)
         ),
         .init(
             id: .anthropic,
             name: "Anthropic",
-            credentials: nil
+            credentials: .hostAndToken(nil, nil)
         ),
         .init(
             id: .google,
             name: "Google",
-            credentials: nil
+            credentials: .hostAndToken(nil, nil)
         ),
         .init(
             id: .fal,
             name: "Fal",
-            credentials: nil
+            credentials: .hostAndToken(nil, nil)
         ),
         .init(
             id: .groq,
             name: "Groq",
-            credentials: nil
+            credentials: .hostAndToken(.init(string: "https://api.groq.com/openai/v1")!, nil)
         ),
     ]
     

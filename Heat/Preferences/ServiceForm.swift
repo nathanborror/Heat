@@ -17,21 +17,23 @@ struct ServiceForm: View {
         Form {
             Section {
                 TextField("Name", text: $service.name)
+                    .disabled(true)
                 TextField("Host", text: $host)
                     .autocorrectionDisabled()
                     .textContentType(.URL)
+                    .submitLabel(.next)
+                    .onSubmit { handleSetDefaults() }
                     #if !os(macOS)
                     .textInputAutocapitalization(.never)
                     #endif
                 TextField("Token", text: $token)
+                    .submitLabel(.next)
+                    .onSubmit { handleSetDefaults() }
             }
             
             Section {
                 Button(action: handleSetDefaults) {
                     Text("Set Defaults")
-                }
-                Button(action: handleLoadModels) {
-                    Text("Reload Models")
                 }
             }
             
@@ -60,8 +62,14 @@ struct ServiceForm: View {
                 Picker("Summarization", selection: $service.preferredSummarizationModel) {
                     serviceModelPickerView
                 }
-            } footer: {
-                Text("Preferred models to use.")
+            } header: {
+                Text("Model Selection")
+            }
+            
+            Section {
+                Button(action: handleLoadModels) {
+                    Text("Reload Models")
+                }
             }
         }
         #if os(macOS)
@@ -146,26 +154,25 @@ struct ServiceForm: View {
     }
     
     func handleLoadCredentials() {
-        if let credentials = service.credentials {
-            switch credentials {
-            case .host(let host):
-                self.host = host.absoluteString
-            case .token(let token):
-                self.token = token
-            }
+        switch service.credentials {
+        case let .host(host):
+            self.host = host?.absoluteString ?? ""
+        case let .token(token):
+            self.token = token ?? ""
+        case let .hostAndToken(host, token):
+            self.host = host?.absoluteString ?? ""
+            self.token = token ?? ""
         }
     }
     
     func handleApplyCredentials() {
-        switch (token.isEmpty, host.isEmpty) {
-        case (false, true):
-            service.credentials = .token(token)
-        case (true, false):
-            service.credentials = .host(URL(string: host)!)
-        case (false, false):
-            print("not implemented")
-        default:
-            service.credentials = nil
+        switch service.credentials {
+        case .host:
+            service.credentials = .host(host.isEmpty ? nil : .init(string: host))
+        case .token:
+            service.credentials = .token(token.isEmpty ? nil : token)
+        case .hostAndToken:
+            service.credentials = .hostAndToken(host.isEmpty ? nil : .init(string: host), token.isEmpty ? nil: token)
         }
     }
 }

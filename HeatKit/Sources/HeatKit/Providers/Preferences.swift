@@ -83,6 +83,14 @@ public final class PreferencesProvider {
     
     public private(set) var preferences: Preferences = .init()
     public private(set) var services: [Service] = []
+    public private(set) var status: Status = .waiting
+    
+    public enum Status {
+        case ready
+        case waiting
+        case needsServiceSetup
+        case needsPreferredService
+    }
     
     public func get(serviceID: Service.ServiceID?) throws -> Service {
         guard let service = services.first(where: { $0.id == serviceID }) else {
@@ -229,8 +237,9 @@ public final class PreferencesProvider {
     }
     
     private func load() async throws {
-        self.preferences = try await preferencesStore.load()
-        self.services = try await servicesStore.load()
+        preferences = try await preferencesStore.load()
+        services = try await servicesStore.load()
+        statusCheck()
         
         if services.isEmpty {
             try await reset()
@@ -240,6 +249,22 @@ public final class PreferencesProvider {
     private func save() async throws {
         try await preferencesStore.save(preferences)
         try await servicesStore.save(services)
+        statusCheck()
+    }
+    
+    private func statusCheck() {
+        // Check for chat service support
+        if services.filter({ $0.supportsChats }).isEmpty {
+            status = .needsServiceSetup
+            return
+        }
+        // Check for preferred chat service
+        if preferences.preferred.chatServiceID == nil {
+            status = .needsPreferredService
+            return
+        }
+        // Minimal services ready to go
+        status = .ready
     }
 }
 

@@ -33,7 +33,6 @@ struct MainApp: App {
     @State private var conversationViewModel = ConversationViewModel()
     @State private var searchInput = ""
     @State private var showingLauncher = false
-    @State private var showingBarrier = false
     
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.option])
@@ -50,10 +49,6 @@ struct MainApp: App {
             }
             .onAppear {
                 handleInit()
-            }
-            .sheet(isPresented: $showingBarrier) {
-                ConversationBarrier()
-                    .frame(width: 300, height: 325)
             }
             .floatingPanel(isPresented: $showingLauncher) {
                 LauncherView()
@@ -105,9 +100,6 @@ struct MainApp: App {
                 .environment(\.debug, preferencesProvider.preferences.debug)
                 .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
                 .modelContainer(for: Memory.self)
-                .sheet(isPresented: $showingBarrier) {
-                    ConversationBarrier()
-                }
                 .onAppear {
                     handleInit()
                 }

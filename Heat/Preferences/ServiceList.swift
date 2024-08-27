@@ -5,17 +5,27 @@ import HeatKit
 struct ServiceList: View {
     @Environment(PreferencesProvider.self) var preferencesProvider
     
+    @State var services: [Service] = []
     @State var selectedService: Service?
     
     var body: some View {
         Form {
-            Section {
-                ForEach(preferencesProvider.services) { service in
+            ForEach(services) { service in
+                Section {
+                    LabeledContent("Chat", value: service.preferredChatModel ?? "None")
+                    LabeledContent("Image", value: service.preferredImageModel ?? "None")
+                    LabeledContent("Vision", value: service.preferredVisionModel ?? "None")
+                    LabeledContent("Tools", value: service.preferredToolModel ?? "None")
+                    LabeledContent("Summarization", value: service.preferredSummarizationModel ?? "None")
+                } header: {
                     HStack {
                         Text(service.name)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Button("Edit") {
+                        Spacer()
+                        Button {
                             selectedService = service
+                        } label: {
+                            Text("Edit")
+                                .font(.footnote)
                         }
                     }
                 }
@@ -27,5 +37,16 @@ struct ServiceList: View {
                 ServiceForm(service: service)
             }
         }
+        .onAppear {
+            services = preferencesProvider.services
+        }
     }
+}
+
+#Preview {
+    ServiceList(services: [
+        Defaults.openAI,
+        Defaults.anthropic,
+        Defaults.mistral,
+    ])
 }

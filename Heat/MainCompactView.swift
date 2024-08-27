@@ -16,12 +16,41 @@ struct MainCompactView: View {
     enum Sheet: String, Identifiable {
         case conversationList
         case preferences
+        case services
         var id: String { rawValue }
     }
     
     var body: some View {
         NavigationStack {
             ConversationView()
+                .overlay {
+                    switch preferencesProvider.status {
+                    case .needsServiceSetup:
+                        ContentUnavailableView {
+                            Label("Missing services", systemImage: "exclamationmark.icloud")
+                        } description: {
+                            Text("Configure a service like OpenAI, Anthropic or Ollama to get started.")
+                            Button("Open Services") { sheet = .services }
+                        }
+                    case .needsPreferredService:
+                        ContentUnavailableView {
+                            Label("Missing chat service", systemImage: "slider.horizontal.2.square")
+                        } description: {
+                            Text("Open Preferences to pick a chat service to use.")
+                            Button("Open Preferences") { sheet = .preferences }
+                        }
+                    case .ready:
+                        if conversationViewModel.messages.isEmpty {
+                            ContentUnavailableView {
+                                Label("New conversation", systemImage: "bubble")
+                            } description: {
+                                Text("Start a new conversation by typing a message.")
+                            }
+                        }
+                    case .waiting:
+                        EmptyView()
+                    }
+                }
                 .toolbar {
                     ToolbarItem {
                         Menu {
@@ -43,6 +72,8 @@ struct MainCompactView: View {
                         switch sheet {
                         case .preferences:
                             PreferencesForm(preferences: preferencesProvider.preferences)
+                        case .services:
+                            ServiceList()
                         case .conversationList:
                             ConversationList()
                         }

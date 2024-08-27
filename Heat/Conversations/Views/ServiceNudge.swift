@@ -1,47 +1,39 @@
 import SwiftUI
 import HeatKit
 
-struct ConversationBarrier: View {
+struct ServiceNudge: View {
     @Environment(\.dismiss) private var dismiss
     
     @State var apiKey = ""
     @State var hasPaseboardString = false
     
     var body: some View {
-        VStack(alignment: horizontalAlignment, spacing: 24) {
+        VStack(alignment: horizontalAlignment, spacing: 12) {
             
-            Image("IconDark")
-                .resizable()
-                .frame(width: iconSize, height: iconSize)
-                .padding(4)
-                .background(.background)
-                .clipShape(Squircle())
-                .shadow(color: .primary.opacity(0.2), radius: 1, y: 1)
+            Text("Getting Started")
+                .font(.headline)
             
-            // Copy
-            VStack(alignment: horizontalAlignment, spacing: 8) {
-                Text("Welcome to Heat")
-                    .font(.body)
-                    .fontWeight(.semibold)
-                Text("Before getting started you need to provide an [OpenAI API key](https://platform.openai.com/api-keys). Other services can be configured under the Services tab in the Preferences pane.")
-                    .font(.subheadline)
-                    .multilineTextAlignment(textAlignment)
-                    .foregroundStyle(.secondary)
-            }
+            Text("Open Preferences to configure a Service like Ollama, Anthropic, Groq, Mistral and more.")
+                .font(.subheadline)
+                .multilineTextAlignment(textAlignment)
             
-            // API key field
+            Text("Or quickly get started using [OpenAI](https://platform.openai.com/api-keys):")
+                .font(.subheadline)
+                .multilineTextAlignment(textAlignment)
+            
             HStack {
-                TextField("Your API Key", text: $apiKey)
+                TextField("OpenAI API Key", text: $apiKey)
                     .padding(verticalPadding)
                     .textFieldStyle(.plain)
                     .frame(maxWidth: .infinity)
+                    .submitLabel(.done)
                     .onSubmit {
                         Task { try await handleSubmit() }
                     }
                 if hasPaseboardString {
                     Button(action: handleLoadPasteboard) {
                         Image(systemName: "list.clipboard")
-                            .padding(.trailing, 16)
+                            .padding(.trailing, 12)
                             .padding(.bottom, 2)
                             .foregroundStyle(.secondary)
                     }
@@ -51,50 +43,7 @@ struct ConversationBarrier: View {
             .overlay {
                 RoundedRectangle(cornerRadius: cornerRadius).stroke(.primary.opacity(0.1), lineWidth: 1)
             }
-            
-            // Actions
-            VStack(spacing: 8) {
-                #if os(macOS)
-                HStack(spacing: 8) {
-                    SettingsLink {
-                        Text("Preferences")
-                            .padding(.vertical, verticalPadding)
-                            .frame(maxWidth: .infinity)
-                            .background(.primary.opacity(0.1))
-                            .clipShape(.rect(cornerRadius: cornerRadius))
-                    }
-                    .buttonStyle(.plain)
-                    
-                    Button {
-                        Task { try await handleSubmit() }
-                    } label: {
-                        Text("Submit")
-                            .padding(.vertical, verticalPadding)
-                            .frame(maxWidth: .infinity)
-                            .background(.tint)
-                            .overlay(.linearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .bottom).blendMode(.softLight))
-                            .foregroundStyle(.white)
-                            .clipShape(.rect(cornerRadius: cornerRadius))
-                    }
-                    .buttonStyle(.plain)
-                }
-                #else
-                VStack(spacing: 8) {
-                    Button {
-                        Task { try await handleSubmit() }
-                    } label: {
-                        Text("Submit")
-                            .padding(.vertical, verticalPadding)
-                            .frame(maxWidth: .infinity)
-                            .background(.tint)
-                            .overlay(.linearGradient(colors: [.white.opacity(0.6), .clear], startPoint: .top, endPoint: .bottom).blendMode(.softLight))
-                            .foregroundStyle(.white)
-                            .clipShape(.rect(cornerRadius: cornerRadius))
-                    }
-                    .buttonStyle(.plain)
-                }
-                #endif
-            }
+            .padding(.horizontal, -12)
         }
         .padding(24)
         .onAppear {
@@ -161,3 +110,6 @@ struct ConversationBarrier: View {
     #endif
 }
 
+#Preview {
+    ServiceNudge()
+}

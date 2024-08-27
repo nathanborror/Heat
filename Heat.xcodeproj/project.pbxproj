@@ -27,7 +27,7 @@
 		D4B2D2692B6563DB0017FB52 /* MessageInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2682B6563DB0017FB52 /* MessageInput.swift */; };
 		D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */; };
 		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
-		D809F5A22BDABEFE00FD627B /* ConversationBarrier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D809F5A12BDABEFE00FD627B /* ConversationBarrier.swift */; };
+		D809F5A22BDABEFE00FD627B /* ServiceNudge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D809F5A12BDABEFE00FD627B /* ServiceNudge.swift */; };
 		D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698C2B9CF19000C53D4D /* MessageTool.swift */; };
 		D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */; };
 		D8271A572C7A4B2F008C345B /* Environment+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A562C7A4B2F008C345B /* Environment+.swift */; };
@@ -74,7 +74,7 @@
 		D4B2D2682B6563DB0017FB52 /* MessageInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageInput.swift; sourceTree = "<group>"; };
 		D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
-		D809F5A12BDABEFE00FD627B /* ConversationBarrier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationBarrier.swift; sourceTree = "<group>"; };
+		D809F5A12BDABEFE00FD627B /* ServiceNudge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceNudge.swift; sourceTree = "<group>"; };
 		D815698C2B9CF19000C53D4D /* MessageTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTool.swift; sourceTree = "<group>"; };
 		D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryList.swift; sourceTree = "<group>"; };
 		D8271A562C7A4B2F008C345B /* Environment+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+.swift"; sourceTree = "<group>"; };
@@ -199,7 +199,6 @@
 				D4B2D2662B649DFD0017FB52 /* ConversationList.swift */,
 				D41E193A2AE4C759002516C1 /* ConversationView.swift */,
 				D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */,
-				D809F5A12BDABEFE00FD627B /* ConversationBarrier.swift */,
 			);
 			path = Conversations;
 			sourceTree = "<group>";
@@ -207,6 +206,7 @@
 		D4A2C56C2B8BFA830004F27B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				D809F5A12BDABEFE00FD627B /* ServiceNudge.swift */,
 				D45CC1F92B8A5C1A009DFDF4 /* Suggestions.swift */,
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 			);
@@ -374,7 +374,7 @@
 				D4017C8B2B6EEF01001CE137 /* MainCompactView.swift in Sources */,
 				D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */,
 				D4017C8D2B6EEF70001CE137 /* Squircle.swift in Sources */,
-				D809F5A22BDABEFE00FD627B /* ConversationBarrier.swift in Sources */,
+				D809F5A22BDABEFE00FD627B /* ServiceNudge.swift in Sources */,
 				D41E19352AE4C665002516C1 /* AgentForm.swift in Sources */,
 				D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */,
 				D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */,
