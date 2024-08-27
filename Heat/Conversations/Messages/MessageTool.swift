@@ -13,18 +13,25 @@ struct MessageTool: View {
             if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
-                    content(message, symbol: "checkmark.circle")
+                    MessageToolBadge(text: "Generated")
+                        .padding(.top, 8)
                     MessageToolAttachments(message: message)
+                        .padding(.bottom, 8)
                 case .searchWeb:
-                    content(message, symbol: "checkmark.circle")
+                    MessageToolBadge(text: "Searched")
+                        .padding(.top, 8)
                     MessageToolWebSearch(message: message)
+                        .padding(.bottom, 8)
                 default:
-                    content(message, symbol: "checkmark.circle")
+                    MessageToolContent(message: message, symbol: "checkmark.circle")
+                        .padding(.horizontal, 12)
                 }
             } else {
-                content(message, symbol: "circle.badge.questionmark")
+                MessageToolContent(message: message, symbol: "circle.badge.questionmark")
+                    .padding(.horizontal, 12)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .sheet(isPresented: $isShowingContext) {
             NavigationStack {
                 ScrollView {
@@ -50,16 +57,21 @@ struct MessageTool: View {
             }
         }
     }
+}
+
+struct MessageToolBadge: View {
+    let text: String
     
-    func content(_ message: Message, symbol: String) -> MessageToolContent {
-        .init(message: message, symbol: symbol)
+    var body: some View {
+        Text(text)
+            .font(.system(size: 14, weight: .medium))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
+            .background(.black)
+            .foregroundStyle(.white)
+            .clipShape(.rect(cornerRadius: 5))
+            .padding(.horizontal, 12)
     }
-    
-    #if os(macOS)
-    var monospaceFontSize: CGFloat = 11
-    #else
-    var monospaceFontSize: CGFloat = 12
-    #endif
 }
 
 struct MessageToolContent: View {
@@ -99,15 +111,16 @@ struct MessageToolAttachments: View {
                 ForEach(message.attachments.indices, id: \.self) { index in
                     if case .asset(let asset) = message.attachments[index] {
                         PictureView(asset: asset)
-                            .frame(width: 200, height: 200)
-                            .clipShape(.rect(cornerRadius: 10))
+                            .aspectRatio(1.0, contentMode: .fit)    // Forces a square aspect ratio.
+                            .containerRelativeFrame([.horizontal])  // Makes the frame width fill the scroll view.
                     }
                 }
                 Spacer()
             }
+            .scrollTargetLayout()
         }
+        .scrollTargetBehavior(.viewAligned)
         .scrollIndicators(.hidden)
-        .scrollClipDisabled()
     }
 }
 
@@ -135,25 +148,15 @@ struct MessageToolWebSearchImages: View {
         ScrollView(.horizontal) {
             HStack {
                 ForEach(images.indices, id: \.self) { index in
-                    Button(action: {}) {
-                        AsyncImage(url: images[index].image) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        } placeholder: {
-                            Color.primary
-                        }
-                        .frame(width: 200, height: 200)
-                        .clipShape(.rect(cornerRadius: 10))
-                    }
-                    .buttonStyle(.plain)
+                    PictureView(asset: .init(name: images[index].image?.absoluteString ?? "", kind: .image, location: .url))
+                        .aspectRatio(1.0, contentMode: .fit)    // Forces a square aspect ratio.
+                        .containerRelativeFrame([.horizontal])  // Makes the frame width fill the scroll view.
                 }
                 Spacer()
             }
+            .scrollTargetLayout()
         }
+        .scrollTargetBehavior(.viewAligned)
         .scrollIndicators(.hidden)
-        .scrollClipDisabled()
-        .padding(.vertical, 8)
-        .padding(.leading, -12)
     }
 }

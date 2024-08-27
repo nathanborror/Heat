@@ -16,7 +16,7 @@ struct ConversationView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 HStack {
-                    Spacer()
+                    Spacer(minLength: 0)
                     VStack(spacing: 0) {
                         
                         // Show message history
@@ -46,11 +46,11 @@ struct ConversationView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 24)
                         .id("bottom")
                     }
                     .frame(maxWidth: 800, alignment: .center)
-                    .padding()
-                    Spacer()
+                    Spacer(minLength: 0)
                 }
             }
             .background(.background)

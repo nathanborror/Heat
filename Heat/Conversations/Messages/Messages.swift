@@ -19,18 +19,21 @@ struct MessageView: View {
                     .messageSpacing(message)
                     .messageAttachments(message)
                     .padding(.vertical, 8)
+                    .padding(.horizontal, 24)
             }
             if message.role == .assistant && message.toolCalls == nil {
                 MessageViewText(message: message)
                     .messageSpacing(message)
                     .messageAttachments(message)
                     .padding(.vertical, 8)
+                    .padding(.horizontal, 24)
             }
             if message.role == .assistant && message.toolCalls != nil {
                 if message.content != nil {
                     MessageViewText(message: message)
                         .messageSpacing(message)
                         .padding(.vertical, 8)
+                        .padding(.horizontal, 24)
                 }
                 if debug {
                     MessageToolCall(message: message)
@@ -51,26 +54,29 @@ struct MessageViewText: View {
     let message: Message
     
     var body: some View {
-        switch message.role {
-        case .user:
-            if useMarkdown {
-                Markdown(message.content ?? "")
-                    .markdownTheme(.app)
-                    .markdownCodeSyntaxHighlighter(.app)
-            } else {
-                Text(message.content ?? "")
+        Group {
+            switch message.role {
+            case .user:
+                if useMarkdown {
+                    Markdown(message.content ?? "")
+                        .markdownTheme(.app)
+                        .markdownCodeSyntaxHighlighter(.app)
+                } else {
+                    Text(message.content ?? "")
+                }
+            case .assistant:
+                if useMarkdown {
+                    Markdown(message.content ?? "")
+                        .markdownTheme(.app)
+                        .markdownCodeSyntaxHighlighter(.app)
+                } else {
+                    Text(message.content ?? "")
+                }
+            default:
+                EmptyView()
             }
-        case .assistant:
-            if useMarkdown {
-                Markdown(message.content ?? "")
-                    .markdownTheme(.app)
-                    .markdownCodeSyntaxHighlighter(.app)
-            } else {
-                Text(message.content ?? "")
-            }
-        default:
-            EmptyView()
         }
+        .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
     }
     
     struct ParsedText {
