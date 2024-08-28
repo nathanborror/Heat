@@ -49,6 +49,8 @@ struct PermissionsList: View {
                 }
             }))
         }
+        .navigationTitle("Permissions")
+        .appFormStyle()
         .onAppear {
             getNotificationSettings()
             getLocationSettings()

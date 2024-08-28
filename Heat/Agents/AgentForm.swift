@@ -47,11 +47,7 @@ struct AgentForm: View {
                     .font(.system(size: 14, design: .monospaced))
             }
         }
-        #if os(macOS)
-        .formStyle(.grouped)
-        .frame(width: 400)
-        .frame(minHeight: 450)
-        #endif
+        .appFormStyle()
         .navigationTitle("Agent")
         .interactiveDismissDisabled()
         .toolbar {

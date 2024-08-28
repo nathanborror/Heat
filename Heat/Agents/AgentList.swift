@@ -26,6 +26,7 @@ struct AgentList: View {
             }
         }
         .navigationTitle("Agents")
+        .appFormStyle()
     }
     
     func handleDeleteAgent(_ agent: Agent) {

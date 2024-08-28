@@ -85,7 +85,6 @@ struct MainCompactView: View {
                     .environment(\.debug, preferencesProvider.preferences.debug)
                     .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
                     .modelContainer(for: Memory.self)
-                    .presentationDragIndicator(.visible)
                 }
         }
     }

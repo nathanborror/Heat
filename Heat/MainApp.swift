@@ -33,6 +33,7 @@ struct MainApp: App {
     @State private var conversationViewModel = ConversationViewModel()
     @State private var searchInput = ""
     @State private var showingLauncher = false
+    @State private var showingPreferences = false
     
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.option])
@@ -46,6 +47,27 @@ struct MainApp: App {
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
                 ConversationView()
+                    .toolbar {
+                        ToolbarItem {
+                            Button {
+                                showingPreferences.toggle()
+                            } label: {
+                                Label("Preferences", systemImage: "slider.horizontal.3")
+                            }
+                        }
+                        ToolbarItem {
+                            Button {
+                                Task { try await conversationViewModel.newConversation() }
+                            } label: {
+                                Label("New Conversation", systemImage: "plus")
+                            }
+                        }
+                    }
+            }
+            .sheet(isPresented: $showingPreferences) {
+                NavigationStack {
+                    PreferencesForm(preferences: preferencesProvider.preferences)
+                }
             }
             .onAppear {
                 handleInit()
@@ -77,17 +99,10 @@ struct MainApp: App {
                 Button("New Conversation", action: handleNewConversation)
                     .keyboardShortcut("n", modifiers: .command)
             }
-        }
-        
-        Settings {
-            NavigationStack {
-                PreferencesWindow()
+            CommandGroup(replacing: .appSettings) {
+                Button("Preferences...", action: handleShowPreferences)
+                    .keyboardShortcut(",", modifiers: .command)
             }
-            .frame(width: 600)
-            .environment(agentsProvider)
-            .environment(conversationsProvider)
-            .environment(preferencesProvider)
-            .modelContainer(for: Memory.self)
         }
         #else
         WindowGroup {
@@ -133,5 +148,9 @@ struct MainApp: App {
             showingLauncher.toggle()
         }
         #endif
+    }
+    
+    func handleShowPreferences() {
+        showingPreferences.toggle()
     }
 }

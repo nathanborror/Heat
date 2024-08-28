@@ -24,11 +24,8 @@ struct MemoryForm: View {
                     }
                 }
         }
-        #if os(macOS)
-        .formStyle(.grouped)
-        .frame(width: 400)
-        .frame(minHeight: 450)
-        #endif
+        .navigationTitle("New Memory")
+        .appFormStyle()
         .onAppear {
             isFocused = true
         }

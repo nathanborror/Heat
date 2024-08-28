@@ -26,6 +26,7 @@ struct MemoryList: View {
                 }
             }
         }
+        .appFormStyle()
         .navigationTitle("Memories")
         .overlay {
             if memories.isEmpty {

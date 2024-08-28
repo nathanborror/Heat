@@ -32,6 +32,7 @@ struct ServiceList: View {
             }
         }
         .navigationTitle("Services")
+        .appFormStyle()
         .sheet(item: $selectedService) { service in
             NavigationStack {
                 ServiceForm(service: service)

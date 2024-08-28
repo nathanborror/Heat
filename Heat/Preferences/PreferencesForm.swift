@@ -16,12 +16,6 @@ struct PreferencesForm: View {
     
     var body: some View {
         Form {
-            #if !os(macOS)
-            Section {
-                
-            }
-            #endif
-            
             Section {
                 NavigationLink("Memories") {
                     MemoryList()
@@ -73,7 +67,6 @@ struct PreferencesForm: View {
                 Text("These are the services used when you start a new conversation.")
             }
             
-            #if !os(macOS)
             Section {
                 NavigationLink("Permissions") {
                     PermissionsList()
@@ -95,7 +88,6 @@ struct PreferencesForm: View {
             } footer: {
                 Text("Configure third-party services that offer model access.")
             }
-            #endif
             
             Section {
                 Button("Reset Agents", action: handleAgentReset)
@@ -104,13 +96,19 @@ struct PreferencesForm: View {
             }
         }
         .navigationTitle("Preferences")
+        .appFormStyle()
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done", action: handleSave)
+            }
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel", action: dismiss.callAsFunction)
+            }
+        }
         .alert("Are you sure?", isPresented: $isShowingDeleteConfirmation) {
             Button("Delete", role: .destructive, action: handleDeleteAll)
         } message: {
             Text("This will delete all app data and preferences.")
-        }
-        .onDisappear {
-            handleSave()
         }
     }
     
@@ -150,60 +148,8 @@ struct PreferencesForm: View {
     func handleSave() {
         Task {
             try await preferencesProvider.upsert(preferences)
+            dismiss()
         }
-    }
-}
-
-struct PreferencesWindow: View {
-    @Environment(AgentsProvider.self) var agentsProvider
-    @Environment(ConversationsProvider.self) var conversationsProvider
-    @Environment(PreferencesProvider.self) var preferencesProvider
-    
-    @State var selection = Tabs.general
-    
-    enum Tabs: Hashable {
-        case general, services, agents, permissions, memories
-    }
-    
-    var body: some View {
-        TabView(selection: $selection) {
-            PreferencesForm(preferences: preferencesProvider.preferences)
-                .padding(20)
-                .frame(width: 400)
-                .tag(Tabs.general)
-                .tabItem {
-                    Label("General", systemImage: "gearshape")
-                }
-            ServiceList()
-                .padding(20)
-                .frame(width: 400)
-                .tag(Tabs.services)
-                .tabItem {
-                    Label("Services", systemImage: "cloud")
-                }
-            AgentList()
-                .padding(20)
-                .frame(width: 400)
-                .tag(Tabs.agents)
-                .tabItem {
-                    Label("Agents", systemImage: "network")
-                }
-            PermissionsList()
-                .padding(20)
-                .frame(width: 400)
-                .tag(Tabs.permissions)
-                .tabItem {
-                    Label("Permissions", systemImage: "hand.raised")
-                }
-            MemoryList()
-                .padding(20)
-                .frame(width: 400)
-                .tag(Tabs.memories)
-                .tabItem {
-                    Label("Memories", systemImage: "brain")
-                }
-        }
-        .frame(minHeight: 450, alignment: .top)
     }
 }
 

@@ -72,11 +72,7 @@ struct ServiceForm: View {
                 }
             }
         }
-        #if os(macOS)
-        .formStyle(.grouped)
-        .frame(width: 400)
-        .frame(minHeight: 450)
-        #endif
+        .appFormStyle()
         .scrollDismissesKeyboard(.immediately)
         .navigationTitle("Service")
         .toolbar {
