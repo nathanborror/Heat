@@ -6,7 +6,7 @@ public struct Defaults {
     public static let assistant = Agent(
         id: "bundle-assistant",
         name: "Assistant",
-        instructions: assistantInstructions(name: "Heat", creator: "Nathan Borror"),
+        instructions: AssistantInstructions(name: "Heat", creator: "Nathan Borror").render(),
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,

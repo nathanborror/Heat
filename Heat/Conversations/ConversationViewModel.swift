@@ -202,7 +202,7 @@ final class ConversationViewModel {
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: titlePrompt(history: messages))
+        req.with(system: TitlePrompt(history: messages).render())
         
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
@@ -233,7 +233,7 @@ final class ConversationViewModel {
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: suggestionsPrompt(history: messages))
+        req.with(system: SuggestionsPrompt(history: messages).render())
         
         // Indicate we are suggesting
         try await conversationsProvider.upsert(state: .suggesting, conversationID: conversation.id)
