@@ -211,10 +211,10 @@ final class ConversationViewModel {
             guard let content = message.content else { continue }
             
             let name = "title"
-            let result = try Parser.shared.parse(input: content, tags: [name])
+            let result = try ContentParser.shared.parse(input: content, tags: [name])
             let tag = result.get(tag: name)
             
-            guard let title = tag?.content, !title.isEmpty else { continue }
+            guard let title = tag?.content else { continue }
             try await conversationsProvider.upsert(title: title, conversationID: conversation.id)
         }
         
@@ -245,11 +245,13 @@ final class ConversationViewModel {
             guard let content = message.content else { continue }
             
             let name = "suggested_replies"
-            let result = try Parser.shared.parse(input: content, tags: [name])
+            let result = try ContentParser.shared.parse(input: content, tags: [name])
             let tag = result.get(tag: name)
             
             guard let content = tag?.content else { continue }
-            let suggestions = content.split(separator: .newlineSequence).map { String($0) }
+            let suggestions = content
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .components(separatedBy: .newlines)
             
             try await conversationsProvider.upsert(suggestions: suggestions, conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)

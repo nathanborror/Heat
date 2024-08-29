@@ -114,9 +114,9 @@ public final class ConversationsProvider {
         try await save()
     }
     
-    public func upsert(title: String?, conversationID: String) async throws {
+    public func upsert(title: String, conversationID: String) async throws {
         var conversation = try get(conversationID)
-        conversation.title = title
+        conversation.title = title.isEmpty ? nil : title
         try await upsert(conversation)
     }
     

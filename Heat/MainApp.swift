@@ -49,18 +49,10 @@ struct MainApp: App {
                 ConversationView()
                     .toolbar {
                         ToolbarItem {
-                            Button {
-                                showingPreferences.toggle()
-                            } label: {
-                                Label("Preferences", systemImage: "slider.horizontal.3")
-                            }
+                            preferencesButton
                         }
                         ToolbarItem {
-                            Button {
-                                Task { try await conversationViewModel.newConversation() }
-                            } label: {
-                                Label("New Conversation", systemImage: "plus")
-                            }
+                            newConversationButton
                         }
                     }
             }
@@ -68,9 +60,6 @@ struct MainApp: App {
                 NavigationStack {
                     PreferencesForm(preferences: preferencesProvider.preferences)
                 }
-            }
-            .onAppear {
-                handleInit()
             }
             .floatingPanel(isPresented: $showingLauncher) {
                 LauncherView()
@@ -82,6 +71,9 @@ struct MainApp: App {
                     .environment(\.debug, preferencesProvider.preferences.debug)
                     .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
                     .modelContainer(for: Memory.self)
+            }
+            .onAppear {
+                handleInit()
             }
         }
         .environment(agentsProvider)
@@ -96,11 +88,11 @@ struct MainApp: App {
         .defaultPosition(.center)
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button("New Conversation", action: handleNewConversation)
+                newConversationButton
                     .keyboardShortcut("n", modifiers: .command)
             }
             CommandGroup(replacing: .appSettings) {
-                Button("Preferences...", action: handleShowPreferences)
+                preferencesButton
                     .keyboardShortcut(",", modifiers: .command)
             }
         }
@@ -122,6 +114,22 @@ struct MainApp: App {
         #endif
     }
     
+    var newConversationButton: some View {
+        Button {
+            conversationViewModel.conversationID = nil
+        } label: {
+            Label("New Conversation", systemImage: "square.and.pencil")
+        }
+    }
+    
+    var preferencesButton: some View {
+        Button {
+            showingPreferences.toggle()
+        } label: {
+            Label("Preferences...", systemImage: "slider.horizontal.3")
+        }
+    }
+    
     func handleInit() {
         handleReset()
         handleHotKeySetup()
@@ -138,19 +146,11 @@ struct MainApp: App {
         }
     }
     
-    func handleNewConversation() {
-        conversationViewModel.conversationID = nil
-    }
-    
     func handleHotKeySetup() {
         #if os(macOS)
         hotKey.keyDownHandler = {
             showingLauncher.toggle()
         }
         #endif
-    }
-    
-    func handleShowPreferences() {
-        showingPreferences.toggle()
     }
 }

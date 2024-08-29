@@ -37,6 +37,7 @@
 		D8271A5E2C7A4F64008C345B /* CodeBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A5D2C7A4F64008C345B /* CodeBlockView.swift */; };
 		D8271A602C7CD5C3008C345B /* MemoryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A5F2C7CD5C3008C345B /* MemoryForm.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
+		D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */; };
 		D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */; };
 		D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */; };
 		D884AAC82BD5A6A500B90E9B /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = D884AAC72BD5A6A500B90E9B /* HotKey */; };
@@ -84,6 +85,7 @@
 		D8271A5D2C7A4F64008C345B /* CodeBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeBlockView.swift; sourceTree = "<group>"; };
 		D8271A5F2C7CD5C3008C345B /* MemoryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryForm.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
+		D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageAttachments.swift; sourceTree = "<group>"; };
 		D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageToolCall.swift; sourceTree = "<group>"; };
 		D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSystemView.swift; sourceTree = "<group>"; };
 		D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
@@ -251,6 +253,7 @@
 				D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */,
 				D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */,
 				D4B2D2682B6563DB0017FB52 /* MessageInput.swift */,
+				D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */,
 			);
 			path = Messages;
 			sourceTree = "<group>";
@@ -357,6 +360,7 @@
 				D8271A572C7A4B2F008C345B /* Environment+.swift in Sources */,
 				D816DE7E2C7F9C6000F9D44F /* Modifiers.swift in Sources */,
 				D884AAFE2BD9B40000B90E9B /* PermissionsList.swift in Sources */,
+				D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */,
 				D4017C902B6EEFB5001CE137 /* Asset+.swift in Sources */,
 				D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */,
 				D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */,

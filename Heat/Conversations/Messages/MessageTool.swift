@@ -13,15 +13,41 @@ struct MessageTool: View {
             if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
-                    MessageToolBadge(text: "Generated")
-                        .padding(.top, 8)
-                    MessageToolAttachments(message: message)
-                        .padding(.bottom, 8)
+                    VStack(alignment: .leading) {
+                        MessageAttachments(message: message)
+                            #if os(macOS)
+                            .frame(width: 300, height: 300)
+                            .scaleEffect(1.05)
+                            .clipShape(.rect(cornerRadius: 10))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                            }
+                            #endif
+                            .padding(.bottom, 12)
+                    }
+                    #if os(macOS)
+                    .padding(.leading, 12)
+                    #endif
                 case .searchWeb:
-                    MessageToolBadge(text: "Searched")
-                        .padding(.top, 8)
-                    MessageToolWebSearch(message: message)
-                        .padding(.bottom, 8)
+                    VStack(alignment: .leading) {
+                        MessageToolContent(message: message)
+                            .padding(.top, 8)
+                        MessageToolWebSearch(message: message)
+                            #if os(macOS)
+                            .frame(width: 200, height: 200)
+                            .scaleEffect(1.05)
+                            .clipShape(.rect(cornerRadius: 10))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                            }
+                            #endif
+                            .padding(.bottom, 12)
+                    }
+                    #if os(macOS)
+                    .padding(.leading, 12)
+                    #endif
                 default:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
                         .padding(.horizontal, 12)
@@ -102,28 +128,6 @@ struct MessageToolContent: View {
     }
 }
 
-struct MessageToolAttachments: View {
-    let message: Message
-    
-    var body: some View {
-        ScrollView(.horizontal) {
-            HStack {
-                ForEach(message.attachments.indices, id: \.self) { index in
-                    if case .asset(let asset) = message.attachments[index] {
-                        PictureView(asset: asset)
-                            .aspectRatio(1.0, contentMode: .fit)    // Forces a square aspect ratio.
-                            .containerRelativeFrame([.horizontal])  // Makes the frame width fill the scroll view.
-                    }
-                }
-                Spacer()
-            }
-            .scrollTargetLayout()
-        }
-        .scrollTargetBehavior(.viewAligned)
-        .scrollIndicators(.hidden)
-    }
-}
-
 struct MessageToolWebSearch: View {
     let message: Message
     var response: WebSearchTool.Response? = nil
@@ -142,6 +146,8 @@ struct MessageToolWebSearch: View {
 }
 
 struct MessageToolWebSearchImages: View {
+    @Environment(\.openURL) var openURL
+    
     let images: [WebSearchResult]
     
     var body: some View {
@@ -151,6 +157,10 @@ struct MessageToolWebSearchImages: View {
                     PictureView(asset: .init(name: images[index].image?.absoluteString ?? "", kind: .image, location: .url))
                         .aspectRatio(1.0, contentMode: .fit)    // Forces a square aspect ratio.
                         .containerRelativeFrame([.horizontal])  // Makes the frame width fill the scroll view.
+                        .clipped()
+                        .onTapGesture {
+                            openURL(images[index].url)
+                        }
                 }
                 Spacer()
             }

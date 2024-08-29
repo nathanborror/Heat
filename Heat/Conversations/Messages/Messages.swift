@@ -10,25 +10,25 @@ struct MessageView: View {
     let message: Message
     
     var body: some View {
-        Group {
-            if message.role == .system && debug {
+        switch message.role {
+        case .system:
+            if debug {
                 MessageSystemView(message: message)
             }
-            if message.role == .user {
+        case .user:
+            MessageViewText(message: message)
+                .messageSpacing(message)
+                .messageAttachments(message)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 24)
+        case .assistant:
+            if message.toolCalls == nil {
                 MessageViewText(message: message)
                     .messageSpacing(message)
                     .messageAttachments(message)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 24)
-            }
-            if message.role == .assistant && message.toolCalls == nil {
-                MessageViewText(message: message)
-                    .messageSpacing(message)
-                    .messageAttachments(message)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 24)
-            }
-            if message.role == .assistant && message.toolCalls != nil {
+            } else {
                 if message.content != nil {
                     MessageViewText(message: message)
                         .messageSpacing(message)
@@ -39,11 +39,9 @@ struct MessageView: View {
                     MessageToolCall(message: message)
                 }
             }
-            if message.role == .tool {
-                MessageTool(message: message)
-            }
+        case .tool:
+            MessageTool(message: message)
         }
-        .textSelection(.enabled)
     }
 }
 
@@ -77,11 +75,6 @@ struct MessageViewText: View {
             }
         }
         .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
-    }
-    
-    struct ParsedText {
-        var taggedContent: [String: String]
-        var readableContent: String
     }
 }
 
