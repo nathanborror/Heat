@@ -56,7 +56,7 @@ public struct Defaults {
         .init(
             id: .ollama,
             name: "Ollama",
-            credentials: .hostAndToken(nil, nil)
+            credentials: .host(nil)
         ),
         .init(
             id: .elevenLabs,
