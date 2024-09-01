@@ -58,13 +58,18 @@ extension WebBrowseTool {
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
             let args = try Arguments(toolCall.function.arguments)
-            let sources = try await summarize(args)
-            let sourcesData = try JSONEncoder().encode(sources)
-            let sourcesString = String(data: sourcesData, encoding: .utf8)
+            let summary = try await summarize(args)
             let label = "Read \(URL(string: args.url)?.host() ?? "")"
             return [.init(
                 role: .tool,
-                content: sourcesString,
+                content: """
+                A summary of the website (\(args.url)):
+                
+                <website_summary>
+                    \(summary.title ?? "No Title")
+                    \(summary.content ?? "No Content")
+                </website_summary>
+                """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
                 metadata: ["label": label]
