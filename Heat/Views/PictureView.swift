@@ -16,15 +16,16 @@ struct PictureView: View {
                 switch asset.location {
                 case .filesystem, .cache, .url:
                     if let url = asset.url {
-                        AsyncImage(url: url, content: { image in
+                        AsyncImage(url: url) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: geo.size.width, height: geo.size.height)
-                        }, placeholder: {
+                        } placeholder: {
                             Rectangle()
+                                .fill(.primary.opacity(0.05))
                                 .frame(width: geo.size.width, height: geo.size.height)
-                        })
+                        }
                     } else {
                         empty(size: geo.size)
                     }

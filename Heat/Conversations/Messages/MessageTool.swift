@@ -1,7 +1,6 @@
 import SwiftUI
 import GenKit
 import HeatKit
-import MarkdownUI
 
 struct MessageTool: View {
     let message: Message
@@ -70,9 +69,7 @@ struct MessageTool: View {
                         }
                     case Toolbox.browseWeb.name:
                         VStack {
-                            Markdown(message.content?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "")
-                                .markdownTheme(.app)
-                                .markdownCodeSyntaxHighlighter(.app)
+                            ContentView(text: message.content?.trimmingCharacters(in: .whitespacesAndNewlines))
                                 .textSelection(.enabled)
                                 .padding()
                         }

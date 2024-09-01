@@ -1,7 +1,6 @@
 import SwiftUI
 import GenKit
 import HeatKit
-import MarkdownUI
 
 struct MessageView: View {
     @Environment(\.debug) private var debug
@@ -56,17 +55,23 @@ struct MessageViewText: View {
             switch message.role {
             case .user:
                 if useMarkdown {
-                    Markdown(message.content ?? "")
-                        .markdownTheme(.app)
-                        .markdownCodeSyntaxHighlighter(.app)
+                    ContentView(text: message.content)
                 } else {
                     Text(message.content ?? "")
                 }
             case .assistant:
                 if useMarkdown {
-                    Markdown(message.content ?? "")
-                        .markdownTheme(.app)
-                        .markdownCodeSyntaxHighlighter(.app)
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(contents.indices, id: \.self) { index in
+                            switch contents[index] {
+                            case .text(let text):
+                                ContentView(text: text)
+                            case .tag(let tag):
+                                TagView(tag: tag)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                 } else {
                     Text(message.content ?? "")
                 }
@@ -76,6 +81,15 @@ struct MessageViewText: View {
         }
         .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
     }
+    
+    var contents: [ContentParser.Result.Content] {
+        guard case .assistant = message.role else { return [] }
+        guard let content = message.content else { return [] }
+        let results = try? parser.parse(input: content, tags: ["thinking", "artifact"])
+        return results?.contents ?? []
+    }
+    
+    private let parser = ContentParser.shared
 }
 
 // Modifiers

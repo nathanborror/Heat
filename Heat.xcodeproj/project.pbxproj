@@ -37,6 +37,12 @@
 		D8271A5E2C7A4F64008C345B /* CodeBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A5D2C7A4F64008C345B /* CodeBlockView.swift */; };
 		D8271A602C7CD5C3008C345B /* MemoryForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8271A5F2C7CD5C3008C345B /* MemoryForm.swift */; };
 		D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */; };
+		D85FAE002C8402AC00DA153F /* TagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FADFF2C8402AC00DA153F /* TagView.swift */; };
+		D85FAE022C84052900DA153F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE012C84052900DA153F /* ContentView.swift */; };
+		D85FAE042C84C7E500DA153F /* ImageSearchTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE032C84C7E500DA153F /* ImageSearchTag.swift */; };
+		D85FAE062C84C80E00DA153F /* ArtifactTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE052C84C80E00DA153F /* ArtifactTag.swift */; };
+		D85FAE082C84C83600DA153F /* ThinkingTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE072C84C83600DA153F /* ThinkingTag.swift */; };
+		D85FAE0A2C84C84600DA153F /* NewsSearchTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE092C84C84600DA153F /* NewsSearchTag.swift */; };
 		D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */; };
 		D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */; };
 		D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */; };
@@ -85,6 +91,12 @@
 		D8271A5D2C7A4F64008C345B /* CodeBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeBlockView.swift; sourceTree = "<group>"; };
 		D8271A5F2C7CD5C3008C345B /* MemoryForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryForm.swift; sourceTree = "<group>"; };
 		D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
+		D85FADFF2C8402AC00DA153F /* TagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagView.swift; sourceTree = "<group>"; };
+		D85FAE012C84052900DA153F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D85FAE032C84C7E500DA153F /* ImageSearchTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSearchTag.swift; sourceTree = "<group>"; };
+		D85FAE052C84C80E00DA153F /* ArtifactTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtifactTag.swift; sourceTree = "<group>"; };
+		D85FAE072C84C83600DA153F /* ThinkingTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkingTag.swift; sourceTree = "<group>"; };
+		D85FAE092C84C84600DA153F /* NewsSearchTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsSearchTag.swift; sourceTree = "<group>"; };
 		D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageAttachments.swift; sourceTree = "<group>"; };
 		D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageToolCall.swift; sourceTree = "<group>"; };
 		D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSystemView.swift; sourceTree = "<group>"; };
@@ -199,6 +211,7 @@
 			isa = PBXGroup;
 			children = (
 				D8A2693B2C782F9000D72F87 /* Messages */,
+				D85FADFE2C83EC7400DA153F /* Tags */,
 				D4A2C56C2B8BFA830004F27B /* Views */,
 				D4B2D2662B649DFD0017FB52 /* ConversationList.swift */,
 				D41E193A2AE4C759002516C1 /* ConversationView.swift */,
@@ -226,6 +239,18 @@
 			path = Memory;
 			sourceTree = "<group>";
 		};
+		D85FADFE2C83EC7400DA153F /* Tags */ = {
+			isa = PBXGroup;
+			children = (
+				D85FADFF2C8402AC00DA153F /* TagView.swift */,
+				D85FAE072C84C83600DA153F /* ThinkingTag.swift */,
+				D85FAE092C84C84600DA153F /* NewsSearchTag.swift */,
+				D85FAE052C84C80E00DA153F /* ArtifactTag.swift */,
+				D85FAE032C84C7E500DA153F /* ImageSearchTag.swift */,
+			);
+			path = Tags;
+			sourceTree = "<group>";
+		};
 		D884AAFA2BD7F64A00B90E9B /* Launcher */ = {
 			isa = PBXGroup;
 			children = (
@@ -241,6 +266,7 @@
 				D41E193D2AE4CD20002516C1 /* PictureView.swift */,
 				D41E193F2AE4CD4F002516C1 /* VideoView.swift */,
 				D816DE7D2C7F9C6000F9D44F /* Modifiers.swift */,
+				D85FAE012C84052900DA153F /* ContentView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -362,9 +388,11 @@
 				D884AAFE2BD9B40000B90E9B /* PermissionsList.swift in Sources */,
 				D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */,
 				D4017C902B6EEFB5001CE137 /* Asset+.swift in Sources */,
+				D85FAE062C84C80E00DA153F /* ArtifactTag.swift in Sources */,
 				D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */,
 				D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */,
 				D884AAF72BD7F52600B90E9B /* LauncherView.swift in Sources */,
+				D85FAE002C8402AC00DA153F /* TagView.swift in Sources */,
 				D41E191F2AE45C9B002516C1 /* MainApp.swift in Sources */,
 				D8271A5E2C7A4F64008C345B /* CodeBlockView.swift in Sources */,
 				D41E19402AE4CD4F002516C1 /* VideoView.swift in Sources */,
@@ -375,9 +403,13 @@
 				D8271A602C7CD5C3008C345B /* MemoryForm.swift in Sources */,
 				D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */,
 				D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */,
+				D85FAE022C84052900DA153F /* ContentView.swift in Sources */,
+				D85FAE082C84C83600DA153F /* ThinkingTag.swift in Sources */,
 				D4713D702AEAB9670005597E /* Operators.swift in Sources */,
+				D85FAE042C84C7E500DA153F /* ImageSearchTag.swift in Sources */,
 				D41E193E2AE4CD20002516C1 /* PictureView.swift in Sources */,
 				D41E193B2AE4C759002516C1 /* ConversationView.swift in Sources */,
+				D85FAE0A2C84C84600DA153F /* NewsSearchTag.swift in Sources */,
 				D88D23092B3CFB5100CCCC61 /* Messages.swift in Sources */,
 				D4017C8B2B6EEF01001CE137 /* MainCompactView.swift in Sources */,
 				D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */,
