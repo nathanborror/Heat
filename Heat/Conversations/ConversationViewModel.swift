@@ -212,7 +212,7 @@ final class ConversationViewModel {
             
             let name = "title"
             let result = try ContentParser.shared.parse(input: content, tags: [name])
-            let tag = result.get(tag: name)
+            let tag = result.first(tag: name)
             
             guard let title = tag?.content else { continue }
             try await conversationsProvider.upsert(title: title, conversationID: conversation.id)
@@ -246,7 +246,7 @@ final class ConversationViewModel {
             
             let name = "suggested_replies"
             let result = try ContentParser.shared.parse(input: content, tags: [name])
-            let tag = result.get(tag: name)
+            let tag = result.first(tag: name)
             
             guard let content = tag?.content else { continue }
             let suggestions = content
