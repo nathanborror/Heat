@@ -14,6 +14,17 @@ public struct Defaults {
         ]
     )
     
+    public static let assistantMaker = Agent(
+        id: "bundle-assistant-maker",
+        name: "Assistant Maker",
+        instructions: AssistantArtifactsInstructions(name: "Heat", creator: "Nathan Borror").render(),
+        toolIDs: [
+            Toolbox.generateImages.name,
+            Toolbox.browseWeb.name,
+            Toolbox.searchWeb.name,
+        ]
+    )
+    
     public static let chatServiceID: Service.ServiceID? = nil
     public static let imageServiceID: Service.ServiceID? = nil
     public static let embeddingServiceID: Service.ServiceID? = nil
@@ -22,6 +33,9 @@ public struct Defaults {
     public static let visionServiceID: Service.ServiceID? = nil
     public static let speechServiceID: Service.ServiceID? = nil
     public static let summarizationServiceID: Service.ServiceID? = nil
+    
+    public static let agents = [Defaults.assistant, Defaults.assistantMaker]
+    public static let agentDefaultID = Defaults.assistantMaker.id
     
     public static let services: [Service] = [
         .init(

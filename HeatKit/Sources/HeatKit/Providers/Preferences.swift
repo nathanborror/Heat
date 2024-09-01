@@ -3,7 +3,7 @@ import SharedKit
 import GenKit
 
 public struct Preferences: Codable, Sendable {
-    public var defaultAgentID: String? = Defaults.assistant.id
+    public var defaultAgentID: String? = Defaults.agentDefaultID
     public var shouldStream = true
     public var shouldUseMarkdown = true
     public var debug = false
