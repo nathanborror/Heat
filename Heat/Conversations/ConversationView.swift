@@ -12,6 +12,8 @@ struct ConversationView: View {
     
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
     
+    @State private var showingInspector = false
+    
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -67,6 +69,24 @@ struct ConversationView: View {
                 .environment(conversationViewModel)
                 .padding(12)
                 .background(.background)
+        }
+        .toolbar {
+            ToolbarItem {
+                Button {
+                    showingInspector.toggle()
+                } label: {
+                    Label("Info", systemImage: "sidebar.right")
+                }
+                .keyboardShortcut("0", modifiers: [.command, .option])
+            }
+        }
+        .inspector(isPresented: $showingInspector) {
+            if let conversation = conversationViewModel.conversation {
+                NavigationStack {
+                    ConversationInspector(conversationID: conversation.id, instructions: conversation.instructions)
+                }
+                .inspectorColumnWidth(ideal: 200)
+            }
         }
     }
     

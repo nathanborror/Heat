@@ -120,6 +120,12 @@ public final class ConversationsProvider {
         try await upsert(conversation)
     }
     
+    public func upsert(instructions: String, conversationID: String) async throws {
+        var conversation = try get(conversationID)
+        conversation.instructions = instructions
+        try await upsert(conversation)
+    }
+    
     public func upsert(suggestions: [String], conversationID: String) async throws {
         var conversation = try get(conversationID)
         conversation.suggestions = suggestions

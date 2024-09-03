@@ -43,6 +43,7 @@
 		D85FAE062C84C80E00DA153F /* ArtifactTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE052C84C80E00DA153F /* ArtifactTag.swift */; };
 		D85FAE082C84C83600DA153F /* ThinkingTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE072C84C83600DA153F /* ThinkingTag.swift */; };
 		D85FAE0A2C84C84600DA153F /* NewsSearchTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE092C84C84600DA153F /* NewsSearchTag.swift */; };
+		D85FAE452C852E1100DA153F /* ConversationInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE442C852E1100DA153F /* ConversationInspector.swift */; };
 		D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */; };
 		D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */; };
 		D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */; };
@@ -97,6 +98,7 @@
 		D85FAE052C84C80E00DA153F /* ArtifactTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtifactTag.swift; sourceTree = "<group>"; };
 		D85FAE072C84C83600DA153F /* ThinkingTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkingTag.swift; sourceTree = "<group>"; };
 		D85FAE092C84C84600DA153F /* NewsSearchTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsSearchTag.swift; sourceTree = "<group>"; };
+		D85FAE442C852E1100DA153F /* ConversationInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationInspector.swift; sourceTree = "<group>"; };
 		D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageAttachments.swift; sourceTree = "<group>"; };
 		D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageToolCall.swift; sourceTree = "<group>"; };
 		D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageSystemView.swift; sourceTree = "<group>"; };
@@ -216,6 +218,7 @@
 				D4B2D2662B649DFD0017FB52 /* ConversationList.swift */,
 				D41E193A2AE4C759002516C1 /* ConversationView.swift */,
 				D838D6A62B0A65F100988FDD /* ConversationViewModel.swift */,
+				D85FAE442C852E1100DA153F /* ConversationInspector.swift */,
 			);
 			path = Conversations;
 			sourceTree = "<group>";
@@ -418,6 +421,7 @@
 				D41E19352AE4C665002516C1 /* AgentForm.swift in Sources */,
 				D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */,
 				D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */,
+				D85FAE452C852E1100DA153F /* ConversationInspector.swift in Sources */,
 				D45CC1FA2B8A5C1A009DFDF4 /* Suggestions.swift in Sources */,
 				D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */,
 			);
