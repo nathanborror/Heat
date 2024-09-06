@@ -155,14 +155,10 @@
 				D4017C8A2B6EEF01001CE137 /* MainCompactView.swift */,
 				D8E1FC162B704CD2006C9366 /* Preferences */,
 				D41E194A2AE58D29002516C1 /* Conversations */,
-				D41E19492AE58D1B002516C1 /* Agents */,
 				D884AAFA2BD7F64A00B90E9B /* Launcher */,
-				D8247E2C2BD41C3100D918C0 /* Memory */,
-				D88D23072B3CFB2C00CCCC61 /* Views */,
 				D41E193C2AE4CD12002516C1 /* Shared */,
 				D4017C8E2B6EEF9E001CE137 /* Extensions */,
 				D41E192E2AE45D70002516C1 /* Resources */,
-				D41E19252AE45C9C002516C1 /* Preview Content */,
 			);
 			path = Heat;
 			sourceTree = "<group>";
@@ -181,6 +177,7 @@
 				D41E19332AE46D60002516C1 /* Info.plist */,
 				D41E19222AE45C9C002516C1 /* Assets.xcassets */,
 				D41E19242AE45C9C002516C1 /* Heat.entitlements */,
+				D41E19252AE45C9C002516C1 /* Preview Content */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -188,14 +185,13 @@
 		D41E193C2AE4CD12002516C1 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				D88D23072B3CFB2C00CCCC61 /* Views */,
 				D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */,
 				D4713D6F2AEAB9670005597E /* Operators.swift */,
 				D4FECDD22B817A3900E1BA13 /* HapticManager.swift */,
 				D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */,
-				D884AAF82BD7F54500B90E9B /* VisualEffectView.swift */,
 				D884AAFF2BD9B9DE00B90E9B /* LocationManager.swift */,
 				D8271A5B2C7A4E83008C345B /* CodeHighlighter.swift */,
-				D8271A5D2C7A4F64008C345B /* CodeBlockView.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -270,6 +266,8 @@
 				D41E193F2AE4CD4F002516C1 /* VideoView.swift */,
 				D816DE7D2C7F9C6000F9D44F /* Modifiers.swift */,
 				D85FAE012C84052900DA153F /* ContentView.swift */,
+				D884AAF82BD7F54500B90E9B /* VisualEffectView.swift */,
+				D8271A5D2C7A4F64008C345B /* CodeBlockView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -290,6 +288,8 @@
 		D8E1FC162B704CD2006C9366 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				D41E19492AE58D1B002516C1 /* Agents */,
+				D8247E2C2BD41C3100D918C0 /* Memory */,
 				D41E194B2AE591EA002516C1 /* PreferencesForm.swift */,
 				D8E1FC192B704CE3006C9366 /* ServiceList.swift */,
 				D8E1FC172B704CDD006C9366 /* ServiceForm.swift */,
@@ -556,7 +556,7 @@
 				CODE_SIGN_ENTITLEMENTS = Heat/Resources/Heat.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Heat/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Heat/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = 294VZ3T33E;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
@@ -608,7 +608,7 @@
 				CODE_SIGN_ENTITLEMENTS = Heat/Resources/Heat.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Heat/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Heat/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = 294VZ3T33E;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;

@@ -9,17 +9,15 @@ struct ConversationInspector: View {
     @FocusState var isFocused: Bool
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading) {
-                Text("Instructions")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                
-                TextEditor(text: $instructions)
+        Form {
+            Section {
+                TextField("Instructions", text: $instructions, axis: .vertical)
                     .focused($isFocused)
-                
+            } header: {
+                Text("Instructions")
             }
         }
+        .formStyle(.grouped)
         .navigationTitle("Conversation")
         .onChange(of: isFocused) { oldValue, newValue in
             guard !newValue else { return }
