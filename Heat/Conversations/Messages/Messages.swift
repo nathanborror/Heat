@@ -69,6 +69,7 @@ struct MessageViewText: View {
                             case .tag(let tag):
                                 TagView(tag: tag)
                                     .foregroundStyle(.secondary)
+                                    .padding(.leading, -12)
                             }
                         }
                     }
@@ -80,13 +81,14 @@ struct MessageViewText: View {
             }
         }
         .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
+        .textSelection(.enabled)
     }
     
     var contents: [ContentParser.Result.Content] {
         guard case .assistant = message.role else { return [] }
         guard let content = message.content else { return [] }
-        let results = try? parser.parse(input: content, tags: ["thinking", "artifact"])
-        return results?.contents ?? []
+        guard let results = try? parser.parse(input: content, tags: ["thinking", "artifact", "output"]) else { return [] }
+        return results.contents
     }
     
     private let parser = ContentParser.shared

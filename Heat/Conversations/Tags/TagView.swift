@@ -11,6 +11,11 @@ struct TagView: View {
             ArtifactTag(tag: tag)
         case "thinking":
             ThinkingTag(tag: tag)
+        case "reflection":
+            ReflectionTag(tag: tag)
+        case "output":
+            ContentView(text: tag.content ?? "")
+                .padding(.leading, 12)
         case "image_search":
             ImageSearchTag(tag: tag)
         case "news_search":
