@@ -78,11 +78,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-<<<<<<< HEAD
-        "revision" : "027b838d71d8ff0bf16157ae2096fef150abe57c"
-=======
         "revision" : "590c771c5521402d6e35ba1a7a0e158860a4c247"
->>>>>>> ac930c4 (cleanup)
       }
     },
     {
