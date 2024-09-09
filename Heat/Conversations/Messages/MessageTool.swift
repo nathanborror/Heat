@@ -26,7 +26,7 @@ struct MessageTool: View {
                             .padding(.bottom, 12)
                     }
                     #if os(macOS)
-                    .padding(.leading, 12)
+                    .padding(.leading, 24)
                     #endif
                 case .searchWeb:
                     VStack(alignment: .leading) {
@@ -45,15 +45,15 @@ struct MessageTool: View {
                             .padding(.bottom, 12)
                     }
                     #if os(macOS)
-                    .padding(.leading, 12)
+                    .padding(.leading, 24)
                     #endif
                 default:
                     MessageToolContent(message: message, symbol: "checkmark.circle")
-                        .padding(.horizontal, 12)
+                        .padding(.horizontal, 24)
                 }
             } else {
                 MessageToolContent(message: message, symbol: "circle.badge.questionmark")
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 24)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -90,9 +90,8 @@ struct MessageToolBadge: View {
             .font(.system(size: 14, weight: .medium))
             .padding(.horizontal, 12)
             .padding(.vertical, 4)
-            .background(.black)
             .foregroundStyle(.white)
-            .clipShape(.rect(cornerRadius: 5))
+            .background(.black, in: .rect(cornerRadius: 5))
             .padding(.horizontal, 12)
     }
 }

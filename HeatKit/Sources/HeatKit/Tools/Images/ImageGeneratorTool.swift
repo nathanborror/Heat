@@ -69,7 +69,7 @@ extension ImageGeneratorTool {
         }
     }
     
-    private static func makeImageAttachment(prompt: String, service: ImageService, model: String) async throws -> Message.Attachment? {
+    private static func makeImageAttachment(prompt: String, service: ImageService, model: Model) async throws -> Message.Attachment? {
         var attachments = [Message.Attachment]()
         try await ImageSession.shared
             .generate(service: service, model: model, prompt: prompt) { images in

@@ -40,48 +40,40 @@ public struct Defaults {
     public static let services: [Service] = [
         .init(
             id: .openAI,
-            name: "OpenAI",
-            credentials: .hostAndToken(nil, nil)
+            name: "OpenAI"
         ),
         .init(
             id: .mistral,
-            name: "Mistral",
-            credentials: .hostAndToken(nil, nil)
+            name: "Mistral"
         ),
         .init(
             id: .perplexity,
-            name: "Perplexity",
-            credentials: .hostAndToken(nil, nil)
+            name: "Perplexity"
         ),
         .init(
             id: .ollama,
-            name: "Ollama",
-            credentials: .host(nil)
+            name: "Ollama"
         ),
         .init(
             id: .elevenLabs,
-            name: "ElevenLabs",
-            credentials: .hostAndToken(nil, nil)
+            name: "ElevenLabs"
         ),
         .init(
             id: .anthropic,
-            name: "Anthropic",
-            credentials: .hostAndToken(nil, nil)
+            name: "Anthropic"
         ),
         .init(
             id: .google,
-            name: "Google",
-            credentials: .hostAndToken(nil, nil)
+            name: "Google"
         ),
         .init(
             id: .fal,
-            name: "Fal",
-            credentials: .hostAndToken(nil, nil)
+            name: "Fal"
         ),
         .init(
             id: .groq,
             name: "Groq",
-            credentials: .hostAndToken(.init(string: "https://api.groq.com/openai/v1")!, nil)
+            host: "https://api.groq.com/openai/v1"
         ),
     ]
     

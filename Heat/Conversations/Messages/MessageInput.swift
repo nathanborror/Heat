@@ -90,9 +90,8 @@ struct MessageInput: View {
                         #if os(macOS)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(.tint)
                         .foregroundStyle(.white)
-                        .clipShape(.rect(cornerRadius: 8))
+                        .background(.tint, in: .rect(cornerRadius: 8))
                         .padding(.bottom, 3)
                         .padding(.leading, 3)
                         .padding(.trailing, 8)
@@ -100,9 +99,8 @@ struct MessageInput: View {
                         .font(.subheadline)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(.tint)
                         .foregroundStyle(.white)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.tint, in: .rect(cornerRadius: 6))
                         .padding(.bottom, 5)
                         .padding(.horizontal, 5)
                         #endif
@@ -137,8 +135,7 @@ struct MessageInput: View {
                     }
                 }
             }
-            .background(.primary.opacity(0.05))
-            .clipShape(.rect(cornerRadius: 10))
+            .background(.primary.opacity(0.05), in: .rect(cornerRadius: 10))
             
             if showStopGenerating {
                 Button(action: handleStop) {
@@ -300,9 +297,8 @@ struct ConversationButtonModifier: ViewModifier {
         content
             .fontWeight(.medium)
             .frame(width: width, height: height)
-            .background(.tint)
             .foregroundStyle(.white)
-            .clipShape(.rect(cornerRadius: 10))
+            .background(.tint, in: .rect(cornerRadius: 10))
             .padding(.vertical, 2)
     }
     
@@ -350,7 +346,6 @@ struct ConversationInputImage: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 100, height: 100)
-                    //.clipShape(.rect(cornerRadius: 10))
                 #else
                 Image(uiImage: image)
                     .resizable()

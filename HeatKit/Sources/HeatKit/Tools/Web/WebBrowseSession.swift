@@ -12,14 +12,17 @@ public class WebBrowseSession {
         return try await fetch(url: url, urlMode: .omit, hideJSONLD: true, hideImages: true)
     }
     
-    public func generateSummary(service: ChatService, model: String, url: String) async throws -> String? {
+    public func generateSummary(service: ChatService, model: Model, url: String, instructions: String) async throws -> String? {
         guard let url = URL(string: url) else { return nil }
         
-        let markdown = try await fetch(url: url, urlMode: .omit, hideJSONLD: true, hideImages: true)
+        var markdown = try await fetch(url: url, urlMode: .omit, hideJSONLD: true, hideImages: true)
+        markdown = markdown.trimmingCharacters(in: .whitespacesAndNewlines)
         
         var req = ChatSessionRequest(service: service, model: model)
         req.with(system: """
-            Summarize the following:
+            \(instructions)
+            
+            The website markup was converted to markdown:
             
             \(markdown)
             """)

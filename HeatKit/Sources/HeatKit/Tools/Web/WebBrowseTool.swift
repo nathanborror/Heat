@@ -6,12 +6,12 @@ public struct WebBrowseTool {
 
     public struct Arguments: Codable {
         public var instructions: String
-        public var title: String?
+        public var title: String
         public var url: String
     }
     
     public struct Response: Codable, Identifiable {
-        public let title: String?
+        public let title: String
         public let url: String
         public let content: String?
         public let success: Bool
@@ -38,7 +38,7 @@ public struct WebBrowseTool {
                     description: "A webpage URL"
                 ),
             ],
-            required: ["instructions", "url"]
+            required: ["instructions", "url", "title"]
         )
     )
 }
@@ -63,12 +63,13 @@ extension WebBrowseTool {
             return [.init(
                 role: .tool,
                 content: """
-                A summary of the website (\(args.url)):
-                
-                <website_summary>
-                    \(summary.title ?? "No Title")
-                    \(summary.content ?? "No Content")
-                </website_summary>
+                <website>
+                    <title>\(summary.title)</title>
+                    <url>\(args.url)</url>
+                    <summary>
+                        \(summary.content ?? "No Content")
+                    </summary>
+                </website>
                 """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
@@ -77,7 +78,11 @@ extension WebBrowseTool {
         } catch {
             return [.init(
                 role: .tool,
-                content: "Tool Failed: \(error.localizedDescription)",
+                content: """
+                <error>
+                    \(error.localizedDescription)
+                </error>
+                """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name
             )]
@@ -89,7 +94,12 @@ extension WebBrowseTool {
         let summarizationModel = try await PreferencesProvider.shared.preferredSummarizationModel()
         
         do {
-            let summary = try await WebBrowseSession.shared.generateSummary(service: summarizationService, model: summarizationModel, url: args.url)
+            let summary = try await WebBrowseSession.shared.generateSummary(
+                service: summarizationService,
+                model: summarizationModel,
+                url: args.url,
+                instructions: args.instructions
+            )
             return .init(
                 title: args.title,
                 url: args.url,
@@ -100,7 +110,11 @@ extension WebBrowseTool {
             return .init(
                 title: args.title,
                 url: args.url,
-                content: nil,
+                content: """
+                <error>
+                    \(error.localizedDescription)
+                </error>
+                """,
                 success: false
             )
         }

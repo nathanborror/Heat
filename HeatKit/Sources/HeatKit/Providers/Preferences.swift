@@ -99,6 +99,14 @@ public final class PreferencesProvider {
         return service
     }
     
+    public func get(modelID: String?, serviceID: Service.ServiceID?) throws -> Model {
+        let service = try get(serviceID: serviceID)
+        guard let model = service.models.first(where: { $0.id == modelID }) else {
+            throw PreferencesProviderError.modelNotFound
+        }
+        return model
+    }
+    
     public func upsert(_ preferences: Preferences) async throws {
         self.preferences = preferences
         try await save()
@@ -163,68 +171,44 @@ public final class PreferencesProvider {
     
     // MARK: - Model Preferences
     
-    public func preferredChatModel() throws -> String {
+    public func preferredChatModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.chatServiceID)
-        guard let model = service.preferredChatModel else {
-            throw PreferencesProviderError.modelNotFound
-        }
-        return model
+        return try get(modelID: service.preferredChatModel, serviceID: service.id)
     }
     
-    public func preferredImageModel() throws -> String {
+    public func preferredImageModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.imageServiceID)
-        guard let model = service.preferredImageModel else {
-            throw PreferencesProviderError.modelNotFound
-        }
-        return model
+        return try get(modelID: service.preferredImageModel, serviceID: service.id)
     }
     
-    public func preferredEmbeddingModel() throws -> String {
+    public func preferredEmbeddingModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.embeddingServiceID)
-        guard let model = service.preferredEmbeddingModel else {
-            throw PreferencesProviderError.modelNotFound
-        }
-        return model
+        return try get(modelID: service.preferredEmbeddingModel, serviceID: service.id)
     }
     
-    public func preferredTranscriptionModel() throws -> String {
+    public func preferredTranscriptionModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.transcriptionServiceID)
-        guard let model = service.preferredTranscriptionModel else {
-            throw PreferencesProviderError.modelNotFound
-        }
-        return model
+        return try get(modelID: service.preferredTranscriptionModel, serviceID: service.id)
     }
     
-    public func preferredToolModel() throws -> String {
+    public func preferredToolModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.toolServiceID)
-        guard let model = service.preferredChatModel else {
-            throw PreferencesProviderError.modelNotFound
-        }
-        return model
+        return try get(modelID: service.preferredChatModel, serviceID: service.id)
     }
     
-    public func preferredVisionModel() throws -> String {
+    public func preferredVisionModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.visionServiceID)
-        guard let model = service.preferredVisionModel else {
-            throw PreferencesProviderError.modelNotFound
-        }
-        return model
+        return try get(modelID: service.preferredVisionModel, serviceID: service.id)
     }
     
-    public func preferredSpeechModel() throws -> String {
+    public func preferredSpeechModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.speechServiceID)
-        guard let model = service.preferredSpeechModel else {
-            throw PreferencesProviderError.modelNotFound
-        }
-        return model
+        return try get(modelID: service.preferredSpeechModel, serviceID: service.id)
     }
     
-    public func preferredSummarizationModel() throws -> String {
+    public func preferredSummarizationModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.summarizationServiceID)
-        guard let model = service.preferredSummarizationModel else {
-            throw PreferencesProviderError.modelNotFound
-        }
-        return model
+        return try get(modelID: service.preferredSummarizationModel, serviceID: service.id)
     }
     
     // MARK: - Private

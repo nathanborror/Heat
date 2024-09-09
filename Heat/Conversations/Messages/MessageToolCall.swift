@@ -36,6 +36,9 @@ struct MessageToolCall: View {
                         .foregroundStyle(.secondary.opacity(0.5))
                         .padding(.bottom, 4)
                 }
+                #if os(macOS)
+                .padding(.leading, 24)
+                #endif
             }
         } else {
             Text("Missing tool calls.")

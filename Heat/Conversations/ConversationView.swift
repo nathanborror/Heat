@@ -52,6 +52,7 @@ struct ConversationView: View {
                         .id("bottom")
                     }
                     .frame(maxWidth: 800, alignment: .center)
+                    .padding(.top, 24)
                     Spacer(minLength: 0)
                 }
             }

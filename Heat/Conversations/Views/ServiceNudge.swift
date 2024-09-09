@@ -75,7 +75,7 @@ struct ServiceNudge: View {
         // Update service with token and preferred models
         var service = try PreferencesProvider.shared.get(serviceID: .openAI)
         service.applyPreferredModels(Defaults.openAI)
-        service.credentials = .token(apiKey)
+        service.token = apiKey
         try await PreferencesProvider.shared.upsert(service: service)
         
         // Update preferences with preferred services

@@ -108,8 +108,7 @@ struct MessageViewSpacing: ViewModifier {
                 content
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(.primary.opacity(0.05))
-                    .clipShape(.rect(cornerRadius: 10))
+                    .background(.primary.opacity(0.05), in: .rect(cornerRadius: 10))
                     .padding(.leading, -12)
             }
         }

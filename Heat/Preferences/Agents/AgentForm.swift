@@ -81,8 +81,7 @@ struct AgentPicture: View {
                 .font(.system(size: 17, weight: .semibold))
                 .frame(width: 32, height: 32)
                 .foregroundStyle(.white)
-                .background(.tint)
-                .clipShape(.circle)
+                .background(.tint, in: .circle)
                 .offset(x: 4, y: 4)
         }
         .frame(maxWidth: .infinity)

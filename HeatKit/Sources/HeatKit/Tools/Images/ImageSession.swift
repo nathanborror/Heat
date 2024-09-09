@@ -22,7 +22,7 @@ public final class ImageSession {
     }
     
     @discardableResult
-    public func generate(service: ImageService, model: String, prompt: String, callback: ImagesCallback) async throws -> Self {
+    public func generate(service: ImageService, model: Model, prompt: String, callback: ImagesCallback) async throws -> Self {
         do {
             try Task.checkCancellation()
             let req = ImagineServiceRequest(model: model, prompt: prompt)

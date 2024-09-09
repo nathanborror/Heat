@@ -21,8 +21,7 @@ struct ThinkingTag: View {
             }
         }
         .padding(12)
-        .background(.background)
-        .clipShape(.rect(cornerRadius: 10))
+        .background(.background, in: .rect(cornerRadius: 10))
         .colorInvert()
     }
     
