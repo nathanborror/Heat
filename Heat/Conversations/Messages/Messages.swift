@@ -4,7 +4,6 @@ import HeatKit
 
 struct MessageView: View {
     @Environment(\.debug) private var debug
-    @Environment(\.useMarkdown) private var useMarkdown
     
     let message: Message
     
@@ -54,11 +53,7 @@ struct MessageViewText: View {
         Group {
             switch message.role {
             case .user:
-                if useMarkdown {
-                    ContentView(text: message.content)
-                } else {
-                    Text(message.content ?? "")
-                }
+                ContentView(text: message.content)
             case .assistant:
                 if useMarkdown {
                     VStack(alignment: .leading, spacing: 12) {

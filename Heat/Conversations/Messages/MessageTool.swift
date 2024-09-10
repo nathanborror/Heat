@@ -164,5 +164,6 @@ struct MessageToolWebSearchImages: View {
         }
         .scrollTargetBehavior(.viewAligned)
         .scrollIndicators(.hidden)
+        .background(.black)
     }
 }
