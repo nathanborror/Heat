@@ -3,6 +3,15 @@ import GenKit
 
 public struct Defaults {
     
+    // MARK: - Agents
+    
+    public static let agents = [
+        assistant,
+        assistantMaker
+    ]
+    
+    public static let agentDefaultID = assistantMaker.id
+    
     public static let assistant = Agent(
         id: "bundle-assistant",
         name: "Assistant",
@@ -25,102 +34,153 @@ public struct Defaults {
         ]
     )
     
-    public static let chatServiceID: Service.ServiceID? = nil
-    public static let imageServiceID: Service.ServiceID? = nil
-    public static let embeddingServiceID: Service.ServiceID? = nil
-    public static let transcriptionServiceID: Service.ServiceID? = nil
-    public static let toolServiceID: Service.ServiceID? = nil
-    public static let visionServiceID: Service.ServiceID? = nil
-    public static let speechServiceID: Service.ServiceID? = nil
-    public static let summarizationServiceID: Service.ServiceID? = nil
-    
-    public static let agents = [Defaults.assistant, Defaults.assistantMaker]
-    public static let agentDefaultID = Defaults.assistantMaker.id
+    // MARK: - Services
     
     public static let services: [Service] = [
-        .init(
-            id: .openAI,
-            name: "OpenAI"
-        ),
-        .init(
-            id: .mistral,
-            name: "Mistral"
-        ),
-        .init(
-            id: .perplexity,
-            name: "Perplexity"
-        ),
-        .init(
-            id: .ollama,
-            name: "Ollama"
-        ),
-        .init(
-            id: .elevenLabs,
-            name: "ElevenLabs"
-        ),
-        .init(
-            id: .anthropic,
-            name: "Anthropic"
-        ),
-        .init(
-            id: .google,
-            name: "Google"
-        ),
-        .init(
-            id: .fal,
-            name: "Fal"
-        ),
-        .init(
-            id: .groq,
-            name: "Groq",
-            host: "https://api.groq.com/openai/v1"
-        ),
+        anthropic,
+        elevenlabs,
+        fal,
+        google,
+        groq,
+        mistral,
+        ollama,
+        openAI,
+        perplexity,
     ]
-    
-    public static let openAI =
-        Service(
-            id: .openAI,
-            name: "OpenAI",
-            preferredChatModel: "gpt-4o",
-            preferredImageModel: "dall-e-3",
-            preferredEmbeddingModel: "text-embedding-3-small",
-            preferredTranscriptionModel: "whisper-1",
-            preferredToolModel: "gpt-4o",
-            preferredVisionModel: "gpt-4o",
-            preferredSpeechModel: "tts-1-hd",
-            preferredSummarizationModel: "gpt-4o-mini"
-        )
     
     public static let anthropic =
         Service(
             id: .anthropic,
             name: "Anthropic",
-            preferredChatModel: "claude-3-5-sonnet-20240620",
-            preferredToolModel: "claude-3-5-sonnet-20240620",
-            preferredVisionModel: "claude-3-5-sonnet-20240620",
-            preferredSummarizationModel: "claude-3-haiku-20240307"
+            models: [
+                anthropic_claude_3_5_sonnet,
+                anthropic_claude_3_haiku,
+            ],
+            preferredChatModel: anthropic_claude_3_5_sonnet.id,
+            preferredToolModel: anthropic_claude_3_5_sonnet.id,
+            preferredVisionModel: anthropic_claude_3_5_sonnet.id,
+            preferredSummarizationModel: anthropic_claude_3_haiku.id
         )
     
-    public static let mistral =
+    public static var elevenlabs =
         Service(
-            id: .mistral,
-            name: "Mistral",
-            preferredChatModel: "mistral-large-latest",
-            preferredEmbeddingModel: "mistral-embed",
-            preferredToolModel: "mistral-large-latest"
+            id: .elevenLabs,
+            name: "ElevenLabs",
+            models: [elevenlabs_monolingual_1],
+            preferredSpeechModel: elevenlabs_monolingual_1.id
         )
     
-    public static let perplexity =
+    public static var fal =
         Service(
-            id: .perplexity,
-            name: "Perplexity",
-            preferredChatModel: "pplx-70b-chat"
+            id: .fal,
+            name: "Fal",
+            models: [fal_sdxl_fast],
+            preferredImageModel: fal_sdxl_fast.id
         )
     
     public static let google =
         Service(
             id: .google,
             name: "Google",
-            preferredChatModel: "gemini-pro"
+            models: [google_gemini_pro],
+            preferredChatModel: google_gemini_pro.id
         )
+    
+    public static var groq =
+        Service(
+            id: .groq,
+            name: "Groq",
+            host: "https://api.groq.com/openai/v1",
+            models: [
+                groq_llama_3_1_70b_versatile,
+                groq_llama_3_1_8b_instant,
+            ],
+            preferredChatModel: groq_llama_3_1_70b_versatile.id,
+            preferredToolModel: groq_llama_3_1_70b_versatile.id,
+            preferredSummarizationModel: groq_llama_3_1_8b_instant.id
+        )
+    
+    public static let mistral =
+        Service(
+            id: .mistral,
+            name: "Mistral",
+            models: [
+                mistral_large,
+                mistral_small,
+                mistral_embed,
+            ],
+            preferredChatModel: mistral_large.id,
+            preferredEmbeddingModel: mistral_embed.id,
+            preferredToolModel: mistral_large.id,
+            preferredSummarizationModel: mistral_small.id
+        )
+    
+    public static var ollama =
+        Service(
+            id: .ollama,
+            name: "Ollama",
+            host: "http://127.0.0.1:11434/api"
+        )
+    
+    public static let openAI =
+        Service(
+            id: .openAI,
+            name: "OpenAI",
+            models: [
+                openAI_gpt_4o,
+                openAI_gpt_4o_mini,
+                openAI_dalle_3,
+                openAI_embedding_ada_2,
+                openAI_whisper_1,
+                openAI_tts_1_hd,
+            ],
+            preferredChatModel: openAI_gpt_4o.id,
+            preferredImageModel: openAI_dalle_3.id,
+            preferredEmbeddingModel: openAI_embedding_ada_2.id,
+            preferredTranscriptionModel: openAI_whisper_1.id,
+            preferredToolModel: openAI_gpt_4o.id,
+            preferredVisionModel: openAI_gpt_4o.id,
+            preferredSpeechModel: openAI_tts_1_hd.id,
+            preferredSummarizationModel: openAI_gpt_4o_mini.id
+        )
+    
+    public static let perplexity =
+        Service(
+            id: .perplexity,
+            name: "Perplexity",
+            models: [
+                perplexity_llama_3_1_large,
+                perplexity_llama_3_1_small,
+            ],
+            preferredChatModel: perplexity_llama_3_1_large.id,
+            preferredSummarizationModel: perplexity_llama_3_1_small.id
+        )
+    
+    // MARK: - Models
+    
+    public static var anthropic_claude_3_5_sonnet = Model(id: "claude-3-5-sonnet-20240620", owner: "anthropic", contextWindow: 200_000, maxOutput: 8192)
+    public static var anthropic_claude_3_haiku = Model(id: "claude-3-haiku-20240307", owner: "anthropic", contextWindow: 200_000, maxOutput: 4096)
+    
+    public static var elevenlabs_monolingual_1 = Model(id: "eleven_monolingual_v1", owner: "elevenlabs")
+    
+    public static var fal_sdxl_fast = Model(id: "fast-sdxl", owner: "fal")
+    
+    public static var google_gemini_pro = Model(id: "gemini-pro", owner: "google")
+    
+    public static var groq_llama_3_1_70b_versatile = Model(id: "llama-3.1-70b-versatile", owner: "groq")
+    public static var groq_llama_3_1_8b_instant = Model(id: "llama-3.1-8b-instant", owner: "groq")
+    
+    public static var mistral_large = Model(id: "mistral-large-latest", owner: "mistral")
+    public static var mistral_small = Model(id: "mistral-small-latest", owner: "mistral")
+    public static var mistral_embed = Model(id: "mistral-embed", owner: "mistral")
+    
+    public static var openAI_gpt_4o = Model(id: "gpt-4o", owner: "openai")
+    public static var openAI_gpt_4o_mini = Model(id: "gpt-4o-mini", owner: "openai")
+    public static var openAI_dalle_3 = Model(id: "dall-e-3", owner: "openai")
+    public static var openAI_embedding_ada_2 = Model(id: "text-embedding-ada-002", owner: "openai")
+    public static var openAI_whisper_1 = Model(id: "whisper-1", owner: "openai")
+    public static var openAI_tts_1_hd = Model(id: "tts-1-hd", owner: "openai")
+    
+    public static var perplexity_llama_3_1_large = Model(id: "llama-3.1-sonar-large-128k-chat", owner: "perplexity")
+    public static var perplexity_llama_3_1_small = Model(id: "llama-3.1-sonar-small-128k-chat", owner: "perplexity")
 }
