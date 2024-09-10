@@ -54,7 +54,7 @@ extension CalendarSearchTool.Arguments {
     
     public init(_ arguments: String) throws {
         guard let data = arguments.data(using: .utf8) else {
-            throw KitError.failedtoolDecoding
+            throw ToolboxError.failedDecoding
         }
         self = try CalendarSearchTool.decoder.decode(Self.self, from: data)
     }

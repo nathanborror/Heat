@@ -84,3 +84,7 @@ public enum Toolbox: CaseIterable {
         .generateSuggestions,
     ]
 }
+
+public enum ToolboxError: Error {
+    case failedDecoding
+}

@@ -34,7 +34,7 @@ extension MemoryTool.Arguments {
     
     public init(_ arguments: String) throws {
         guard let data = arguments.data(using: .utf8) else {
-            throw KitError.failedtoolDecoding
+            throw ToolboxError.failedDecoding
         }
         self = try JSONDecoder().decode(Self.self, from: data)
     }

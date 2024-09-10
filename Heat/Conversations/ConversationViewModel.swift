@@ -190,9 +190,7 @@ final class ConversationViewModel {
     
     /// Generate a title for the conversation.
     func generateTitle() async throws -> Bool {
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
+        guard let conversation else { return false }
         guard conversation.title == nil else {
             return false
         }
@@ -224,9 +222,7 @@ final class ConversationViewModel {
     
     /// Generate conversation suggestions related to what's being talked about.
     func generateSuggestions() async throws -> Bool {
-        guard let conversation else {
-            throw KitError.missingConversation
-        }
+        guard let conversation else { return false }
         
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
