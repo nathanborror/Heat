@@ -6,6 +6,7 @@ import HeatKit
 struct PreferencesForm: View {
     @Environment(AgentsProvider.self) var agentsProvider
     @Environment(ConversationsProvider.self) var conversationsProvider
+    @Environment(MessagesProvider.self) var messagesProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
     
     @Environment(\.dismiss) private var dismiss
@@ -92,6 +93,10 @@ struct PreferencesForm: View {
             Section {
                 Button("Reset Agents", action: handleAgentReset)
                 Button("Reset Conversations", action: handleConversationReset)
+                Button("Reset Preferences", action: handlePreferencesReset)
+            }
+            
+            Section {
                 Button("Delete All Data", role: .destructive, action: { isShowingDeleteConfirmation = true })
             }
         }
@@ -131,18 +136,23 @@ struct PreferencesForm: View {
     func handleConversationReset() {
         Task {
             try await conversationsProvider.reset()
-            try await MessagesProvider.shared.reset()
+            try await messagesProvider.reset()
+        }
+    }
+    
+    func handlePreferencesReset() {
+        Task {
+            try await preferencesProvider.reset()
+            
+            // Restablish preferences in the form
+            preferences = preferencesProvider.preferences
         }
     }
     
     func handleDeleteAll() {
-        Task {
-            try await agentsProvider.reset()
-            try await conversationsProvider.reset()
-            try await preferencesProvider.reset()
-            
-            preferences = preferencesProvider.preferences
-        }
+        handleAgentReset()
+        handleConversationReset()
+        handlePreferencesReset()
     }
     
     func handleSave() {
