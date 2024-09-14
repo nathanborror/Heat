@@ -78,7 +78,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "590c771c5521402d6e35ba1a7a0e158860a4c247"
+        "revision" : "e4bea31ea53675faefb2f06b40d05b67218a1fb7"
       }
     },
     {
@@ -93,10 +93,10 @@
     {
       "identity" : "swift-markdown-ui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/electricsidecar-dev/swift-markdown-ui",
+      "location" : "https://github.com/gonzalezreal/swift-markdown-ui",
       "state" : {
-        "branch" : "recursive",
-        "revision" : "f0d1b7fe722e6eda41db2e56f75529956ffa42fa"
+        "branch" : "main",
+        "revision" : "55441810c0f678c78ed7e2ebd46dde89228e02fc"
       }
     },
     {
