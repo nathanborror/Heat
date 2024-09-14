@@ -47,14 +47,14 @@ struct MainApp: App {
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
                 ConversationView()
-                    .toolbar {
-                        ToolbarItem {
-                            preferencesButton
-                        }
-                        ToolbarItem {
-                            newConversationButton
-                        }
-                    }
+            }
+            .toolbar {
+                ToolbarItem {
+                    preferencesButton
+                }
+                ToolbarItem {
+                    newConversationButton
+                }
             }
             .sheet(isPresented: $showingPreferences) {
                 NavigationStack {

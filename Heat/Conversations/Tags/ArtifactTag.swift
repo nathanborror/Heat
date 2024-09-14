@@ -21,7 +21,7 @@ struct ArtifactTag: View {
         .background {
             Rectangle()
                 .fill(.background)
-                .shadow(color: .primary.opacity(0.2), radius: 20, y: 10)
+                .stroke(Color.primary, lineWidth: 1)
         }
         .padding(.vertical, 12)
     }

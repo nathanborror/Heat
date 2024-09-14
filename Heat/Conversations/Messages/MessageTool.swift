@@ -12,50 +12,36 @@ struct MessageTool: View {
             if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
-                    VStack(alignment: .leading) {
-                        MessageAttachments(message: message)
-                            #if os(macOS)
-                            .frame(width: 300, height: 300)
-                            .scaleEffect(1.05)
-                            .clipShape(.rect(cornerRadius: 10))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                            }
-                            #endif
-                            .padding(.bottom, 12)
-                    }
-                    #if os(macOS)
-                    .padding(.leading, 24)
-                    #endif
+                    MessageAttachments(message: message)
+                        #if os(macOS)
+                        .frame(width: 300, height: 300)
+                        .scaleEffect(1.05)
+                        .clipShape(.rect(cornerRadius: 10))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                        }
+                        #endif
                 case .searchWeb:
-                    VStack(alignment: .leading) {
-                        MessageToolContent(message: message)
-                            .padding(.top, 8)
-                        MessageToolWebSearch(message: message)
-                            #if os(macOS)
-                            .frame(width: 200, height: 200)
-                            .scaleEffect(1.05)
-                            .clipShape(.rect(cornerRadius: 10))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                            }
-                            #endif
-                            .padding(.bottom, 12)
-                    }
-                    #if os(macOS)
-                    .padding(.leading, 24)
-                    #endif
+                    MessageToolContent(message: message)
+                    MessageToolWebSearch(message: message)
+                        #if os(macOS)
+                        .frame(width: 200, height: 200)
+                        .scaleEffect(1.05)
+                        .clipShape(.rect(cornerRadius: 10))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                        }
+                        #endif
                 default:
-                    MessageToolContent(message: message, symbol: "checkmark.circle")
-                        .padding(.horizontal, 24)
+                    MessageToolContent(message: message)
                 }
             } else {
-                MessageToolContent(message: message, symbol: "circle.badge.questionmark")
-                    .padding(.horizontal, 24)
+                MessageToolContent(message: message)
             }
         }
+        .padding(.horizontal, 24)
         .frame(maxWidth: .infinity, alignment: .leading)
         .sheet(isPresented: $isShowingContext) {
             NavigationStack {
@@ -82,36 +68,18 @@ struct MessageTool: View {
     }
 }
 
-struct MessageToolBadge: View {
-    let text: String
-    
-    var body: some View {
-        Text(text)
-            .font(.system(size: 14, weight: .medium))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 4)
-            .foregroundStyle(.white)
-            .background(.black, in: .rect(cornerRadius: 5))
-            .padding(.horizontal, 12)
-    }
-}
-
 struct MessageToolContent: View {
     @Environment(\.debug) private var debug
     
     var message: Message
-    var symbol: String = "checkmark.circle"
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(alignment: .firstTextBaseline) {
-                Image(systemName: symbol)
-                Text(message.metadata.label)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .lineLimit(1)
-            }
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
+            Text(message.metadata.label)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
             
             if debug, let content = message.content {
                 Text(content)
@@ -120,7 +88,6 @@ struct MessageToolContent: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .padding(.vertical, 2)
     }
 }
 

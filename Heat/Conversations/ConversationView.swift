@@ -72,13 +72,15 @@ struct ConversationView: View {
                 .background(.background)
         }
         .toolbar {
-            ToolbarItem {
-                Button {
-                    showingInspector.toggle()
-                } label: {
-                    Label("Info", systemImage: "sidebar.right")
+            if conversationViewModel.conversationID != nil {
+                ToolbarItem {
+                    Button {
+                        showingInspector.toggle()
+                    } label: {
+                        Label("Info", systemImage: "sidebar.right")
+                    }
+                    .keyboardShortcut("0", modifiers: [.command, .option])
                 }
-                .keyboardShortcut("0", modifiers: [.command, .option])
             }
         }
         .inspector(isPresented: $showingInspector) {
@@ -87,6 +89,15 @@ struct ConversationView: View {
                     ConversationInspector(conversationID: conversation.id, instructions: conversation.instructions)
                 }
                 .inspectorColumnWidth(ideal: 200)
+            }
+        }
+        .overlay {
+            if conversationViewModel.conversationID == nil {
+                ContentUnavailableView {
+                    Label("No conversation", systemImage: "message")
+                } description: {
+                    Text("Your conversation will show here after you send your first message.")
+                }
             }
         }
     }

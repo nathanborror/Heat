@@ -7,26 +7,26 @@ struct MessageToolCall: View {
     
     var body: some View {
         if let toolCalls = message.toolCalls {
-            ForEach(toolCalls, id: \.id) { toolCall in
-                VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(toolCalls, id: \.id) { toolCall in
                     if let tool = Toolbox(name: toolCall.function.name) {
                         switch tool {
                         case .generateImages:
-                            content("Generating images...")
+                            MessageToolCallContent(label: "Generating images...")
                         case .generateMemory:
-                            content("Remembering...")
+                            MessageToolCallContent(label: "Remembering...")
                         case .generateSuggestions:
-                            content("Generating suggestions...")
+                            MessageToolCallContent(label: "Generating suggestions...")
                         case .generateTitle:
-                            content("Generating title...")
+                            MessageToolCallContent(label: "Generating title...")
                         case .searchFiles:
-                            content("Searching files...")
+                            MessageToolCallContent(label: "Searching files...")
                         case .searchCalendar:
-                            content("Searching calendar...")
+                            MessageToolCallContent(label: "Searching calendar...")
                         case .searchWeb:
-                            content("Searching the web...")
+                            MessageToolCallContent(label: "Searching the web...")
                         case .browseWeb:
-                            content("Browsing the web...")
+                            MessageToolCallContent(label: "Browsing the web...")
                         }
                     } else {
                         Text("Missing tool calls.")
@@ -34,34 +34,22 @@ struct MessageToolCall: View {
                     Text(toolCall.function.arguments)
                         .font(.footnote)
                         .foregroundStyle(.secondary.opacity(0.5))
-                        .padding(.bottom, 4)
                 }
-                #if os(macOS)
-                .padding(.leading, 24)
-                #endif
             }
+            .padding(.horizontal, 24)
         } else {
             Text("Missing tool calls.")
         }
-    }
-    
-    func content(_ label: String) -> MessageToolCallContent {
-        .init(label: label)
     }
 }
 
 struct MessageToolCallContent: View {
     var label: String
-    var symbol: String = "circle"
     
     var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Image(systemName: symbol)
-            Text(label)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
-        .padding(.vertical, 2)
+        Text(label)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
     }
 }

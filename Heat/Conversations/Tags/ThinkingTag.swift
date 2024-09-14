@@ -20,6 +20,7 @@ struct ThinkingTag: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(.background, in: .rect(cornerRadius: 10))
         .colorInvert()

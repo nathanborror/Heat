@@ -12,8 +12,8 @@ struct ImageSearchTag: View {
     var body: some View {
         VStack(alignment: .leading) {
             ScrollView(.horizontal) {
-                LazyHStack(spacing: 6) {
-                    ForEach(results.indices, id: \.self) { index in
+                HStack(spacing: 6) {
+                    ForEach(results.prefix(10).indices, id: \.self) { index in
                         if let imageURL = results[index].image {
                             PictureView(asset: .init(name: imageURL.absoluteString, kind: .image, location: .url))
                                 .scaleEffect(1.1)
