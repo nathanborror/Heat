@@ -46,7 +46,7 @@ final class ConversationViewModel {
             return
         }
         let agent = try AgentsProvider.shared.get(agentID)
-        let instructions = agent.instructions
+        let instructions = Prompt.render(agent.instructions, with: ["DATETIME": Date.now.formatted()])
         let conversation = try await conversationsProvider.create(instructions: instructions, toolIDs: agent.toolIDs)
         conversationID = conversation.id
     }
@@ -198,9 +198,13 @@ final class ConversationViewModel {
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
+        let history = messages
+            .map { "\($0.role.rawValue): \($0.content ?? "Empty")" }
+            .joined(separator: "\n\n")
+        
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: TitlePrompt(history: messages).render())
+        req.with(system: Prompt.render(SuggestionsInstructions, with: ["HISTORY": history]))
         
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
@@ -227,9 +231,13 @@ final class ConversationViewModel {
         let service = try PreferencesProvider.shared.preferredChatService()
         let model = try PreferencesProvider.shared.preferredChatModel()
         
+        let history = messages
+            .map { "\($0.role.rawValue): \($0.content ?? "Empty")" }
+            .joined(separator: "\n\n")
+        
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: SuggestionsPrompt(history: messages).render())
+        req.with(system: Prompt.render(SuggestionsInstructions, with: ["HISTORY": history]))
         
         // Indicate we are suggesting
         try await conversationsProvider.upsert(state: .suggesting, conversationID: conversation.id)

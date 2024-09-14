@@ -7,7 +7,7 @@ public struct Defaults {
     
     public static let agents = [
         assistant,
-        assistantMaker
+        assistantMaker,
     ]
     
     public static let agentDefaultID = assistantMaker.id
@@ -15,7 +15,7 @@ public struct Defaults {
     public static let assistant = Agent(
         id: "bundle-assistant",
         name: "Assistant",
-        instructions: AssistantInstructions(name: "Heat", creator: "Nathan Borror").render(),
+        instructions: Prompt.render(AssistantInstructions, with: ["NAME": "Heat", "CREATOR": "Nathan Borror"]),
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
@@ -26,7 +26,7 @@ public struct Defaults {
     public static let assistantMaker = Agent(
         id: "bundle-assistant-maker",
         name: "Assistant Maker",
-        instructions: AssistantArtifactsInstructions(name: "Heat", creator: "Nathan Borror").render(),
+        instructions: Prompt.render(AssistantArtifactsInstructions, with: ["NAME": "Heat", "CREATOR": "Nathan Borror"]),
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
