@@ -1,5 +1,5 @@
-import MarkdownUI
 import SwiftUI
+import MarkdownUI
 
 struct CodeBlockView: View {
     let configuration: CodeBlockConfiguration
@@ -7,31 +7,31 @@ struct CodeBlockView: View {
     @State private var isCopied = false
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text(configuration.language?.capitalized ?? "")
-                    .font(.subheadline)
+                    .font(.system(size: 12, weight: .medium))
                 Spacer()
                 Button(action: copyCodeAction) {
-                    Image(systemName: isCopied ? "checkmark" : "clipboard")
-                        .imageScale(.small)
-                        .frame(height: 14)
+                    Image(systemName: isCopied ? "checkmark" : "square.on.square")
+                        .font(.system(size: 12))
                 }
                 .buttonStyle(.plain)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(.primary.opacity(0.05))
+            .padding(.vertical, 6)
             .foregroundStyle(.secondary)
+            .colorInvert()
+            
+            Divider()
+                .colorInvert()
             
             configuration.label
                 .relativeLineSpacing(.em(0.25))
-                .padding(.top, 6)
-                .padding(.bottom, 12)
-                .padding(.horizontal, 12)
+                .padding(12)
         }
-        .background(.primary.opacity(0.05))
-        .clipShape(.rect(cornerRadius: 10))
+        .background(.primary)
+        .clipShape(.rect(cornerRadius: 5))
         .padding(.horizontal, -12)
     }
     

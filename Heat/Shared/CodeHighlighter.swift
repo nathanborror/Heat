@@ -10,7 +10,7 @@ struct CodeHighlighter: CodeSyntaxHighlighter {
             fatalError("Failed to initialize Highlightr")
         }
         self.highlightr = highlightrInstance
-        self.highlightr.setTheme(to: "atom-one-light")
+        self.highlightr.setTheme(to: "atom-one-dark")
     }
     
     func highlightCode(_ code: String, language: String?) -> Text {
