@@ -204,7 +204,7 @@ final class ConversationViewModel {
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: Prompt.render(SuggestionsInstructions, with: ["HISTORY": history]))
+        req.with(system: Prompt.render(TitleInstructions, with: ["HISTORY": history]))
         
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
