@@ -1,11 +1,12 @@
 import SwiftUI
+import HeatKit
 
 private struct DebugKey: EnvironmentKey {
     static let defaultValue: Bool = false
 }
 
-private struct MarkdownKey: EnvironmentKey {
-    static let defaultValue: Bool = true
+private struct TextRenderingKey: EnvironmentKey {
+    static let defaultValue: Preferences.TextRendering = .markdown
 }
 
 extension EnvironmentValues {
@@ -15,8 +16,8 @@ extension EnvironmentValues {
         set { self[DebugKey.self] = newValue }
     }
     
-    var useMarkdown: Bool {
-        get { self[MarkdownKey.self] }
-        set { self[MarkdownKey.self] = newValue }
+    var textRendering: Preferences.TextRendering {
+        get { self[TextRenderingKey.self] }
+        set { self[TextRenderingKey.self] = newValue }
     }
 }

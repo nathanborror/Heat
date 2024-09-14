@@ -21,7 +21,6 @@
 		D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E194B2AE591EA002516C1 /* PreferencesForm.swift */; };
 		D45CC1FA2B8A5C1A009DFDF4 /* Suggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D45CC1F92B8A5C1A009DFDF4 /* Suggestions.swift */; };
 		D4713D702AEAB9670005597E /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4713D6F2AEAB9670005597E /* Operators.swift */; };
-		D4A2C55A2B8BF8550004F27B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = D4A2C5592B8BF8550004F27B /* MarkdownUI */; };
 		D4A2C5672B8BF9CE0004F27B /* MarkdownUI+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */; };
 		D4B2D2672B649DFD0017FB52 /* ConversationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2662B649DFD0017FB52 /* ConversationList.swift */; };
 		D4B2D2692B6563DB0017FB52 /* MessageInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2682B6563DB0017FB52 /* MessageInput.swift */; };
@@ -29,6 +28,7 @@
 		D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */; };
 		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
 		D809F5A22BDABEFE00FD627B /* ServiceNudge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D809F5A12BDABEFE00FD627B /* ServiceNudge.swift */; };
+		D80F73B62C95F0E0001B2778 /* AttributedString+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80F73B52C95F0E0001B2778 /* AttributedString+.swift */; };
 		D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698C2B9CF19000C53D4D /* MessageTool.swift */; };
 		D816DE7E2C7F9C6000F9D44F /* Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D816DE7D2C7F9C6000F9D44F /* Modifiers.swift */; };
 		D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */; };
@@ -45,6 +45,7 @@
 		D85FAE082C84C83600DA153F /* ThinkingTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE072C84C83600DA153F /* ThinkingTag.swift */; };
 		D85FAE0A2C84C84600DA153F /* NewsSearchTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE092C84C84600DA153F /* NewsSearchTag.swift */; };
 		D85FAE452C852E1100DA153F /* ConversationInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE442C852E1100DA153F /* ConversationInspector.swift */; };
+		D85FE3822C8FDD4F004CA2F3 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = D85FE3812C8FDD4F004CA2F3 /* MarkdownUI */; };
 		D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */; };
 		D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCall.swift */; };
 		D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC42BD57C5600B90E9B /* MessageSystemView.swift */; };
@@ -86,6 +87,7 @@
 		D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D809F5A12BDABEFE00FD627B /* ServiceNudge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceNudge.swift; sourceTree = "<group>"; };
+		D80F73B52C95F0E0001B2778 /* AttributedString+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributedString+.swift"; sourceTree = "<group>"; };
 		D815698C2B9CF19000C53D4D /* MessageTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTool.swift; sourceTree = "<group>"; };
 		D816DE7D2C7F9C6000F9D44F /* Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifiers.swift; sourceTree = "<group>"; };
 		D8247E2D2BD41C3A00D918C0 /* MemoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryList.swift; sourceTree = "<group>"; };
@@ -124,7 +126,7 @@
 				D8271A5A2C7A4E3E008C345B /* Highlightr in Frameworks */,
 				D41E19322AE467F5002516C1 /* HeatKit in Frameworks */,
 				D884AAC82BD5A6A500B90E9B /* HotKey in Frameworks */,
-				D4A2C55A2B8BF8550004F27B /* MarkdownUI in Frameworks */,
+				D85FE3822C8FDD4F004CA2F3 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,8 +137,9 @@
 			isa = PBXGroup;
 			children = (
 				D4017C8F2B6EEFB5001CE137 /* Asset+.swift */,
-				D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */,
+				D80F73B52C95F0E0001B2778 /* AttributedString+.swift */,
 				D8271A562C7A4B2F008C345B /* Environment+.swift */,
+				D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -319,9 +322,9 @@
 			name = Heat;
 			packageProductDependencies = (
 				D41E19312AE467F5002516C1 /* HeatKit */,
-				D4A2C5592B8BF8550004F27B /* MarkdownUI */,
 				D884AAC72BD5A6A500B90E9B /* HotKey */,
 				D8271A592C7A4E3E008C345B /* Highlightr */,
+				D85FE3812C8FDD4F004CA2F3 /* MarkdownUI */,
 			);
 			productName = Heat;
 			productReference = D443C3ED2BE1536B00C97FBD /* Heat.app */;
@@ -352,9 +355,9 @@
 			);
 			mainGroup = D41E19122AE45C9B002516C1;
 			packageReferences = (
-				D4A2C5582B8BF8550004F27B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				D884AAC62BD5A6A500B90E9B /* XCRemoteSwiftPackageReference "HotKey" */,
 				D8271A582C7A4E3E008C345B /* XCRemoteSwiftPackageReference "Highlightr" */,
+				D85FE3802C8FDD4F004CA2F3 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			productRefGroup = D41E19122AE45C9B002516C1;
 			projectDirPath = "";
@@ -409,6 +412,7 @@
 				D8271A602C7CD5C3008C345B /* MemoryForm.swift in Sources */,
 				D884AAC32BD5741A00B90E9B /* MessageToolCall.swift in Sources */,
 				D884AAC52BD57C5600B90E9B /* MessageSystemView.swift in Sources */,
+				D80F73B62C95F0E0001B2778 /* AttributedString+.swift in Sources */,
 				D85FAE022C84052900DA153F /* ContentView.swift in Sources */,
 				D85FAE082C84C83600DA153F /* ThinkingTag.swift in Sources */,
 				D4713D702AEAB9670005597E /* Operators.swift in Sources */,
@@ -680,19 +684,19 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D4A2C5582B8BF8550004F27B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/electricsidecar-dev/swift-markdown-ui";
-			requirement = {
-				branch = recursive;
-				kind = branch;
-			};
-		};
 		D8271A582C7A4E3E008C345B /* XCRemoteSwiftPackageReference "Highlightr" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/raspu/Highlightr";
 			requirement = {
 				branch = master;
+				kind = branch;
+			};
+		};
+		D85FE3802C8FDD4F004CA2F3 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				branch = main;
 				kind = branch;
 			};
 		};
@@ -711,15 +715,15 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = HeatKit;
 		};
-		D4A2C5592B8BF8550004F27B /* MarkdownUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D4A2C5582B8BF8550004F27B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
-			productName = MarkdownUI;
-		};
 		D8271A592C7A4E3E008C345B /* Highlightr */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D8271A582C7A4E3E008C345B /* XCRemoteSwiftPackageReference "Highlightr" */;
 			productName = Highlightr;
+		};
+		D85FE3812C8FDD4F004CA2F3 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D85FE3802C8FDD4F004CA2F3 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
 		};
 		D884AAC72BD5A6A500B90E9B /* HotKey */ = {
 			isa = XCSwiftPackageProductDependency;

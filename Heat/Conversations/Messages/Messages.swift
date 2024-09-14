@@ -45,7 +45,6 @@ struct MessageView: View {
 
 struct MessageViewText: View {
     @Environment(\.colorScheme) private var colorScheme
-    @Environment(\.useMarkdown) private var useMarkdown
     
     let message: Message
     
@@ -55,28 +54,23 @@ struct MessageViewText: View {
             case .user:
                 ContentView(text: message.content)
             case .assistant:
-                if useMarkdown {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(contents.indices, id: \.self) { index in
-                            switch contents[index] {
-                            case .text(let text):
-                                ContentView(text: text)
-                            case .tag(let tag):
-                                TagView(tag: tag)
-                                    .foregroundStyle(.secondary)
-                                    .padding(.leading, -12)
-                            }
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(contents.indices, id: \.self) { index in
+                        switch contents[index] {
+                        case .text(let text):
+                            ContentView(text: text)
+                        case .tag(let tag):
+                            TagView(tag: tag)
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, -12)
                         }
                     }
-                } else {
-                    Text(message.content ?? "")
                 }
             default:
                 EmptyView()
             }
         }
         .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
-        .textSelection(.enabled)
     }
     
     var contents: [ContentParser.Result.Content] {

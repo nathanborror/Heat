@@ -23,8 +23,13 @@ struct PreferencesForm: View {
                 }
                 
                 Toggle("Response Streaming", isOn: $preferences.shouldStream)
-                Toggle("Markdown", isOn: $preferences.shouldUseMarkdown)
                 Toggle("Debug", isOn: $preferences.debug)
+                
+                Picker("Text Rendering", selection: $preferences.textRendering) {
+                    ForEach(Preferences.TextRendering.allCases, id: \.self) {
+                        Text($0.rawValue.capitalized).tag($0)
+                    }
+                }
                 
                 Picker("Default Agent", selection: $preferences.defaultAgentID) {
                     Text("None").tag(String?.none)

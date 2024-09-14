@@ -5,7 +5,7 @@ import GenKit
 public struct Preferences: Codable, Sendable {
     public var defaultAgentID: String? = Defaults.agentDefaultID
     public var shouldStream = true
-    public var shouldUseMarkdown = true
+    public var textRendering: TextRendering = .markdown
     public var debug = false
     public var preferred: Services = .init()
     
@@ -18,6 +18,12 @@ public struct Preferences: Codable, Sendable {
         public var visionServiceID: Service.ServiceID? = nil
         public var speechServiceID: Service.ServiceID? = nil
         public var summarizationServiceID: Service.ServiceID? = nil
+    }
+    
+    public enum TextRendering: String, CaseIterable, Codable, Sendable {
+        case markdown
+        case text
+        case attributed
     }
 }
 

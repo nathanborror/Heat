@@ -69,7 +69,7 @@ struct MainApp: App {
                     .environment(preferencesProvider)
                     .environment(conversationViewModel)
                     .environment(\.debug, preferencesProvider.preferences.debug)
-                    .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
+                    .environment(\.textRendering, preferencesProvider.preferences.textRendering)
                     .modelContainer(for: Memory.self)
             }
             .onAppear {
@@ -82,7 +82,7 @@ struct MainApp: App {
         .environment(preferencesProvider)
         .environment(conversationViewModel)
         .environment(\.debug, preferencesProvider.preferences.debug)
-        .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
+        .environment(\.textRendering, preferencesProvider.preferences.textRendering)
         .modelContainer(for: Memory.self)
         .defaultSize(width: 600, height: 700)
         .defaultPosition(.center)
@@ -105,7 +105,7 @@ struct MainApp: App {
                 .environment(preferencesProvider)
                 .environment(conversationViewModel)
                 .environment(\.debug, preferencesProvider.preferences.debug)
-                .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
+                .environment(\.textRendering, preferencesProvider.preferences.textRendering)
                 .modelContainer(for: Memory.self)
                 .onAppear {
                     handleInit()

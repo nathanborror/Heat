@@ -83,7 +83,7 @@ struct MainCompactView: View {
                     .environment(preferencesProvider)
                     .environment(conversationViewModel)
                     .environment(\.debug, preferencesProvider.preferences.debug)
-                    .environment(\.useMarkdown, preferencesProvider.preferences.shouldUseMarkdown)
+                    .environment(\.textRendering, preferencesProvider.preferences.textRendering)
                     .modelContainer(for: Memory.self)
                 }
         }
