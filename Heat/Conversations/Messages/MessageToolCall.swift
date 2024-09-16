@@ -34,9 +34,9 @@ struct MessageToolCall: View {
                     Text(toolCall.function.arguments)
                         .font(.footnote)
                         .foregroundStyle(.secondary.opacity(0.5))
+                        .textSelection(.enabled)
                 }
             }
-            .padding(.horizontal, 24)
         } else {
             Text("Missing tool calls.")
         }

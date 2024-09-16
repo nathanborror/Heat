@@ -69,36 +69,13 @@ extension WebSearchTool {
                             <description>\($0.description ?? "No description")</description>
                         </result>
                     """
-                }.joined(separator: "\n")
+                }
                 return [.init(
                     role: .tool,
-                    content: """
-                    Select relevant website results, scrape their page and summarize it. Use the <search_results> \
-                    below to select at least 3 results to scrape and summarize. Choose the most relevant and diverse \
-                    sources that would provide comprehensive information about the search query, "\(args.query)". \
-                    
-                    Consider factors such as:
-                       - Relevance to the search query
-                       - Credibility of the source
-                       - Diversity of perspectives
-                       - Recency of the information
-                    
-                    For each selected result, provide a summary of the key information. Your summary should:
-                       - Be concise but informative (aim for 3-5 sentences per result)
-                       - Capture the main points relevant to the search query
-                       - Avoid unnecessary details or tangential information
-                       - Use your own words, do not copy text directly from the sources
-                    
-                    Remember to select at least 3 results, but you may choose more if you find additional sources that \
-                    provide valuable and diverse information. Ensure that your summaries are objective and accurately \
-                    represent the content of each source.
-                    
-                    Use the `\(Toolbox.browseWeb.name)` tool.
-                    
-                    <search_results>
-                    \(results)
-                    </search_results>
-                    """,
+                    content: Prompt.render(BrowseSearchResultsInstructions, with: [
+                        "QUERY": args.query,
+                        "RESULTS": results.joined(separator: "\n"),
+                    ]),
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,
                     metadata: ["label": "Searched web for '\(args.query)'"]
@@ -113,36 +90,13 @@ extension WebSearchTool {
                             <description>\($0.description ?? "No description")</description>
                         </result>
                     """
-                }.joined(separator: "\n")
+                }
                 return [.init(
                     role: .tool,
-                    content: """
-                    Select relevant website results, scrape their page and summarize it. Use the <search_results> \
-                    below to select at least 3 results to scrape and summarize. Choose the most relevant and diverse \
-                    sources that would provide comprehensive information about the search query, "\(args.query)". \
-                    
-                    Consider factors such as:
-                       - Relevance to the search query
-                       - Credibility of the source
-                       - Diversity of perspectives
-                       - Recency of the information
-                    
-                    For each selected result, provide a summary of the key information. Your summary should:
-                       - Be concise but informative (aim for 3-5 sentences per result)
-                       - Capture the main points relevant to the search query
-                       - Avoid unnecessary details or tangential information
-                       - Use your own words, do not copy text directly from the sources
-                    
-                    Remember to select at least 3 results, but you may choose more if you find additional sources that \
-                    provide valuable and diverse information. Ensure that your summaries are objective and accurately \
-                    represent the content of each source.
-                    
-                    Use the `\(Toolbox.browseWeb.name)` tool.
-                    
-                    <news_search_results>
-                    \(results)
-                    </news_search_results>
-                    """,
+                    content: Prompt.render(BrowseSearchResultsInstructions, with: [
+                        "QUERY": args.query,
+                        "RESULTS": results.joined(separator: "\n"),
+                    ]),
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,
                     metadata: ["label": "Searched web news for '\(args.query)'"]

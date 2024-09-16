@@ -8,38 +8,39 @@ struct MessageView: View {
     let message: Message
     
     var body: some View {
-        switch message.role {
-        case .system:
+        VStack(alignment: .leading, spacing: 0) {
             if debug {
-                MessageSystemView(message: message)
+                Text(message.role.rawValue)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
-        case .user:
-            MessageViewText(message: message)
-                .messageSpacing(message)
-                .messageAttachments(message)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 24)
-        case .assistant:
-            if message.toolCalls == nil {
+            switch message.role {
+            case .system:
+                if debug {
+                    MessageSystemView(message: message)
+                }
+            case .user:
                 MessageViewText(message: message)
                     .messageSpacing(message)
                     .messageAttachments(message)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 24)
-            } else {
-                if message.content != nil {
+            case .assistant:
+                if message.toolCalls == nil {
                     MessageViewText(message: message)
                         .messageSpacing(message)
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 24)
-                }
-                if debug {
+                        .messageAttachments(message)
+                } else {
+                    if message.content != nil {
+                        MessageViewText(message: message)
+                            .messageSpacing(message)
+                    }
                     MessageToolCall(message: message)
                 }
+            case .tool:
+                MessageTool(message: message)
             }
-        case .tool:
-            MessageTool(message: message)
         }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 24)
     }
 }
 
@@ -49,7 +50,7 @@ struct MessageViewText: View {
     let message: Message
     
     var body: some View {
-        Group {
+        VStack(alignment: .leading, spacing: 0) {
             switch message.role {
             case .user:
                 ContentView(text: message.content)
@@ -97,8 +98,9 @@ struct MessageViewSpacing: ViewModifier {
                 content
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(.primary.opacity(0.05), in: .rect(cornerRadius: 10))
+                    .background(.background, in: .rect(cornerRadius: 10))
                     .padding(.leading, -12)
+                    .colorInvert()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -41,7 +41,6 @@ struct MessageTool: View {
                 MessageToolContent(message: message)
             }
         }
-        .padding(.horizontal, 24)
         .frame(maxWidth: .infinity, alignment: .leading)
         .sheet(isPresented: $isShowingContext) {
             NavigationStack {
@@ -77,7 +76,7 @@ struct MessageToolContent: View {
         VStack(alignment: .leading) {
             Text(message.metadata.label)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.subheadline)
+                .font(.system(size: 16))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             
@@ -86,6 +85,7 @@ struct MessageToolContent: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary.opacity(0.5))
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
             }
         }
     }

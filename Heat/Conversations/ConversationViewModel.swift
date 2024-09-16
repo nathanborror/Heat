@@ -40,6 +40,12 @@ final class ConversationViewModel {
         return history ?? []
     }
     
+    /// The conversation history aggregated by Run which packages up all tool calls and responses into a Run.
+    var runs: [Run] {
+        guard conversationID != nil else { return [] }
+        return prepareRuns()
+    }
+    
     /// Create a new conversation with the default agent's instructions (system prompt) and tools.
     func newConversation() async throws {
         guard let agentID = PreferencesProvider.shared.preferences.defaultAgentID else {
@@ -320,6 +326,37 @@ final class ConversationViewModel {
             )
             return .init(messages: [toolResponse], shouldContinue: false)
         }
+    }
+    
+    /// Bundle messages into runs.
+    private func prepareRuns() -> [Run] {
+        var runs: [Run] = []
+        var currentRun = Run()
+        
+        // Cluster message runs
+        for message in messages {
+            if currentRun.id == message.runID {
+                currentRun.messages.append(message)
+                currentRun.ended = message.modified
+            } else {
+                if !currentRun.messages.isEmpty {
+                    runs.append(currentRun)
+                }
+                currentRun = Run(
+                    id: message.runID ?? message.id,
+                    messages: [message],
+                    started: message.created,
+                    ended: message.modified
+                )
+            }
+        }
+        
+        // Append remaining run
+        if !currentRun.messages.isEmpty {
+            runs.append(currentRun)
+        }
+        
+        return runs
     }
     
     /// Execute a haptic tap.

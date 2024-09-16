@@ -16,52 +16,45 @@ struct ConversationView: View {
     
     var body: some View {
         ScrollViewReader { proxy in
-            ScrollView {
-                HStack {
-                    Spacer(minLength: 0)
-                    VStack(spacing: 0) {
-                        
-                        // Show message history
-                        ForEach(conversationViewModel.messages) { message in
-                            MessageView(message: message)
-                        }
-                        
-                        VStack(spacing: 0) {
-                            // Assistant typing indicator when processing
-                            if conversationViewModel.conversation?.state == .processing {
-                                TypingIndicator()
-                            }
-                            
-                            // Suggestions typing indicator when suggesting
-                            if conversationViewModel.conversation?.state == .suggesting {
-                                TypingIndicator(foregroundColor: .accentColor)
-                            }
-                            
-                            // Show suggestions when they are available
-                            if !conversationViewModel.suggestions.isEmpty {
-                                SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
-                                    SuggestionView(suggestion: suggestion) { suggestion in
-                                        Task { try await handleSuggestion(suggestion) }
-                                    }
-                                }
-                                .padding(.vertical, 8)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 24)
-                        .id("bottom")
-                    }
-                    .frame(maxWidth: 800, alignment: .center)
-                    .padding(.top, 24)
-                    Spacer(minLength: 0)
+            List {
+                // Show message run history
+                ForEach(conversationViewModel.runs) { run in
+                    RunView(run: run)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets())
                 }
+                
+                VStack(spacing: 0) {
+                    // Assistant typing indicator when processing
+                    if conversationViewModel.conversation?.state == .processing {
+                        TypingIndicator()
+                    }
+                    
+                    // Suggestions typing indicator when suggesting
+                    if conversationViewModel.conversation?.state == .suggesting {
+                        TypingIndicator(foregroundColor: .accentColor)
+                    }
+                    
+                    // Show suggestions when they are available
+                    if !conversationViewModel.suggestions.isEmpty {
+                        SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
+                            SuggestionView(suggestion: suggestion) { suggestion in
+                                Task { try await handleSuggestion(suggestion) }
+                            }
+                        }
+                        .padding(.vertical, 8)
+                    }
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
+                .padding(.horizontal, 24)
+                .id("bottom")
             }
-            .background(.background)
+            .listStyle(.plain)
             .onChange(of: conversationViewModel.streamingTokens) { _, _ in
                 proxy.scrollTo("bottom")
             }
         }
-        .defaultScrollAnchor(.bottom)
         .scrollClipDisabled()
         .scrollDismissesKeyboard(.interactively)
         .scrollIndicators(.hidden)
@@ -89,15 +82,6 @@ struct ConversationView: View {
                     ConversationInspector(conversationID: conversation.id, instructions: conversation.instructions)
                 }
                 .inspectorColumnWidth(ideal: 200)
-            }
-        }
-        .overlay {
-            if conversationViewModel.conversationID == nil {
-                ContentUnavailableView {
-                    Label("No conversation", systemImage: "message")
-                } description: {
-                    Text("Your conversation will show here after you send your first message.")
-                }
             }
         }
     }

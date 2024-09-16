@@ -10,17 +10,18 @@ struct CodeBlockView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text(configuration.language?.capitalized ?? "")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Button(action: copyCodeAction) {
                     Image(systemName: isCopied ? "checkmark" : "square.on.square")
                         .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .foregroundStyle(.secondary)
             .colorInvert()
             
             Divider()

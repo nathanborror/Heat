@@ -42,9 +42,9 @@ struct MainCompactView: View {
                     case .ready:
                         if conversationViewModel.messages.isEmpty {
                             ContentUnavailableView {
-                                Label("New conversation", systemImage: "bubble")
+                                Label("No conversation", systemImage: "message")
                             } description: {
-                                Text("Start a new conversation by typing a message.")
+                                Text("Your conversation will show here after you send your first message.")
                             }
                         }
                     case .waiting:
