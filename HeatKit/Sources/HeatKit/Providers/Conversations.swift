@@ -1,9 +1,9 @@
-// A conversation is an interaction between the user and a large language model (LLM). It has a title that helps
-// set context for what the conversation is generally about and it has a history or messages.
-
 import Foundation
 import GenKit
 import SharedKit
+import OSLog
+
+private let logger = Logger(subsystem: "Conversations", category: "Kit")
 
 public struct Conversation: Codable, Identifiable, Sendable {
     public var id: String
@@ -144,6 +144,7 @@ public final class ConversationsProvider {
     }
     
     public func reset() async throws {
+        logger.debug("Resetting conversations...")
         conversations = []
         try await save()
     }

@@ -1,9 +1,9 @@
-// An agent is a helpful set of instructions that kicks off a conversation. The messages that accompany an agent
-// help orient a conversation. It can improve utility and/or entertainment of an experience.
-
 import Foundation
 import GenKit
 import SharedKit
+import OSLog
+
+private let logger = Logger(subsystem: "Agents", category: "Kit")
 
 public struct Agent: Codable, Identifiable, Sendable {
     public var id: String
@@ -94,6 +94,7 @@ public final class AgentsProvider {
     }
     
     public func reset() async throws {
+        logger.debug("Resetting agents...")
         agents = Defaults.agents
         try await save()
     }

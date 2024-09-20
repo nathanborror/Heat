@@ -1,6 +1,9 @@
 import Foundation
 import SharedKit
 import GenKit
+import OSLog
+
+private let logger = Logger(subsystem: "Preferences", category: "Kit")
 
 public struct Preferences: Codable, Sendable {
     public var defaultAgentID: String? = Defaults.agentDefaultID
@@ -128,6 +131,7 @@ public final class PreferencesProvider {
     }
     
     public func reset() async throws {
+        logger.debug("Resetting preferences...")
         self.preferences = .init()
         self.services = Defaults.services
         try await save()
