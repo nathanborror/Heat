@@ -9,6 +9,7 @@ struct ConversationView: View {
     @Environment(PreferencesProvider.self) var preferencesProvider
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.debug) private var debug
     
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
     

@@ -11,22 +11,15 @@ struct ServiceList: View {
     var body: some View {
         Form {
             ForEach(services) { service in
-                Section {
-                    LabeledContent("Chat", value: service.preferredChatModel ?? "None")
-                    LabeledContent("Image", value: service.preferredImageModel ?? "None")
-                    LabeledContent("Vision", value: service.preferredVisionModel ?? "None")
-                    LabeledContent("Tools", value: service.preferredToolModel ?? "None")
-                    LabeledContent("Summarization", value: service.preferredSummarizationModel ?? "None")
-                } header: {
+                NavigationLink {
+                    ServiceForm(service: service)
+                } label: {
                     HStack {
                         Text(service.name)
                         Spacer()
-                        Button {
-                            selectedService = service
-                        } label: {
-                            Text("Edit")
-                                .font(.footnote)
-                        }
+                        Circle()
+                            .fill(statusIndicatorColor(service))
+                            .frame(width: 8, height: 8)
                     }
                 }
             }
@@ -42,12 +35,15 @@ struct ServiceList: View {
             services = preferencesProvider.services
         }
     }
-}
-
-#Preview {
-    ServiceList(services: [
-        Defaults.openAI,
-        Defaults.anthropic,
-        Defaults.mistral,
-    ])
+    
+    func statusIndicatorColor(_ service: Service) -> Color {
+        switch service.status {
+        case .ready:
+            .green
+        case .unknown:
+            .primary.opacity(0.1)
+        default:
+            .yellow
+        }
+    }
 }

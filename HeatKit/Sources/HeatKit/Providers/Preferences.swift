@@ -130,6 +130,32 @@ public final class PreferencesProvider {
         try await save()
     }
     
+    public func upsert(models: [Model], serviceID: Service.ServiceID) async throws {
+        var service = try get(serviceID: serviceID)
+        service.models = models
+        try await upsert(service: service)
+    }
+    
+    public func upsert(status: Service.Status, serviceID: Service.ServiceID) async throws {
+        var service = try get(serviceID: serviceID)
+        service.status = status
+        try await upsert(service: service)
+    }
+    
+    public func initializeServices() async throws {
+        for service in services {
+            do {
+                let client = service.modelService()
+                let models = try await client.models()
+                try await upsert(models: models, serviceID: service.id)
+                try await upsert(status: .ready, serviceID: service.id)
+            } catch {
+                logger.error("Service error (\(service.name)): \(error)")
+                try await upsert(status: .unknown, serviceID: service.id)
+            }
+        }
+    }
+    
     public func reset() async throws {
         logger.debug("Resetting preferences...")
         self.preferences = .init()
@@ -227,15 +253,19 @@ public final class PreferencesProvider {
     private let servicesStore = ServicesStore()
     
     private init() {
-        Task { try await load() }
+        Task {
+            try await load()
+            try await initializeServices()
+        }
     }
     
     private func load() async throws {
-        preferences = try await preferencesStore.load()
-        services = try await servicesStore.load()
-        statusCheck()
-        
-        if services.isEmpty {
+        do {
+            preferences = try await preferencesStore.load()
+            services = try await servicesStore.load()
+            statusCheck()
+        } catch {
+            logger.error("Failed to load preferences: \(error)")
             try await reset()
         }
     }

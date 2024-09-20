@@ -142,6 +142,8 @@ struct MainApp: App {
                 try await conversationsProvider.reset()
                 try await messagesProvider.reset()
                 try await preferencesProvider.reset()
+                
+                try await preferencesProvider.initializeServices()
             }
         }
     }

@@ -15,9 +15,9 @@ let package = Package(
         .library(name: "HeatKit", targets: ["HeatKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/nathanborror/swift-shared-kit", branch: "main"),
-        .package(url: "https://github.com/nathanborror/swift-gen-kit", branch: "main"),
-        .package(url: "https://github.com/cezheng/Fuzi", branch: "master"),
+        .package(url: "git@github.com:nathanborror/swift-shared-kit", branch: "main"),
+        .package(url: "git@github.com:nathanborror/swift-gen-kit", branch: "main"),
+        .package(url: "git@github.com:cezheng/Fuzi", branch: "master"),
     ],
     targets: [
         .target(

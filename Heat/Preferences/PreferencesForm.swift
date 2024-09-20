@@ -23,7 +23,6 @@ struct PreferencesForm: View {
                 }
                 
                 Toggle("Response Streaming", isOn: $preferences.shouldStream)
-                Toggle("Debug", isOn: $preferences.debug)
                 
                 Picker("Text Rendering", selection: $preferences.textRendering) {
                     ForEach(Preferences.TextRendering.allCases, id: \.self) {
@@ -74,12 +73,13 @@ struct PreferencesForm: View {
             }
             
             Section {
-                NavigationLink("Permissions") {
-                    PermissionsList()
+                NavigationLink("Services") {
+                    ServiceList()
                 }
             } footer: {
-                Text("Manage permissions to third-party integrations.")
+                Text("Configure which models to use.")
             }
+            
             Section {
                 NavigationLink("Agents") {
                     AgentList()
@@ -87,12 +87,19 @@ struct PreferencesForm: View {
             } footer: {
                 Text("Agents determine the behavior conversations.")
             }
+            
             Section {
-                NavigationLink("Services") {
-                    ServiceList()
+                NavigationLink("Permissions") {
+                    PermissionsList()
                 }
             } footer: {
-                Text("Configure third-party services that offer model access.")
+                Text("Manage permissions to third-party integrations.")
+            }
+            
+            Section {
+                Toggle("Debug", isOn: $preferences.debug)
+            } footer: {
+                Text("Displays additional debug output throughout the app.")
             }
             
             Section {
