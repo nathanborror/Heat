@@ -29,8 +29,8 @@ struct SuggestionView: View {
                 .font(.system(size: fontSize))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .foregroundStyle(.tint)
                 .background(.tint.opacity(0.05), in: .rect(cornerRadius: 10))
+                .foregroundStyle(.tint)
                 .padding(.leading, -12)
         }
         .buttonStyle(.plain)

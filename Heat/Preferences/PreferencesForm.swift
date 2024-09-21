@@ -13,7 +13,8 @@ struct PreferencesForm: View {
     
     @State var preferences: Preferences
     
-    @State private var isShowingDeleteConfirmation = false
+    @State private var showingDeleteConfirmation = false
+    @State private var showingAdditionalServices = false
     
     var body: some View {
         Form {
@@ -48,24 +49,34 @@ struct PreferencesForm: View {
                 Picker("Images", selection: $preferences.preferred.imageServiceID) {
                     servicePickerView(\.supportsImages)
                 }
-                Picker("Embeddings", selection: $preferences.preferred.embeddingServiceID) {
-                    servicePickerView(\.supportsEmbeddings)
-                }
-                Picker("Transcriptions", selection: $preferences.preferred.transcriptionServiceID) {
-                    servicePickerView(\.supportsTranscriptions)
-                }
-                Picker("Tools", selection: $preferences.preferred.toolServiceID) {
-                    servicePickerView(\.supportsTools)
-                }
                 Picker("Vision", selection: $preferences.preferred.visionServiceID) {
                     servicePickerView(\.supportsVision)
-                }
-                Picker("Speech", selection: $preferences.preferred.speechServiceID) {
-                    servicePickerView(\.supportsSpeech)
                 }
                 Picker("Summarization", selection: $preferences.preferred.summarizationServiceID) {
                     servicePickerView(\.supportsSummarization)
                 }
+                
+                if showingAdditionalServices {
+                    Picker("Tools", selection: $preferences.preferred.toolServiceID) {
+                        servicePickerView(\.supportsTools)
+                    }
+                    Picker("Embeddings", selection: $preferences.preferred.embeddingServiceID) {
+                        servicePickerView(\.supportsEmbeddings)
+                    }
+                    Picker("Transcriptions", selection: $preferences.preferred.transcriptionServiceID) {
+                        servicePickerView(\.supportsTranscriptions)
+                    }
+                    Picker("Speech", selection: $preferences.preferred.speechServiceID) {
+                        servicePickerView(\.supportsSpeech)
+                    }
+                } else {
+                    Button {
+                        showingAdditionalServices = true
+                    } label: {
+                        Text("Additional services")
+                    }
+                }
+                
             } header: {
                 Text("Preferred Services")
             } footer: {
@@ -109,7 +120,7 @@ struct PreferencesForm: View {
             }
             
             Section {
-                Button("Delete All Data", role: .destructive, action: { isShowingDeleteConfirmation = true })
+                Button("Delete All Data", role: .destructive, action: { showingDeleteConfirmation = true })
             }
         }
         .navigationTitle("Preferences")
@@ -122,7 +133,7 @@ struct PreferencesForm: View {
                 Button("Cancel", action: dismiss.callAsFunction)
             }
         }
-        .alert("Are you sure?", isPresented: $isShowingDeleteConfirmation) {
+        .alert("Are you sure?", isPresented: $showingDeleteConfirmation) {
             Button("Delete", role: .destructive, action: handleDeleteAll)
         } message: {
             Text("This will delete all app data and preferences.")

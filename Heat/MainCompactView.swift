@@ -42,17 +42,16 @@ struct MainCompactView: View {
                     case .ready:
                         if conversationViewModel.messages.isEmpty {
                             ContentUnavailableView {
-                                Label("No conversation", systemImage: "message")
-                            } description: {
-                                Text("Your conversation will show here after you send your first message.")
+                                Label("New conversation", systemImage: "message")
                             }
+                            .foregroundStyle(.secondary)
                         }
                     case .waiting:
                         EmptyView()
                     }
                 }
                 .toolbar {
-                    ToolbarItem {
+                    ToolbarItem(placement: .topBarLeading) {
                         Menu {
                             menuButton("History", symbol: "clock") { sheet = .conversationList }
                             Divider()

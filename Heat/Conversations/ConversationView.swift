@@ -71,7 +71,11 @@ struct ConversationView: View {
                     Button {
                         showingInspector.toggle()
                     } label: {
+                        #if os(macOS)
                         Label("Info", systemImage: "sidebar.right")
+                        #else
+                        Label("Info", systemImage: "info")
+                        #endif
                     }
                     .keyboardShortcut("0", modifiers: [.command, .option])
                 }

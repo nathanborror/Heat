@@ -61,14 +61,6 @@ struct MessageInput: View {
                                 Label("Imagine", systemImage: "paintpalette")
                             }
                             .keyboardShortcut("2", modifiers: .command)
-                            Button(action: { command = "summarize" }) {
-                                Label("Summarize", systemImage: "doc.text.magnifyingglass")
-                            }
-                            .keyboardShortcut("3", modifiers: .command)
-                            Button(action: { command = "search" }) {
-                                Label("Search", systemImage: "magnifyingglass")
-                            }
-                            .keyboardShortcut("4", modifiers: .command)
                         } label: {
                             Image(systemName: "plus")
                                 .modifier(ConversationInlineButtonModifier())
@@ -124,15 +116,6 @@ struct MessageInput: View {
                             }
                         }
                         #endif
-                    
-                    // Speech to text
-                    if showInlineControls {
-                        Button(action: handleSpeak) {
-                            Image(systemName: "waveform")
-                                .modifier(ConversationInlineButtonModifier())
-                        }
-                        .buttonStyle(.plain)
-                    }
                 }
             }
             .background(.primary.opacity(0.05), in: .rect(cornerRadius: 10))
@@ -173,12 +156,6 @@ struct MessageInput: View {
         case "imagine":
             handleImagine(content)
             return
-        case "summarize":
-            handleSummarize(content)
-            return
-        case "search":
-            handleSearch(content)
-            return
         default:
             break
         }
@@ -217,39 +194,6 @@ struct MessageInput: View {
         clear()
     }
     
-    func handleSummarize(_ content: String) {
-//        Task {
-//            do {
-//                if let markdown = try await WebBrowseSession.shared.generateMarkdown(for: content) {
-//                    try conversationViewModel.generateSummary(url: content, markdown: markdown)
-//                } else {
-//                    logger.error("Failed to generate markdown")
-//                }
-//            } catch let error as KitError {
-//                conversationViewModel.error = error
-//            } catch {
-//                logger.error("Failed to fetch: \(error)")
-//            }
-//        }
-//        clear()
-    }
-    
-    func handleSearch(_ content: String) {
-        Task {
-            do {
-                let resp = try await WebSearchSession.shared.search(query: content)
-                print(resp)
-            } catch {
-                logger.error("Failed to search: \(error)")
-            }
-        }
-        clear()
-    }
-    
-    func handleSpeak() {
-        logger.debug("not implemented")
-    }
-    
     func handleStop() {
         conversationViewModel.cancel()
     }
@@ -276,9 +220,7 @@ struct MessageInput: View {
         return message != nil
     }
     
-    private var showInlineControls: Bool    { content.isEmpty }
     private var showInputPadding: Bool      { !content.isEmpty }
-    
     private var showStopGenerating: Bool    { (conversationViewModel.conversation?.state ?? .none) != .none }
     private var showSubmit: Bool            { !content.isEmpty }
     

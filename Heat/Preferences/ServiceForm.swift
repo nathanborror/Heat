@@ -8,6 +8,8 @@ struct ServiceForm: View {
     
     @State var service: Service
     
+    @State private var showingAdditionalServices = false
+    
     private var showSelections: Bool {
         !service.models.isEmpty
     }
@@ -36,12 +38,21 @@ struct ServiceForm: View {
                 if showSelections {
                     ModelPicker("Chats", models: service.models, selection: $service.preferredChatModel)
                     ModelPicker("Images", models: service.models, selection: $service.preferredImageModel)
-                    ModelPicker("Embeddings", models: service.models, selection: $service.preferredEmbeddingModel)
-                    ModelPicker("Transcriptions", models: service.models, selection: $service.preferredTranscriptionModel)
-                    ModelPicker("Tools", models: service.models, selection: $service.preferredToolModel)
                     ModelPicker("Vision", models: service.models, selection: $service.preferredVisionModel)
-                    ModelPicker("Speech", models: service.models, selection: $service.preferredSpeechModel)
                     ModelPicker("Summarization", models: service.models, selection: $service.preferredSummarizationModel)
+                    
+                    if showingAdditionalServices {
+                        ModelPicker("Tools", models: service.models, selection: $service.preferredToolModel)
+                        ModelPicker("Embeddings", models: service.models, selection: $service.preferredEmbeddingModel)
+                        ModelPicker("Transcriptions", models: service.models, selection: $service.preferredTranscriptionModel)
+                        ModelPicker("Speech", models: service.models, selection: $service.preferredSpeechModel)
+                    } else {
+                        Button {
+                            showingAdditionalServices = true
+                        } label: {
+                            Text("Additional services")
+                        }
+                    }
                 } else {
                     ContentUnavailableView {
                         Label("No models", systemImage: "network")
@@ -147,7 +158,7 @@ struct ModelPicker: View {
             ForEach(modelsByFamily.keys.sorted(), id: \.self) { family in
                 if let familyModels = modelsByFamily[family] {
                     if familyModels.count > 1 {
-                        Menu(family.capitalized) {
+                        Menu(family) {
                             ForEach(familyModels) { model in
                                 menuItem(model: model)
                             }
@@ -162,7 +173,11 @@ struct ModelPicker: View {
                 Text(title)
                 Spacer()
                 Group {
-                    Text(selectedModel?.name ?? "Select Model")
+                    if let selectedModel {
+                        Text(selectedModel.name ?? selectedModel.id)
+                    } else {
+                        Text("Select Model")
+                    }
                     Image(systemName: "chevron.up.chevron.down")
                         .imageScale(.small)
                 }
