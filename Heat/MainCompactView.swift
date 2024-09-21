@@ -51,7 +51,7 @@ struct MainCompactView: View {
                     }
                 }
                 .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
+                    ToolbarItem(placement: .secondaryAction) {
                         Menu {
                             menuButton("History", symbol: "clock") { sheet = .conversationList }
                             Divider()

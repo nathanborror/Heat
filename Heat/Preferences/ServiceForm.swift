@@ -19,17 +19,21 @@ struct ServiceForm: View {
             Section {
                 TextField("Name", text: $service.name)
                     .disabled(true)
+                
                 TextField("Host", text: $service.host)
                     .autocorrectionDisabled()
                     .textContentType(.URL)
-                    .submitLabel(.next)
-                    .onSubmit { handleSetDefaults() }
                     #if !os(macOS)
                     .textInputAutocapitalization(.never)
                     #endif
+                    .submitLabel(.next)
+                    .onSubmit { handleSetDefaults() }
+                
                 TextField("Token", text: $service.token)
                     .autocorrectionDisabled()
+                    #if !os(macOS)
                     .textInputAutocapitalization(.never)
+                    #endif
                     .submitLabel(.next)
                     .onSubmit { handleSetDefaults() }
             }
