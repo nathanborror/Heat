@@ -3,7 +3,7 @@
     {
       "identity" : "fuzi",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:cezheng/Fuzi",
+      "location" : "https://github.com/cezheng/Fuzi",
       "state" : {
         "branch" : "master",
         "revision" : "e853de3bdeb6fd458bcab6daa4d56e68ff80c531"
@@ -75,7 +75,7 @@
     {
       "identity" : "swift-gen-kit",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-gen-kit",
+      "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
         "revision" : "ed8516bf5d864e1215917052c72b72a87d5f7fe4"
@@ -138,7 +138,7 @@
     {
       "identity" : "swift-shared-kit",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-shared-kit",
+      "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
         "revision" : "323b63fccc9b6cf372e7b4dffda68d598ccf381f"
