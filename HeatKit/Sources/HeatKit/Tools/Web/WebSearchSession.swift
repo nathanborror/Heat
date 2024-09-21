@@ -2,23 +2,24 @@ import Foundation
 import QuartzCore
 import Fuzi
 
-public class WebSearchSession {
+public actor WebSearchSession {
     public static var shared = WebSearchSession()
-    
-    private let engine = GoogleSearch()
     
     private init() {}
     
     public func search(query: String) async throws -> WebSearchResponse {
-        try await engine.search(query: query)
+        let engine = GoogleSearch()
+        return try await engine.search(query: query)
     }
     
     public func searchNews(query: String) async throws -> WebSearchResponse {
-        try await engine.searchNews(query: query)
+        let engine = GoogleSearch()
+        return try await engine.searchNews(query: query)
     }
     
     public func searchImages(query: String) async throws -> WebSearchResponse {
-        try await engine.searchImages(query: query)
+        let engine = GoogleSearch()
+        return try await engine.searchImages(query: query)
     }
 }
 
@@ -250,7 +251,7 @@ private extension Fuzi.XMLElement {
 
 // MARK: Types
 
-public struct WebSearchResponse: Codable {
+public struct WebSearchResponse: Codable, Sendable {
     public var query: String
     public var results: [WebSearchResult]
 
@@ -260,7 +261,7 @@ public struct WebSearchResponse: Codable {
     }
 }
 
-public struct WebSearchResult: Codable {
+public struct WebSearchResult: Codable, Sendable {
     public var url: URL
     public var title: String?
     public var description: String?

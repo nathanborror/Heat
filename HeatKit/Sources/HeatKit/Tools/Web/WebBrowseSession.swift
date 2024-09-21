@@ -2,7 +2,7 @@ import Foundation
 import GenKit
 import Fuzi
 
-public class WebBrowseSession {
+public actor WebBrowseSession {
     public static let shared = WebBrowseSession()
     
     private init() {}
