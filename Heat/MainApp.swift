@@ -99,13 +99,6 @@ struct MainApp: App {
                         ConversationList()
                     }
                 }
-//                .environment(agentsProvider)
-//                .environment(conversationsProvider)
-//                .environment(preferencesProvider)
-//                .environment(conversationViewModel)
-//                .environment(\.debug, preferencesProvider.preferences.debug)
-//                .environment(\.textRendering, preferencesProvider.preferences.textRendering)
-//                .modelContainer(for: Memory.self)
             }
             .floatingPanel(isPresented: $showingLauncher) {
                 LauncherView()

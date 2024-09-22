@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D4017C8B2B6EEF01001CE137 /* MainCompactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4017C8A2B6EEF01001CE137 /* MainCompactView.swift */; };
 		D4017C8D2B6EEF70001CE137 /* Squircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4017C8C2B6EEF70001CE137 /* Squircle.swift */; };
 		D4017C902B6EEFB5001CE137 /* Asset+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4017C8F2B6EEFB5001CE137 /* Asset+.swift */; };
 		D41E191F2AE45C9B002516C1 /* MainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D41E191E2AE45C9B002516C1 /* MainApp.swift */; };
@@ -65,7 +64,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		D4017C8A2B6EEF01001CE137 /* MainCompactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCompactView.swift; sourceTree = "<group>"; };
 		D4017C8C2B6EEF70001CE137 /* Squircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Squircle.swift; sourceTree = "<group>"; };
 		D4017C8F2B6EEFB5001CE137 /* Asset+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Asset+.swift"; sourceTree = "<group>"; };
 		D41E191E2AE45C9B002516C1 /* MainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainApp.swift; sourceTree = "<group>"; };
@@ -161,7 +159,6 @@
 			isa = PBXGroup;
 			children = (
 				D41E191E2AE45C9B002516C1 /* MainApp.swift */,
-				D4017C8A2B6EEF01001CE137 /* MainCompactView.swift */,
 				D8E1FC162B704CD2006C9366 /* Preferences */,
 				D41E194A2AE58D29002516C1 /* Conversations */,
 				D884AAFA2BD7F64A00B90E9B /* Launcher */,
@@ -428,7 +425,6 @@
 				D41E193B2AE4C759002516C1 /* ConversationView.swift in Sources */,
 				D85FAE0A2C84C84600DA153F /* NewsSearchTag.swift in Sources */,
 				D88D23092B3CFB5100CCCC61 /* Messages.swift in Sources */,
-				D4017C8B2B6EEF01001CE137 /* MainCompactView.swift in Sources */,
 				D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */,
 				D4B4F9282C8BB17A00C82284 /* ReflectionTag.swift in Sources */,
 				D4017C8D2B6EEF70001CE137 /* Squircle.swift in Sources */,
