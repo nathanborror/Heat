@@ -9,7 +9,7 @@ More people need to experience open source LLMs. Heat is an open source native i
 - Supports popular LLM providers (OpenAI, Mistral, Anthropic, Gemini)
 - Supports locally run open source LLMs with Ollama
 - Supoprts image gen (Stable Diffusion and Dall-e)
-- Launcher similar to Spotlight <kbd>Shift</kbd>+<kbd>Control</kbd>+<kbd>Space</kbd>
+- Launcher similar to Spotlight <kbd>Option</kbd>+<kbd>Space</kbd>
 - Multi-step tool use (dependent on model)
 - Web search and browsing to improve response accuracy
 - Calendar reading and understanding
