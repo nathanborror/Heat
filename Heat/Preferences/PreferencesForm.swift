@@ -75,6 +75,9 @@ struct PreferencesForm: View {
                     } label: {
                         Text("Additional services")
                     }
+                    #if os(macOS)
+                    .buttonStyle(.link)
+                    #endif
                 }
                 
             } header: {
@@ -87,24 +90,16 @@ struct PreferencesForm: View {
                 NavigationLink("Services") {
                     ServiceList()
                 }
-            } footer: {
-                Text("Configure which models to use.")
-            }
-            
-            Section {
                 NavigationLink("Agents") {
                     AgentList()
                 }
-            } footer: {
-                Text("Agents determine the behavior conversations.")
-            }
-            
-            Section {
                 NavigationLink("Permissions") {
                     PermissionsList()
                 }
+            } header: {
+                Text("Advanced")
             } footer: {
-                Text("Manage permissions to third-party integrations.")
+                Text("Configure services, agent prompts and third-party permissions.")
             }
             
             Section {
@@ -118,10 +113,16 @@ struct PreferencesForm: View {
                 Button("Reset Conversations", action: handleConversationReset)
                 Button("Reset Preferences", action: handlePreferencesReset)
             }
+            #if os(macOS)
+            .buttonStyle(.link)
+            #endif
             
             Section {
                 Button("Delete All Data", role: .destructive, action: { showingDeleteConfirmation = true })
             }
+            #if os(macOS)
+            .buttonStyle(.link)
+            #endif
         }
         .navigationTitle("Preferences")
         .appFormStyle()

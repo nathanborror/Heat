@@ -56,6 +56,9 @@ struct ServiceForm: View {
                         } label: {
                             Text("Additional services")
                         }
+                        #if os(macOS)
+                        .buttonStyle(.link)
+                        #endif
                     }
                 } else {
                     ContentUnavailableView {
@@ -73,6 +76,9 @@ struct ServiceForm: View {
                     Button(action: handleLoadModels) {
                         Text("Load Models")
                     }
+                    #if os(macOS)
+                    .buttonStyle(.link)
+                    #endif
                 }
             }
         }
@@ -151,44 +157,41 @@ struct ModelPicker: View {
     }
     
     var body: some View {
-        Menu {
-            Button {
-                selectedModel = nil
-                selection = nil
-            } label: {
-                Text("None")
-            }
-            Divider()
-            ForEach(modelsByFamily.keys.sorted(), id: \.self) { family in
-                if let familyModels = modelsByFamily[family] {
-                    if familyModels.count > 1 {
-                        Menu(family) {
-                            ForEach(familyModels) { model in
-                                menuItem(model: model)
+        LabeledContent(title) {
+            Menu {
+                Button {
+                    selectedModel = nil
+                    selection = nil
+                } label: {
+                    Text("None")
+                }
+                Divider()
+                ForEach(modelsByFamily.keys.sorted(), id: \.self) { family in
+                    if let familyModels = modelsByFamily[family] {
+                        if familyModels.count > 1 {
+                            Menu(family) {
+                                ForEach(familyModels) { model in
+                                    menuItem(model: model)
+                                }
                             }
+                        } else if let model = familyModels.first {
+                            menuItem(model: model)
                         }
-                    } else if let model = familyModels.first {
-                        menuItem(model: model)
                     }
                 }
-            }
-        } label: {
-            HStack {
-                Text(title)
-                Spacer()
+            } label: {
                 Group {
                     if let selectedModel {
                         Text(selectedModel.name ?? selectedModel.id)
                     } else {
                         Text("Select Model")
                     }
-                    Image(systemName: "chevron.up.chevron.down")
-                        .imageScale(.small)
                 }
                 .foregroundStyle(.secondary)
             }
+            .foregroundStyle(.primary)
+            .menuStyle(.button)
         }
-        .foregroundStyle(.primary)
     }
     
     func menuItem(model: Model) -> some View {

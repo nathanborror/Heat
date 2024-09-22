@@ -53,13 +53,13 @@ struct MessageViewText: View {
         VStack(alignment: .leading, spacing: 0) {
             switch message.role {
             case .user:
-                ContentView(text: message.content)
+                ContentView(text: message.content, role: .user)
             case .assistant:
                 VStack(alignment: .leading, spacing: 12) {
                     ForEach(contents.indices, id: \.self) { index in
                         switch contents[index] {
                         case .text(let text):
-                            ContentView(text: text)
+                            ContentView(text: text, role: .assistant)
                         case .tag(let tag):
                             TagView(tag: tag)
                                 .foregroundStyle(.secondary)
@@ -96,7 +96,7 @@ struct MessageViewSpacing: ViewModifier {
                 content
             case .user:
                 content
-                    .colorInvert()
+                    //.colorInvert()
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(.tint, in: .rect(cornerRadius: 10))

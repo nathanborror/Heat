@@ -21,9 +21,6 @@ private let logger = Logger(subsystem: "MainApp", category: "Heat")
 
 @main
 struct MainApp: App {
-    #if os(macOS)
-    @Environment(\.openWindow) private var openWindow
-    #endif
     
     private let agentsProvider = AgentsProvider.shared
     private let conversationsProvider = ConversationsProvider.shared
@@ -33,11 +30,19 @@ struct MainApp: App {
     @State private var conversationViewModel = ConversationViewModel()
     @State private var searchInput = ""
     @State private var showingLauncher = false
-    @State private var showingPreferences = false
     
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.option])
     #endif
+
+    @State private var sheet: Sheet? = nil
+    
+    enum Sheet: String, Identifiable {
+        case conversationList
+        case preferences
+        case services
+        var id: String { rawValue }
+    }
     
     var body: some Scene {
         #if os(macOS)
@@ -47,6 +52,33 @@ struct MainApp: App {
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
                 ConversationView()
+                    .overlay {
+                        switch preferencesProvider.status {
+                        case .needsServiceSetup:
+                            ContentUnavailableView {
+                                Label("Missing services", systemImage: "exclamationmark.icloud")
+                            } description: {
+                                Text("Configure a service like OpenAI, Anthropic or Ollama to get started.")
+                                Button("Open Services") { sheet = .services }
+                            }
+                        case .needsPreferredService:
+                            ContentUnavailableView {
+                                Label("Missing chat service", systemImage: "slider.horizontal.2.square")
+                            } description: {
+                                Text("Open Preferences to pick a chat service to use.")
+                                Button("Open Preferences") { sheet = .preferences }
+                            }
+                        case .ready:
+                            if conversationViewModel.messages.isEmpty {
+                                ContentUnavailableView {
+                                    Label("New conversation", systemImage: "message")
+                                }
+                                .foregroundStyle(.secondary)
+                            }
+                        case .waiting:
+                            EmptyView()
+                        }
+                    }
             }
             .toolbar {
                 ToolbarItem {
@@ -56,10 +88,24 @@ struct MainApp: App {
                     newConversationButton
                 }
             }
-            .sheet(isPresented: $showingPreferences) {
+            .sheet(item: $sheet) { sheet in
                 NavigationStack {
-                    PreferencesForm(preferences: preferencesProvider.preferences)
+                    switch sheet {
+                    case .preferences:
+                        PreferencesForm(preferences: preferencesProvider.preferences)
+                    case .services:
+                        ServiceList()
+                    case .conversationList:
+                        ConversationList()
+                    }
                 }
+//                .environment(agentsProvider)
+//                .environment(conversationsProvider)
+//                .environment(preferencesProvider)
+//                .environment(conversationViewModel)
+//                .environment(\.debug, preferencesProvider.preferences.debug)
+//                .environment(\.textRendering, preferencesProvider.preferences.textRendering)
+//                .modelContainer(for: Memory.self)
             }
             .floatingPanel(isPresented: $showingLauncher) {
                 LauncherView()
@@ -98,18 +144,58 @@ struct MainApp: App {
         }
         #else
         WindowGroup {
-            MainCompactView()
-                .environment(agentsProvider)
-                .environment(conversationsProvider)
-                .environment(messagesProvider)
-                .environment(preferencesProvider)
-                .environment(conversationViewModel)
-                .environment(\.debug, preferencesProvider.preferences.debug)
-                .environment(\.textRendering, preferencesProvider.preferences.textRendering)
-                .modelContainer(for: Memory.self)
-                .onAppear {
-                    handleInit()
-                }
+            NavigationStack {
+                ConversationView()
+                    .toolbar {
+                        ToolbarItem {
+                            Menu {
+                                Button {
+                                    sheet = .conversationList
+                                } label: {
+                                    Label("History", systemImage: "clock")
+                                }
+                                Divider()
+                                Button {
+                                    sheet = .preferences
+                                } label: {
+                                    Label("Preferences", systemImage: "slider.horizontal.3")
+                                }
+                            } label: {
+                                Label("Menu", systemImage: "ellipsis")
+                            }
+                        }
+                        ToolbarItem {
+                            Button {
+                                Task { try await conversationViewModel.newConversation() }
+                            } label: {
+                                Label("New Conversation", systemImage: "plus")
+                            }
+                        }
+                    }
+                    .sheet(item: $sheet) { sheet in
+                        NavigationStack {
+                            switch sheet {
+                            case .preferences:
+                                PreferencesForm(preferences: preferencesProvider.preferences)
+                            case .services:
+                                ServiceList()
+                            case .conversationList:
+                                ConversationList()
+                            }
+                        }
+                    }
+            }
+            .environment(agentsProvider)
+            .environment(conversationsProvider)
+            .environment(messagesProvider)
+            .environment(preferencesProvider)
+            .environment(conversationViewModel)
+            .environment(\.debug, preferencesProvider.preferences.debug)
+            .environment(\.textRendering, preferencesProvider.preferences.textRendering)
+            .modelContainer(for: Memory.self)
+            .onAppear {
+                handleInit()
+            }
         }
         #endif
     }
@@ -124,7 +210,7 @@ struct MainApp: App {
     
     var preferencesButton: some View {
         Button {
-            showingPreferences.toggle()
+            sheet = .preferences
         } label: {
             Label("Preferences...", systemImage: "slider.horizontal.3")
         }

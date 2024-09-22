@@ -10,7 +10,7 @@ struct ArtifactTag: View {
             ForEach(contents.indices, id: \.self) { index in
                 switch contents[index] {
                 case .text(let text):
-                    ContentView(text: text)
+                    ContentView(text: text, role: .assistant)
                 case .tag(let tag):
                     TagView(tag: tag)
                         .foregroundStyle(.secondary)

@@ -39,10 +39,10 @@
     {
       "identity" : "swift-anthropic",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-anthropic",
+      "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "65a087fc4446fef5120dd2b58652cc7b6cbfa172"
+        "revision" : "de54b69e526a3c23a43a82e2f7b439fa8108a3b8"
       }
     },
     {
@@ -57,7 +57,7 @@
     {
       "identity" : "swift-elevenlabs",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-elevenlabs",
+      "location" : "https://github.com/nathanborror/swift-elevenlabs",
       "state" : {
         "branch" : "main",
         "revision" : "80718d036fe5a4680184b5c3f2eebcbce538788f"
@@ -66,10 +66,10 @@
     {
       "identity" : "swift-fal",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-fal",
+      "location" : "https://github.com/nathanborror/swift-fal",
       "state" : {
         "branch" : "main",
-        "revision" : "27ab706414436febca52a8d2ffc995fa4ff0b430"
+        "revision" : "bb6ebada9c54294b7e1e63457084dadcd198cffe"
       }
     },
     {
@@ -78,16 +78,16 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "ed8516bf5d864e1215917052c72b72a87d5f7fe4"
+        "revision" : "41fafaf8388e1817ba1e01aed7fb4ad16775007a"
       }
     },
     {
       "identity" : "swift-google-gen",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-google-gen",
+      "location" : "https://github.com/nathanborror/swift-google-gen",
       "state" : {
         "branch" : "main",
-        "revision" : "05daf8ef37a713f5b941f503f786c9efffcaa0cf"
+        "revision" : "4f9bcf32ef848b699f2d76b7978c9c4b56e42619"
       }
     },
     {
@@ -102,7 +102,7 @@
     {
       "identity" : "swift-mistral",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-mistral",
+      "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
         "revision" : "b684e503b4b4642d485be9b1c6131093ccd7f46d"
@@ -111,16 +111,16 @@
     {
       "identity" : "swift-ollama",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-ollama",
+      "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "85a1b168890f0b33c85b098ae5e0ea30002dd5be"
+        "revision" : "8ba8f0dfe41c34b14506518b0d0a43e3a3e10537"
       }
     },
     {
       "identity" : "swift-openai",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-openai",
+      "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
         "revision" : "76d632ace7e035ec9fb8e0873457e272ad0a032a"
@@ -129,7 +129,7 @@
     {
       "identity" : "swift-perplexity",
       "kind" : "remoteSourceControl",
-      "location" : "git@github.com:nathanborror/swift-perplexity",
+      "location" : "https://github.com/nathanborror/swift-perplexity",
       "state" : {
         "branch" : "main",
         "revision" : "9bf4b475f8ea7a1cb284e6de17bb879930c29f94"

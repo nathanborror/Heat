@@ -6,8 +6,7 @@ struct AppFormStyle: ViewModifier {
         content
             #if os(macOS)
             .formStyle(.grouped)
-            .frame(width: 400)
-            .frame(maxHeight: 450)
+            .frame(width: 400, height: 500)
             #endif
     }
 }

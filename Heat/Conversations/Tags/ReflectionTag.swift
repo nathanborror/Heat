@@ -10,7 +10,7 @@ struct ReflectionTag: View {
             Text("Reflection".uppercased())
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-            ContentView(text: tag.content ?? "")
+            ContentView(text: tag.content ?? "", role: .assistant)
         }
         .padding(12)
         .background(.background)
