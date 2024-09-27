@@ -5,7 +5,7 @@ import OSLog
 import GenKit
 import HeatKit
 
-private let logger = Logger(subsystem: "LauncherView", category: "Heat")
+private let logger = Logger(subsystem: "LauncherView", category: "App")
 
 struct LauncherView: View {
     @Environment(ConversationViewModel.self) var conversationViewModel

@@ -4,7 +4,7 @@ import SharedKit
 import GenKit
 import HeatKit
 
-private let logger = Logger(subsystem: "AgentForm", category: "Heat")
+private let logger = Logger(subsystem: "AgentForm", category: "App")
 
 struct AgentForm: View {
     @Environment(AgentsProvider.self) var agentsProvider

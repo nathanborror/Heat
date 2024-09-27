@@ -17,26 +17,28 @@ import EventKit
 import SharedKit
 import HeatKit
 
-private let logger = Logger(subsystem: "MainApp", category: "Heat")
+private let logger = Logger(subsystem: "MainApp", category: "App")
 
 @main
 struct MainApp: App {
     
+    // Providers
     private let agentsProvider = AgentsProvider.shared
     private let conversationsProvider = ConversationsProvider.shared
     private let messagesProvider = MessagesProvider.shared
     private let preferencesProvider = PreferencesProvider.shared
     
+    // View models
     @State private var conversationViewModel = ConversationViewModel()
+    
     @State private var searchInput = ""
     @State private var showingLauncher = false
+    @State private var sheet: Sheet? = nil
     
     #if os(macOS)
     private let hotKey = HotKey(key: .space, modifiers: [.option])
     #endif
 
-    @State private var sheet: Sheet? = nil
-    
     enum Sheet: String, Identifiable {
         case conversationList
         case preferences
@@ -59,7 +61,7 @@ struct MainApp: App {
                                 Label("Missing services", systemImage: "exclamationmark.icloud")
                             } description: {
                                 Text("Configure a service like OpenAI, Anthropic or Ollama to get started.")
-                                Button("Open Services") { sheet = .services }
+                                Button("Open Preferences") { sheet = .preferences }
                             }
                         case .needsPreferredService:
                             ContentUnavailableView {
@@ -147,7 +149,6 @@ struct MainApp: App {
                                 } label: {
                                     Label("History", systemImage: "clock")
                                 }
-                                Divider()
                                 Button {
                                     sheet = .preferences
                                 } label: {

@@ -15,7 +15,7 @@ public struct Defaults {
     public static let assistant = Agent(
         id: "bundle-assistant",
         name: "Assistant",
-        instructions: Prompt.render(AssistantInstructions, with: ["NAME": "Heat", "CREATOR": "Nathan Borror"]),
+        instructions: AssistantInstructions,
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
@@ -26,7 +26,7 @@ public struct Defaults {
     public static let assistantMaker = Agent(
         id: "bundle-assistant-maker",
         name: "Assistant Maker",
-        instructions: Prompt.render(AssistantArtifactsInstructions, with: ["NAME": "Heat", "CREATOR": "Nathan Borror"]),
+        instructions: AssistantArtifactsInstructions,
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,

@@ -3,7 +3,7 @@ import SwiftData
 import OSLog
 import HeatKit
 
-private let logger = Logger(subsystem: "ConversationView", category: "Heat")
+private let logger = Logger(subsystem: "ConversationView", category: "App")
 
 struct ConversationView: View {
     @Environment(PreferencesProvider.self) var preferencesProvider

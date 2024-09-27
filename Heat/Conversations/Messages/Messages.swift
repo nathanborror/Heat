@@ -96,7 +96,6 @@ struct MessageViewSpacing: ViewModifier {
                 content
             case .user:
                 content
-                    //.colorInvert()
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(.tint, in: .rect(cornerRadius: 10))

@@ -3,7 +3,7 @@ import OSLog
 import SharedKit
 import PhotosUI
 
-private let logger = Logger(subsystem: "ImagePicker", category: "Heat")
+private let logger = Logger(subsystem: "ImagePicker", category: "App")
 
 @MainActor
 @Observable

@@ -3,7 +3,7 @@ import OSLog
 import GenKit
 import HeatKit
 
-private let logger = Logger(subsystem: "ConversationViewModel", category: "Heat")
+private let logger = Logger(subsystem: "ConversationViewModel", category: "App")
 
 @Observable
 @MainActor
