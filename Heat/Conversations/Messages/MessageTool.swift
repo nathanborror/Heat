@@ -12,7 +12,7 @@ struct MessageTool: View {
             if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
-                    MessageAttachments(message: message)
+                    MessageAttachments(message.attachments)
                         #if os(macOS)
                         .frame(width: 300, height: 300)
                         .scaleEffect(1.05)
@@ -34,6 +34,9 @@ struct MessageTool: View {
                                 .stroke(Color.primary.opacity(0.2), lineWidth: 1)
                         }
                         #endif
+                case .browseWeb:
+                    MessageToolContent(message: message)
+                    Text(message.content ?? "")
                 default:
                     MessageToolContent(message: message)
                 }
@@ -54,7 +57,7 @@ struct MessageTool: View {
                         }
                     case Toolbox.browseWeb.name:
                         VStack {
-                            ContentView(text: message.content?.trimmingCharacters(in: .whitespacesAndNewlines), role: .assistant)
+                            ContentView(message.content)
                                 .textSelection(.enabled)
                                 .padding()
                         }
@@ -76,17 +79,14 @@ struct MessageToolContent: View {
         VStack(alignment: .leading) {
             Text(message.metadata.label)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.system(size: 16))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
             
-            if debug, let content = message.content {
-                Text(content)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary.opacity(0.5))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
-            }
+//            if debug, let content = message.content {
+//                Text(content)
+//                    .font(.footnote)
+//                    .foregroundStyle(.secondary.opacity(0.5))
+//                    .frame(maxWidth: .infinity, alignment: .leading)
+//                    .textSelection(.enabled)
+//            }
         }
     }
 }

@@ -198,7 +198,7 @@ struct MainApp: App {
         Button {
             conversationViewModel.conversationID = nil
         } label: {
-            Label("New Conversation", systemImage: "square.and.pencil")
+            Label("New Conversation", systemImage: "plus")
         }
     }
     

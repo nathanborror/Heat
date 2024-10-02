@@ -2,11 +2,15 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct MessageToolCall: View {
-    let message: Message
+struct MessageToolCalls: View {
+    let toolCalls: [ToolCall]
+    
+    init(_ toolCalls: [ToolCall]?) {
+        self.toolCalls = toolCalls ?? []
+    }
     
     var body: some View {
-        if let toolCalls = message.toolCalls {
+        if !toolCalls.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(toolCalls, id: \.id) { toolCall in
                     if let tool = Toolbox(name: toolCall.function.name) {
@@ -37,8 +41,6 @@ struct MessageToolCall: View {
                         .textSelection(.enabled)
                 }
             }
-        } else {
-            Text("Missing tool calls.")
         }
     }
 }

@@ -38,7 +38,7 @@ struct RunView: View {
         } label: {
             HStack(alignment: .firstTextBaseline) {
                 Text("\(run.steps.count) Steps")
-                Image(systemName: "info.circle")
+                Image(systemName: "chevron.right")
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)
@@ -49,7 +49,7 @@ struct RunView: View {
         .buttonStyle(.plain)
         .popover(isPresented: $isInspecting, arrowEdge: .leading) {
             RunStepsView(messages: run.steps)
-                .frame(width: 400, height: 400)
+                .frame(width: 500, height: 600)
         }
     }
 }
@@ -64,8 +64,9 @@ struct RunStepsView: View {
                     MessageView(message: message)
                 }
             }
-            .foregroundStyle(.secondary)
+            .padding(.vertical)
         }
+        .background(.background)
     }
 }
 
@@ -73,7 +74,7 @@ struct RunStepsView: View {
     VStack {
         RunView(run: mock_run)
     }
-    .frame(width: 400, height: 400)
+    .frame(width: 500, height: 600)
 }
 
 
@@ -81,5 +82,5 @@ struct RunStepsView: View {
     VStack {
         RunStepsView(messages: mock_run.steps)
     }
-    .frame(width: 400, height: 400)
+    .frame(width: 500, height: 600)
 }

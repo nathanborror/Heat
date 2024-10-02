@@ -10,7 +10,7 @@ struct ArtifactTag: View {
             ForEach(contents.indices, id: \.self) { index in
                 switch contents[index] {
                 case .text(let text):
-                    ContentView(text: text, role: .assistant)
+                    ContentView(text)
                 case .tag(let tag):
                     TagView(tag: tag)
                         .foregroundStyle(.secondary)
@@ -29,7 +29,7 @@ struct ArtifactTag: View {
     
     var contents: [ContentParser.Result.Content] {
         guard let content = tag.content else { return [] }
-        let results = try? parser.parse(input: content, tags: ["image_search", "news_search"])
+        let results = try? parser.parse(input: content, tags: ["image_search_query", "news_search"])
         return results?.contents ?? []
     }
     

@@ -9,32 +9,24 @@ struct MessageView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if debug {
-                Text(message.role.rawValue)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
+            
+            // Render role for all messages in debug mode
+            MessageRole(message.role)
+            
+            // Render message content
             switch message.role {
             case .system:
-                if debug {
-                    MessageSystemView(message: message)
-                }
-            case .user:
-                MessageViewText(message: message)
+                MessageContent(message.content, for: message.role)
                     .messageSpacing(message)
-                    .messageAttachments(message)
+            case .user:
+                MessageContent(message.content, for: message.role)
+                    .messageSpacing(message)
+                MessageAttachments(message.attachments)
             case .assistant:
-                if message.toolCalls == nil {
-                    MessageViewText(message: message)
-                        .messageSpacing(message)
-                        .messageAttachments(message)
-                } else {
-                    if message.content != nil {
-                        MessageViewText(message: message)
-                            .messageSpacing(message)
-                    }
-                    MessageToolCall(message: message)
-                }
+                MessageContent(message.content, for: message.role)
+                    .messageSpacing(message)
+                MessageAttachments(message.attachments)
+                MessageToolCalls(message.toolCalls)
             case .tool:
                 MessageTool(message: message)
             }
@@ -44,40 +36,70 @@ struct MessageView: View {
     }
 }
 
-struct MessageViewText: View {
-    @Environment(\.colorScheme) private var colorScheme
+struct MessageRole: View {
+    @Environment(\.debug) private var debug
     
-    let message: Message
+    let role: Message.Role
+    
+    init(_ role: Message.Role) {
+        self.role = role
+    }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            switch message.role {
-            case .user:
-                ContentView(text: message.content, role: .user)
-            case .assistant:
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(contents.indices, id: \.self) { index in
-                        switch contents[index] {
-                        case .text(let text):
-                            ContentView(text: text, role: .assistant)
-                        case .tag(let tag):
-                            TagView(tag: tag)
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, -12)
+        if debug {
+            Text(role.rawValue)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+struct MessageContent: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
+    let content: String?
+    let role: Message.Role
+    
+    init(_ content: String?, for role: Message.Role) {
+        self.content = content
+        self.role = role
+    }
+    
+    var body: some View {
+        if let content {
+            VStack(alignment: .leading, spacing: 0) {
+                switch role {
+                case .system:
+                    ContentView(content, formatter: .text)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                case .user:
+                    ContentView(content, role: .user)
+                case .assistant:
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(contents.indices, id: \.self) { index in
+                            switch contents[index] {
+                            case .text(let text):
+                                ContentView(text)
+                            case .tag(let tag):
+                                TagView(tag: tag)
+                                    .foregroundStyle(.secondary)
+                                    .padding(.horizontal, -12)
+                            }
                         }
                     }
+                default:
+                    EmptyView()
                 }
-            default:
-                EmptyView()
             }
+            .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
         }
-        .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
     }
     
     var contents: [ContentParser.Result.Content] {
-        guard case .assistant = message.role else { return [] }
-        guard let content = message.content else { return [] }
-        guard let results = try? parser.parse(input: content, tags: ["thinking", "artifact", "output"]) else { return [] }
+        guard case .assistant = role else { return [] }
+        guard let content = content else { return [] }
+        guard let results = try? parser.parse(input: content, tags: ["thinking", "artifact", "output", "image_search_query"]) else { return [] }
         return results.contents
     }
     
@@ -106,44 +128,9 @@ struct MessageViewSpacing: ViewModifier {
     }
 }
 
-struct MessageViewAttachments: ViewModifier {
-    let message: Message
-        
-    func body(content: Content) -> some View {
-        if message.attachments.isEmpty {
-            content
-        } else {
-            VStack {
-                ScrollView(.horizontal) {
-                    HStack {
-                        ForEach(message.attachments.indices, id: \.self) { index in
-                            switch message.attachments[index] {
-                            case .agent(let agentID):
-                                Text(agentID)
-                            case .asset(let asset):
-                                PictureView(asset: asset)
-                                    .frame(width: 300, height: 300)
-                                    .clipShape(.rect(cornerRadius: 10))
-                            default:
-                                EmptyView()
-                            }
-                        }
-                    }
-                }
-                .scrollClipDisabled()
-                content
-            }
-        }
-    }
-}
-
 extension View {
     
     func messageSpacing(_ message: Message) -> some View {
         self.modifier(MessageViewSpacing(message: message))
-    }
-    
-    func messageAttachments(_ message: Message) -> some View {
-        self.modifier(MessageViewAttachments(message: message))
     }
 }

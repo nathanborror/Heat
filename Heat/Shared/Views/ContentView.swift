@@ -1,15 +1,21 @@
 import SwiftUI
 import MarkdownUI
 import GenKit
+import HeatKit
 
 struct ContentView: View {
-    @Environment(\.textRendering) private var textRendering
-    
     let text: String?
     let role: Message.Role
+    let formatter: Preferences.TextRendering!
+    
+    init(_ text: String?, role: Message.Role = .assistant, formatter: Preferences.TextRendering? = nil) {
+        self.text = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        self.role = role
+        self.formatter = formatter ?? PreferencesProvider.shared.preferences.textRendering
+    }
     
     var body: some View {
-        switch textRendering {
+        switch formatter {
         case .markdown:
             if role == .user {
                 Markdown(text ?? "")
@@ -28,7 +34,7 @@ struct ContentView: View {
         case .attributed:
             Text(toAttributedString)
                 .textSelection(.enabled)
-        case .text:
+        default:
             Text(text ?? "")
                 .textSelection(.enabled)
         }
