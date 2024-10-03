@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 import OSLog
 import PhotosUI
 import GenKit
@@ -8,24 +7,27 @@ import HeatKit
 private let logger = Logger(subsystem: "ConversationInput", category: "App")
 
 struct MessageInput: View {
-    @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.modelContext) private var modelContext
     
-    @Query(sort: \Memory.created, order: .forward)
-    var memories: [Memory]
+    typealias ActionHandler = (String, [Data], Command) -> Void
     
-    @State var imagePickerViewModel: ImagePickerViewModel
-    @State var content: String
-    @State var command: String
-    @State var isShowingPhotos: Bool
+    let action: ActionHandler
     
-    @FocusState var isFocused: Bool
+    enum Command: String {
+        case text
+        case imagine
+        case vision
+    }
     
-    init(imagePickerViewModel: ImagePickerViewModel = .init(), content: String = "", command: String = "") {
-        self.imagePickerViewModel = imagePickerViewModel
-        self.content = content
-        self.command = command
-        self.isShowingPhotos = false
+    @State private var imagePickerViewModel = ImagePickerViewModel()
+    @State private var content = ""
+    @State private var command: Command = .text
+    @State private var isShowingPhotos = false
+    
+    @FocusState private var isFocused: Bool
+    
+    init(action: @escaping ActionHandler) {
+        self.action = action
     }
     
     var body: some View {
@@ -52,13 +54,13 @@ struct MessageInput: View {
                 HStack(alignment: .bottom, spacing: 0) {
                     
                     // Command menu
-                    if command.isEmpty {
+                    if command == .text {
                         Menu {
                             Button(action: { isShowingPhotos = true }) {
                                 Label("Attach Photo", systemImage: "photo")
                             }
                             .keyboardShortcut("1", modifiers: .command)
-                            Button(action: { command = "imagine" }) {
+                            Button(action: { command = .imagine }) {
                                 Label("Imagine", systemImage: "paintpalette")
                             }
                             .keyboardShortcut("2", modifiers: .command)
@@ -70,10 +72,10 @@ struct MessageInput: View {
                     }
                     
                     // Selected command
-                    if !command.isEmpty {
+                    if command != .text {
                         HStack {
-                            Text(command)
-                            Button(action: { command = "" }) {
+                            Text(command.rawValue)
+                            Button(action: { self.command = .text }) {
                                 Image(systemName: "xmark")
                                     .imageScale(.small)
                                     .opacity(0.5)
@@ -154,75 +156,42 @@ struct MessageInput: View {
         
         // Check for command
         switch command {
-        case "imagine":
-            handleImagine(content)
+        case .imagine:
+            action(content, [], .imagine)
             return
         default:
             break
         }
         
-        // Handle vision prompt if exists
-        if hasVisionAsset || !imagePickerViewModel.imagesSelected.isEmpty {
-            handleVision(content); return
-        }
-        
-        do {
-            try conversationViewModel.generate(chat: content, context: memories.map { $0.content })
-        } catch {
-            conversationViewModel.error = error
-        }
-    }
-    
-    func handleVision(_ content: String) {
-        do {
+        // If there are images in the image picker, return a vision action
+        if !imagePickerViewModel.imagesSelected.isEmpty {
+            
+            // Resize image so we're not sending huge amounts of data to the services.
             let images = imagePickerViewModel.imagesSelected.map {
-                // Resize image so we're not sending huge amounts of data to the services.
                 $0.image?.resize(to: .init(width: 512, height: 512))
             }.compactMap { $0 }
-            try conversationViewModel.generate(chat: content, images: images)
-        } catch {
-            conversationViewModel.error = error
+            
+            action(content, images, .vision)
+            return
         }
-        clear()
-    }
-    
-    func handleImagine(_ prompt: String) {
-        do {
-            try conversationViewModel.generate(image: prompt)
-        } catch {
-            conversationViewModel.error = error
-        }
+        
+        // Return regular text action
+        action(content, [], command)
         clear()
     }
     
     func handleStop() {
-        conversationViewModel.cancel()
+        print("not implemented")
     }
     
     private func clear() {
         content = ""
-        command = ""
+        command = .text
         imagePickerViewModel.removeAll()
     }
     
-    private var hasVisionAsset: Bool {
-        let visible = conversationViewModel.messages.filter { $0.kind != .instruction }
-        let message = visible.first { message in
-            let attachment = message.attachments.first { attachment in
-                switch attachment {
-                case .agent, .automation, .component, .file:
-                    return false
-                case .asset(let asset):
-                    return asset.noop == false
-                }
-            }
-            return attachment != nil
-        }
-        return message != nil
-    }
-    
     private var showInputPadding: Bool      { !content.isEmpty }
-    private var showStopGenerating: Bool    { (conversationViewModel.conversation?.state ?? .none) != .none }
+    private var showStopGenerating: Bool    { false } // TODO: Fix this
     private var showSubmit: Bool            { !content.isEmpty }
     
     #if os(macOS)

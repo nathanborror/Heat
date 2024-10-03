@@ -39,9 +39,7 @@ struct ConversationView: View {
                     // Show suggestions when they are available
                     if !conversationViewModel.suggestions.isEmpty {
                         SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
-                            SuggestionView(suggestion: suggestion) { suggestion in
-                                Task { try await handleSuggestion(suggestion) }
-                            }
+                            SuggestionView(suggestion: suggestion) { handleSubmit($0) }
                         }
                         .padding(.vertical, 8)
                     }
@@ -60,10 +58,11 @@ struct ConversationView: View {
         .scrollDismissesKeyboard(.interactively)
         .scrollIndicators(.hidden)
         .safeAreaInset(edge: .bottom, alignment: .center) {
-            MessageInput()
-                .environment(conversationViewModel)
-                .padding(12)
-                .background(.background)
+            MessageInput { prompt, images, command in
+                handleSubmit(prompt, images: images, command: command)
+            }
+            .padding(12)
+            .background(.background)
         }
         .toolbar {
             if conversationViewModel.conversationID != nil {
@@ -91,11 +90,21 @@ struct ConversationView: View {
         }
     }
     
-    func handleSuggestion(_ suggestion: String) async throws {
-        do {
-            try conversationViewModel.generate(chat: suggestion, context: memories.map { $0.content })
-        } catch {
-            conversationViewModel.error = error
+    func handleSubmit(_ prompt: String, images: [Data] = [], command: MessageInput.Command = .text) {
+        Task {
+            let context = memories.map { $0.content }
+            do {
+                switch command {
+                case .text:
+                    try conversationViewModel.generate(chat: prompt, context: context)
+                case .vision:
+                    try conversationViewModel.generate(chat: prompt, images: images, context: context)
+                case .imagine:
+                    try conversationViewModel.generate(image: prompt)
+                }
+            } catch {
+                conversationViewModel.error = error
+            }
         }
     }
 }
