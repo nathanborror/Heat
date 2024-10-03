@@ -29,6 +29,7 @@ struct MessageAttachments: View {
             }
             .scrollTargetBehavior(.viewAligned)
             .scrollIndicators(.hidden)
+            .background(.black)
         }
     }
 }
