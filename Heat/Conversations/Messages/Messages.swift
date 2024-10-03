@@ -70,17 +70,17 @@ struct MessageContent: View {
             VStack(alignment: .leading, spacing: 0) {
                 switch role {
                 case .system:
-                    ContentView(content, formatter: .text)
+                    RenderText(content, formatter: .text)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 case .user:
-                    ContentView(content, role: .user)
+                    RenderText(content, role: .user)
                 case .assistant:
                     VStack(alignment: .leading, spacing: 12) {
                         ForEach(contents.indices, id: \.self) { index in
                             switch contents[index] {
                             case .text(let text):
-                                ContentView(text)
+                                RenderText(text)
                             case .tag(let tag):
                                 TagView(tag: tag)
                                     .foregroundStyle(.secondary)

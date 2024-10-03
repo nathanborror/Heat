@@ -57,7 +57,7 @@ struct MessageTool: View {
                         }
                     case Toolbox.browseWeb.name:
                         VStack {
-                            ContentView(message.content)
+                            RenderText(message.content)
                                 .textSelection(.enabled)
                                 .padding()
                         }

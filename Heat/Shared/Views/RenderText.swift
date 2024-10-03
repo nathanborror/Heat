@@ -3,7 +3,7 @@ import MarkdownUI
 import GenKit
 import HeatKit
 
-struct ContentView: View {
+struct RenderText: View {
     let text: String?
     let role: Message.Role
     let formatter: Preferences.TextRendering!

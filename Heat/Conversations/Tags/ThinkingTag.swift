@@ -20,7 +20,7 @@ struct ThinkingTag: View {
                 ForEach(contents.indices, id: \.self) { index in
                     switch contents[index] {
                     case .text(let text):
-                        ContentView(text)
+                        RenderText(text)
                     case .tag(let tag):
                         TagView(tag: tag)
                             .foregroundStyle(.secondary)

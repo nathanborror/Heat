@@ -14,7 +14,7 @@ struct TagView: View {
         case "reflection":
             ReflectionTag(tag: tag)
         case "output":
-            ContentView(tag.content)
+            RenderText(tag.content)
                 .padding(.leading, 12)
         case "image_search_query":
             ImageSearchTag(tag: tag)
