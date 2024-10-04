@@ -6,7 +6,7 @@ import HeatKit
 
 private let logger = Logger(subsystem: "ConversationInput", category: "App")
 
-struct MessageInput: View {
+struct MessageField: View {
     @Environment(\.modelContext) private var modelContext
     
     typealias ActionHandler = (String, [Data], Command) -> Void

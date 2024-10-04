@@ -82,7 +82,7 @@ struct MessageContent: View {
                             case .text(let text):
                                 RenderText(text)
                             case .tag(let tag):
-                                TagView(tag: tag)
+                                TagView(tag)
                                     .foregroundStyle(.secondary)
                                     .padding(.horizontal, -12)
                             }
@@ -99,7 +99,8 @@ struct MessageContent: View {
     var contents: [ContentParser.Result.Content] {
         guard case .assistant = role else { return [] }
         guard let content = content else { return [] }
-        guard let results = try? parser.parse(input: content, tags: ["thinking", "artifact", "output", "image_search_query"]) else { return [] }
+        let tags = ["thinking", "artifact", "output", "reflection", "image_search_query"]
+        guard let results = try? parser.parse(input: content, tags: tags) else { return [] }
         return results.contents
     }
     

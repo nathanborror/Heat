@@ -5,6 +5,10 @@ import HeatKit
 struct ReflectionTag: View {
     let tag: ContentParser.Result.Tag
 
+    init(_ tag: ContentParser.Result.Tag) {
+        self.tag = tag
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Reflection".uppercased())

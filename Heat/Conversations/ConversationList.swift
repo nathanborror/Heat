@@ -3,10 +3,9 @@ import HeatKit
 
 struct ConversationList: View {
     @Environment(ConversationsProvider.self) var conversationsProvider
-    @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.dismiss) private var dismiss
     
-    @State var selected: String? = nil
+    @Binding var selected: String?
     
     var body: some View {
         List(selection: $selected) {
@@ -29,14 +28,10 @@ struct ConversationList: View {
         .listStyle(.sidebar)
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle("History")
-        .onChange(of: selected) { _, newValue in
-            conversationViewModel.conversationID = newValue
-            
-            #if os(iOS)
-            if newValue != nil { dismiss() }
-            #endif
-        }
         #if os(iOS)
+        .onChange(of: selected) { _, newValue in
+            if newValue != nil { dismiss() }
+        }
         .overlay {
             if conversationsProvider.conversations.isEmpty {
                 ContentUnavailableView {

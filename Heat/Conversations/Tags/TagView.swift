@@ -5,21 +5,25 @@ import HeatKit
 struct TagView: View {
     let tag: ContentParser.Result.Tag
     
+    init(_ tag: ContentParser.Result.Tag) {
+        self.tag = tag
+    }
+    
     var body: some View {
         switch tag.name {
         case "artifact":
-            ArtifactTag(tag: tag)
+            ArtifactTag(tag)
         case "thinking":
-            ThinkingTag(tag: tag)
+            ThinkingTag(tag)
         case "reflection":
-            ReflectionTag(tag: tag)
+            ReflectionTag(tag)
         case "output":
-            RenderText(tag.content)
+            OutputTag(tag)
                 .padding(.leading, 12)
         case "image_search_query":
-            ImageSearchTag(tag: tag)
+            ImageSearchTag(tag)
         case "news_search":
-            NewsSearchTag(tag: tag)
+            NewsSearchTag(tag)
         default:
             Text("<\(tag.name)> not implemented")
         }

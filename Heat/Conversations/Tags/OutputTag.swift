@@ -2,7 +2,7 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct ArtifactTag: View {
+struct OutputTag: View {
     let tag: ContentParser.Result.Tag
 
     init(_ tag: ContentParser.Result.Tag) {
@@ -10,7 +10,7 @@ struct ArtifactTag: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             ForEach(contents.indices, id: \.self) { index in
                 switch contents[index] {
                 case .text(let text):
@@ -21,20 +21,14 @@ struct ArtifactTag: View {
                 }
             }
         }
-        .padding(24)
-        .background {
-            Rectangle()
-                .fill(.background)
-                .stroke(Color.primary.opacity(0.1), lineWidth: 1)
-                .shadow(color: .primary.opacity(0.1), radius: 20, y: 10)
-        }
-        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     var contents: [ContentParser.Result.Content] {
         guard let content = tag.content else { return [] }
-        let results = try? parser.parse(input: content, tags: ["image_search_query", "news_search"])
-        return results?.contents ?? []
+        let tags = ["reflection", "image_search_query"]
+        guard let results = try? parser.parse(input: content, tags: tags) else { return [] }
+        return results.contents
     }
     
     private let parser = ContentParser.shared

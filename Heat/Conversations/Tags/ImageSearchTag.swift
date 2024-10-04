@@ -9,6 +9,10 @@ struct ImageSearchTag: View {
     
     @State private var results: [WebSearchResult] = []
     
+    init(_ tag: ContentParser.Result.Tag) {
+        self.tag = tag
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             ScrollView(.horizontal) {

@@ -16,6 +16,10 @@ final class ConversationViewModel {
     private let messagesProvider = MessagesProvider.shared
     private var generateTask: Task<(), Error>? = nil
     
+    init(conversationID: String) {
+        self.conversationID = conversationID
+    }
+    
     var conversation: Conversation? {
         guard let conversationID else { return nil }
         return try? conversationsProvider.get(conversationID)

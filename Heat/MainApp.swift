@@ -28,10 +28,7 @@ struct MainApp: App {
     private let messagesProvider = MessagesProvider.shared
     private let preferencesProvider = PreferencesProvider.shared
     
-    // View models
-    @State private var conversationViewModel = ConversationViewModel()
-    
-    @State private var searchInput = ""
+    @State private var selectedConversationID: String? = nil
     @State private var showingLauncher = false
     @State private var sheet: Sheet? = nil
     
@@ -50,10 +47,11 @@ struct MainApp: App {
         #if os(macOS)
         Window("Heat", id: "heat") {
             NavigationSplitView {
-                ConversationList()
+                ConversationList(selected: $selectedConversationID)
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
-                ConversationView()
+                ConversationView(selected: $selectedConversationID)
+                    .background(.background)
                     .overlay {
                         switch preferencesProvider.status {
                         case .needsServiceSetup:
@@ -70,24 +68,18 @@ struct MainApp: App {
                                 Text("Open Preferences to pick a chat service to use.")
                                 Button("Open Preferences") { sheet = .preferences }
                             }
-                        case .ready:
-                            if conversationViewModel.messages.isEmpty {
-                                ContentUnavailableView {
-                                    Label("New conversation", systemImage: "message")
-                                }
-                                .foregroundStyle(.secondary)
-                            }
-                        case .waiting:
+                        case .ready, .waiting:
                             EmptyView()
                         }
                     }
             }
             .toolbar {
                 ToolbarItem {
-                    preferencesButton
-                }
-                ToolbarItem {
-                    newConversationButton
+                    Button {
+                        sheet = .preferences
+                    } label: {
+                        Label("Preferences", systemImage: "slider.horizontal.3")
+                    }
                 }
             }
             .sheet(item: $sheet) { sheet in
@@ -98,21 +90,20 @@ struct MainApp: App {
                     case .services:
                         ServiceList()
                     case .conversationList:
-                        ConversationList()
+                        ConversationList(selected: $selectedConversationID)
                     }
                 }
             }
-            .floatingPanel(isPresented: $showingLauncher) {
-                LauncherView()
-                    .environment(agentsProvider)
-                    .environment(conversationsProvider)
-                    .environment(messagesProvider)
-                    .environment(preferencesProvider)
-                    .environment(conversationViewModel)
-                    .environment(\.debug, preferencesProvider.preferences.debug)
-                    .environment(\.textRendering, preferencesProvider.preferences.textRendering)
-                    .modelContainer(for: Memory.self)
-            }
+//            .floatingPanel(isPresented: $showingLauncher) {
+//                LauncherView()
+//                    .environment(agentsProvider)
+//                    .environment(conversationsProvider)
+//                    .environment(messagesProvider)
+//                    .environment(preferencesProvider)
+//                    .environment(\.debug, preferencesProvider.preferences.debug)
+//                    .environment(\.textRendering, preferencesProvider.preferences.textRendering)
+//                    .modelContainer(for: Memory.self)
+//            }
             .onAppear {
                 handleInit()
             }
@@ -121,26 +112,29 @@ struct MainApp: App {
         .environment(conversationsProvider)
         .environment(messagesProvider)
         .environment(preferencesProvider)
-        .environment(conversationViewModel)
         .environment(\.debug, preferencesProvider.preferences.debug)
         .environment(\.textRendering, preferencesProvider.preferences.textRendering)
         .modelContainer(for: Memory.self)
         .defaultSize(width: 600, height: 700)
         .defaultPosition(.center)
         .commands {
-            CommandGroup(replacing: .newItem) {
-                newConversationButton
-                    .keyboardShortcut("n", modifiers: .command)
-            }
+//            CommandGroup(replacing: .newItem) {
+//                newConversationButton
+//                    .keyboardShortcut("n", modifiers: .command)
+//            }
             CommandGroup(replacing: .appSettings) {
-                preferencesButton
-                    .keyboardShortcut(",", modifiers: .command)
+                Button {
+                    sheet = .preferences
+                } label: {
+                    Label("Preferences", systemImage: "slider.horizontal.3")
+                }
+                .keyboardShortcut(",", modifiers: .command)
             }
         }
         #else
         WindowGroup {
             NavigationStack {
-                ConversationView()
+                ConversationView(selected: $selectedConversationID)
                     .toolbar {
                         ToolbarItem {
                             Menu {
@@ -158,13 +152,6 @@ struct MainApp: App {
                                 Label("Menu", systemImage: "ellipsis")
                             }
                         }
-                        ToolbarItem {
-                            Button {
-                                Task { try await conversationViewModel.newConversation() }
-                            } label: {
-                                Label("New Conversation", systemImage: "plus")
-                            }
-                        }
                     }
                     .sheet(item: $sheet) { sheet in
                         NavigationStack {
@@ -174,7 +161,7 @@ struct MainApp: App {
                             case .services:
                                 ServiceList()
                             case .conversationList:
-                                ConversationList()
+                                ConversationList(selected: $selectedConversationID)
                             }
                         }
                     }
@@ -183,7 +170,6 @@ struct MainApp: App {
             .environment(conversationsProvider)
             .environment(messagesProvider)
             .environment(preferencesProvider)
-            .environment(conversationViewModel)
             .environment(\.debug, preferencesProvider.preferences.debug)
             .environment(\.textRendering, preferencesProvider.preferences.textRendering)
             .modelContainer(for: Memory.self)
@@ -192,22 +178,6 @@ struct MainApp: App {
             }
         }
         #endif
-    }
-    
-    var newConversationButton: some View {
-        Button {
-            conversationViewModel.conversationID = nil
-        } label: {
-            Label("New Conversation", systemImage: "plus")
-        }
-    }
-    
-    var preferencesButton: some View {
-        Button {
-            sheet = .preferences
-        } label: {
-            Label("Preferences...", systemImage: "slider.horizontal.3")
-        }
     }
     
     func handleInit() {
