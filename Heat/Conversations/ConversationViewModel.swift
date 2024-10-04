@@ -5,8 +5,7 @@ import HeatKit
 
 private let logger = Logger(subsystem: "ConversationViewModel", category: "App")
 
-@Observable
-@MainActor
+@Observable @MainActor
 final class ConversationViewModel {
     var conversationID: String? = nil
     var streamingTokens: String? = nil
@@ -56,7 +55,7 @@ final class ConversationViewModel {
             return
         }
         let agent = try AgentsProvider.shared.get(agentID)
-        let instructions = Prompt.render(agent.instructions, with: ["DATETIME": Date.now.formatted()])
+        let instructions = agent.instructions
         let conversation = try await conversationsProvider.create(instructions: instructions, toolIDs: agent.toolIDs)
         conversationID = conversation.id
     }
@@ -82,7 +81,7 @@ final class ConversationViewModel {
             
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
-            req.with(system: conversation.instructions)
+            req.with(system: Prompt.render(conversation.instructions, with: ["DATETIME": Date.now.formatted()]))
             req.with(history: messages)
             req.with(tools: Toolbox.get(names: conversation.toolIDs))
             req.with(context: context)
@@ -133,7 +132,7 @@ final class ConversationViewModel {
             
             // Initial request
             var req = VisionSessionRequest(service: service, model: model)
-            req.with(system: conversation.instructions)
+            req.with(system: Prompt.render(conversation.instructions, with: ["DATETIME": Date.now.formatted()]))
             req.with(history: messages)
             req.with(context: context)
             

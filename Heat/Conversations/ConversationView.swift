@@ -26,11 +26,42 @@ struct ConversationView: View {
             } else {
                 VStack {
                     Spacer()
-                    ContentUnavailableView {
-                        Text("New Conversation")
-                    } description: {
-                        Text("The beginning of something special.")
+                    VStack {
+                        Text("Assistant picker")
+                            .foregroundStyle(.secondary)
+                        Menu {
+                            ForEach(agentsProvider.agents) { agent in
+                                Button(agent.name) {
+                                    Task {
+                                        var preferences = preferencesProvider.preferences
+                                        preferences.defaultAgentID = agent.id
+                                        try await preferencesProvider.upsert(preferences)
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                if let agentID = preferencesProvider.preferences.defaultAgentID, let agent = try? agentsProvider.get(agentID) {
+                                    Text(agent.name)
+                                } else {
+                                    Text("Pick agent")
+                                }
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .imageScale(.small)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
+                            .background {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(.background)
+                                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                            }
+                        }
                     }
+                    .font(.subheadline)
+                    .buttonStyle(.plain)
+                    
                     Spacer()
                 }
             }

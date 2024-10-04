@@ -7,14 +7,15 @@ public struct Defaults {
     
     public static let agents = [
         assistant,
-        assistantMaker,
+        assistantThoughtful,
+        assistantCreator,
     ]
     
-    public static let agentDefaultID = assistantMaker.id
+    public static let agentDefaultID = assistant.id
     
     public static let assistant = Agent(
         id: "bundle-assistant",
-        name: "Assistant",
+        name: "Basic Assistant",
         instructions: AssistantInstructions,
         toolIDs: [
             Toolbox.generateImages.name,
@@ -23,10 +24,21 @@ public struct Defaults {
         ]
     )
     
-    public static let assistantMaker = Agent(
-        id: "bundle-assistant-maker",
-        name: "Assistant Maker",
-        instructions: AssistantArtifactsInstructions,
+    public static let assistantThoughtful = Agent(
+        id: "bundle-assistant-thoughtful",
+        name: "Thoughtful Assistant",
+        instructions: AssistantThoughtfulInstructions,
+        toolIDs: [
+            Toolbox.generateImages.name,
+            Toolbox.browseWeb.name,
+            Toolbox.searchWeb.name,
+        ]
+    )
+    
+    public static let assistantCreator = Agent(
+        id: "bundle-assistant-creator",
+        name: "Creator Assistant",
+        instructions: AssistantCreatorInstructions,
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
