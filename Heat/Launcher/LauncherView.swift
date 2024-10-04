@@ -37,7 +37,7 @@
 //            ScrollView {
 //                VStack(spacing: 0) {
 //                    if let message = conversationViewModel.messages.last, message.role == .assistant {
-//                        MessageView(message: message)
+//                        MessageView(message)
 //                            .font(.title2)
 //                    }
 //                    if conversationViewModel.conversation?.state == .processing {

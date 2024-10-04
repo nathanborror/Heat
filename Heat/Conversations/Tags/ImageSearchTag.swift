@@ -41,7 +41,6 @@ struct ImageSearchTag: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(.vertical, 12)
         .onAppear {
             Task { try await performQuery() }
         }

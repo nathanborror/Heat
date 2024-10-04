@@ -12,11 +12,10 @@ struct MessageList: View {
     var body: some View {
         ScrollViewReader { proxy in
             MessageListScrollView {
+                
                 // Show message run history
                 ForEach(conversationViewModel.runs) { run in
-                    RunView(run: run)
-                        .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets())
+                    RunView(run)
                 }
                 
                 VStack(spacing: 0) {
@@ -35,18 +34,14 @@ struct MessageList: View {
                         SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
                             SuggestionView(suggestion: suggestion) { handleSubmit($0) }
                         }
-                        .padding(.vertical, 8)
                     }
                 }
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets())
-                .padding(.horizontal, 24)
                 .id("bottom")
             }
-            .onAppear {
+            .onChange(of: conversationViewModel.streamingTokens) { _, _ in
                 proxy.scrollTo("bottom")
             }
-            .onChange(of: conversationViewModel.streamingTokens) { _, _ in
+            .onAppear {
                 proxy.scrollTo("bottom")
             }
             .onOpenURL { url in
@@ -56,9 +51,6 @@ struct MessageList: View {
                 proxy.scrollTo("bottom")
             }
         }
-        .scrollClipDisabled()
-        .scrollDismissesKeyboard(.interactively)
-        .scrollIndicators(.hidden)
     }
     
     func handleSubmit(_ prompt: String) {
@@ -83,14 +75,22 @@ struct MessageListScrollView<Content: View>: View {
         List {
             content()
                 .listRowSeparator(.hidden)
+                .listRowInsets(.init(top: 6, leading: 4, bottom: 6, trailing: 4))
         }
         .listStyle(.plain)
+        .scrollClipDisabled()
+        .scrollDismissesKeyboard(.interactively)
+        .defaultScrollAnchor(.bottom)
         #else
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
                 content()
             }
+            .padding(.horizontal, 12)
         }
+        .scrollClipDisabled()
+        .scrollDismissesKeyboard(.interactively)
+        .defaultScrollAnchor(.bottom)
         #endif
     }
 }

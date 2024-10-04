@@ -7,8 +7,12 @@ struct MessageView: View {
     
     let message: Message
     
+    init(_ message: Message) {
+        self.message = message
+    }
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 12) {
             
             // Render role for all messages in debug mode
             MessageRole(message.role)
@@ -23,16 +27,17 @@ struct MessageView: View {
                     .messageSpacing(message)
                 MessageAttachments(message.attachments)
             case .assistant:
+                MessageToolCalls(message.toolCalls)
+                    .messageSpacing(message)
                 MessageContent(message.content, for: message.role)
                     .messageSpacing(message)
                 MessageAttachments(message.attachments)
-                MessageToolCalls(message.toolCalls)
+                    .messageSpacing(message)
             case .tool:
                 MessageTool(message: message)
+                    .messageSpacing(message)
             }
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 24)
     }
 }
 
@@ -67,7 +72,7 @@ struct MessageContent: View {
     
     var body: some View {
         if let content {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
                 switch role {
                 case .system:
                     RenderText(content, formatter: .text)
@@ -75,21 +80,16 @@ struct MessageContent: View {
                         .foregroundStyle(.secondary)
                 case .user:
                     RenderText(content, role: .user)
-                case .assistant:
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(contents.indices, id: \.self) { index in
-                            switch contents[index] {
-                            case .text(let text):
-                                RenderText(text)
-                            case .tag(let tag):
-                                TagView(tag)
-                                    .foregroundStyle(.secondary)
-                                    .padding(.horizontal, -12)
-                            }
+                case .assistant, .tool:
+                    ForEach(contents.indices, id: \.self) { index in
+                        switch contents[index] {
+                        case let .text(text):
+                            RenderText(text)
+                        case let .tag(tag):
+                            TagView(tag)
+                                .padding(.horizontal, -12)
                         }
                     }
-                default:
-                    EmptyView()
                 }
             }
             .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
@@ -97,7 +97,6 @@ struct MessageContent: View {
     }
     
     var contents: [ContentParser.Result.Content] {
-        guard case .assistant = role else { return [] }
         guard let content = content else { return [] }
         let tags = ["thinking", "artifact", "output", "reflection", "image_search_query"]
         guard let results = try? parser.parse(input: content, tags: tags) else { return [] }
@@ -117,12 +116,12 @@ struct MessageViewSpacing: ViewModifier {
             switch message.role {
             case .system, .tool, .assistant:
                 content
+                    .padding(.horizontal, 12)
             case .user:
                 content
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(.tint, in: .rect(cornerRadius: 10))
-                    .padding(.leading, -12)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

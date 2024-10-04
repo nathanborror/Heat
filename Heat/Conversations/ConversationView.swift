@@ -61,7 +61,6 @@ struct ConversationView: View {
                     }
                     .font(.subheadline)
                     .buttonStyle(.plain)
-                    
                     Spacer()
                 }
             }

@@ -146,9 +146,6 @@ struct MessageField: View {
             }
         }
         .photosPicker(isPresented: $isShowingPhotos, selection: $imagePickerViewModel.imagesPicked, maxSelectionCount: 3, matching: .images, photoLibrary: .shared())
-        #if !os(macOS)
-        .background(.background)
-        #endif
     }
     
     func handleSubmit() async throws {

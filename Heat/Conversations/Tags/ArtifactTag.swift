@@ -28,7 +28,6 @@ struct ArtifactTag: View {
                 .stroke(Color.primary.opacity(0.1), lineWidth: 1)
                 .shadow(color: .primary.opacity(0.1), radius: 20, y: 10)
         }
-        .padding(.vertical, 12)
     }
     
     var contents: [ContentParser.Result.Content] {

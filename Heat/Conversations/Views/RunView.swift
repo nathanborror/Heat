@@ -5,28 +5,29 @@ import HeatKit
 struct RunView: View {
     let run: Run
     
-    /// The final response given for the run of work.
-    var response: Message? {
-        guard let last = run.messages.last else { return nil }
-        guard last.role == .assistant else { return nil }
-        return last
+    @State private var isInspecting = false
+    
+    init(_ run: Run) {
+        self.run = run
     }
     
-    @State private var isInspecting = false
+    /// The final response given for the run of work.
+    var response: Message? {
+        run.messages.last
+    }
     
     var body: some View {
         if run.messages.count == 1 {
-            MessageView(message: run.messages[0])
+            MessageView(run.messages[0])
         } else {
             VStack(alignment: .leading, spacing: 0) {
                 
                 // Show steps of work toggle
                 stepsButton
-                    .padding(.horizontal, 12)
                 
                 // Show the final response
                 if let response {
-                    MessageView(message: response)
+                    MessageView(response)
                 }
             }
         }
@@ -37,8 +38,14 @@ struct RunView: View {
             isInspecting.toggle()
         } label: {
             HStack(alignment: .firstTextBaseline) {
-                Text("\(run.steps.count) Steps")
+                if let pretty = run.elapsedPretty {
+                    Text("\(run.steps.count) steps · \(pretty)")
+                } else {
+                    Text("\(run.steps.count) steps")
+                }
                 Image(systemName: "chevron.right")
+                    .imageScale(.small)
+                    .foregroundStyle(.secondary)
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)
@@ -48,8 +55,12 @@ struct RunView: View {
         }
         .buttonStyle(.plain)
         .popover(isPresented: $isInspecting, arrowEdge: .leading) {
-            RunStepsView(messages: run.steps)
-                .frame(width: 500, height: 600)
+            NavigationStack {
+                RunStepsView(messages: run.steps)
+            }
+            #if os(macOS)
+            .frame(width: 500, height: 600)
+            #endif
         }
     }
 }
@@ -58,29 +69,49 @@ struct RunStepsView: View {
     let messages: [Message]
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading) {
-                ForEach(messages) { message in
-                    MessageView(message: message)
+        List {
+            ForEach(messages) { message in
+                NavigationLink {
+                    RunStepDetail(message.content)
+                } label: {
+                    MessageView(message)
                 }
+                .buttonStyle(.plain)
+                .listRowInsets(.init(top: 12, leading: 4, bottom: 12, trailing: 12))
             }
-            .padding(.vertical)
         }
+        .listStyle(.plain)
+        .navigationTitle("Steps")
         .background(.background)
     }
 }
 
-#Preview("Run") {
-    VStack {
-        RunView(run: mock_run)
+struct RunStepDetail: View {
+    let text: String
+    
+    init(_ text: String?) {
+        self.text = text ?? ""
     }
-    .frame(width: 500, height: 600)
+    
+    var body: some View {
+        ScrollView {
+            Text(text)
+                .padding(24)
+        }
+        .navigationTitle("Details")
+    }
+}
+
+#Preview("Run") {
+    NavigationStack {
+        RunView(mock_run)
+            .padding(12)
+    }
 }
 
 
 #Preview("Run Steps") {
-    VStack {
+    NavigationStack {
         RunStepsView(messages: mock_run.steps)
     }
-    .frame(width: 500, height: 600)
 }

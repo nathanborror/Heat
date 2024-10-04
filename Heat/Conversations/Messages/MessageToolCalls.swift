@@ -11,34 +11,31 @@ struct MessageToolCalls: View {
     
     var body: some View {
         if !toolCalls.isEmpty {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 4) {
                 ForEach(toolCalls, id: \.id) { toolCall in
                     if let tool = Toolbox(name: toolCall.function.name) {
                         switch tool {
                         case .generateImages:
-                            MessageToolCallContent(label: "Generating images...")
+                            MessageToolCallContent("Generating images...")
                         case .generateMemory:
-                            MessageToolCallContent(label: "Remembering...")
+                            MessageToolCallContent("Remembering...")
                         case .generateSuggestions:
-                            MessageToolCallContent(label: "Generating suggestions...")
+                            MessageToolCallContent("Generating suggestions...")
                         case .generateTitle:
-                            MessageToolCallContent(label: "Generating title...")
+                            MessageToolCallContent("Generating title...")
                         case .searchFiles:
-                            MessageToolCallContent(label: "Searching files...")
+                            MessageToolCallContent("Searching files...")
                         case .searchCalendar:
-                            MessageToolCallContent(label: "Searching calendar...")
+                            MessageToolCallContent("Searching calendar...")
                         case .searchWeb:
-                            MessageToolCallContent(label: "Searching the web...")
+                            MessageToolCallContent("Searching the web...")
                         case .browseWeb:
-                            MessageToolCallContent(label: "Browsing the web...")
+                            MessageToolCallContent("Browsing the web...")
                         }
                     } else {
                         Text("Missing tool calls.")
                     }
-                    Text(toolCall.function.arguments)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary.opacity(0.5))
-                        .textSelection(.enabled)
+                    MessageToolCallArguments(toolCall.function)
                 }
             }
         }
@@ -46,12 +43,53 @@ struct MessageToolCalls: View {
 }
 
 struct MessageToolCallContent: View {
-    var label: String
+    let text: String
+    
+    init(_ text: String) {
+        self.text = text
+    }
     
     var body: some View {
-        Text(label)
+        Text(text)
+            .font(.system(size: textFontSize, weight: .medium))
             .frame(maxWidth: .infinity, alignment: .leading)
-            .font(.subheadline)
+    }
+    
+    #if os(macOS)
+    let textFontSize: CGFloat = 14
+    #else
+    let textFontSize: CGFloat = 16
+    #endif
+}
+
+struct MessageToolCallArguments: View {
+    let function: ToolCall.FunctionCall
+    
+    init(_ function: ToolCall.FunctionCall) {
+        self.function = function
+    }
+    
+    var body: some View {
+        Text(subtext)
+            .font(.footnote)
             .foregroundStyle(.secondary)
+            .textSelection(.enabled)
+            .lineLimit(4)
+    }
+    
+    var subtext: String {
+        switch function.name {
+        case Toolbox.searchWeb.name:
+            let args = try? WebSearchTool.Arguments(function.arguments)
+            return "\"\(args?.query ?? "")\""
+        case Toolbox.browseWeb.name:
+            let args = try? WebBrowseTool.Arguments(function.arguments)
+            return args?.url ?? ""
+        case Toolbox.generateImages.name:
+            let args = try? ImageGeneratorTool.Arguments(function.arguments)
+            return args?.prompts.joined(separator: ", ") ?? ""
+        default:
+            return function.arguments
+        }
     }
 }

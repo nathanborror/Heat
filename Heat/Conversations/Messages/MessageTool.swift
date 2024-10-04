@@ -8,7 +8,7 @@ struct MessageTool: View {
     @State private var isShowingContext = false
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
             if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
@@ -23,25 +23,25 @@ struct MessageTool: View {
                         }
                         #endif
                 case .searchWeb:
-                    MessageToolContent(message: message)
-                    MessageToolWebSearch(message: message)
-                        #if os(macOS)
-                        .frame(width: 200, height: 200)
-                        .scaleEffect(1.05)
-                        .clipShape(.rect(cornerRadius: 10))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                        }
-                        #endif
+                    MessageToolTitle("Search results")
+                    MessageToolContent(message.content)
                 case .browseWeb:
-                    MessageToolContent(message: message)
-                    Text(message.content ?? "")
-                default:
-                    MessageToolContent(message: message)
+                    MessageToolTitle("Summarized webpage")
+                    MessageToolContent(message.content)
+                case .generateMemory:
+                    MessageToolTitle("Remembering")
+                    MessageToolContent(message.content)
+                case .searchFiles:
+                    MessageToolTitle("File search results")
+                    MessageToolContent(message.content)
+                case .searchCalendar:
+                    MessageToolTitle("Calendar search results")
+                    MessageToolContent(message.content)
+                case .generateTitle, .generateSuggestions:
+                    MessageToolTitle(message.metadata.label)
                 }
             } else {
-                MessageToolContent(message: message)
+                MessageToolTitle(message.metadata.label)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -70,23 +70,45 @@ struct MessageTool: View {
     }
 }
 
+struct MessageToolTitle: View {
+    @Environment(\.debug) private var debug
+    
+    let content: String?
+    
+    init(_ content: String?) {
+        self.content = content
+    }
+    
+    var body: some View {
+        if let content {
+            Text(content)
+                .font(.system(size: textFontSize, weight: .medium))
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+    
+    #if os(macOS)
+    let textFontSize: CGFloat = 14
+    #else
+    let textFontSize: CGFloat = 16
+    #endif
+}
+
 struct MessageToolContent: View {
     @Environment(\.debug) private var debug
     
-    var message: Message
+    let content: String?
+    
+    init(_ content: String?) {
+        self.content = content
+    }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(message.metadata.label)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-//            if debug, let content = message.content {
-//                Text(content)
-//                    .font(.footnote)
-//                    .foregroundStyle(.secondary.opacity(0.5))
-//                    .frame(maxWidth: .infinity, alignment: .leading)
-//                    .textSelection(.enabled)
-//            }
+        if let content {
+            Text(content)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .lineLimit(4)
         }
     }
 }
