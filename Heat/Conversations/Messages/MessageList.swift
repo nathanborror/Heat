@@ -49,6 +49,12 @@ struct MessageList: View {
             .onChange(of: conversationViewModel.streamingTokens) { _, _ in
                 proxy.scrollTo("bottom")
             }
+            .onOpenURL { url in
+                if let suggestion = url.queryParameters["suggestion"] {
+                    handleSubmit(suggestion.replacingOccurrences(of: "+", with: " "))
+                }
+                proxy.scrollTo("bottom")
+            }
         }
         .scrollClipDisabled()
         .scrollDismissesKeyboard(.interactively)

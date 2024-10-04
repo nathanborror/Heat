@@ -28,6 +28,10 @@ class ThemeCache {
                 .text {
                     FontSize(fontSize)
                 }
+                .link {
+                    ForegroundColor(.primary)
+                    UnderlineStyle(.single)
+                }
                 .paragraph { config in
                     config.label
                         .relativeLineSpacing(relativeLineSpacing)

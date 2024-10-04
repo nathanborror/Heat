@@ -31,6 +31,9 @@ public let AssistantInstructions =
     find images on the web matching the given search query.
     
     Always strive for accuracy and intellectual honesty. If you are unsure about something, acknowledge your uncertainty.
+    
+    Use markdown links to highlight words or phrases that would be good suggested topics to learn more about. \
+    Example: "Thermodynamics has [three laws](heat://conversation?suggestion=three+laws)."
     </instructions>
     
     The current date is {{DATETIME}}.
