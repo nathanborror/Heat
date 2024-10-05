@@ -39,13 +39,12 @@ struct MainApp: App {
     enum Sheet: String, Identifiable {
         case conversationList
         case preferences
-        case services
         var id: String { rawValue }
     }
     
     var body: some Scene {
         #if os(macOS)
-        Window("Heat", id: "heat") {
+        WindowGroup {
             NavigationSplitView {
                 ConversationList(selected: $selectedConversationID)
                     .navigationSplitViewStyle(.prominentDetail)
@@ -53,24 +52,7 @@ struct MainApp: App {
                 ConversationView(selected: $selectedConversationID)
                     .background(.background)
                     .overlay {
-                        switch preferencesProvider.status {
-                        case .needsServiceSetup:
-                            ContentUnavailableView {
-                                Label("Missing services", systemImage: "exclamationmark.icloud")
-                            } description: {
-                                Text("Configure a service like OpenAI, Anthropic or Ollama to get started.")
-                                Button("Open Preferences") { sheet = .preferences }
-                            }
-                        case .needsPreferredService:
-                            ContentUnavailableView {
-                                Label("Missing chat service", systemImage: "slider.horizontal.2.square")
-                            } description: {
-                                Text("Open Preferences to pick a chat service to use.")
-                                Button("Open Preferences") { sheet = .preferences }
-                            }
-                        case .ready, .waiting:
-                            EmptyView()
-                        }
+                        PreferencesSetup()
                     }
             }
             .toolbar {
@@ -87,23 +69,21 @@ struct MainApp: App {
                     switch sheet {
                     case .preferences:
                         PreferencesForm(preferences: preferencesProvider.preferences)
-                    case .services:
-                        ServiceList()
                     case .conversationList:
                         ConversationList(selected: $selectedConversationID)
                     }
                 }
             }
-//            .floatingPanel(isPresented: $showingLauncher) {
-//                LauncherView()
-//                    .environment(agentsProvider)
-//                    .environment(conversationsProvider)
-//                    .environment(messagesProvider)
-//                    .environment(preferencesProvider)
-//                    .environment(\.debug, preferencesProvider.preferences.debug)
-//                    .environment(\.textRendering, preferencesProvider.preferences.textRendering)
-//                    .modelContainer(for: Memory.self)
-//            }
+            .floatingPanel(isPresented: $showingLauncher) {
+                LauncherView(selected: $selectedConversationID)
+                    .environment(agentsProvider)
+                    .environment(conversationsProvider)
+                    .environment(messagesProvider)
+                    .environment(preferencesProvider)
+                    .environment(\.debug, preferencesProvider.preferences.debug)
+                    .environment(\.textRendering, preferencesProvider.preferences.textRendering)
+                    .modelContainer(for: Memory.self)
+            }
             .onAppear {
                 handleInit()
             }
@@ -130,6 +110,15 @@ struct MainApp: App {
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
+        }
+        
+        MenuBarExtra {
+            Button("Quit") {
+                NSApplication.shared.terminate(nil)
+            }
+            .keyboardShortcut("q")
+        } label: {
+            Label("Heat", systemImage: "circle")
         }
         #else
         WindowGroup {
@@ -204,5 +193,50 @@ struct MainApp: App {
             showingLauncher.toggle()
         }
         #endif
+    }
+}
+
+struct PreferencesSetup: View {
+    @Environment(PreferencesProvider.self) var preferencesProvider
+    
+    @State var sheet: Sheet? = nil
+    
+    enum Sheet: String, Identifiable {
+        case preferences
+        case services
+        var id: String { rawValue }
+    }
+    
+    var body: some View {
+        Group {
+            switch preferencesProvider.status {
+            case .needsServiceSetup:
+                ContentUnavailableView {
+                    Label("Missing services", systemImage: "exclamationmark.icloud")
+                } description: {
+                    Text("Configure a service like OpenAI, Anthropic or Ollama to get started.")
+                    Button("Open Preferences") { sheet = .preferences }
+                }
+            case .needsPreferredService:
+                ContentUnavailableView {
+                    Label("Missing chat service", systemImage: "slider.horizontal.2.square")
+                } description: {
+                    Text("Open Preferences to pick a chat service to use.")
+                    Button("Open Preferences") { sheet = .preferences }
+                }
+            case .ready, .waiting:
+                EmptyView()
+            }
+        }
+        .sheet(item: $sheet) { sheet in
+            NavigationStack {
+                switch sheet {
+                case .preferences:
+                    PreferencesForm(preferences: preferencesProvider.preferences)
+                case .services:
+                    ServiceList()
+                }
+            }
+        }
     }
 }
