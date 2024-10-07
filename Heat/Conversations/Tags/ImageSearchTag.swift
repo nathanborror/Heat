@@ -33,6 +33,7 @@ struct ImageSearchTag: View {
                 }
                 .frame(height: height)
             }
+            .scrollIndicators(.hidden)
             .clipShape(.rect(cornerRadius: 5))
             
             if let content = tag.content {
@@ -55,5 +56,5 @@ struct ImageSearchTag: View {
     }
     
     private let width: CGFloat = 200
-    private let height: CGFloat = 150
+    private let height: CGFloat = 200
 }

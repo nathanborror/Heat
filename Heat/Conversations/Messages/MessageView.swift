@@ -38,6 +38,7 @@ struct MessageView: View {
                     .messageSpacing(message)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

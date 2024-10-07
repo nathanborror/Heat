@@ -44,26 +44,18 @@ struct MainApp: App {
     
     var body: some Scene {
         #if os(macOS)
-        WindowGroup {
+        Window("Heat", id: "heat") {
             NavigationSplitView {
                 ConversationList(selected: $selectedConversationID)
+                    .frame(minWidth: 200)
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
                 ConversationView(selected: $selectedConversationID)
-                    .background(.background)
                     .overlay {
                         PreferencesSetup()
                     }
             }
-            .toolbar {
-                ToolbarItem {
-                    Button {
-                        sheet = .preferences
-                    } label: {
-                        Label("Preferences", systemImage: "slider.horizontal.3")
-                    }
-                }
-            }
+            .containerBackground(.background, for: .window)
             .sheet(item: $sheet) { sheet in
                 NavigationStack {
                     switch sheet {
@@ -88,6 +80,9 @@ struct MainApp: App {
                 handleInit()
             }
         }
+        .defaultSize(width: 600, height: 700)
+        .defaultPosition(.center)
+        .defaultLaunchBehavior(.presented)
         .environment(agentsProvider)
         .environment(conversationsProvider)
         .environment(messagesProvider)
@@ -95,8 +90,6 @@ struct MainApp: App {
         .environment(\.debug, preferencesProvider.preferences.debug)
         .environment(\.textRendering, preferencesProvider.preferences.textRendering)
         .modelContainer(for: Memory.self)
-        .defaultSize(width: 600, height: 700)
-        .defaultPosition(.center)
         .commands {
 //            CommandGroup(replacing: .newItem) {
 //                newConversationButton
@@ -118,8 +111,9 @@ struct MainApp: App {
             }
             .keyboardShortcut("q")
         } label: {
-            Label("Heat", systemImage: "circle")
+            Label("Heat", systemImage: "flame.fill")
         }
+        
         #else
         WindowGroup {
             NavigationStack {
@@ -147,8 +141,6 @@ struct MainApp: App {
                             switch sheet {
                             case .preferences:
                                 PreferencesForm(preferences: preferencesProvider.preferences)
-                            case .services:
-                                ServiceList()
                             case .conversationList:
                                 ConversationList(selected: $selectedConversationID)
                             }

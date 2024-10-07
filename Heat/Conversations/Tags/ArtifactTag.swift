@@ -10,23 +10,26 @@ struct ArtifactTag: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(contents.indices, id: \.self) { index in
-                switch contents[index] {
-                case .text(let text):
-                    RenderText(text)
-                case .tag(let tag):
-                    TagView(tag)
-                        .foregroundStyle(.secondary)
+        HStack {
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(contents.indices, id: \.self) { index in
+                    switch contents[index] {
+                    case .text(let text):
+                        RenderText(text)
+                    case .tag(let tag):
+                        TagView(tag)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
-        }
-        .padding(24)
-        .background {
-            Rectangle()
-                .fill(.background)
-                .stroke(Color.primary.opacity(0.1), lineWidth: 1)
-                .shadow(color: .primary.opacity(0.1), radius: 20, y: 10)
+            .padding(24)
+            .frame(maxWidth: 700)
+            .background {
+                Rectangle()
+                    .fill(.background)
+                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                    .shadow(color: .primary.opacity(0.1), radius: 20, y: 10)
+            }
         }
     }
     

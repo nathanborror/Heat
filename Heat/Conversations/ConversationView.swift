@@ -74,29 +74,28 @@ struct ConversationView: View {
             .background(.background)
         }
         .toolbar {
-            ToolbarItem {
+            ToolbarItemGroup {
                 Button {
                     selected = nil
                     conversationViewModel = nil
                 } label: {
                     Label("New Conversation", systemImage: "plus")
                 }
-                .keyboardShortcut("0", modifiers: [.command, .option])
-            }
-            if selected != nil {
-                ToolbarItem {
-                    Button {
-                        showingInspector.toggle()
-                    } label: {
-                        #if os(macOS)
-                        Label("Info", systemImage: "sidebar.right")
-                        #else
-                        Label("Info", systemImage: "info")
-                        #endif
-                    }
-                    .keyboardShortcut("0", modifiers: [.command, .option])
+                .keyboardShortcut("n", modifiers: [.command])
+                
+                Button {
+                    showingInspector.toggle()
+                } label: {
+                    #if os(macOS)
+                    Label("Info", systemImage: "sidebar.right")
+                    #else
+                    Label("Info", systemImage: "info")
+                    #endif
                 }
+                .keyboardShortcut("0", modifiers: [.command, .option])
+                .disabled(selected == nil)
             }
+            
         }
         .inspector(isPresented: $showingInspector) {
             if let selected {
