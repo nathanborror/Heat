@@ -2,7 +2,7 @@ import Foundation
 import SharedKit
 import GenKit
 
-public enum Toolbox: CaseIterable {
+public enum Toolbox: CaseIterable, Sendable {
     case generateImages
     case generateMemory
     case generateSuggestions

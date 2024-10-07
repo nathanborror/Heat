@@ -1,6 +1,6 @@
 import Foundation
 
-class SpotlightSession {
+actor SpotlightSession {
     public static let shared = SpotlightSession()
     
     private init() {}

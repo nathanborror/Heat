@@ -42,17 +42,15 @@ extension MemoryTool.Arguments {
 
 extension MemoryTool {
     
+    @MainActor
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
             let args = try Arguments(toolCall.function.arguments)
             let container = try ModelContainer(for: Memory.self)
             
-            Task { @MainActor in
-                args.items.forEach {
-                    container.mainContext.insert(Memory(content: $0))
-                }
+            for item in args.items {
+                container.mainContext.insert(Memory(content: item))
             }
-            
             return [.init(
                 role: .tool,
                 content: "Saved to memory.",

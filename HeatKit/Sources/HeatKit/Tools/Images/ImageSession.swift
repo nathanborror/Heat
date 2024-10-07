@@ -5,7 +5,7 @@ import GenKit
 
 private let logger = Logger(subsystem: "ImageSession", category: "HeatKit")
 
-public final class ImageSession {
+public actor ImageSession {
     public typealias SessionCallback = () async throws -> Void
     public typealias ImagesCallback = ([Data]) async throws -> Void
     
@@ -26,7 +26,7 @@ public final class ImageSession {
         do {
             try Task.checkCancellation()
             let req = ImagineServiceRequest(model: model, prompt: prompt)
-            let images = try await service.imagine(request: req)
+            let images = try await service.imagine(req)
             try await callback(images)
         } catch {
             apply(error: error)

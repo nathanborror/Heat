@@ -180,7 +180,7 @@ final class ConversationViewModel {
             
             // Generate image
             let req = ImagineServiceRequest(model: model, prompt: prompt)
-            let data = try await service.imagine(request: req)
+            let data = try await service.imagine(req)
             
             // Save images as assistant response
             let attachments = data.map {
@@ -293,6 +293,7 @@ final class ConversationViewModel {
     // MARK: - Private
     
     /// Determine which tool is being called, execute the tool request if needed and return a tool call response before another turn of the conversation happens.
+    @Sendable
     private func prepareToolResponse(toolCall: ToolCall) async throws -> ToolCallResponse {
         if let tool = Toolbox(name: toolCall.function.name) {
             switch tool {

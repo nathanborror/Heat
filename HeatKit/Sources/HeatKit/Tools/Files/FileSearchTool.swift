@@ -47,7 +47,7 @@ extension FileSearchTool {
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
             let args = try Arguments(toolCall.function.arguments)
-            let results = try SpotlightSession.shared.query(args.query, kind: .init(rawValue: args.kind ?? ""))
+            let results = try await SpotlightSession.shared.query(args.query, kind: .init(rawValue: args.kind ?? ""))
             return [.init(
                 role: .tool,
                 content: results.joined(separator: "\n"),

@@ -51,7 +51,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "44dd206a8528abde66dc52cd6e61f2991949b5a4"
+        "revision" : "83c5134a242086c053261095937f9964301a453a"
       }
     },
     {
@@ -78,7 +78,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "41fafaf8388e1817ba1e01aed7fb4ad16775007a"
+        "revision" : "15f3924bd496a2e2810df989d3288d65d740c219"
       }
     },
     {
@@ -132,7 +132,7 @@
       "location" : "https://github.com/nathanborror/swift-perplexity",
       "state" : {
         "branch" : "main",
-        "revision" : "9bf4b475f8ea7a1cb284e6de17bb879930c29f94"
+        "revision" : "7c16384e287f940133619ffdbda8c5a369d1ad37"
       }
     },
     {
