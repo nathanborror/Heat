@@ -4,19 +4,19 @@ import Fuzi
 
 public actor WebSearchSession {
     public static var shared = WebSearchSession()
-    
+
     private init() {}
-    
+
     public func search(query: String) async throws -> WebSearchResponse {
         let engine = GoogleSearch()
         return try await engine.search(query: query)
     }
-    
+
     public func searchNews(query: String) async throws -> WebSearchResponse {
         let engine = GoogleSearch()
         return try await engine.searchNews(query: query)
     }
-    
+
     public func searchImages(query: String) async throws -> WebSearchResponse {
         let engine = GoogleSearch()
         return try await engine.searchImages(query: query)
@@ -27,9 +27,25 @@ public actor WebSearchSession {
 
 public struct GoogleSearch {
 
+    private let session = {
+        let memoryCapacity = 500 * 1024 * 1024 // 500 MB
+        let diskCapacity = 500 * 1024 * 1024   // 500 MB
+        let cachesURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let diskPath = cachesURL.appendingPathComponent("GoogleSearchCache").path
+
+        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: diskPath)
+        URLCache.shared = cache
+
+        let configuration = URLSessionConfiguration.default
+        configuration.urlCache = cache
+        configuration.requestCachePolicy = .useProtocolCachePolicy
+
+        return URLSession(configuration: configuration)
+    }()
+
     private let desktopUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
     private let mobileUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1"
-    
+
     public init() {}
 
     public func search(query: String) async throws -> WebSearchResponse {
@@ -41,8 +57,9 @@ public struct GoogleSearch {
         request.httpShouldHandleCookies = false
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(desktopUserAgent, forHTTPHeaderField: "User-Agent")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
+        request.cachePolicy = .returnCacheDataElseLoad
+
+        let (data, response) = try await session.data(for: request)
         guard let html = String(data: data, encoding: .utf8) else {
             throw SearchError.invalidHTML
         }
@@ -53,7 +70,7 @@ public struct GoogleSearch {
         print("[Timing] [GoogleSearch] Parsed at \(CACurrentMediaTime() - start)")
         return resp
     }
-    
+
     public func searchNews(query: String) async throws -> WebSearchResponse {
         var urlComponents = URLComponents(string: "https://www.google.com/search")!
         urlComponents.queryItems = [
@@ -64,8 +81,9 @@ public struct GoogleSearch {
         request.httpShouldHandleCookies = false
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(desktopUserAgent, forHTTPHeaderField: "User-Agent")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
+        request.cachePolicy = .returnCacheDataElseLoad
+
+        let (data, response) = try await session.data(for: request)
         guard let html = String(data: data, encoding: .utf8) else {
             throw SearchError.invalidHTML
         }
@@ -88,21 +106,22 @@ public struct GoogleSearch {
         request.httpShouldHandleCookies = false
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue(mobileUserAgent, forHTTPHeaderField: "User-Agent")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
+        request.cachePolicy = .returnCacheDataElseLoad
+
+        let (data, response) = try await session.data(for: request)
         guard let html = String(data: data, encoding: .utf8) else {
             throw SearchError.invalidHTML
         }
         let baseURL = response.url ?? urlComponents.url!
-        
+
         let start = CACurrentMediaTime()
         let resp = try extractImageResults(html: html, baseURL: baseURL, query: query)
         print("[Timing] [GoogleImageSearch] Parsed at \(CACurrentMediaTime() - start)")
         return resp
     }
-    
+
     // MARK: Private
-    
+
     private func extractResults(html: String, baseURL: URL, query: String) throws -> WebSearchResponse {
         let doc = try Fuzi.HTMLDocument(string: html)
 
@@ -131,7 +150,7 @@ public struct GoogleSearch {
         }
         return .init(query: query, results: results)
     }
-    
+
     private func extractNewsResults(html: String, baseURL: URL, query: String) throws -> WebSearchResponse {
         let doc = try Fuzi.HTMLDocument(string: html)
 
@@ -143,7 +162,7 @@ public struct GoogleSearch {
             let urls = el.xpath("//a[.//div[@role='heading']]/@href")
             let headers = el.xpath("//div[@role='heading'][@aria-level='3']/text()")
             let descriptions = el.xpath("//div[@role='heading'][@aria-level='3']/following-sibling::div[1]/text()")
-         
+
             return zip(urls, zip(headers, descriptions)).map {
                 WebSearchResult(url: URL(string: $0.stringValue)!, title: $1.0.stringValue, description: $1.1.stringValue)
             }
@@ -169,7 +188,7 @@ public struct GoogleSearch {
         }
         return WebSearchResponse(query: query, results: results)
     }
-    
+
     enum SearchError: Error {
         case invalidHTML
         case missingMainElement
@@ -177,7 +196,7 @@ public struct GoogleSearch {
 }
 
 private extension Fuzi.XMLElement {
-    
+
     func extractYouTubeResults() throws -> [WebSearchResult]? {
         var results = [WebSearchResult]()
         // Search for elements with a href starting with https://www.youtube.com, which contain a div role=heading
@@ -220,7 +239,7 @@ private extension Fuzi.XMLElement {
             }
             return nil
         }()
-        
+
         return WebSearchResult(url: parsed, title: title, description: description)
     }
 
