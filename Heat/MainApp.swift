@@ -11,16 +11,17 @@
 import SwiftUI
 import SwiftData
 import OSLog
-import HotKey
 import CoreServices
 import EventKit
 import SharedKit
 import HeatKit
+import KeyboardShortcuts
 
 private let logger = Logger(subsystem: "MainApp", category: "App")
 
 @main
 struct MainApp: App {
+    @Environment(\.openWindow) var openWindow
     
     // Providers
     private let agentsProvider = AgentsProvider.shared
@@ -32,10 +33,6 @@ struct MainApp: App {
     @State private var showingLauncher = false
     @State private var sheet: Sheet? = nil
     
-    #if os(macOS)
-    private let hotKey = HotKey(key: .space, modifiers: [.option])
-    #endif
-
     enum Sheet: String, Identifiable {
         case conversationList
         case preferences
@@ -66,16 +63,6 @@ struct MainApp: App {
                     }
                 }
             }
-            .floatingPanel(isPresented: $showingLauncher) {
-                LauncherView(selected: $selectedConversationID)
-                    .environment(agentsProvider)
-                    .environment(conversationsProvider)
-                    .environment(messagesProvider)
-                    .environment(preferencesProvider)
-                    .environment(\.debug, preferencesProvider.preferences.debug)
-                    .environment(\.textRendering, preferencesProvider.preferences.textRendering)
-                    .modelContainer(for: Memory.self)
-            }
             .onAppear {
                 handleInit()
             }
@@ -91,10 +78,6 @@ struct MainApp: App {
         .environment(\.textRendering, preferencesProvider.preferences.textRendering)
         .modelContainer(for: Memory.self)
         .commands {
-//            CommandGroup(replacing: .newItem) {
-//                newConversationButton
-//                    .keyboardShortcut("n", modifiers: .command)
-//            }
             CommandGroup(replacing: .appSettings) {
                 Button {
                     sheet = .preferences
@@ -104,6 +87,19 @@ struct MainApp: App {
                 .keyboardShortcut(",", modifiers: .command)
             }
         }
+        
+        Window("Launcher", id: "launcher") {
+            List {
+                Text("Hello")
+                Text("World")
+            }
+        }
+        .windowManagerRole(.associated)
+        .windowLevel(.floating)
+        .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 400, height: 400)
+        .defaultPosition(.center)
+        .restorationBehavior(.disabled)
         
         MenuBarExtra {
             Button("Quit") {
@@ -181,7 +177,9 @@ struct MainApp: App {
     
     func handleHotKeySetup() {
         #if os(macOS)
-        hotKey.keyDownHandler = {
+        KeyboardShortcuts.onKeyUp(for: .toggleLauncher) { [self] in
+            print("SHOW LAUNCHER")
+            openWindow(id: "launcher")
             showingLauncher.toggle()
         }
         #endif
@@ -232,3 +230,9 @@ struct PreferencesSetup: View {
         }
     }
 }
+
+#if os(macOS)
+extension KeyboardShortcuts.Name {
+    static let toggleLauncher = Self("toggleLauncher", default: .init(.h, modifiers: [.shift, .command]))
+}
+#endif

@@ -19,12 +19,12 @@
       }
     },
     {
-      "identity" : "hotkey",
+      "identity" : "keyboardshortcuts",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/soffes/HotKey",
+      "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
       "state" : {
         "branch" : "main",
-        "revision" : "4d02d80de143d69b7eeb5962729591a157a57ede"
+        "revision" : "9369a045a72a5296150879781321aecd228171db"
       }
     },
     {

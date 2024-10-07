@@ -48,9 +48,9 @@
 		D85FAE452C852E1100DA153F /* ConversationViewInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE442C852E1100DA153F /* ConversationViewInspector.swift */; };
 		D85FE37F2C8FCA0B004CA2F3 /* RunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FE37E2C8FCA0B004CA2F3 /* RunView.swift */; };
 		D85FE3822C8FDD4F004CA2F3 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = D85FE3812C8FDD4F004CA2F3 /* MarkdownUI */; };
+		D87386092CB19EE1005625B9 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = D87386082CB19EE1005625B9 /* KeyboardShortcuts */; };
 		D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */; };
 		D884AAC32BD5741A00B90E9B /* MessageToolCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCalls.swift */; };
-		D884AAC82BD5A6A500B90E9B /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = D884AAC72BD5A6A500B90E9B /* HotKey */; };
 		D884AAF52BD7F50E00B90E9B /* FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */; };
 		D884AAF72BD7F52600B90E9B /* LauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF62BD7F52600B90E9B /* LauncherView.swift */; };
 		D884AAF92BD7F54500B90E9B /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF82BD7F54500B90E9B /* VisualEffectView.swift */; };
@@ -129,7 +129,7 @@
 			files = (
 				D8271A5A2C7A4E3E008C345B /* Highlightr in Frameworks */,
 				D41E19322AE467F5002516C1 /* HeatKit in Frameworks */,
-				D884AAC82BD5A6A500B90E9B /* HotKey in Frameworks */,
+				D87386092CB19EE1005625B9 /* KeyboardShortcuts in Frameworks */,
 				D85FE3822C8FDD4F004CA2F3 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -328,9 +328,9 @@
 			name = Heat;
 			packageProductDependencies = (
 				D41E19312AE467F5002516C1 /* HeatKit */,
-				D884AAC72BD5A6A500B90E9B /* HotKey */,
 				D8271A592C7A4E3E008C345B /* Highlightr */,
 				D85FE3812C8FDD4F004CA2F3 /* MarkdownUI */,
+				D87386082CB19EE1005625B9 /* KeyboardShortcuts */,
 			);
 			productName = Heat;
 			productReference = D443C3ED2BE1536B00C97FBD /* Heat.app */;
@@ -361,9 +361,9 @@
 			);
 			mainGroup = D41E19122AE45C9B002516C1;
 			packageReferences = (
-				D884AAC62BD5A6A500B90E9B /* XCRemoteSwiftPackageReference "HotKey" */,
 				D8271A582C7A4E3E008C345B /* XCRemoteSwiftPackageReference "Highlightr" */,
 				D85FE3802C8FDD4F004CA2F3 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				D87386072CB19EE1005625B9 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			productRefGroup = D41E19122AE45C9B002516C1;
 			projectDirPath = "";
@@ -591,10 +591,10 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = run.nathan.Heat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -643,10 +643,10 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = run.nathan.Heat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -708,9 +708,9 @@
 				kind = branch;
 			};
 		};
-		D884AAC62BD5A6A500B90E9B /* XCRemoteSwiftPackageReference "HotKey" */ = {
+		D87386072CB19EE1005625B9 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/soffes/HotKey";
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -733,10 +733,10 @@
 			package = D85FE3802C8FDD4F004CA2F3 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
 		};
-		D884AAC72BD5A6A500B90E9B /* HotKey */ = {
+		D87386082CB19EE1005625B9 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = D884AAC62BD5A6A500B90E9B /* XCRemoteSwiftPackageReference "HotKey" */;
-			productName = HotKey;
+			package = D87386072CB19EE1005625B9 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
