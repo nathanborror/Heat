@@ -3,6 +3,8 @@ import GenKit
 import HeatKit
 
 struct RunView: View {
+    @Environment(\.colorScheme) var colorScheme
+    
     let run: Run
     
     @State private var isInspecting = false
@@ -52,6 +54,13 @@ struct RunView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(.primary.opacity(0.05), in: .rect(cornerRadius: 10))
+            .overlay {
+                if colorScheme == .dark {
+                    RoundedRectangle(cornerRadius: 10)
+                        .inset(by: 1)
+                        .stroke(.tint.opacity(0.5), lineWidth: 1)
+                }
+            }
         }
         .buttonStyle(.plain)
         .popover(isPresented: $isInspecting, arrowEdge: .leading) {
@@ -99,19 +108,5 @@ struct RunStepDetail: View {
                 .padding(24)
         }
         .navigationTitle("Details")
-    }
-}
-
-#Preview("Run") {
-    NavigationStack {
-        RunView(mock_run)
-            .padding(12)
-    }
-}
-
-
-#Preview("Run Steps") {
-    NavigationStack {
-        RunStepsView(messages: mock_run.steps)
     }
 }

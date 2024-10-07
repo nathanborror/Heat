@@ -31,6 +31,13 @@ struct SuggestionView: View {
                 .padding(.vertical, 8)
                 .background(.tint.opacity(0.05), in: .rect(cornerRadius: 10))
                 .foregroundStyle(.tint)
+                .overlay {
+                    if colorScheme == .dark {
+                        RoundedRectangle(cornerRadius: 10)
+                            .inset(by: 1)
+                            .stroke(.tint.opacity(0.5), lineWidth: 1)
+                    }
+                }
         }
         .buttonStyle(.plain)
         #if os(macOS)

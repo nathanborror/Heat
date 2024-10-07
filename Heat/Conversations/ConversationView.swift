@@ -11,6 +11,7 @@ struct ConversationView: View {
     @Environment(PreferencesProvider.self) var preferencesProvider
     
     @Environment(\.modelContext) private var modelContext
+    
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
     
     @Binding var selected: String?
@@ -55,7 +56,7 @@ struct ConversationView: View {
                             .background {
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(.background)
-                                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                                    .stroke(Color.primary.opacity(0.2), lineWidth: 1)
                             }
                         }
                     }

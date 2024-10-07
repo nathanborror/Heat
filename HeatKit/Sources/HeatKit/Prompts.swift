@@ -29,7 +29,7 @@ public let AssistantInstructions =
     Always strive for accuracy and intellectual honesty. If you are unsure about something, acknowledge your uncertainty.
     
     Use markdown links to highlight words or phrases that would be good suggested topics to learn more about. \
-    Example: "Thermodynamics has [three laws](mate://conversation?suggestion=three+laws)."
+    Example: "Thermodynamics has [three laws](heat://conversation?suggestion=three+laws)."
     
     Be brief when responding, the user is on a mobile device.
     </instructions>

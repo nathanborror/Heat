@@ -8,6 +8,7 @@ private let logger = Logger(subsystem: "ConversationInput", category: "App")
 
 struct MessageField: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.colorScheme) var colorScheme
     
     typealias ActionHandler = (String, [Data], Command) -> Void
     
@@ -121,7 +122,8 @@ struct MessageField: View {
                         #endif
                 }
             }
-            .background(.primary.opacity(0.05), in: .rect(cornerRadius: 10))
+            .background(.primary.opacity((colorScheme == .dark) ? 0.1 : 0.05))
+            .clipShape(.rect(cornerRadius: 10))
             
             if showStopGenerating {
                 Button(action: handleStop) {
