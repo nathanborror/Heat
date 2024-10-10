@@ -24,7 +24,7 @@ struct MainApp: App {
     @Environment(\.openWindow) var openWindow
     
     // Providers
-    private let agentsProvider = AgentsProvider.shared
+    private let templatesProvider = TemplatesProvider.shared
     private let conversationsProvider = ConversationsProvider.shared
     private let messagesProvider = MessagesProvider.shared
     private let preferencesProvider = PreferencesProvider.shared
@@ -70,7 +70,7 @@ struct MainApp: App {
         .defaultSize(width: 600, height: 700)
         .defaultPosition(.center)
         .defaultLaunchBehavior(.presented)
-        .environment(agentsProvider)
+        .environment(templatesProvider)
         .environment(conversationsProvider)
         .environment(messagesProvider)
         .environment(preferencesProvider)
@@ -143,7 +143,7 @@ struct MainApp: App {
                         }
                     }
             }
-            .environment(agentsProvider)
+            .environment(templatesProvider)
             .environment(conversationsProvider)
             .environment(messagesProvider)
             .environment(preferencesProvider)
@@ -165,7 +165,7 @@ struct MainApp: App {
     func handleReset() {
         if BundleVersion.shared.isBundleVersionNew() {
             Task {
-                try await agentsProvider.reset()
+                try await templatesProvider.reset()
                 try await conversationsProvider.reset()
                 try await messagesProvider.reset()
                 try await preferencesProvider.reset()

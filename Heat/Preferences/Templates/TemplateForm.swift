@@ -4,13 +4,13 @@ import SharedKit
 import GenKit
 import HeatKit
 
-private let logger = Logger(subsystem: "AgentForm", category: "App")
+private let logger = Logger(subsystem: "TemplateForm", category: "App")
 
-struct AgentForm: View {
-    @Environment(AgentsProvider.self) var agentsProvider
+struct TemplateForm: View {
+    @Environment(TemplatesProvider.self) var templatesProvider
     @Environment(\.dismiss) private var dismiss
     
-    @State var agent: Agent
+    @State var template: Template
     
     @State private var newToolName: String = ""
     @State private var isShowingAlert = false
@@ -19,15 +19,20 @@ struct AgentForm: View {
     var body: some View {
         Form {
             Section("Info") {
-                TextField("ID", text: $agent.id)
-                TextField("Name", text: $agent.name)
+                TextField("ID", text: $template.id)
+                TextField("Name", text: $template.name)
+                Picker("Kind", selection: $template.kind) {
+                    ForEach(Template.Kind.allCases, id: \.self) {
+                        Text($0.rawValue.capitalized).tag($0)
+                    }
+                }
             }
             Section("Tools") {
-                ForEach(Array(agent.toolIDs.sorted(by: <)), id: \.self) { toolID in
+                ForEach(Array(template.toolIDs.sorted(by: <)), id: \.self) { toolID in
                     Text(toolID)
                         .swipeActions {
                             Button(role: .destructive) {
-                                agent.toolIDs.remove(toolID)
+                                template.toolIDs.remove(toolID)
                             } label: {
                                 Label("Trash", systemImage: "trash")
                             }
@@ -36,19 +41,19 @@ struct AgentForm: View {
             }
             Section {
                 NavigationLink("Add Tool") {
-                    AgentTool { name in
+                    TemplateTool { name in
                         guard !name.isEmpty else { return }
-                        agent.toolIDs.insert(name)
+                        template.toolIDs.insert(name)
                     }
                 }
             }
             Section("Instructions") {
-                TextField("Instructions", text: $agent.instructions, axis: .vertical)
+                TextField("Instructions", text: $template.instructions, axis: .vertical)
                     .font(.system(size: 14, design: .monospaced))
             }
         }
         .appFormStyle()
-        .navigationTitle("Agent")
+        .navigationTitle("Template")
         .interactiveDismissDisabled()
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
@@ -65,30 +70,12 @@ struct AgentForm: View {
     }
     
     private func handleDone() {
-        Task { try await agentsProvider.upsert(agent) }
+        Task { try await templatesProvider.upsert(template) }
         dismiss()
     }
 }
 
-struct AgentPicture: View {
-    @Environment(ImagePickerViewModel.self) private var viewModel
-    
-    let picture: Asset?
-    
-    var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            Image(systemName: "pencil")
-                .font(.system(size: 17, weight: .semibold))
-                .frame(width: 32, height: 32)
-                .foregroundStyle(.white)
-                .background(.tint, in: .circle)
-                .offset(x: 4, y: 4)
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct AgentTool: View {
+struct TemplateTool: View {
     @Environment(\.dismiss) private var dismiss
     
     @State var text: String = ""

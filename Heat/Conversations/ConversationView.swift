@@ -6,7 +6,7 @@ import HeatKit
 private let logger = Logger(subsystem: "ConversationView", category: "App")
 
 struct ConversationView: View {
-    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(TemplatesProvider.self) var templatesProvider
     @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
     
@@ -31,21 +31,21 @@ struct ConversationView: View {
                         Text("Assistant picker")
                             .foregroundStyle(.secondary)
                         Menu {
-                            ForEach(agentsProvider.agents) { agent in
-                                Button(agent.name) {
+                            ForEach(templatesProvider.templates.filter { $0.kind == .assistant }) { template in
+                                Button(template.name) {
                                     Task {
                                         var preferences = preferencesProvider.preferences
-                                        preferences.defaultAgentID = agent.id
+                                        preferences.defaultAssistantID = template.id
                                         try await preferencesProvider.upsert(preferences)
                                     }
                                 }
                             }
                         } label: {
                             HStack {
-                                if let agentID = preferencesProvider.preferences.defaultAgentID, let agent = try? agentsProvider.get(agentID) {
-                                    Text(agent.name)
+                                if let templateID = preferencesProvider.preferences.defaultAssistantID, let template = try? templatesProvider.get(templateID) {
+                                    Text(template.name)
                                 } else {
-                                    Text("Pick agent")
+                                    Text("Pick assistant")
                                 }
                                 Image(systemName: "chevron.up.chevron.down")
                                     .imageScale(.small)
@@ -118,9 +118,9 @@ struct ConversationView: View {
         Task {
             // Create a new conversation if one isn't already selected
             if conversationViewModel == nil {
-                guard let agentID = preferencesProvider.preferences.defaultAgentID else { return }
-                let agent = try agentsProvider.get(agentID)
-                let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
+                guard let templateID = preferencesProvider.preferences.defaultAssistantID else { return }
+                let template = try templatesProvider.get(templateID)
+                let conversation = try await conversationsProvider.create(instructions: template.instructions, toolIDs: template.toolIDs)
                 
                 selected = conversation.id
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)

@@ -3,24 +3,26 @@ import GenKit
 
 public struct Defaults {
     
-    // MARK: - Agents
+    // MARK: - Templates
     
-    public static let agents = [
+    public static let templates = [
         assistant,
         assistantThoughtful,
         assistantCreator,
     ]
     
-    public static let agentDefaultID = assistant.id
+    public static let assistantDefaultID = assistant.id
     
-    public static let assistant = Agent(
+    public static let assistant = Template(
         id: "bundle-assistant",
+        kind: .assistant,
         name: "Basic Assistant",
         instructions: AssistantInstructions
     )
     
-    public static let assistantThoughtful = Agent(
+    public static let assistantThoughtful = Template(
         id: "bundle-assistant-thoughtful",
+        kind: .assistant,
         name: "Thoughtful Assistant",
         instructions: AssistantThoughtfulInstructions,
         toolIDs: [
@@ -30,8 +32,9 @@ public struct Defaults {
         ]
     )
     
-    public static let assistantCreator = Agent(
+    public static let assistantCreator = Template(
         id: "bundle-assistant-creator",
+        kind: .assistant,
         name: "Creator Assistant",
         instructions: AssistantCreatorInstructions,
         toolIDs: [

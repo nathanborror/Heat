@@ -6,7 +6,7 @@ import OSLog
 private let logger = Logger(subsystem: "Preferences", category: "Kit")
 
 public struct Preferences: Codable, Sendable {
-    public var defaultAgentID: String? = Defaults.agentDefaultID
+    public var defaultAssistantID: String? = Defaults.assistantDefaultID
     public var shouldStream = true
     public var textRendering: TextRendering = .markdown
     public var debug = false

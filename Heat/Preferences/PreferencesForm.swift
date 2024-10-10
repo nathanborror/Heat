@@ -4,7 +4,7 @@ import GenKit
 import HeatKit
 
 struct PreferencesForm: View {
-    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(TemplatesProvider.self) var templatesProvider
     @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(MessagesProvider.self) var messagesProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
@@ -31,11 +31,11 @@ struct PreferencesForm: View {
                     }
                 }
                 
-                Picker("Default Agent", selection: $preferences.defaultAgentID) {
+                Picker("Default Assistant", selection: $preferences.defaultAssistantID) {
                     Text("None").tag(String?.none)
                     Divider()
-                    ForEach(agentsProvider.agents) { agent in
-                        Text(agent.name).tag(agent.id)
+                    ForEach(templatesProvider.templates.filter { $0.kind == .assistant }) { template in
+                        Text(template.name).tag(template.id)
                     }
                 }
             } header: {
@@ -87,8 +87,8 @@ struct PreferencesForm: View {
                 NavigationLink("Services") {
                     ServiceList()
                 }
-                NavigationLink("Agents") {
-                    AgentList()
+                NavigationLink("Templates") {
+                    TemplateList()
                 }
                 NavigationLink("Permissions") {
                     PermissionsList()
@@ -96,7 +96,7 @@ struct PreferencesForm: View {
             } header: {
                 Text("Advanced")
             } footer: {
-                Text("Configure services, agent prompts and third-party permissions.")
+                Text("Configure services, prompt templates and third-party permissions.")
             }
             
             Section {
@@ -106,7 +106,7 @@ struct PreferencesForm: View {
             }
             
             Section {
-                Button("Reset Agents", action: handleAgentReset)
+                Button("Reset Templates", action: handleTemplateReset)
                 Button("Reset Conversations", action: handleConversationReset)
                 Button("Reset Preferences", action: handlePreferencesReset)
             }
@@ -148,9 +148,9 @@ struct PreferencesForm: View {
         }
     }
     
-    func handleAgentReset() {
+    func handleTemplateReset() {
         Task {
-            try await agentsProvider.reset()
+            try await templatesProvider.reset()
         }
     }
     
@@ -171,7 +171,7 @@ struct PreferencesForm: View {
     }
     
     func handleDeleteAll() {
-        handleAgentReset()
+        handleTemplateReset()
         handleConversationReset()
         handlePreferencesReset()
     }

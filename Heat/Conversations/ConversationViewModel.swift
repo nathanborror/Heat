@@ -49,17 +49,6 @@ final class ConversationViewModel {
         return prepareRuns()
     }
     
-    /// Create a new conversation with the default agent's instructions (system prompt) and tools.
-    func newConversation() async throws {
-        guard let agentID = PreferencesProvider.shared.preferences.defaultAgentID else {
-            return
-        }
-        let agent = try AgentsProvider.shared.get(agentID)
-        let instructions = agent.instructions
-        let conversation = try await conversationsProvider.create(instructions: instructions, toolIDs: agent.toolIDs)
-        conversationID = conversation.id
-    }
-    
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
     func generate(chat prompt: String, context: [String] = [], toolChoice: Tool? = nil) throws {
         guard !prompt.isEmpty else { return }
@@ -68,9 +57,6 @@ final class ConversationViewModel {
         let model = try PreferencesProvider.shared.preferredChatModel()
         
         generateTask = Task {
-            if conversationID == nil {
-                try await newConversation()
-            }
             guard let conversation else { return }
             
             // New user message
@@ -117,9 +103,6 @@ final class ConversationViewModel {
         let model = try PreferencesProvider.shared.preferredVisionModel()
         
         generateTask = Task {
-            if conversationID == nil {
-                try await newConversation()
-            }
             guard let conversation else { return }
             
             // New user message
@@ -167,9 +150,6 @@ final class ConversationViewModel {
         let model = try PreferencesProvider.shared.preferredImageModel()
         
         generateTask = Task {
-            if conversationID == nil {
-                try await newConversation()
-            }
             guard let conversation else { return }
             
             // New user message

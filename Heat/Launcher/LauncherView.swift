@@ -8,7 +8,7 @@ import HeatKit
 private let logger = Logger(subsystem: "LauncherView", category: "App")
 
 struct LauncherView: View {
-    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(TemplatesProvider.self) var templatesProvider
     @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
     
@@ -61,9 +61,9 @@ struct LauncherView: View {
         Task {
             // Create a new conversation if one isn't already selected
             if conversationViewModel == nil {
-                guard let agentID = preferencesProvider.preferences.defaultAgentID else { return }
-                let agent = try agentsProvider.get(agentID)
-                let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
+                guard let templateID = preferencesProvider.preferences.defaultAssistantID else { return }
+                let template = try templatesProvider.get(templateID)
+                let conversation = try await conversationsProvider.create(instructions: template.instructions, toolIDs: template.toolIDs)
                 
                 selected = conversation.id
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)
