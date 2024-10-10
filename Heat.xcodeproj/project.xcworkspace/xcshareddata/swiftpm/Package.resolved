@@ -24,7 +24,7 @@
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
       "state" : {
         "branch" : "main",
-        "revision" : "9369a045a72a5296150879781321aecd228171db"
+        "revision" : "528cd5c4d51d85582397acbaa954ca709a74520e"
       }
     },
     {
@@ -51,7 +51,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "83c5134a242086c053261095937f9964301a453a"
+        "revision" : "72bf21248fb6fbc146dc992fbf01c2e935377455"
       }
     },
     {
@@ -78,7 +78,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "15f3924bd496a2e2810df989d3288d65d740c219"
+        "revision" : "515c072c2c8a00501b6d7ab27540fa4f1a43c4e9"
       }
     },
     {
@@ -114,7 +114,7 @@
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "8ba8f0dfe41c34b14506518b0d0a43e3a3e10537"
+        "revision" : "0a9ce934d10316e503e5fcfff1d8d6e98d2cfd83"
       }
     },
     {
@@ -141,7 +141,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "323b63fccc9b6cf372e7b4dffda68d598ccf381f"
+        "revision" : "72357d264d37d91a4273b14c112973dc480ce355"
       }
     }
   ],

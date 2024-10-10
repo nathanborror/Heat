@@ -57,9 +57,6 @@ struct PreferencesForm: View {
                 }
                 
                 if showingAdditionalServices {
-                    Picker("Tools", selection: $preferences.preferred.toolServiceID) {
-                        servicePickerView(\.supportsTools)
-                    }
                     Picker("Embeddings", selection: $preferences.preferred.embeddingServiceID) {
                         servicePickerView(\.supportsEmbeddings)
                     }

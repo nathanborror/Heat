@@ -16,12 +16,7 @@ public struct Defaults {
     public static let assistant = Agent(
         id: "bundle-assistant",
         name: "Basic Assistant",
-        instructions: AssistantInstructions,
-        toolIDs: [
-            Toolbox.generateImages.name,
-            Toolbox.browseWeb.name,
-            Toolbox.searchWeb.name,
-        ]
+        instructions: AssistantInstructions
     )
     
     public static let assistantThoughtful = Agent(
@@ -101,7 +96,7 @@ public struct Defaults {
         Service(
             id: .ollama,
             name: "Ollama",
-            host: "http://127.0.0.1:11434/api"
+            host: "http://127.0.0.1:11434/v1"
         )
     
     public static let openAI =

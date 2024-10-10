@@ -84,7 +84,6 @@ struct ServiceNudge: View {
         preferences.preferred.imageServiceID = .openAI
         preferences.preferred.embeddingServiceID = .openAI
         preferences.preferred.transcriptionServiceID = .openAI
-        preferences.preferred.toolServiceID = .openAI
         preferences.preferred.visionServiceID = .openAI
         preferences.preferred.speechServiceID = .openAI
         preferences.preferred.summarizationServiceID = .openAI

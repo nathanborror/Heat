@@ -17,7 +17,6 @@ public struct Preferences: Codable, Sendable {
         public var imageServiceID: Service.ServiceID? = nil
         public var embeddingServiceID: Service.ServiceID? = nil
         public var transcriptionServiceID: Service.ServiceID? = nil
-        public var toolServiceID: Service.ServiceID? = nil
         public var visionServiceID: Service.ServiceID? = nil
         public var speechServiceID: Service.ServiceID? = nil
         public var summarizationServiceID: Service.ServiceID? = nil
@@ -185,11 +184,6 @@ public final class PreferencesProvider {
         return try service.transcriptionService()
     }
     
-    public func preferredToolService() throws -> ToolService {
-        let service = try get(serviceID: preferences.preferred.toolServiceID)
-        return try service.toolService()
-    }
-    
     public func preferredVisionService() throws -> VisionService {
         let service = try get(serviceID: preferences.preferred.visionServiceID)
         return try service.visionService()
@@ -225,11 +219,6 @@ public final class PreferencesProvider {
     public func preferredTranscriptionModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.transcriptionServiceID)
         return try get(modelID: service.preferredTranscriptionModel, serviceID: service.id)
-    }
-    
-    public func preferredToolModel() throws -> Model {
-        let service = try get(serviceID: preferences.preferred.toolServiceID)
-        return try get(modelID: service.preferredChatModel, serviceID: service.id)
     }
     
     public func preferredVisionModel() throws -> Model {
