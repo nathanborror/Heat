@@ -10,6 +10,7 @@ public struct Template: Codable, Identifiable, Sendable {
     public var kind: Kind
     public var name: String
     public var instructions: String
+    public var context: [String: String]
     public var toolIDs: Set<String>
     public var created: Date
     public var modified: Date
@@ -19,11 +20,12 @@ public struct Template: Codable, Identifiable, Sendable {
         case prompt
     }
     
-    public init(id: String = .id, kind: Kind, name: String, instructions: String, toolIDs: Set<String> = []) {
+    public init(id: String = .id, kind: Kind, name: String, instructions: String, context: [String: String] = [:], toolIDs: Set<String> = []) {
         self.id = id
         self.kind = kind
         self.name = name
         self.instructions = instructions
+        self.context = context
         self.toolIDs = toolIDs
         self.created = .now
         self.modified = .now
@@ -37,6 +39,7 @@ public struct Template: Codable, Identifiable, Sendable {
         kind = template.kind
         name = template.name
         instructions = template.instructions
+        context = template.context
         toolIDs = template.toolIDs
         modified = .now
     }

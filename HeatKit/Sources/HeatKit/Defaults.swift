@@ -9,6 +9,9 @@ public struct Defaults {
         assistant,
         assistantThoughtful,
         assistantCreator,
+        investigateTemplate,
+        reportTemplate,
+        creativeWriterTemplate,
     ]
     
     public static let assistantDefaultID = assistant.id
@@ -37,6 +40,42 @@ public struct Defaults {
         kind: .assistant,
         name: "Creator Assistant",
         instructions: AssistantCreatorInstructions,
+        toolIDs: [
+            Toolbox.generateImages.name,
+            Toolbox.browseWeb.name,
+            Toolbox.searchWeb.name,
+        ]
+    )
+    
+    public static let investigateTemplate = Template(
+        id: "bundle-investigate",
+        kind: .prompt,
+        name: "Investigate",
+        instructions: InvestigatorInstructions,
+        toolIDs: [
+            Toolbox.generateImages.name,
+            Toolbox.browseWeb.name,
+            Toolbox.searchWeb.name,
+        ]
+    )
+    
+    public static let reportTemplate = Template(
+        id: "bundle-report",
+        kind: .prompt,
+        name: "Report",
+        instructions: ReporterInstructions,
+        toolIDs: [
+            Toolbox.generateImages.name,
+            Toolbox.browseWeb.name,
+            Toolbox.searchWeb.name,
+        ]
+    )
+    
+    public static let creativeWriterTemplate = Template(
+        id: "bundle-creative-writer",
+        kind: .prompt,
+        name: "Creative Writer",
+        instructions: CreativeWriterInstructions,
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,

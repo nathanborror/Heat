@@ -4,9 +4,10 @@ import PhotosUI
 import GenKit
 import HeatKit
 
-private let logger = Logger(subsystem: "ConversationInput", category: "App")
+private let logger = Logger(subsystem: "MessageField", category: "App")
 
 struct MessageField: View {
+    @Environment(TemplatesProvider.self) var templatesProvider
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
     
@@ -61,10 +62,23 @@ struct MessageField: View {
                                 Label("Attach Photo", systemImage: "photo")
                             }
                             .keyboardShortcut("1", modifiers: .command)
+                            
+                            Divider()
+                            
                             Button(action: { command = .imagine }) {
                                 Label("Imagine", systemImage: "paintpalette")
                             }
                             .keyboardShortcut("2", modifiers: .command)
+                            
+                            Divider()
+                            
+                            ForEach(templatesProvider.templates.filter { $0.kind == .prompt }) { template in
+                                Button {
+                                    print("not implemented")
+                                } label: {
+                                    Text(template.name)
+                                }
+                            }
                         } label: {
                             Image(systemName: "plus")
                                 .modifier(ConversationInlineButtonModifier())
