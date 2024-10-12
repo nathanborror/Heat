@@ -128,6 +128,9 @@ struct ServiceForm: View {
             let client = service.modelService()
             let models = try await client.models()
             service.models = models
+            
+            // Save service models
+            try await preferencesProvider.upsert(models: models, serviceID: service.id)
         }
     }
 }
@@ -138,16 +141,10 @@ struct ModelPicker: View {
     
     @Binding var selection: String?
     
-    @State private var selectedModel: Model? = nil
-    
     init(_ title: String, models: [Model], selection: Binding<String?>) {
         self.title = title
         self.models = models
         self._selection = selection
-        
-        if let selection = selection.wrappedValue {
-            self.selectedModel = models.first(where: { $0.id == selection })
-        }
     }
     
     var modelsByFamily: [String: [Model]] {
@@ -160,7 +157,6 @@ struct ModelPicker: View {
         LabeledContent(title) {
             Menu {
                 Button {
-                    selectedModel = nil
                     selection = nil
                 } label: {
                     Text("None")
@@ -181,8 +177,8 @@ struct ModelPicker: View {
                 }
             } label: {
                 Group {
-                    if let selectedModel {
-                        Text(selectedModel.name ?? selectedModel.id)
+                    if let selection, let model = models.first(where: { $0.id == selection }) {
+                        Text(model.name ?? model.id)
                     } else {
                         Text("Select Model")
                     }
@@ -196,12 +192,11 @@ struct ModelPicker: View {
     
     func menuItem(model: Model) -> some View {
         Button {
-            selectedModel = model
             selection = model.id
         } label: {
             HStack {
                 Text(model.name ?? model.id)
-                if selectedModel?.id == model.id {
+                if let selection, selection == model.id {
                     Spacer()
                     Image(systemName: "checkmark")
                 }

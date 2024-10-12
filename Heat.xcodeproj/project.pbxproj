@@ -60,6 +60,8 @@
 		D885D7612C9727220099CB51 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = D885D7602C9727220099CB51 /* Mocks.swift */; };
 		D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageView.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
+		D8D050AF2CBB1400004C66EE /* ServiceSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D050AE2CBB1400004C66EE /* ServiceSetup.swift */; };
+		D8D050B12CBB1455004C66EE /* AssistantPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D050B02CBB1455004C66EE /* AssistantPicker.swift */; };
 		D8E1FC182B704CDD006C9366 /* ServiceForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC172B704CDD006C9366 /* ServiceForm.swift */; };
 		D8E1FC1A2B704CE3006C9366 /* ServiceList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC192B704CE3006C9366 /* ServiceList.swift */; };
 		D8FBB20D2AEDB60700783E9B /* AgentList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FBB20C2AEDB60700783E9B /* AgentList.swift */; };
@@ -119,6 +121,8 @@
 		D885D7602C9727220099CB51 /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
 		D88D23082B3CFB5100CCCC61 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
+		D8D050AE2CBB1400004C66EE /* ServiceSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceSetup.swift; sourceTree = "<group>"; };
+		D8D050B02CBB1455004C66EE /* AssistantPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantPicker.swift; sourceTree = "<group>"; };
 		D8E1FC172B704CDD006C9366 /* ServiceForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceForm.swift; sourceTree = "<group>"; };
 		D8E1FC192B704CE3006C9366 /* ServiceList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceList.swift; sourceTree = "<group>"; };
 		D8FBB20C2AEDB60700783E9B /* AgentList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentList.swift; sourceTree = "<group>"; };
@@ -237,6 +241,8 @@
 				D45CC1F92B8A5C1A009DFDF4 /* Suggestions.swift */,
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 				D85FE37E2C8FCA0B004CA2F3 /* RunView.swift */,
+				D8D050AE2CBB1400004C66EE /* ServiceSetup.swift */,
+				D8D050B02CBB1455004C66EE /* AssistantPicker.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -407,11 +413,13 @@
 				D884AAFE2BD9B40000B90E9B /* PermissionsList.swift in Sources */,
 				D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */,
 				D4F518BD2CAF47CE005E147E /* MessageList.swift in Sources */,
+				D8D050AF2CBB1400004C66EE /* ServiceSetup.swift in Sources */,
 				D4017C902B6EEFB5001CE137 /* Asset+.swift in Sources */,
 				D85FAE062C84C80E00DA153F /* ArtifactTag.swift in Sources */,
 				D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */,
 				D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */,
 				D884AAF72BD7F52600B90E9B /* LauncherView.swift in Sources */,
+				D8D050B12CBB1455004C66EE /* AssistantPicker.swift in Sources */,
 				D85FAE002C8402AC00DA153F /* TagView.swift in Sources */,
 				D41E191F2AE45C9B002516C1 /* MainApp.swift in Sources */,
 				D8271A5E2C7A4F64008C345B /* CodeBlockView.swift in Sources */,

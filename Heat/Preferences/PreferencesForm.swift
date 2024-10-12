@@ -87,7 +87,7 @@ struct PreferencesForm: View {
                 NavigationLink("Services") {
                     ServiceList()
                 }
-                NavigationLink("Templates") {
+                NavigationLink("Agents") {
                     AgentList()
                 }
                 NavigationLink("Permissions") {
@@ -106,7 +106,7 @@ struct PreferencesForm: View {
             }
             
             Section {
-                Button("Reset Templates", action: handleTemplateReset)
+                Button("Reset Agents", action: handleAgentReset)
                 Button("Reset Conversations", action: handleConversationReset)
                 Button("Reset Preferences", action: handlePreferencesReset)
             }
@@ -148,7 +148,7 @@ struct PreferencesForm: View {
         }
     }
     
-    func handleTemplateReset() {
+    func handleAgentReset() {
         Task {
             try await agentsProvider.reset()
         }
@@ -171,7 +171,7 @@ struct PreferencesForm: View {
     }
     
     func handleDeleteAll() {
-        handleTemplateReset()
+        handleAgentReset()
         handleConversationReset()
         handlePreferencesReset()
     }

@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import OSLog
+import GenKit
 import HeatKit
 
 private let logger = Logger(subsystem: "ConversationView", category: "App")
@@ -25,44 +26,8 @@ struct ConversationView: View {
                 MessageList()
                     .environment(conversationViewModel)
             } else {
-                VStack {
-                    Spacer()
-                    VStack {
-                        Text("Assistant picker")
-                            .foregroundStyle(.secondary)
-                        Menu {
-                            ForEach(agentsProvider.agents.filter { $0.kind == .assistant }) { agent in
-                                Button(agent.name) {
-                                    Task {
-                                        var preferences = preferencesProvider.preferences
-                                        preferences.defaultAssistantID = agent.id
-                                        try await preferencesProvider.upsert(preferences)
-                                    }
-                                }
-                            }
-                        } label: {
-                            HStack {
-                                if let agentID = preferencesProvider.preferences.defaultAssistantID, let agent = try? agentsProvider.get(agentID) {
-                                    Text(agent.name)
-                                } else {
-                                    Text("Pick assistant")
-                                }
-                                Image(systemName: "chevron.up.chevron.down")
-                                    .imageScale(.small)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 12)
-                            .background {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(.background)
-                                    .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                            }
-                        }
-                    }
-                    .font(.subheadline)
-                    .buttonStyle(.plain)
-                    Spacer()
+                MessageListScrollView {
+                    AssistantPicker()
                 }
             }
         }

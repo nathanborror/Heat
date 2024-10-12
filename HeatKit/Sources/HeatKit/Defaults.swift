@@ -3,20 +3,20 @@ import GenKit
 
 public struct Defaults {
     
-    // MARK: - Templates
+    // MARK: - Agents
     
     public static let agents = [
-        assistant,
-        assistantThoughtful,
-        assistantCreator,
-        investigateTemplate,
-        reportTemplate,
-        creativeWriterTemplate,
+        agentAssistant,
+        agentAssistantThoughtful,
+        agentAssistantCreator,
+        agentInvestigator,
+        agentReporter,
+        agentCreativeWriter,
     ]
     
-    public static let assistantDefaultID = assistant.id
+    public static let assistantDefaultID = agentAssistant.id
     
-    public static let assistant = Agent(
+    public static let agentAssistant = Agent(
         id: "bundle-assistant",
         kind: .assistant,
         name: "Basic Assistant",
@@ -28,7 +28,7 @@ public struct Defaults {
         ]
     )
     
-    public static let assistantThoughtful = Agent(
+    public static let agentAssistantThoughtful = Agent(
         id: "bundle-assistant-thoughtful",
         kind: .assistant,
         name: "Thoughtful Assistant",
@@ -40,7 +40,7 @@ public struct Defaults {
         ]
     )
     
-    public static let assistantCreator = Agent(
+    public static let agentAssistantCreator = Agent(
         id: "bundle-assistant-creator",
         kind: .assistant,
         name: "Creator Assistant",
@@ -52,8 +52,8 @@ public struct Defaults {
         ]
     )
     
-    public static let investigateTemplate = Agent(
-        id: "bundle-investigate",
+    public static let agentInvestigator = Agent(
+        id: "bundle-investigator",
         kind: .prompt,
         name: "Investigate",
         instructions: InvestigatorInstructions,
@@ -66,8 +66,8 @@ public struct Defaults {
         ]
     )
     
-    public static let reportTemplate = Agent(
-        id: "bundle-report",
+    public static let agentReporter = Agent(
+        id: "bundle-reporter",
         kind: .prompt,
         name: "Report",
         instructions: ReporterInstructions,
@@ -80,7 +80,7 @@ public struct Defaults {
         ]
     )
     
-    public static let creativeWriterTemplate = Agent(
+    public static let agentCreativeWriter = Agent(
         id: "bundle-creative-writer",
         kind: .prompt,
         name: "Creative Writer",

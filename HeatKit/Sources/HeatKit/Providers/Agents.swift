@@ -85,7 +85,7 @@ public final class AgentsProvider {
     
     public func get(_ id: String) throws -> Agent {
         guard let agent = agents.first(where: { $0.id == id }) else {
-            throw TemplatesProviderError.notFound
+            throw AgentsProviderError.notFound
         }
         return agent
     }
@@ -131,6 +131,6 @@ public final class AgentsProvider {
     }
 }
 
-public enum TemplatesProviderError: Error {
+public enum AgentsProviderError: Error {
     case notFound
 }

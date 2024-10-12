@@ -129,6 +129,13 @@ public final class PreferencesProvider {
         try await save()
     }
     
+    public func upsert(token: String, serviceID: Service.ServiceID) async throws {
+        var service = try get(serviceID: serviceID)
+        service.token = token
+        try await upsert(service: service)
+        try await initialize(serviceID: serviceID)
+    }
+    
     public func upsert(models: [Model], serviceID: Service.ServiceID) async throws {
         var service = try get(serviceID: serviceID)
         service.models = models
@@ -141,17 +148,22 @@ public final class PreferencesProvider {
         try await upsert(service: service)
     }
     
+    public func initialize(serviceID: Service.ServiceID) async throws {
+        let service = try get(serviceID: serviceID)
+        do {
+            let client = service.modelService()
+            let models = try await client.models()
+            try await upsert(models: models, serviceID: service.id)
+            try await upsert(status: .ready, serviceID: service.id)
+        } catch {
+            logger.error("Service error (\(service.name)): \(error)")
+            try await upsert(status: .unknown, serviceID: service.id)
+        }
+    }
+    
     public func initializeServices() async throws {
         for service in services {
-            do {
-                let client = service.modelService()
-                let models = try await client.models()
-                try await upsert(models: models, serviceID: service.id)
-                try await upsert(status: .ready, serviceID: service.id)
-            } catch {
-                logger.error("Service error (\(service.name)): \(error)")
-                try await upsert(status: .unknown, serviceID: service.id)
-            }
+            try await initialize(serviceID: service.id)
         }
     }
     

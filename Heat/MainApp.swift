@@ -48,9 +48,6 @@ struct MainApp: App {
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
                 ConversationView(selected: $selectedConversationID)
-                    .overlay {
-                        PreferencesSetup()
-                    }
             }
             .containerBackground(.background, for: .window)
             .sheet(item: $sheet) { sheet in
@@ -87,6 +84,16 @@ struct MainApp: App {
                 .keyboardShortcut(",", modifiers: .command)
             }
         }
+        
+        Window("Setup", id: "setup") {
+            Text("Setup preferences")
+        }
+        .windowManagerRole(.associated)
+        .windowLevel(.floating)
+        .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 400, height: 400)
+        .defaultPosition(.center)
+        .restorationBehavior(.disabled)
         
         Window("Launcher", id: "launcher") {
             List {
@@ -183,51 +190,6 @@ struct MainApp: App {
             showingLauncher.toggle()
         }
         #endif
-    }
-}
-
-struct PreferencesSetup: View {
-    @Environment(PreferencesProvider.self) var preferencesProvider
-    
-    @State var sheet: Sheet? = nil
-    
-    enum Sheet: String, Identifiable {
-        case preferences
-        case services
-        var id: String { rawValue }
-    }
-    
-    var body: some View {
-        Group {
-            switch preferencesProvider.status {
-            case .needsServiceSetup:
-                ContentUnavailableView {
-                    Label("Missing services", systemImage: "exclamationmark.icloud")
-                } description: {
-                    Text("Configure a service like OpenAI, Anthropic or Ollama to get started.")
-                    Button("Open Preferences") { sheet = .preferences }
-                }
-            case .needsPreferredService:
-                ContentUnavailableView {
-                    Label("Missing chat service", systemImage: "slider.horizontal.2.square")
-                } description: {
-                    Text("Open Preferences to pick a chat service to use.")
-                    Button("Open Preferences") { sheet = .preferences }
-                }
-            case .ready, .waiting:
-                EmptyView()
-            }
-        }
-        .sheet(item: $sheet) { sheet in
-            NavigationStack {
-                switch sheet {
-                case .preferences:
-                    PreferencesForm(preferences: preferencesProvider.preferences)
-                case .services:
-                    ServiceList()
-                }
-            }
-        }
     }
 }
 

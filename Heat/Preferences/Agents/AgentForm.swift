@@ -39,7 +39,7 @@ struct AgentForm: View {
             }
             Section {
                 NavigationLink("Add Tool") {
-                    TemplateTool { name in
+                    AgentTool { name in
                         guard !name.isEmpty else { return }
                         agent.toolIDs.insert(name)
                     }
@@ -51,7 +51,7 @@ struct AgentForm: View {
             }
         }
         .appFormStyle()
-        .navigationTitle("Template")
+        .navigationTitle("Agent")
         .interactiveDismissDisabled()
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
@@ -73,7 +73,7 @@ struct AgentForm: View {
     }
 }
 
-struct TemplateTool: View {
+struct AgentTool: View {
     @Environment(\.dismiss) private var dismiss
     
     @State var text: String = ""
