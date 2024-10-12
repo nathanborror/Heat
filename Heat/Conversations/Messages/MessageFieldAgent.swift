@@ -8,21 +8,30 @@ struct MessageFieldAgent: View {
     let action: (Agent) -> Void
     
     var body: some View {
-        Form {
-            Section {
+        ScrollView {
+            VStack(alignment: .leading) {
                 ForEach(Array(agent.context.keys), id: \.self) { key in
-                    VStack {
-                        TextField(key, text: Binding(
+                    TextField(key,
+                        text: Binding(
                             get: { agent.context[key] ?? "" },
                             set: { agent.context[key] = $0 }
-                        ))
-                    }
+                        ),
+                        axis: .vertical
+                    )
+                    .textFieldStyle(.plain)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(.primary.opacity(0.05))
+                    .clipShape(.rect(cornerRadius: 10))
                 }
+                
+                Text(agent.instructions)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 4)
             }
-            
-            TextField("Instructions", text: $agent.instructions, axis: .vertical)
         }
-        .appFormStyle()
+        .padding()
+        .frame(maxHeight: 400)
         .navigationTitle(agent.name)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {

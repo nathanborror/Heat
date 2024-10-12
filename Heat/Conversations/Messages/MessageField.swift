@@ -65,23 +65,19 @@ struct MessageField: View {
                             Button(action: { showingPhotos = true }) {
                                 Label("Attach Photo", systemImage: "photo")
                             }
-                            .keyboardShortcut("1", modifiers: .command)
-                            
-                            Divider()
-                            
                             Button(action: { command = .imagine }) {
-                                Label("Imagine", systemImage: "paintpalette")
+                                Label("Create Image", systemImage: "paintpalette")
                             }
-                            .keyboardShortcut("2", modifiers: .command)
-                            
-                            Divider()
-                            
-                            ForEach(agentsProvider.agents.filter { $0.kind == .prompt }) { agent in
-                                Button {
-                                    showingAgent = agent
-                                } label: {
-                                    Text(agent.name)
+                            Menu {
+                                ForEach(agentsProvider.agents.filter { $0.kind == .prompt }) { agent in
+                                    Button {
+                                        showingAgent = agent
+                                    } label: {
+                                        Text(agent.name)
+                                    }
                                 }
+                            } label: {
+                                Label("Use Agent", systemImage: "puzzlepiece")
                             }
                         } label: {
                             Image(systemName: "plus")
