@@ -56,7 +56,7 @@ struct MessageList: View {
     func handleSubmit(_ prompt: String) {
         Task {
             do {
-                let context = memories.map { $0.content }
+                let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
                 try conversationViewModel.generate(chat: prompt, context: context)
             } catch {
                 conversationViewModel.error = error

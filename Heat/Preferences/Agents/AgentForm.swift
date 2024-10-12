@@ -4,13 +4,11 @@ import SharedKit
 import GenKit
 import HeatKit
 
-private let logger = Logger(subsystem: "TemplateForm", category: "App")
-
-struct TemplateForm: View {
-    @Environment(TemplatesProvider.self) var templatesProvider
+struct AgentForm: View {
+    @Environment(AgentsProvider.self) var agentsProvider
     @Environment(\.dismiss) private var dismiss
     
-    @State var template: Template
+    @State var agent: Agent
     
     @State private var newToolName: String = ""
     @State private var isShowingAlert = false
@@ -19,20 +17,20 @@ struct TemplateForm: View {
     var body: some View {
         Form {
             Section("Info") {
-                TextField("ID", text: $template.id)
-                TextField("Name", text: $template.name)
-                Picker("Kind", selection: $template.kind) {
-                    ForEach(Template.Kind.allCases, id: \.self) {
+                TextField("ID", text: $agent.id)
+                TextField("Name", text: $agent.name)
+                Picker("Kind", selection: $agent.kind) {
+                    ForEach(Agent.Kind.allCases, id: \.self) {
                         Text($0.rawValue.capitalized).tag($0)
                     }
                 }
             }
             Section("Tools") {
-                ForEach(Array(template.toolIDs.sorted(by: <)), id: \.self) { toolID in
+                ForEach(Array(agent.toolIDs.sorted(by: <)), id: \.self) { toolID in
                     Text(toolID)
                         .swipeActions {
                             Button(role: .destructive) {
-                                template.toolIDs.remove(toolID)
+                                agent.toolIDs.remove(toolID)
                             } label: {
                                 Label("Trash", systemImage: "trash")
                             }
@@ -43,12 +41,12 @@ struct TemplateForm: View {
                 NavigationLink("Add Tool") {
                     TemplateTool { name in
                         guard !name.isEmpty else { return }
-                        template.toolIDs.insert(name)
+                        agent.toolIDs.insert(name)
                     }
                 }
             }
             Section("Instructions") {
-                TextField("Instructions", text: $template.instructions, axis: .vertical)
+                TextField("Instructions", text: $agent.instructions, axis: .vertical)
                     .font(.system(size: 14, design: .monospaced))
             }
         }
@@ -70,7 +68,7 @@ struct TemplateForm: View {
     }
     
     private func handleDone() {
-        Task { try await templatesProvider.upsert(template) }
+        Task { try await agentsProvider.upsert(agent) }
         dismiss()
     }
 }

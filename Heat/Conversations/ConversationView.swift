@@ -6,7 +6,7 @@ import HeatKit
 private let logger = Logger(subsystem: "ConversationView", category: "App")
 
 struct ConversationView: View {
-    @Environment(TemplatesProvider.self) var templatesProvider
+    @Environment(AgentsProvider.self) var agentsProvider
     @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
     
@@ -31,19 +31,19 @@ struct ConversationView: View {
                         Text("Assistant picker")
                             .foregroundStyle(.secondary)
                         Menu {
-                            ForEach(templatesProvider.templates.filter { $0.kind == .assistant }) { template in
-                                Button(template.name) {
+                            ForEach(agentsProvider.agents.filter { $0.kind == .assistant }) { agent in
+                                Button(agent.name) {
                                     Task {
                                         var preferences = preferencesProvider.preferences
-                                        preferences.defaultAssistantID = template.id
+                                        preferences.defaultAssistantID = agent.id
                                         try await preferencesProvider.upsert(preferences)
                                     }
                                 }
                             }
                         } label: {
                             HStack {
-                                if let templateID = preferencesProvider.preferences.defaultAssistantID, let template = try? templatesProvider.get(templateID) {
-                                    Text(template.name)
+                                if let agentID = preferencesProvider.preferences.defaultAssistantID, let agent = try? agentsProvider.get(agentID) {
+                                    Text(agent.name)
                                 } else {
                                     Text("Pick assistant")
                                 }
@@ -69,6 +69,8 @@ struct ConversationView: View {
         .safeAreaInset(edge: .bottom, alignment: .center) {
             MessageField { prompt, images, command in
                 handleSubmit(prompt, images: images, command: command)
+            } agent: { agent in
+                handleSubmit(agent: agent)
             }
             .padding(12)
             .background(.background)
@@ -118,9 +120,9 @@ struct ConversationView: View {
         Task {
             // Create a new conversation if one isn't already selected
             if conversationViewModel == nil {
-                guard let templateID = preferencesProvider.preferences.defaultAssistantID else { return }
-                let template = try templatesProvider.get(templateID)
-                let conversation = try await conversationsProvider.create(instructions: template.instructions, toolIDs: template.toolIDs)
+                guard let agentID = preferencesProvider.preferences.defaultAssistantID else { return }
+                let agent = try agentsProvider.get(agentID)
+                let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
                 
                 selected = conversation.id
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)
@@ -130,7 +132,7 @@ struct ConversationView: View {
             guard let conversationViewModel else { return }
             
             // Context full of memories
-            let context = memories.map { $0.content }
+            let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
             
             // Try to generate a response
             do {
@@ -145,6 +147,22 @@ struct ConversationView: View {
             } catch {
                 conversationViewModel.error = error
             }
+        }
+    }
+    
+    func handleSubmit(agent: Agent) {
+        Task {
+            // Create a new conversation if one isn't already selected
+            if conversationViewModel == nil {
+                guard let agentID = preferencesProvider.preferences.defaultAssistantID else { return }
+                let agent = try agentsProvider.get(agentID)
+                let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
+                
+                selected = conversation.id
+                conversationViewModel = ConversationViewModel(conversationID: conversation.id)
+            }
+            guard let conversationViewModel else { return }
+            try conversationViewModel.generate(chat: agent.instructions, context: agent.context, agentID: agent.id)
         }
     }
 }

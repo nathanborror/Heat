@@ -22,10 +22,8 @@ struct TagView: View {
                 .padding(.leading, 12)
         case "image_search_query":
             ImageSearchTag(tag)
-        case "news_search":
-            NewsSearchTag(tag)
         default:
-            Text("<\(tag.name)> not implemented")
+            GenericTag(tag)
         }
     }
 }

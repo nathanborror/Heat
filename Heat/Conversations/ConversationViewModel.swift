@@ -13,6 +13,8 @@ final class ConversationViewModel {
     
     private let conversationsProvider = ConversationsProvider.shared
     private let messagesProvider = MessagesProvider.shared
+    private let preferencesProvider = PreferencesProvider.shared
+    
     private var generateTask: Task<(), Error>? = nil
     
     init(conversationID: String) {
@@ -50,24 +52,28 @@ final class ConversationViewModel {
     }
     
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
-    func generate(chat prompt: String, context: [String] = [], toolChoice: Tool? = nil) throws {
+    func generate(chat prompt: String, context: [String: String] = [:], toolChoice: Tool? = nil, agentID: String? = nil) throws {
         guard !prompt.isEmpty else { return }
         
-        let service = try PreferencesProvider.shared.preferredChatService()
-        let model = try PreferencesProvider.shared.preferredChatModel()
+        let service = try preferencesProvider.preferredChatService()
+        let model = try preferencesProvider.preferredChatModel()
         
         generateTask = Task {
             guard let conversation else { return }
             
+            // Augment context
+            var context = context
+            context["DATETIME"] = Date.now.formatted()
+            
             // New user message
-            let userMessage = Message(role: .user, content: prompt)
+            let userMessage = Message(role: .user, content: Prompt.render(prompt, with: context))
             try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
             try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
-            req.with(system: Prompt.render(conversation.instructions, with: ["DATETIME": Date.now.formatted()]))
+            req.with(system: Prompt.render(conversation.instructions, with: context))
             req.with(history: messages)
             req.with(tools: Toolbox.get(names: conversation.toolIDs))
             req.with(context: context)
@@ -76,6 +82,13 @@ final class ConversationViewModel {
             let stream = ChatSession.shared.stream(req)
             for try await message in stream {
                 try Task.checkCancellation()
+                
+                // Indicate which agent was used
+                var message = message
+                if let agentID {
+                    message.metadata.agentID = agentID
+                }
+                
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
                 streamingTokens = message.content
@@ -96,26 +109,33 @@ final class ConversationViewModel {
     }
     
     /// Generate a response using images as inputs alongside text. This will eventually be combined with generate(chat: ...) above.
-    func generate(chat prompt: String, images: [Data], context: [String] = []) throws {
+    func generate(chat prompt: String, images: [Data], context: [String: String] = [:]) throws {
         guard !prompt.isEmpty else { return }
         
-        let service = try PreferencesProvider.shared.preferredVisionService()
-        let model = try PreferencesProvider.shared.preferredVisionModel()
+        let service = try preferencesProvider.preferredVisionService()
+        let model = try preferencesProvider.preferredVisionModel()
         
         generateTask = Task {
             guard let conversation else { return }
             
+            // Augment context
+            var context = context
+            context["DATETIME"] = Date.now.formatted()
+            
             // New user message
-            let userMessage = Message(role: .user, content: prompt, attachments: images.map {
-                .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
-            })
+            let userMessage = Message(
+                role: .user,
+                content: Prompt.render(prompt, with: context),
+                attachments: images.map {
+                    .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
+                })
             try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
             try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
             // Initial request
             var req = VisionSessionRequest(service: service, model: model)
-            req.with(system: Prompt.render(conversation.instructions, with: ["DATETIME": Date.now.formatted()]))
+            req.with(system: Prompt.render(conversation.instructions, with: context))
             req.with(history: messages)
             req.with(context: context)
             
@@ -146,8 +166,8 @@ final class ConversationViewModel {
     func generate(image prompt: String) throws {
         guard !prompt.isEmpty else { return }
         
-        let service = try PreferencesProvider.shared.preferredImageService()
-        let model = try PreferencesProvider.shared.preferredImageModel()
+        let service = try preferencesProvider.preferredImageService()
+        let model = try preferencesProvider.preferredImageModel()
         
         generateTask = Task {
             guard let conversation else { return }
@@ -184,8 +204,8 @@ final class ConversationViewModel {
             return false
         }
         
-        let service = try PreferencesProvider.shared.preferredChatService()
-        let model = try PreferencesProvider.shared.preferredChatModel()
+        let service = try preferencesProvider.preferredChatService()
+        let model = try preferencesProvider.preferredChatModel()
         
         let history = messages
             .map { "\($0.role.rawValue): \($0.content ?? "Empty")" }
@@ -217,8 +237,8 @@ final class ConversationViewModel {
     func generateSuggestions() async throws -> Bool {
         guard let conversation else { return false }
         
-        let service = try PreferencesProvider.shared.preferredChatService()
-        let model = try PreferencesProvider.shared.preferredChatModel()
+        let service = try preferencesProvider.preferredChatService()
+        let model = try preferencesProvider.preferredChatModel()
         
         let history = messages
             .map { "\($0.role.rawValue): \($0.content ?? "Empty")" }

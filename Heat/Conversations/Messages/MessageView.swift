@@ -20,16 +20,16 @@ struct MessageView: View {
             // Render message content
             switch message.role {
             case .system:
-                MessageContent(message.content, for: message.role)
+                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
                     .messageSpacing(message)
             case .user:
-                MessageContent(message.content, for: message.role)
+                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
                     .messageSpacing(message)
                 MessageAttachments(message.attachments)
             case .assistant:
                 MessageToolCalls(message.toolCalls)
                     .messageSpacing(message)
-                MessageContent(message.content, for: message.role)
+                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
                     .messageSpacing(message)
                 MessageAttachments(message.attachments)
                     .messageSpacing(message)
@@ -61,14 +61,17 @@ struct MessageRole: View {
 }
 
 struct MessageContent: View {
+    @Environment(AgentsProvider.self) var agentsProvider
     @Environment(\.colorScheme) private var colorScheme
     
     let content: String?
     let role: Message.Role
+    let agentID: String?
     
-    init(_ content: String?, for role: Message.Role) {
+    init(_ content: String?, for role: Message.Role, agentID: String? = nil) {
         self.content = content
         self.role = role
+        self.agentID = agentID
     }
     
     var body: some View {
@@ -99,7 +102,14 @@ struct MessageContent: View {
     
     var contents: [ContentParser.Result.Content] {
         guard let content = content else { return [] }
-        let tags = ["thinking", "artifact", "output", "reflection", "image_search_query"]
+        
+        // Start with default tags to look for, if the message has a agentID associated with it
+        // look for the tags its agent is expecting to output.
+        var tags = ["thinking", "artifact", "output", "reflection", "image_search_query"]
+        if let agentID, let agent = try? agentsProvider.get(agentID) {
+            tags = agent.tags
+        }
+        
         guard let results = try? parser.parse(input: content, tags: tags) else { return [] }
         return results.contents
     }

@@ -4,7 +4,7 @@ import GenKit
 import HeatKit
 
 struct PreferencesForm: View {
-    @Environment(TemplatesProvider.self) var templatesProvider
+    @Environment(AgentsProvider.self) var agentsProvider
     @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(MessagesProvider.self) var messagesProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
@@ -34,8 +34,8 @@ struct PreferencesForm: View {
                 Picker("Default Assistant", selection: $preferences.defaultAssistantID) {
                     Text("None").tag(String?.none)
                     Divider()
-                    ForEach(templatesProvider.templates.filter { $0.kind == .assistant }) { template in
-                        Text(template.name).tag(template.id)
+                    ForEach(agentsProvider.agents.filter { $0.kind == .assistant }) { agent in
+                        Text(agent.name).tag(agent.id)
                     }
                 }
             } header: {
@@ -88,7 +88,7 @@ struct PreferencesForm: View {
                     ServiceList()
                 }
                 NavigationLink("Templates") {
-                    TemplateList()
+                    AgentList()
                 }
                 NavigationLink("Permissions") {
                     PermissionsList()
@@ -96,7 +96,7 @@ struct PreferencesForm: View {
             } header: {
                 Text("Advanced")
             } footer: {
-                Text("Configure services, prompt templates and third-party permissions.")
+                Text("Configure services, prompt agents and third-party permissions.")
             }
             
             Section {
@@ -150,7 +150,7 @@ struct PreferencesForm: View {
     
     func handleTemplateReset() {
         Task {
-            try await templatesProvider.reset()
+            try await agentsProvider.reset()
         }
     }
     

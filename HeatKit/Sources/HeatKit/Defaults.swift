@@ -5,7 +5,7 @@ public struct Defaults {
     
     // MARK: - Templates
     
-    public static let templates = [
+    public static let agents = [
         assistant,
         assistantThoughtful,
         assistantCreator,
@@ -16,14 +16,19 @@ public struct Defaults {
     
     public static let assistantDefaultID = assistant.id
     
-    public static let assistant = Template(
+    public static let assistant = Agent(
         id: "bundle-assistant",
         kind: .assistant,
         name: "Basic Assistant",
-        instructions: AssistantInstructions
+        instructions: AssistantInstructions,
+        toolIDs: [
+            Toolbox.generateImages.name,
+            Toolbox.browseWeb.name,
+            Toolbox.searchWeb.name,
+        ]
     )
     
-    public static let assistantThoughtful = Template(
+    public static let assistantThoughtful = Agent(
         id: "bundle-assistant-thoughtful",
         kind: .assistant,
         name: "Thoughtful Assistant",
@@ -35,7 +40,7 @@ public struct Defaults {
         ]
     )
     
-    public static let assistantCreator = Template(
+    public static let assistantCreator = Agent(
         id: "bundle-assistant-creator",
         kind: .assistant,
         name: "Creator Assistant",
@@ -47,11 +52,13 @@ public struct Defaults {
         ]
     )
     
-    public static let investigateTemplate = Template(
+    public static let investigateTemplate = Agent(
         id: "bundle-investigate",
         kind: .prompt,
         name: "Investigate",
         instructions: InvestigatorInstructions,
+        context: ["TOPIC": "", "EXISTING_NOTEBOOK": ""],
+        tags: ["updated_notebook", "reasoning", "update_summary"],
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
@@ -59,11 +66,13 @@ public struct Defaults {
         ]
     )
     
-    public static let reportTemplate = Template(
+    public static let reportTemplate = Agent(
         id: "bundle-report",
         kind: .prompt,
         name: "Report",
         instructions: ReporterInstructions,
+        context: ["TOPIC": "", "NOTEBOOK": ""],
+        tags: ["scratchpad", "report"],
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
@@ -71,11 +80,13 @@ public struct Defaults {
         ]
     )
     
-    public static let creativeWriterTemplate = Template(
+    public static let creativeWriterTemplate = Agent(
         id: "bundle-creative-writer",
         kind: .prompt,
         name: "Creative Writer",
         instructions: CreativeWriterInstructions,
+        context: ["REPORT": "", "WRITER": ""],
+        tags: ["rewritten_report", "style_explanation"],
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,

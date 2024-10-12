@@ -7,13 +7,15 @@ import HeatKit
 private let logger = Logger(subsystem: "MessageField", category: "App")
 
 struct MessageField: View {
-    @Environment(TemplatesProvider.self) var templatesProvider
+    @Environment(AgentsProvider.self) var agentsProvider
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
     
     typealias ActionHandler = (String, [Data], Command) -> Void
+    typealias AgentHandler = (Agent) -> Void
     
     let action: ActionHandler
+    let agentAction: AgentHandler?
     
     enum Command: String {
         case text
@@ -24,12 +26,14 @@ struct MessageField: View {
     @State private var imagePickerViewModel = ImagePickerViewModel()
     @State private var content = ""
     @State private var command: Command = .text
-    @State private var isShowingPhotos = false
+    @State private var showingPhotos = false
+    @State private var showingAgent: Agent? = nil
     
     @FocusState private var isFocused: Bool
     
-    init(action: @escaping ActionHandler) {
+    init(action: @escaping ActionHandler, agent: AgentHandler? = nil) {
         self.action = action
+        self.agentAction = agent
     }
     
     var body: some View {
@@ -58,7 +62,7 @@ struct MessageField: View {
                     // Command menu
                     if command == .text {
                         Menu {
-                            Button(action: { isShowingPhotos = true }) {
+                            Button(action: { showingPhotos = true }) {
                                 Label("Attach Photo", systemImage: "photo")
                             }
                             .keyboardShortcut("1", modifiers: .command)
@@ -72,11 +76,11 @@ struct MessageField: View {
                             
                             Divider()
                             
-                            ForEach(templatesProvider.templates.filter { $0.kind == .prompt }) { template in
+                            ForEach(agentsProvider.agents.filter { $0.kind == .prompt }) { agent in
                                 Button {
-                                    print("not implemented")
+                                    showingAgent = agent
                                 } label: {
-                                    Text(template.name)
+                                    Text(agent.name)
                                 }
                             }
                         } label: {
@@ -161,7 +165,14 @@ struct MessageField: View {
                 .buttonStyle(.plain)
             }
         }
-        .photosPicker(isPresented: $isShowingPhotos, selection: $imagePickerViewModel.imagesPicked, maxSelectionCount: 3, matching: .images, photoLibrary: .shared())
+        .photosPicker(isPresented: $showingPhotos, selection: $imagePickerViewModel.imagesPicked, maxSelectionCount: 3, matching: .images, photoLibrary: .shared())
+        .sheet(item: $showingAgent) { agent in
+            NavigationStack {
+                MessageFieldAgent(agent: agent) { agent in
+                    agentAction?(agent)
+                }
+            }
+        }
     }
     
     func handleSubmit() async throws {

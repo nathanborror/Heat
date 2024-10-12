@@ -3,8 +3,8 @@ import GenKit
 
 public struct Prompt {
     
-    public static func render(_ template: String, with context: [String: String] = [:]) -> String {
-        template.replacing(#/{{(?<key>\w+)}}/#) { match in
+    public static func render(_ instructions: String, with context: [String: String] = [:]) -> String {
+        instructions.replacing(#/{{(?<key>\w+)}}/#) { match in
             let key = String(match.output.key)
             return context[key] ?? ""
         }
