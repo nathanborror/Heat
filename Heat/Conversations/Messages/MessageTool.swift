@@ -31,9 +31,6 @@ struct MessageTool: View {
                 case .generateMemory:
                     MessageToolTitle("Remembering")
                     MessageToolContent(message.content)
-                case .searchFiles:
-                    MessageToolTitle("File search results")
-                    MessageToolContent(message.content)
                 case .searchCalendar:
                     MessageToolTitle("Calendar search results")
                     MessageToolContent(message.content)

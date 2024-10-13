@@ -317,7 +317,7 @@ final class ConversationViewModel {
                 let messages = await WebBrowseTool.handle(toolCall)
                 haptic(tap: .heavy)
                 return .init(messages: messages, shouldContinue: true)
-            case .generateSuggestions, .generateTitle, .searchFiles:
+            case .generateSuggestions, .generateTitle:
                 return .init(messages: [], shouldContinue: false)
             }
         } else {

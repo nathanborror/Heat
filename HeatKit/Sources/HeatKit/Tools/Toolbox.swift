@@ -7,7 +7,6 @@ public enum Toolbox: CaseIterable, Sendable {
     case generateMemory
     case generateSuggestions
     case generateTitle
-    case searchFiles
     case searchCalendar
     case searchWeb
     case browseWeb
@@ -24,8 +23,6 @@ public enum Toolbox: CaseIterable, Sendable {
             self = .generateSuggestions
         case TitleTool.function.name:
             self = .generateTitle
-        case FileSearchTool.function.name:
-            self = .searchFiles
         case CalendarSearchTool.function.name:
             self = .searchCalendar
         case WebSearchTool.function.name:
@@ -47,8 +44,6 @@ public enum Toolbox: CaseIterable, Sendable {
             Tool(function: SuggestTool.function)
         case .generateTitle:
             Tool(function: TitleTool.function)
-        case .searchFiles:
-            Tool(function: FileSearchTool.function)
         case .searchCalendar:
             Tool(function: CalendarSearchTool.function)
         case .searchWeb:

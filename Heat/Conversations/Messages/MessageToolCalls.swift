@@ -23,8 +23,6 @@ struct MessageToolCalls: View {
                             MessageToolCallContent("Generating suggestions...")
                         case .generateTitle:
                             MessageToolCallContent("Generating title...")
-                        case .searchFiles:
-                            MessageToolCallContent("Searching files...")
                         case .searchCalendar:
                             MessageToolCallContent("Searching calendar...")
                         case .searchWeb:
