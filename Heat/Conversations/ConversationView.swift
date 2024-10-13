@@ -31,6 +31,7 @@ struct ConversationView: View {
                 }
             }
         }
+        .navigationTitle(conversationViewModel?.conversation?.title ?? "Untitled")
         .safeAreaInset(edge: .bottom, alignment: .center) {
             MessageField { prompt, images, command in
                 handleSubmit(prompt, images: images, command: command)

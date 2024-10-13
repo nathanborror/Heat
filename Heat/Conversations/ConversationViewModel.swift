@@ -66,14 +66,14 @@ final class ConversationViewModel {
             context["DATETIME"] = Date.now.formatted()
             
             // New user message
-            let userMessage = Message(role: .user, content: Prompt.render(prompt, with: context))
+            let userMessage = Message(role: .user, content: PromptTemplate(prompt, with: context))
             try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
             try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
-            req.with(system: Prompt.render(conversation.instructions, with: context))
+            req.with(system: PromptTemplate(conversation.instructions, with: context))
             req.with(history: messages)
             req.with(tools: Toolbox.get(names: conversation.toolIDs))
             req.with(context: context)
@@ -125,7 +125,7 @@ final class ConversationViewModel {
             // New user message
             let userMessage = Message(
                 role: .user,
-                content: Prompt.render(prompt, with: context),
+                content: PromptTemplate(prompt, with: context),
                 attachments: images.map {
                     .asset(.init(name: "image", data: $0, kind: .image, location: .none, noop: false))
                 })
@@ -135,7 +135,7 @@ final class ConversationViewModel {
             
             // Initial request
             var req = VisionSessionRequest(service: service, model: model)
-            req.with(system: Prompt.render(conversation.instructions, with: context))
+            req.with(system: PromptTemplate(conversation.instructions, with: context))
             req.with(history: messages)
             req.with(context: context)
             
@@ -213,7 +213,7 @@ final class ConversationViewModel {
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: Prompt.render(TitleInstructions, with: ["HISTORY": history]))
+        req.with(system: PromptTemplate(TitleInstructions, with: ["HISTORY": history]))
         
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
@@ -246,7 +246,7 @@ final class ConversationViewModel {
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: Prompt.render(SuggestionsInstructions, with: ["HISTORY": history]))
+        req.with(system: PromptTemplate(SuggestionsInstructions, with: ["HISTORY": history]))
         
         // Indicate we are suggesting
         try await conversationsProvider.upsert(state: .suggesting, conversationID: conversation.id)

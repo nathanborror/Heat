@@ -27,7 +27,7 @@ public struct WebBrowseTool {
             properties: [
                 "instructions": .init(
                     type: .string,
-                    description: "Instructions to perform on the given URLs. Default to summarization."
+                    description: "Instructions on how to scrape information from the webpage URL."
                 ),
                 "title": .init(
                     type: .string,

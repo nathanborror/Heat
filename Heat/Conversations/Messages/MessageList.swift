@@ -38,6 +38,7 @@ struct MessageList: View {
                 }
                 .id("bottom")
             }
+            .padding(.vertical, 12)
             .onChange(of: conversationViewModel.streamingTokens) { _, _ in
                 proxy.scrollTo("bottom")
             }
@@ -75,7 +76,7 @@ struct MessageListScrollView<Content: View>: View {
         List {
             content()
                 .listRowSeparator(.hidden)
-                .listRowInsets(.init(top: 6, leading: 4, bottom: 6, trailing: 4))
+                .listRowInsets(.init())
         }
         .listStyle(.plain)
         .scrollClipDisabled()

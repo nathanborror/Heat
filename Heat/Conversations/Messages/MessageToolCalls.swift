@@ -4,9 +4,11 @@ import HeatKit
 
 struct MessageToolCalls: View {
     let toolCalls: [ToolCall]
+    let lineLimit: Int
     
-    init(_ toolCalls: [ToolCall]?) {
+    init(_ toolCalls: [ToolCall]?, lineLimit: Int = 4) {
         self.toolCalls = toolCalls ?? []
+        self.lineLimit = lineLimit
     }
     
     var body: some View {
@@ -33,7 +35,7 @@ struct MessageToolCalls: View {
                     } else {
                         Text("Missing tool calls.")
                     }
-                    MessageToolCallArguments(toolCall.function)
+                    MessageToolCallArguments(toolCall.function, lineLimit: lineLimit)
                 }
             }
         }
@@ -62,9 +64,11 @@ struct MessageToolCallContent: View {
 
 struct MessageToolCallArguments: View {
     let function: ToolCall.FunctionCall
+    let lineLimit: Int
     
-    init(_ function: ToolCall.FunctionCall) {
+    init(_ function: ToolCall.FunctionCall, lineLimit: Int = 4) {
         self.function = function
+        self.lineLimit = lineLimit
     }
     
     var body: some View {
@@ -72,7 +76,7 @@ struct MessageToolCallArguments: View {
             .font(.footnote)
             .foregroundStyle(.secondary)
             .textSelection(.enabled)
-            .lineLimit(4)
+            .lineLimit(lineLimit)
     }
     
     var subtext: String {
@@ -81,8 +85,15 @@ struct MessageToolCallArguments: View {
             let args = try? WebSearchTool.Arguments(function.arguments)
             return "\"\(args?.query ?? "")\""
         case Toolbox.browseWeb.name:
-            let args = try? WebBrowseTool.Arguments(function.arguments)
-            return args?.url ?? ""
+            guard let args = try? WebBrowseTool.Arguments(function.arguments) else {
+                return ""
+            }
+            return """
+                Title: \(args.title)
+                URL: \(args.url)
+                Instructions:
+                \(args.instructions)
+                """
         case Toolbox.generateImages.name:
             let args = try? ImageGeneratorTool.Arguments(function.arguments)
             return args?.prompts.joined(separator: ", ") ?? ""

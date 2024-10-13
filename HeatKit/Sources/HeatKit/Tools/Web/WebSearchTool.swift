@@ -72,7 +72,7 @@ extension WebSearchTool {
                 }
                 return [.init(
                     role: .tool,
-                    content: Prompt.render(BrowseSearchResultsInstructions, with: [
+                    content: PromptTemplate(BrowseSearchResultsInstructions, with: [
                         "QUERY": args.query,
                         "RESULTS": results.joined(separator: "\n"),
                     ]),
@@ -93,7 +93,7 @@ extension WebSearchTool {
                 }
                 return [.init(
                     role: .tool,
-                    content: Prompt.render(BrowseSearchResultsInstructions, with: [
+                    content: PromptTemplate(BrowseSearchResultsInstructions, with: [
                         "QUERY": args.query,
                         "RESULTS": results.joined(separator: "\n"),
                     ]),

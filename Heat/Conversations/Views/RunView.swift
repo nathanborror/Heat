@@ -22,7 +22,7 @@ struct RunView: View {
         if run.messages.count == 1 {
             MessageView(run.messages[0])
         } else {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
                 
                 // Show steps of work toggle
                 stepsButton
@@ -81,7 +81,7 @@ struct RunStepsView: View {
         List {
             ForEach(messages) { message in
                 NavigationLink {
-                    RunStepDetail(message.content)
+                    RunStepDetail(message)
                 } label: {
                     MessageView(message)
                 }
@@ -96,15 +96,15 @@ struct RunStepsView: View {
 }
 
 struct RunStepDetail: View {
-    let text: String
+    let message: Message
     
-    init(_ text: String?) {
-        self.text = text ?? ""
+    init(_ message: Message) {
+        self.message = message
     }
     
     var body: some View {
         ScrollView {
-            Text(text)
+            MessageView(message, lineLimit: .max)
                 .padding(24)
         }
         .navigationTitle("Details")

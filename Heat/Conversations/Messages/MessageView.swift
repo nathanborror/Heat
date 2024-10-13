@@ -6,9 +6,11 @@ struct MessageView: View {
     @Environment(\.debug) private var debug
     
     let message: Message
+    let lineLimit: Int
     
-    init(_ message: Message) {
+    init(_ message: Message, lineLimit: Int = 4) {
         self.message = message
+        self.lineLimit = lineLimit
     }
     
     var body: some View {
@@ -26,15 +28,16 @@ struct MessageView: View {
                 MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
                     .messageSpacing(message)
                 MessageAttachments(message.attachments)
-            case .assistant:
-                MessageToolCalls(message.toolCalls)
                     .messageSpacing(message)
+            case .assistant:
                 MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
                     .messageSpacing(message)
                 MessageAttachments(message.attachments)
                     .messageSpacing(message)
+                MessageToolCalls(message.toolCalls, lineLimit: lineLimit)
+                    .messageSpacing(message)
             case .tool:
-                MessageTool(message: message)
+                MessageTool(message, lineLimit: lineLimit)
                     .messageSpacing(message)
             }
         }
@@ -91,7 +94,6 @@ struct MessageContent: View {
                             RenderText(text)
                         case let .tag(tag):
                             TagView(tag)
-                                .padding(.horizontal, -12)
                         }
                     }
                 }

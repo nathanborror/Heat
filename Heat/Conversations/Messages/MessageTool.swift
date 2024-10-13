@@ -4,8 +4,14 @@ import HeatKit
 
 struct MessageTool: View {
     let message: Message
+    let lineLimit: Int
     
     @State private var isShowingContext = false
+    
+    init(_ message: Message, lineLimit: Int = 4) {
+        self.message = message
+        self.lineLimit = lineLimit
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -24,16 +30,16 @@ struct MessageTool: View {
                         #endif
                 case .searchWeb:
                     MessageToolTitle("Search results")
-                    MessageToolContent(message.content)
+                    MessageToolContent(message.content, lineLimit: lineLimit)
                 case .browseWeb:
-                    MessageToolTitle("Summarized webpage")
-                    MessageToolContent(message.content)
+                    MessageToolTitle("Read webpage")
+                    MessageToolContent(message.content, lineLimit: lineLimit)
                 case .generateMemory:
                     MessageToolTitle("Remembering")
-                    MessageToolContent(message.content)
+                    MessageToolContent(message.content, lineLimit: lineLimit)
                 case .searchCalendar:
                     MessageToolTitle("Calendar search results")
-                    MessageToolContent(message.content)
+                    MessageToolContent(message.content, lineLimit: lineLimit)
                 case .generateTitle, .generateSuggestions:
                     MessageToolTitle(message.metadata.label)
                 }
@@ -95,9 +101,11 @@ struct MessageToolContent: View {
     @Environment(\.debug) private var debug
     
     let content: String?
+    let lineLimit: Int
     
-    init(_ content: String?) {
+    init(_ content: String?, lineLimit: Int = 4) {
         self.content = content
+        self.lineLimit = lineLimit
     }
     
     var body: some View {
@@ -105,7 +113,7 @@ struct MessageToolContent: View {
             Text(content)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
-                .lineLimit(4)
+                .lineLimit(lineLimit)
         }
     }
 }

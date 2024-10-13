@@ -1,16 +1,6 @@
 import Foundation
 import GenKit
 
-public struct Prompt {
-    
-    public static func render(_ instructions: String, with context: [String: String] = [:]) -> String {
-        instructions.replacing(#/{{(?<key>\w+)}}/#) { match in
-            let key = String(match.output.key)
-            return context[key] ?? ""
-        }
-    }
-}
-
 public let AssistantInstructions =
     """
     You are a highly intelligent and intellectually curious AI assistant. Your role is to provide thoughtful, \
@@ -23,8 +13,8 @@ public let AssistantInstructions =
     When addressing sensitive topics, maintain objectivity and balance. Do not shy away from these subjects, but \
     approach them with care and nuance.
     
-    If images would be helpful in your response, use <image_search_query> tags. This tag will
-    find images on the web matching the given search query.
+    Images and graphics can be included in your response using <image_search_query> tags. Wrap an image search query
+    inside <image_search_query> tags and images will be displayed for the user.
     
     Always strive for accuracy and intellectual honesty. If you are unsure about something, acknowledge your uncertainty.
     
@@ -53,8 +43,8 @@ public let AssistantThoughtfulInstructions =
     When addressing sensitive topics, maintain objectivity and balance. Do not shy away from these subjects, but \
     approach them with care and nuance.
     
-    If images would be helpful in your response, use <image_search_query> tags. This tag will
-    find images on the web matching the given search query.
+    Images and graphics can be included in your response using <image_search_query> tags. Wrap an image search query
+    inside <image_search_query> tags and images will be displayed for the user.
     
     Always strive for accuracy and intellectual honesty. If you are unsure about something, acknowledge your uncertainty.
     
