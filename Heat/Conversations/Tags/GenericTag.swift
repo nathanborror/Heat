@@ -57,13 +57,15 @@ struct GenericTag: View {
     private let parser = ContentParser.shared
     
     private func handleCopy() {
+        guard let contents = tag.content?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+        
         #if os(macOS)
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(tag.content ?? "", forType: .string)
+        pasteboard.setString(contents, forType: .string)
         #else
         let pasteboard = UIPasteboard.general
-        pasteboard.string = configuration.content
+        pasteboard.string = contents
         #endif
         
         isCopied = true
