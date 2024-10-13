@@ -57,8 +57,8 @@ public struct Defaults {
         kind: .prompt,
         name: "Investigate",
         instructions: InvestigatorInstructions,
-        context: ["TOPIC": "", "EXISTING_NOTEBOOK": ""],
-        tags: ["updated_notebook", "reasoning", "update_summary"],
+        context: ["TOPIC": "", "NOTEBOOK": ""],
+        tags: ["notebook"],
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
@@ -72,7 +72,7 @@ public struct Defaults {
         name: "Report",
         instructions: ReporterInstructions,
         context: ["TOPIC": "", "NOTEBOOK": ""],
-        tags: ["scratchpad", "report"],
+        tags: ["outline", "report"],
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
@@ -86,7 +86,7 @@ public struct Defaults {
         name: "Creative Writer",
         instructions: CreativeWriterInstructions,
         context: ["REPORT": "", "WRITER": ""],
-        tags: ["rewritten_report", "style_explanation"],
+        tags: ["report", "summary", "headline"],
         toolIDs: [
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,

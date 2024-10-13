@@ -323,7 +323,7 @@ public let InvestigatorInstructions: String =
 
     Here is the existing notebook content:
     <existing_notebook>
-    {{EXISTING_NOTEBOOK}}
+    {{NOTEBOOK}}
     </existing_notebook>
 
     To perform your task, follow these steps:
@@ -346,17 +346,9 @@ public let InvestigatorInstructions: String =
     4. Output Format:
        Provide your response in the following format:
 
-       <updated_notebook>
+       <notebook>
        [Include the updated notebook content here, with new or modified information clearly marked]
-       </updated_notebook>
-
-       <reasoning>
-       [Explain your chain of thought reasoning, including why you added or modified certain information, and any insights or patterns you identified]
-       </reasoning>
-
-       <update_summary>
-       [Provide a brief summary of the updates made to the notebook, or indicate if no significant updates were necessary]
-       </update_summary>
+       </notebook>
 
     Remember to maintain objectivity and avoid personal biases in your investigation. Your goal is to provide a \
     comprehensive and accurate notebook on the given topic, updated with the most recent and relevant information \
@@ -389,9 +381,9 @@ public let ReporterInstructions: String =
 
     1. Carefully read through the entire notebook, paying attention to key facts, figures, and themes.
 
-    2. In a <scratchpad> section, organize the information into main topics or categories. Identify the most important and relevant pieces of information.
+    2. In a <notebook> section, organize the information into main topics or categories. Identify the most important and relevant pieces of information.
 
-    3. Use chain-of-thought reasoning to connect different pieces of information and draw logical conclusions. Write out your thought process in the <scratchpad> section.
+    3. Use chain-of-thought reasoning to connect different pieces of information and draw logical conclusions. Write out your thought process in the <notebook> section.
 
     4. Plan the structure of your report, including an introduction, main body paragraphs, and a conclusion. Each paragraph should focus on a specific aspect or theme of the topic.
 
@@ -408,7 +400,7 @@ public let ReporterInstructions: String =
     Remember to base your report solely on the information provided in the notebook. Do not include any external \
     information or personal opinions. Your goal is to present the facts objectively and clearly.
 
-    Begin your response with the <scratchpad> section, followed by the <report> section containing your final draft.
+    Begin your response with the <outline> section, followed by the <report> section containing your final draft.
     """
 
 /// You are a creative writer agent that embodies writer styles. When you are given a draft <report> rewrite it in the style of the given <writer> to make it
@@ -443,9 +435,8 @@ public let CreativeWriterInstructions: String =
     4. Ensure that the rewritten version flows naturally and maintains coherence.
     5. If appropriate for the writer's style, add relevant examples or anecdotes to illustrate points.
 
-    Present your rewritten report within <rewritten_report> tags. After the rewritten report, provide a brief \
-    explanation (2-3 sentences) of how you adapted the writing style to match the specified writer, enclosed in \
-    <style_explanation> tags.
+    Present your rewritten report within <report> tags. After the rewritten report, provide a brief teaser summary \
+    (2-3 sentences) enclosed in <summary> tags, and a pithy headline enclosed in <headline> tags.
 
     Remember, your goal is to make the report more compelling to read while staying true to both the original \
     content and the specified writer's style.
