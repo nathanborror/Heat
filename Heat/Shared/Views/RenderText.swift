@@ -19,24 +19,33 @@ struct RenderText: View {
         case .markdown:
             if role == .user {
                 Markdown(text ?? "")
-                    .markdownTheme(.app)
+                    .markdownTheme(.user)
                     .markdownCodeSyntaxHighlighter(.app)
-                    .markdownTextStyle {
-                        ForegroundColor(.white)
-                    }
                     .textSelection(.enabled)
             } else {
                 Markdown(text ?? "")
-                    .markdownTheme(.app)
+                    .markdownTheme(.assistant)
                     .markdownCodeSyntaxHighlighter(.app)
                     .textSelection(.enabled)
             }
         case .attributed:
-            Text(toAttributedString)
-                .textSelection(.enabled)
+            if role == .user {
+                Text(toAttributedString)
+                    .foregroundStyle(.white)
+                    .textSelection(.enabled)
+            } else {
+                Text(toAttributedString)
+                    .textSelection(.enabled)
+            }
         default:
-            Text(text ?? "")
-                .textSelection(.enabled)
+            if role == .user {
+                Text(text ?? "")
+                    .foregroundStyle(.white)
+                    .textSelection(.enabled)
+            } else {
+                Text(text ?? "")
+                    .textSelection(.enabled)
+            }
         }
     }
     
