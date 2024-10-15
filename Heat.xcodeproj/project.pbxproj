@@ -30,7 +30,6 @@
 		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
 		D8015CC72CB8EDBF0068749D /* MessageFieldAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8015CC62CB8EDBF0068749D /* MessageFieldAgent.swift */; };
 		D8015CC92CB8F4D60068749D /* GenericTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8015CC82CB8F4D60068749D /* GenericTag.swift */; };
-		D809F5A22BDABEFE00FD627B /* ServiceNudge.swift in Sources */ = {isa = PBXBuildFile; fileRef = D809F5A12BDABEFE00FD627B /* ServiceNudge.swift */; };
 		D80F73B62C95F0E0001B2778 /* AttributedString+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80F73B52C95F0E0001B2778 /* AttributedString+.swift */; };
 		D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698C2B9CF19000C53D4D /* MessageTool.swift */; };
 		D816DE7E2C7F9C6000F9D44F /* Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D816DE7D2C7F9C6000F9D44F /* Modifiers.swift */; };
@@ -94,7 +93,6 @@
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D8015CC62CB8EDBF0068749D /* MessageFieldAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageFieldAgent.swift; sourceTree = "<group>"; };
 		D8015CC82CB8F4D60068749D /* GenericTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericTag.swift; sourceTree = "<group>"; };
-		D809F5A12BDABEFE00FD627B /* ServiceNudge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceNudge.swift; sourceTree = "<group>"; };
 		D80F73B52C95F0E0001B2778 /* AttributedString+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributedString+.swift"; sourceTree = "<group>"; };
 		D815698C2B9CF19000C53D4D /* MessageTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTool.swift; sourceTree = "<group>"; };
 		D816DE7D2C7F9C6000F9D44F /* Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifiers.swift; sourceTree = "<group>"; };
@@ -237,7 +235,6 @@
 		D4A2C56C2B8BFA830004F27B /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D809F5A12BDABEFE00FD627B /* ServiceNudge.swift */,
 				D45CC1F92B8A5C1A009DFDF4 /* Suggestions.swift */,
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 				D85FE37E2C8FCA0B004CA2F3 /* RunView.swift */,
@@ -443,7 +440,6 @@
 				D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */,
 				D4B4F9282C8BB17A00C82284 /* ReflectionTag.swift in Sources */,
 				D4017C8D2B6EEF70001CE137 /* Squircle.swift in Sources */,
-				D809F5A22BDABEFE00FD627B /* ServiceNudge.swift in Sources */,
 				D41E19352AE4C665002516C1 /* AgentForm.swift in Sources */,
 				D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */,
 				D41E194C2AE591EA002516C1 /* PreferencesForm.swift in Sources */,

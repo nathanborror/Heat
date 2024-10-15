@@ -87,6 +87,7 @@ public final class ConversationsProvider {
     public static let shared = ConversationsProvider()
     
     public private(set) var conversations: [Conversation] = []
+    public private(set) var updated: Date = .now
     
     public func get(_ id: String) throws -> Conversation {
         guard let conversation = conversations.first(where: { $0.id == id }) else {
@@ -149,6 +150,10 @@ public final class ConversationsProvider {
         try await save()
     }
     
+    public func flush() async throws {
+        try await save()
+    }
+    
     // MARK: - Private
     
     private let conversationStore = ConversationStore()
@@ -159,10 +164,16 @@ public final class ConversationsProvider {
     
     private func load() async throws {
         self.conversations = try await conversationStore.load()
+        ping()
     }
     
     private func save() async throws {
         try await conversationStore.save(conversations)
+        ping()
+    }
+    
+    private func ping() {
+        updated = .now
     }
 }
 

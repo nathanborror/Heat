@@ -92,6 +92,7 @@ public final class PreferencesProvider {
     public private(set) var preferences: Preferences = .init()
     public private(set) var services: [Service] = []
     public private(set) var status: Status = .waiting
+    public private(set) var updated: Date = .now
     
     public enum Status {
         case ready
@@ -171,6 +172,10 @@ public final class PreferencesProvider {
         logger.debug("Resetting preferences...")
         self.preferences = .init()
         self.services = Defaults.services
+        try await save()
+    }
+    
+    public func flush() async throws {
         try await save()
     }
     
@@ -269,12 +274,18 @@ public final class PreferencesProvider {
             logger.error("Failed to load preferences: \(error)")
             try await reset()
         }
+        ping()
     }
     
     private func save() async throws {
         try await preferencesStore.save(preferences)
         try await servicesStore.save(services)
         statusCheck()
+        ping()
+    }
+    
+    private func ping() {
+        updated = .now
     }
     
     private func statusCheck() {

@@ -82,6 +82,7 @@ public final class AgentsProvider {
     public static let shared = AgentsProvider()
     
     public private(set) var agents: [Agent] = []
+    public private(set) var updated: Date = .now
     
     public func get(_ id: String) throws -> Agent {
         guard let agent = agents.first(where: { $0.id == id }) else {
@@ -114,6 +115,10 @@ public final class AgentsProvider {
         try await save()
     }
     
+    public func flush() async throws {
+        try await save()
+    }
+    
     // MARK: - Private
     
     private let store = AgentStore()
@@ -124,10 +129,16 @@ public final class AgentsProvider {
     
     private func load() async throws {
         agents = try await store.load()
+        ping()
     }
     
     private func save() async throws {
         try await store.save(agents)
+        ping()
+    }
+    
+    public func ping() {
+        updated = .now
     }
 }
 

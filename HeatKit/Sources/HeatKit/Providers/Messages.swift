@@ -38,6 +38,7 @@ public final class MessagesProvider {
     public static let shared = MessagesProvider()
     
     public private(set) var messages: [Message] = []
+    public private(set) var updated: Date = .now
     
     public func get(id: String) throws -> Message {
         guard let message = messages.first(where: { $0.id == id }) else {
@@ -64,7 +65,7 @@ public final class MessagesProvider {
         } else {
             messages.append(message)
         }
-        // intentionally not saving here due to streaming
+        ping() // intentionally not saving here due to streaming
     }
     
     public func delete(id: String) async throws {
@@ -77,17 +78,13 @@ public final class MessagesProvider {
         try await save()
     }
     
-    public func load() async throws {
-        messages = try await messageStore.load()
-    }
-    
-    public func save() async throws {
-        try await messageStore.save(messages)
-    }
-    
     public func reset() async throws {
         logger.debug("Resetting messages...")
         messages = []
+        try await save()
+    }
+    
+    public func flush() async throws {
         try await save()
     }
     
@@ -98,6 +95,20 @@ public final class MessagesProvider {
     
     private init() {
         Task { try await load() }
+    }
+    
+    private func load() async throws {
+        messages = try await messageStore.load()
+        ping()
+    }
+    
+    private func save() async throws {
+        try await messageStore.save(messages)
+        ping()
+    }
+    
+    public func ping() {
+        updated = .now
     }
 }
 

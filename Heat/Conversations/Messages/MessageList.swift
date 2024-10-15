@@ -5,6 +5,7 @@ import HeatKit
 
 struct MessageList: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
+    @Environment(MessagesProvider.self) var messagesProvider
     @Environment(\.modelContext) private var modelContext
     
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
@@ -38,8 +39,7 @@ struct MessageList: View {
                 }
                 .id("bottom")
             }
-            .padding(.vertical, 12)
-            .onChange(of: conversationViewModel.streamingTokens) { _, _ in
+            .onChange(of: messagesProvider.updated) { _, _ in
                 proxy.scrollTo("bottom")
             }
             .onAppear {
