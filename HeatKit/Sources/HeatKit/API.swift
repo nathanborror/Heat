@@ -20,7 +20,6 @@ public final class API {
         
         return Task {
             let conversation = try conversationsProvider.get(conversationID)
-            let messages = try messagesProvider.get(parentID: conversationID)
             
             // Augment context
             var context = context
@@ -31,6 +30,9 @@ public final class API {
             try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
             try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
+            
+            // Fetch messages
+            let messages = try messagesProvider.get(parentID: conversationID)
             
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
@@ -81,7 +83,6 @@ public final class API {
         
         return Task {
             let conversation = try conversationsProvider.get(conversationID)
-            let messages = try messagesProvider.get(parentID: conversationID)
             
             // Augment context
             var context = context
@@ -97,6 +98,9 @@ public final class API {
             try await messagesProvider.upsert(message: userMessage, parentID: conversation.id)
             try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
+            
+            // Fetch messages
+            let messages = try messagesProvider.get(parentID: conversationID)
             
             // Initial request
             var req = VisionSessionRequest(service: service, model: model)
