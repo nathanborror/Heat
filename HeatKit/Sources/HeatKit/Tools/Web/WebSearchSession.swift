@@ -27,25 +27,6 @@ public actor WebSearchSession {
 
 public struct GoogleSearch {
 
-    private let session = {
-        let memoryCapacity = 500 * 1024 * 1024 // 500 MB
-        let diskCapacity = 500 * 1024 * 1024   // 500 MB
-        let cachesURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        let diskPath = cachesURL.appendingPathComponent("GoogleSearchCache").path
-
-        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: diskPath)
-        URLCache.shared = cache
-
-        let configuration = URLSessionConfiguration.default
-        configuration.urlCache = cache
-        configuration.requestCachePolicy = .useProtocolCachePolicy
-
-        return URLSession(configuration: configuration)
-    }()
-
-    private let desktopUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-    private let mobileUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1"
-
     public init() {}
 
     public func search(query: String) async throws -> WebSearchResponse {
@@ -189,6 +170,25 @@ public struct GoogleSearch {
         return WebSearchResponse(query: query, results: results)
     }
 
+    private let session = {
+        let memoryCapacity = 500 * 1024 * 1024 // 500 MB
+        let diskCapacity = 500 * 1024 * 1024   // 500 MB
+        let cachesURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let diskPath = cachesURL.appendingPathComponent("WebSearchCache").path
+
+        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: diskPath)
+        URLCache.shared = cache
+
+        let configuration = URLSessionConfiguration.default
+        configuration.urlCache = cache
+        configuration.requestCachePolicy = .useProtocolCachePolicy
+
+        return URLSession(configuration: configuration)
+    }()
+
+    private let desktopUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+    private let mobileUserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1"
+    
     enum SearchError: Error {
         case invalidHTML
         case missingMainElement

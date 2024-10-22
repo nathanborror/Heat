@@ -8,7 +8,6 @@ private let logger = Logger(subsystem: "MessageField", category: "App")
 
 struct MessageField: View {
     @Environment(AgentsProvider.self) var agentsProvider
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) var colorScheme
     
     typealias ActionHandler = (String, [Data], Command) -> Void

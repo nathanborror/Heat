@@ -88,6 +88,10 @@ public final class MessagesProvider {
         try await save()
     }
     
+    public func ping() {
+        updated = .now
+    }
+    
     // MARK: - Private
     
     private let conversationStore = ConversationStore()
@@ -105,10 +109,6 @@ public final class MessagesProvider {
     private func save() async throws {
         try await messageStore.save(messages)
         ping()
-    }
-    
-    public func ping() {
-        updated = .now
     }
 }
 

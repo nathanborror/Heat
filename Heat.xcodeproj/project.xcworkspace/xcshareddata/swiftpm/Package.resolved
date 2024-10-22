@@ -24,7 +24,7 @@
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
       "state" : {
         "branch" : "main",
-        "revision" : "528cd5c4d51d85582397acbaa954ca709a74520e"
+        "revision" : "9203a8de359dc64259bdb28cc44af32c15b3fc5b"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gonzalezreal/NetworkImage",
       "state" : {
-        "revision" : "7aff8d1b31148d32c5933d75557d42f6323ee3d1",
-        "version" : "6.0.0"
+        "revision" : "2849f5323265386e200484b0d0f896e73c3411b9",
+        "version" : "6.0.1"
       }
     },
     {
@@ -52,6 +52,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "72bf21248fb6fbc146dc992fbf01c2e935377455"
+      }
+    },
+    {
+      "identity" : "swift-cmark",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-cmark",
+      "state" : {
+        "revision" : "3ccff77b2dc5b96b77db3da0d68d28068593fa53",
+        "version" : "0.5.0"
       }
     },
     {
@@ -96,7 +105,7 @@
       "location" : "https://github.com/gonzalezreal/swift-markdown-ui",
       "state" : {
         "branch" : "main",
-        "revision" : "55441810c0f678c78ed7e2ebd46dde89228e02fc"
+        "revision" : "a9c7615fb50323069c2979c69263973aa1b24a8f"
       }
     },
     {

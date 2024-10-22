@@ -116,7 +116,6 @@ struct MainApp: App {
         } label: {
             Label("Heat", systemImage: "flame.fill")
         }
-        
         #else
         WindowGroup {
             NavigationStack {
