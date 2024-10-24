@@ -11,7 +11,7 @@ public struct TitleTool {
     public static let function = Tool.Function(
         name: "title_maker",
         description: """
-            Returns a title if there is a clear topic of conversation. The title should be under 4 words.
+            Return a title if there is a clear topic of conversation. The title should be under 4 words.
             Nothing is returned if there is no topic or if the conversation is just greetings.
             """,
         parameters: JSONSchema(

@@ -25,6 +25,7 @@ public struct Defaults {
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
             Toolbox.searchWeb.name,
+            Toolbox.searchCalendar.name,
         ]
     )
     
@@ -37,6 +38,7 @@ public struct Defaults {
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
             Toolbox.searchWeb.name,
+            Toolbox.searchCalendar.name,
         ]
     )
     
@@ -49,6 +51,7 @@ public struct Defaults {
             Toolbox.generateImages.name,
             Toolbox.browseWeb.name,
             Toolbox.searchWeb.name,
+            Toolbox.searchCalendar.name,
         ]
     )
     
