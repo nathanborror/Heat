@@ -108,7 +108,7 @@ public final class PreferencesProvider {
         return service
     }
     
-    public func get(modelID: String?, serviceID: Service.ServiceID?) throws -> Model {
+    public func get(modelID: Model.ID?, serviceID: Service.ServiceID?) throws -> Model {
         let service = try get(serviceID: serviceID)
         guard let model = service.models.first(where: { $0.id == modelID }) else {
             throw PreferencesProviderError.modelNotFound

@@ -40,7 +40,7 @@ public final class MessagesProvider {
     public private(set) var messages: [Message] = []
     public private(set) var updated: Date = .now
     
-    public func get(id: String) throws -> Message {
+    public func get(_ id: Message.ID) throws -> Message {
         guard let message = messages.first(where: { $0.id == id }) else {
             throw MessagesProviderError.notFound
         }
@@ -68,7 +68,7 @@ public final class MessagesProvider {
         ping() // intentionally not saving here due to streaming
     }
     
-    public func delete(id: String) async throws {
+    public func delete(_ id: Message.ID) async throws {
         messages.removeAll(where: { $0.id == id })
         try await save()
     }

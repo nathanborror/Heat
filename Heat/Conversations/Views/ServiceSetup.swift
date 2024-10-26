@@ -9,7 +9,7 @@ struct ServiceSetup: View {
     @State var serviceID: Service.ServiceID = .openAI
     @State var serviceAPIKey: String = ""
     @State var serviceModels: [Model] = []
-    @State var serviceModelID: String? = nil
+    @State var serviceModelID: Model.ID? = nil
     
     var body: some View {
         VStack(spacing: 24) {
@@ -51,7 +51,7 @@ struct ServiceSetup: View {
                         Text("None").tag(String?.none)
                         Divider()
                         ForEach(serviceModels) { model in
-                            Text(model.name ?? model.id).tag(model.id)
+                            Text(model.name ?? model.id.rawValue).tag(model.id)
                         }
                     }
                 }
@@ -88,24 +88,24 @@ struct ServiceSetup: View {
         
         // Establish preferred models to use from the service
         // Since these are hard-coded they could become out-of-dated
-        var preferredChatModel = ""
-        var preferredSummarizationModel = ""
+        var preferredChatModel: Model.ID = .init("")
+        var preferredSummarizationModel: Model.ID = .init("")
         switch serviceID {
         case .anthropic:
-            preferredChatModel = "claude-3-5-sonnet-20240620"
-            preferredSummarizationModel = "claude-3-haiku-20240307"
+            preferredChatModel = .init("claude-3-5-sonnet-20240620")
+            preferredSummarizationModel = .init("claude-3-haiku-20240307")
         case .groq:
-            preferredChatModel = "llama-3.1-70b-versatile"
-            preferredSummarizationModel = "llama-3.1-8b-instant"
+            preferredChatModel = .init("llama-3.1-70b-versatile")
+            preferredSummarizationModel = .init("llama-3.1-8b-instant")
         case .mistral:
-            preferredChatModel = "mistral-large-latest"
-            preferredSummarizationModel = "mistral-small-latest"
+            preferredChatModel = .init("mistral-large-latest")
+            preferredSummarizationModel = .init("mistral-small-latest")
         case .ollama:
-            preferredChatModel = serviceModelID ?? "llama3.2"
-            preferredSummarizationModel = serviceModelID ?? "llama3.2"
+            preferredChatModel = serviceModelID ?? .init("llama3.2")
+            preferredSummarizationModel = serviceModelID ?? .init("llama3.2")
         case .openAI:
-            preferredChatModel = "gpt-4o"
-            preferredSummarizationModel = "gpt-4o-mini"
+            preferredChatModel = .init("gpt-4o")
+            preferredSummarizationModel = .init("gpt-4o-mini")
         default:
             return
         }

@@ -15,7 +15,7 @@ let mock_messages: [Message] = [
     )
 ]
 
-let mock_run_id = String.id
+let mock_run_id = Run.ID.id
 
 let mock_run = Run(
     messages: [

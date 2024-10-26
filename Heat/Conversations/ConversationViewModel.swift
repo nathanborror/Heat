@@ -96,7 +96,7 @@ final class ConversationViewModel {
                     runs.append(currentRun)
                 }
                 currentRun = Run(
-                    id: message.runID ?? message.id,
+                    id: message.runID ?? Run.ID(message.id.rawValue),
                     messages: [message],
                     started: message.created,
                     ended: message.modified
