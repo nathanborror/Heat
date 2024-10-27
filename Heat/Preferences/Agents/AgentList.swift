@@ -4,7 +4,7 @@ import HeatKit
 struct AgentList: View {
     @Environment(AgentsProvider.self) var agentsProvider
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         Form {
             Section {
@@ -28,7 +28,7 @@ struct AgentList: View {
         .navigationTitle("Agents")
         .appFormStyle()
     }
-    
+
     func handleDelete(_ agent: Agent) {
         Task { try await agentsProvider.delete(agent.id)}
     }

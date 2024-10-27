@@ -9,36 +9,36 @@ private let logger = Logger(subsystem: "MessageField", category: "App")
 struct MessageField: View {
     @Environment(AgentsProvider.self) var agentsProvider
     @Environment(\.colorScheme) var colorScheme
-    
+
     typealias ActionHandler = (String, [Data], Command) -> Void
     typealias AgentHandler = (Agent) -> Void
-    
+
     let action: ActionHandler
     let agentAction: AgentHandler?
-    
+
     enum Command: String {
         case text
         case imagine
         case vision
     }
-    
+
     @State private var imagePickerViewModel = ImagePickerViewModel()
     @State private var content = ""
     @State private var command: Command = .text
     @State private var showingPhotos = false
     @State private var showingAgent: Agent? = nil
-    
+
     @FocusState private var isFocused: Bool
-    
+
     init(action: @escaping ActionHandler, agent: AgentHandler? = nil) {
         self.action = action
         self.agentAction = agent
     }
-    
+
     var body: some View {
         HStack(alignment: .bottom) {
             VStack {
-                
+
                 // Attached images
                 if !imagePickerViewModel.imagesSelected.isEmpty {
                     ScrollView(.horizontal) {
@@ -54,10 +54,10 @@ struct MessageField: View {
                     .scrollIndicators(.hidden)
                     .scrollClipDisabled()
                 }
-                
+
                 // Input field with buttons
                 HStack(alignment: .bottom, spacing: 0) {
-                    
+
                     // Command menu
                     if command == .text {
                         Menu {
@@ -84,7 +84,7 @@ struct MessageField: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    
+
                     // Selected command
                     if command != .text {
                         HStack {
@@ -114,7 +114,7 @@ struct MessageField: View {
                         .padding(.horizontal, 5)
                         #endif
                     }
-                    
+
                     // Text input
                     TextField("Message", text: $content, axis: .vertical)
                         .textFieldStyle(.plain)
@@ -137,7 +137,7 @@ struct MessageField: View {
             }
             .background(.primary.opacity((colorScheme == .dark) ? 0.1 : 0.05))
             .clipShape(.rect(cornerRadius: 10))
-            
+
             if showStopGenerating {
                 Button(action: handleStop) {
                     Image(systemName: "stop.fill")
@@ -169,10 +169,10 @@ struct MessageField: View {
             }
         }
     }
-    
+
     func handleSubmit() async throws {
         defer { clear() }
-        
+
         // Check for command
         switch command {
         case .imagine:
@@ -181,38 +181,38 @@ struct MessageField: View {
         default:
             break
         }
-        
+
         // If there are images in the image picker, return a vision action
         if !imagePickerViewModel.imagesSelected.isEmpty {
-            
+
             // Resize image so we're not sending huge amounts of data to the services.
             let images = imagePickerViewModel.imagesSelected.map {
                 $0.image?.resize(to: .init(width: 512, height: 512))
             }.compactMap { $0 }
-            
+
             action(content, images, .vision)
             return
         }
-        
+
         // Return regular text action
         action(content, [], command)
         clear()
     }
-    
+
     func handleStop() {
         print("not implemented")
     }
-    
+
     private func clear() {
         content = ""
         command = .text
         imagePickerViewModel.removeAll()
     }
-    
+
     private var showInputPadding: Bool      { !content.isEmpty }
     private var showStopGenerating: Bool    { false } // TODO: Fix this
     private var showSubmit: Bool            { !content.isEmpty }
-    
+
     #if os(macOS)
     private var minHeight: CGFloat = 0
     private var verticalPadding: CGFloat = 9
@@ -231,7 +231,7 @@ struct ConversationButtonModifier: ViewModifier {
             .background(.tint, in: .rect(cornerRadius: 10))
             .padding(.vertical, 2)
     }
-    
+
     #if os(macOS)
     private var width: CGFloat = 32
     private var height: CGFloat = 32
@@ -248,7 +248,7 @@ struct ConversationInlineButtonModifier: ViewModifier {
             .tint(.primary)
             .frame(width: width, height: height)
     }
-    
+
     #if os(macOS)
     private var width: CGFloat = 34
     private var height: CGFloat = 34
@@ -260,14 +260,14 @@ struct ConversationInlineButtonModifier: ViewModifier {
 
 struct ConversationInputImage: View {
     @Environment(ImagePickerViewModel.self) var imagePickerViewModel
-    
+
     let id: String
     #if os(macOS)
     let image: NSImage?
     #else
     let image: UIImage?
     #endif
-    
+
     var body: some View {
         ZStack(alignment: .topTrailing) {
             if let image {
@@ -289,7 +289,7 @@ struct ConversationInputImage: View {
                     .frame(width: 100, height: 100)
                     .clipShape(.rect(cornerRadius: 10))
             }
-            
+
             Button {
                 imagePickerViewModel.remove(id: id)
             } label: {

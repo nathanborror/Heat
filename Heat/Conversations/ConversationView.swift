@@ -10,16 +10,16 @@ struct ConversationView: View {
     @Environment(AgentsProvider.self) var agentsProvider
     @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
-    
+
     @Environment(\.modelContext) private var modelContext
-    
+
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
-    
+
     @Binding var selected: String?
-    
+
     @State private var conversationViewModel: ConversationViewModel? = nil
     @State private var showingInspector = false
-    
+
     var body: some View {
         Group {
             if let conversationViewModel {
@@ -49,7 +49,7 @@ struct ConversationView: View {
                     Label("New Conversation", systemImage: "plus")
                 }
                 .keyboardShortcut("n", modifiers: [.command])
-                
+
                 Button {
                     showingInspector.toggle()
                 } label: {
@@ -62,7 +62,7 @@ struct ConversationView: View {
                 .keyboardShortcut("0", modifiers: [.command, .option])
                 .disabled(selected == nil)
             }
-            
+
         }
         .inspector(isPresented: $showingInspector) {
             if let selected {
@@ -80,7 +80,7 @@ struct ConversationView: View {
             }
         }
     }
-    
+
     func handleSubmit(_ prompt: String, images: [Data] = [], command: MessageField.Command = .text) {
         Task {
             // Create a new conversation if one isn't already selected
@@ -88,17 +88,17 @@ struct ConversationView: View {
                 guard let agentID = preferencesProvider.preferences.defaultAssistantID else { return }
                 let agent = try agentsProvider.get(agentID)
                 let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
-                
+
                 selected = conversation.id
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)
             }
-            
+
             // This should always exist since it was created above
             guard let conversationViewModel else { return }
-            
+
             // Context full of memories
             let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
-            
+
             // Try to generate a response
             do {
                 switch command {
@@ -114,7 +114,7 @@ struct ConversationView: View {
             }
         }
     }
-    
+
     func handleSubmit(agent: Agent) {
         Task {
             // Create a new conversation if one isn't already selected
@@ -122,7 +122,7 @@ struct ConversationView: View {
                 guard let agentID = preferencesProvider.preferences.defaultAssistantID else { return }
                 let agent = try agentsProvider.get(agentID)
                 let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
-                
+
                 selected = conversation.id
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)
             }

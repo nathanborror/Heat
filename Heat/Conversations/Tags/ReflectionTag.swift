@@ -8,7 +8,7 @@ struct ReflectionTag: View {
     init(_ tag: ContentParser.Result.Tag) {
         self.tag = tag
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Reflection".uppercased())

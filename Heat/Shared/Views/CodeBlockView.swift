@@ -5,7 +5,7 @@ struct CodeBlockView: View {
     let configuration: CodeBlockConfiguration
 
     @State private var isCopied = false
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -23,10 +23,10 @@ struct CodeBlockView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .colorInvert()
-            
+
             Divider()
                 .colorInvert()
-            
+
             configuration.label
                 .relativeLineSpacing(.em(0.25))
                 .padding(12)
@@ -35,7 +35,7 @@ struct CodeBlockView: View {
         .clipShape(.rect(cornerRadius: 5))
         .padding(.horizontal, -12)
     }
-    
+
     private func copyCodeAction() {
         #if os(macOS)
         let pasteboard = NSPasteboard.general
@@ -45,9 +45,9 @@ struct CodeBlockView: View {
         let pasteboard = UIPasteboard.general
         pasteboard.string = configuration.content
         #endif
-        
+
         isCopied = true
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             isCopied = false
         }
@@ -55,12 +55,12 @@ struct CodeBlockView: View {
 }
 
 extension CodeBlockConfiguration: @retroactive Hashable {
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(language)
         hasher.combine(content)
     }
-    
+
     public static func == (lhs: CodeBlockConfiguration, rhs: CodeBlockConfiguration) -> Bool {
         return lhs.language == rhs.language && lhs.content == rhs.content
     }

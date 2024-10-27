@@ -17,7 +17,7 @@ final class ImagePickerViewModel {
         #else
         var image: UIImage?
         #endif
-        
+
         enum State {
             case empty
             case loading(Progress)
@@ -25,12 +25,12 @@ final class ImagePickerViewModel {
             case failure(ImagePickerError)
         }
     }
-    
+
     var imagesSelected: [SelectedImage] = []
     var imagesPicked: [PhotosPickerItem] = [] {
         didSet { handleSelectionChange() }
     }
-    
+
     func writeAll() throws -> [String] {
         var out = [String]()
         for selected in imagesSelected {
@@ -42,7 +42,7 @@ final class ImagePickerViewModel {
             }
             let filename = "\(selected.id).png"
             let resource = Resource.document(filename)
-            
+
             guard let url = resource.url else {
                 throw ImagePickerError.missingResourceURL
             }
@@ -51,19 +51,19 @@ final class ImagePickerViewModel {
         }
         return out
     }
-    
+
     func remove(id: String) {
         imagesSelected.removeAll { $0.id == id }
         imagesPicked.removeAll { $0.itemIdentifier == id }
     }
-    
+
     func removeAll() {
         imagesSelected.removeAll()
         imagesPicked.removeAll()
     }
-    
+
     // MARK: - Private
-    
+
     private func handleSelectionChange() {
         for item in imagesPicked {
             if let id = item.itemIdentifier, let progress = handleLoadTransferable(from: item) {
@@ -72,7 +72,7 @@ final class ImagePickerViewModel {
             }
         }
     }
-    
+
     private func handleLoadTransferable(from item: PhotosPickerItem) -> Progress? {
         guard let id = item.itemIdentifier else { return nil }
         return item.loadTransferable(type: ImageTransfer.self) { result in
@@ -89,7 +89,7 @@ final class ImagePickerViewModel {
             }
         }
     }
-    
+
     private func upsert(image: SelectedImage) {
         if let index = imagesSelected.firstIndex(where: { $0.id == image.id }) {
             imagesSelected[index] = image
@@ -104,7 +104,7 @@ enum ImagePickerError: LocalizedError {
     case missingResourceURL
     case transferFailed
     case transferInProgress
-    
+
     var errorDescription: String? {
         switch self {
         case .missingImage: "Missing image"
@@ -113,7 +113,7 @@ enum ImagePickerError: LocalizedError {
         case .transferInProgress: "Image transfer in progress"
         }
     }
-    
+
     var recoverySuggestion: String {
         switch self {
         case .missingImage: "Try picking an image again."
@@ -134,7 +134,7 @@ struct ImageTransfer: Transferable {
     enum TransferError: Error {
         case importFailed
     }
-    
+
     static var transferRepresentation: some TransferRepresentation {
         DataRepresentation(importedContentType: .image) { data in
             #if os(macOS)

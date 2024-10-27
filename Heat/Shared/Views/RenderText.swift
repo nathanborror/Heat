@@ -7,13 +7,13 @@ struct RenderText: View {
     let text: String?
     let role: Message.Role
     let formatter: Preferences.TextRendering!
-    
+
     init(_ text: String?, role: Message.Role = .assistant, formatter: Preferences.TextRendering? = nil) {
         self.text = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         self.role = role
         self.formatter = formatter ?? PreferencesProvider.shared.preferences.textRendering
     }
-    
+
     var body: some View {
         switch formatter {
         case .markdown:
@@ -48,7 +48,7 @@ struct RenderText: View {
             }
         }
     }
-    
+
     var toAttributedString: AttributedString {
         try! .init(markdown: text ?? "")
     }

@@ -5,7 +5,7 @@ import HeatKit
 struct MemoryList: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
-    
+
     var body: some View {
         Form {
             Section {
@@ -38,12 +38,12 @@ struct MemoryList: View {
             }
         }
     }
-    
+
     func handleSave(_ text: String) {
         let memory = Memory(content: text)
         modelContext.insert(memory)
     }
-    
+
     func handleDelete(_ memory: Memory) {
         modelContext.delete(memory)
     }

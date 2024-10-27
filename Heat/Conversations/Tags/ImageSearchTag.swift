@@ -4,15 +4,15 @@ import HeatKit
 
 struct ImageSearchTag: View {
     @Environment(\.openURL) var openURL
-    
+
     let tag: ContentParser.Result.Tag
-    
+
     @State private var results: [WebSearchResult] = []
-    
+
     init(_ tag: ContentParser.Result.Tag) {
         self.tag = tag
     }
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             ScrollView(.horizontal) {
@@ -35,7 +35,7 @@ struct ImageSearchTag: View {
             }
             .scrollIndicators(.hidden)
             .clipShape(.rect(cornerRadius: 5))
-            
+
             if let content = tag.content {
                 Text(content)
                     .font(.caption)
@@ -46,7 +46,7 @@ struct ImageSearchTag: View {
             Task { try await performQuery() }
         }
     }
-    
+
     func performQuery() async throws {
         guard let content = tag.content else {
             throw TagViewError.missingContent
@@ -54,7 +54,7 @@ struct ImageSearchTag: View {
         let resp = try await WebSearchSession.shared.searchImages(query: content)
         results = resp.results
     }
-    
+
     private let width: CGFloat = 200
     private let height: CGFloat = 200
 }

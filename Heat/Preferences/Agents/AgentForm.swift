@@ -7,13 +7,13 @@ import HeatKit
 struct AgentForm: View {
     @Environment(AgentsProvider.self) var agentsProvider
     @Environment(\.dismiss) private var dismiss
-    
+
     @State var agent: Agent
-    
+
     @State private var newToolName: String = ""
     @State private var isShowingAlert = false
     @State private var error: ImagePickerError? = nil
-    
+
     var body: some View {
         Form {
             Section("Info") {
@@ -66,7 +66,7 @@ struct AgentForm: View {
             Text(error.recoverySuggestion)
         }
     }
-    
+
     private func handleDone() {
         Task { try await agentsProvider.upsert(agent) }
         dismiss()
@@ -75,13 +75,13 @@ struct AgentForm: View {
 
 struct AgentTool: View {
     @Environment(\.dismiss) private var dismiss
-    
+
     @State var text: String = ""
-    
+
     let action: (String) -> Void
-    
+
     @FocusState private var isFocused: Bool
-    
+
     var body: some View {
         Form {
             TextField("Name", text: $text)
@@ -103,7 +103,7 @@ struct AgentTool: View {
             isFocused = true
         }
     }
-    
+
     func handleSubmit() {
         action(text.trimmingCharacters(in: .whitespacesAndNewlines))
         text = ""

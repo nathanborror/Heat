@@ -4,11 +4,11 @@ import HeatKit
 
 struct MessageAttachments: View {
     let attachments: [Message.Attachment]
-    
+
     init(_ attachments: [Message.Attachment]) {
         self.attachments = attachments
     }
-    
+
     var body: some View {
         if !attachments.isEmpty {
             ScrollView(.horizontal) {

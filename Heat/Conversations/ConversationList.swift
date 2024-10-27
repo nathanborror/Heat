@@ -1,12 +1,12 @@
-import SwiftUI
 import HeatKit
+import SwiftUI
 
 struct ConversationList: View {
     @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(\.dismiss) private var dismiss
-    
+
     @Binding var selected: String?
-    
+
     var body: some View {
         List(selection: $selected) {
             Section {

@@ -5,21 +5,21 @@ import HeatKit
 struct ServiceForm: View {
     @Environment(PreferencesProvider.self) var preferencesProvider
     @Environment(\.dismiss) private var dismiss
-    
+
     @State var service: Service
-    
+
     @State private var showingAdditionalServices = false
-    
+
     private var showSelections: Bool {
         !service.models.isEmpty
     }
-    
+
     var body: some View {
         Form {
             Section {
                 TextField("Name", text: $service.name)
                     .disabled(true)
-                
+
                 TextField("Host", text: $service.host)
                     .autocorrectionDisabled()
                     .textContentType(.URL)
@@ -28,7 +28,7 @@ struct ServiceForm: View {
                     #endif
                     .submitLabel(.next)
                     .onSubmit { handleSetDefaults() }
-                
+
                 TextField("Token", text: $service.token)
                     .autocorrectionDisabled()
                     #if !os(macOS)
@@ -37,14 +37,14 @@ struct ServiceForm: View {
                     .submitLabel(.next)
                     .onSubmit { handleSetDefaults() }
             }
-            
+
             Section {
                 if showSelections {
                     ModelPicker("Chats", models: service.models, selection: $service.preferredChatModel)
                     ModelPicker("Images", models: service.models, selection: $service.preferredImageModel)
                     ModelPicker("Vision", models: service.models, selection: $service.preferredVisionModel)
                     ModelPicker("Summarization", models: service.models, selection: $service.preferredSummarizationModel)
-                    
+
                     if showingAdditionalServices {
                         ModelPicker("Tools", models: service.models, selection: $service.preferredToolModel)
                         ModelPicker("Embeddings", models: service.models, selection: $service.preferredEmbeddingModel)
@@ -70,7 +70,7 @@ struct ServiceForm: View {
             } header: {
                 Text("Model Selection")
             }
-            
+
             if showSelections {
                 Section {
                     Button(action: handleLoadModels) {
@@ -95,14 +95,14 @@ struct ServiceForm: View {
             handleSave()
         }
     }
-    
+
     func handleSave() {
         Task { try await preferencesProvider.upsert(service: service) }
     }
-    
+
     func handleSetDefaults() {
         handleLoadModels()
-        
+
         switch service.id {
         case .openAI:
             service.applyPreferredModels(Defaults.openAI)
@@ -118,17 +118,17 @@ struct ServiceForm: View {
             break
         }
     }
-    
+
     func handleLoadModels() {
         Task {
             // Save any changes before loading models
             try await preferencesProvider.upsert(service: service)
-            
+
             // Load models
             let client = service.modelService()
             let models = try await client.models()
             service.models = models
-            
+
             // Save service models
             try await preferencesProvider.upsert(models: models, serviceID: service.id)
         }
@@ -138,21 +138,21 @@ struct ServiceForm: View {
 struct ModelPicker: View {
     let title: String
     let models: [Model]
-    
+
     @Binding var selection: Model.ID?
-    
+
     init(_ title: String, models: [Model], selection: Binding<Model.ID?>) {
         self.title = title
         self.models = models
         self._selection = selection
     }
-    
+
     var modelsByFamily: [String: [Model]] {
         Dictionary(grouping: models) { model in
             model.family ?? model.id.rawValue
         }
     }
-    
+
     var body: some View {
         LabeledContent(title) {
             Menu {
@@ -189,7 +189,7 @@ struct ModelPicker: View {
             .menuStyle(.button)
         }
     }
-    
+
     func menuItem(model: Model) -> some View {
         Button {
             selection = model.id

@@ -17,7 +17,6 @@ More people need to experience open source LLMs. Heat is an open source native i
 - Basic memory persistence
 - No server dependencies aside from models being accessed.
 
-### Install from TestFlight
 
 https://testflight.apple.com/join/AX9JftGk (March 17, 2024)
 
@@ -31,7 +30,7 @@ https://testflight.apple.com/join/AX9JftGk (March 17, 2024)
 ### Run locally with Ollama
 
 1. Install [Ollama](https://ollama.ai/download) and pull some [models](https://ollama.ai/library)
-2. Run the ollama server `ollama serve` 
+2. Run the ollama server `ollama serve`
 3. Set up the Ollama service in Preferences > Model Services.
 4. In Preferences set the preferred services to use Ollama.
 
@@ -39,4 +38,4 @@ To run the iOS app on your device you'll need to figure out what the local IP is
 
 ### Future
 
-Originally the plan for this project was to get models running on-device — hence the name Heat because your device will heat up! — but that was hard. As this becomes more feasible I will revisit. 
+Originally the plan for this project was to get models running on-device — hence the name Heat because your device will heat up! — but that was hard. As this becomes more feasible I will revisit.

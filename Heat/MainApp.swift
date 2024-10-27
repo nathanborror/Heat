@@ -184,7 +184,6 @@ struct MainApp: App {
     func handleHotKeySetup() {
         #if os(macOS)
         KeyboardShortcuts.onKeyUp(for: .toggleLauncher) { [self] in
-            print("SHOW LAUNCHER")
             openWindow(id: "launcher")
             showingLauncher.toggle()
         }

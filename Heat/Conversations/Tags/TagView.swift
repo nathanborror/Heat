@@ -4,11 +4,11 @@ import HeatKit
 
 struct TagView: View {
     let tag: ContentParser.Result.Tag
-    
+
     init(_ tag: ContentParser.Result.Tag) {
         self.tag = tag
     }
-    
+
     var body: some View {
         switch tag.name {
         case "artifact":

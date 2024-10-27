@@ -5,12 +5,12 @@ import HeatKit
 struct ServiceSetup: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(PreferencesProvider.self) var preferencesProvider
-    
+
     @State var serviceID: Service.ServiceID = .openAI
     @State var serviceAPIKey: String = ""
     @State var serviceModels: [Model] = []
     @State var serviceModelID: Model.ID? = nil
-    
+
     var body: some View {
         VStack(spacing: 24) {
             HStack(alignment: .center) {
@@ -20,7 +20,7 @@ struct ServiceSetup: View {
                     .frame(width: 64, height: 64)
                 Spacer()
             }
-            
+
             VStack(spacing: 16) {
                 Text("Welcome to Heat")
                     .font(.headline)
@@ -29,7 +29,7 @@ struct ServiceSetup: View {
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
             }
-            
+
             VStack {
                 Picker("Service", selection: $serviceID) {
                     Text("Anthropic").tag(Service.ServiceID.anthropic)
@@ -38,13 +38,13 @@ struct ServiceSetup: View {
                     Text("Ollama").tag(Service.ServiceID.ollama)
                     Text("OpenAI").tag(Service.ServiceID.openAI)
                 }
-                
+
                 // Hide API Key when Ollama is selected because it doesn't require one.
                 if serviceID != .ollama {
                     TextField("API Key", text: $serviceAPIKey)
                         .textFieldStyle(.roundedBorder)
                 }
-                
+
                 // Only show models when Ollama is selected and models are loaded.
                 if serviceID == .ollama && !serviceModels.isEmpty {
                     Picker("Model", selection: $serviceModelID) {
@@ -57,7 +57,7 @@ struct ServiceSetup: View {
                 }
             }
             .labelsHidden()
-            
+
             HStack {
                 Spacer()
                 Button("Open Preferences", action: handleOpenPreferences)
@@ -71,21 +71,21 @@ struct ServiceSetup: View {
             handleServiceChange()
         }
     }
-    
+
     func handleServiceChange() {
         guard serviceID == .ollama else { return }
         Task { serviceModels = try await prepareModels(serviceID) }
     }
-    
+
     func handleOpenPreferences() {
         // dismiss the dialog and openURL that opens the preferences sheet
     }
-    
+
     func handleContinue() async throws {
-        
+
         // Set API token for service
         try await preferencesProvider.upsert(token: serviceAPIKey, serviceID: serviceID)
-        
+
         // Establish preferred models to use from the service
         // Since these are hard-coded they could become out-of-dated
         var preferredChatModel: Model.ID = .init("")
@@ -109,7 +109,7 @@ struct ServiceSetup: View {
         default:
             return
         }
-        
+
         // Set preferred models on service
         var service = try preferencesProvider.get(serviceID: serviceID)
         service.preferredChatModel = preferredChatModel
@@ -121,18 +121,18 @@ struct ServiceSetup: View {
         preferences.preferred.chatServiceID = serviceID
         preferences.preferred.summarizationServiceID = serviceID
         try await preferencesProvider.upsert(preferences)
-        
+
         dismiss()
     }
-    
+
     private func prepareModels(_ serviceID: Service.ServiceID) async throws -> [Model] {
         let service = try preferencesProvider.get(serviceID: serviceID)
         let modelService = service.modelService()
         let models =  try await modelService.models()
-        
+
         // Save models for service
         try await preferencesProvider.upsert(models: models, serviceID: serviceID)
-        
+
         return models
     }
 }

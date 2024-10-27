@@ -10,12 +10,12 @@ private struct TextRenderingKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    
+
     var debug: Bool {
         get { self[DebugKey.self] }
         set { self[DebugKey.self] = newValue }
     }
-    
+
     var textRendering: Preferences.TextRendering {
         get { self[TextRenderingKey.self] }
         set { self[TextRenderingKey.self] = newValue }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AppFormStyle: ViewModifier {
-        
+
     func body(content: Content) -> some View {
         content
             #if os(macOS)
@@ -12,7 +12,7 @@ struct AppFormStyle: ViewModifier {
 }
 
 extension View {
-    
+
     func appFormStyle() -> some View {
         self.modifier(AppFormStyle())
     }

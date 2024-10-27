@@ -5,7 +5,7 @@ import HeatKit
 
 struct PictureView: View {
     let asset: Asset
-    
+
     var scale: Double = 1.0
     var offset: CGSize = .zero
 
@@ -65,16 +65,16 @@ struct PictureView: View {
                         empty(size: geo.size)
                     }
                 }
-            
+
             case .video:
                 VideoView(name: asset.name)
                     .frame(width: geo.size.width, height: geo.size.height)
                     .scaleEffect(scale, anchor: .top)
                     .offset(offset)
-                
+
             case .audio:
                 empty(size: geo.size)
-            
+
             case .symbol:
                 ZStack {
                     Image(systemName: asset.name)
@@ -88,7 +88,7 @@ struct PictureView: View {
             }
         }
     }
-    
+
     func empty(size: CGSize) -> some View {
         Rectangle()
             .fill(asset.backgroundColor ?? .secondary)

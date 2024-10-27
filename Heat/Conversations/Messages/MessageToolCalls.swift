@@ -5,12 +5,12 @@ import HeatKit
 struct MessageToolCalls: View {
     let toolCalls: [ToolCall]
     let lineLimit: Int
-    
+
     init(_ toolCalls: [ToolCall]?, lineLimit: Int = 4) {
         self.toolCalls = toolCalls ?? []
         self.lineLimit = lineLimit
     }
-    
+
     var body: some View {
         if !toolCalls.isEmpty {
             VStack(alignment: .leading, spacing: 4) {
@@ -44,17 +44,17 @@ struct MessageToolCalls: View {
 
 struct MessageToolCallContent: View {
     let text: String
-    
+
     init(_ text: String) {
         self.text = text
     }
-    
+
     var body: some View {
         Text(text)
             .font(.system(size: textFontSize, weight: .medium))
             .frame(maxWidth: .infinity, alignment: .leading)
     }
-    
+
     #if os(macOS)
     let textFontSize: CGFloat = 14
     #else
@@ -65,12 +65,12 @@ struct MessageToolCallContent: View {
 struct MessageToolCallArguments: View {
     let function: ToolCall.FunctionCall
     let lineLimit: Int
-    
+
     init(_ function: ToolCall.FunctionCall, lineLimit: Int = 4) {
         self.function = function
         self.lineLimit = lineLimit
     }
-    
+
     var body: some View {
         Text(subtext)
             .font(.footnote)
@@ -78,7 +78,7 @@ struct MessageToolCallArguments: View {
             .textSelection(.enabled)
             .lineLimit(lineLimit)
     }
-    
+
     var subtext: String {
         switch function.name {
         case Toolbox.searchWeb.name:

@@ -2,13 +2,13 @@ import SwiftUI
 
 struct TypingIndicator: View {
     let foregroundColor: Color
-    
+
     @State private var isVisible = true
-    
+
     init(foregroundColor: Color = .primary) {
         self.foregroundColor = foregroundColor
     }
-    
+
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Rectangle()
@@ -22,13 +22,13 @@ struct TypingIndicator: View {
             handleBlink()
         }
     }
-    
+
     func handleBlink() {
         withAnimation(.snappy(duration: 0.4).repeatForever(autoreverses: true)) {
             isVisible.toggle()
         }
     }
-    
+
     #if os(macOS)
     private let cursorWidth: CGFloat = 2
     private let cursorHeight: CGFloat = 16

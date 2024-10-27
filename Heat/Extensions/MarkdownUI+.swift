@@ -3,7 +3,7 @@ import MarkdownUI
 import HeatKit
 
 extension Theme {
-    
+
     #if os(macOS)
     static let margin: RelativeSize = .em(1)
     static let fontSize: CGFloat = 14
@@ -15,7 +15,7 @@ extension Theme {
     static let relativeLineSpacing: RelativeSize = .em(0.25)
     static let listItemMargin: RelativeSize = .em(0.25)
     #endif
-    
+
     static let user = assistant
         .text {
             ForegroundColor(.white)
@@ -24,9 +24,9 @@ extension Theme {
             ForegroundColor(.white)
             UnderlineStyle(.single)
         }
-    
+
     static let assistant = base
-    
+
     static let base = Theme()
         .text {
             FontSize(fontSize)

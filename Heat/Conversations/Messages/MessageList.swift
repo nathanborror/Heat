@@ -7,29 +7,29 @@ struct MessageList: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(MessagesProvider.self) var messagesProvider
     @Environment(\.modelContext) private var modelContext
-    
+
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
-    
+
     var body: some View {
         ScrollViewReader { proxy in
             MessageListScrollView {
-                
+
                 // Show message run history
                 ForEach(conversationViewModel.runs) { run in
                     RunView(run)
                 }
-                
+
                 VStack(spacing: 0) {
                     // Assistant typing indicator when processing
                     if conversationViewModel.conversation?.state == .processing {
                         TypingIndicator()
                     }
-                    
+
                     // Suggestions typing indicator when suggesting
                     if conversationViewModel.conversation?.state == .suggesting {
                         TypingIndicator(foregroundColor: .accentColor)
                     }
-                    
+
                     // Show suggestions when they are available
                     if !conversationViewModel.suggestions.isEmpty {
                         SuggestionList(suggestions: conversationViewModel.suggestions) { suggestion in
@@ -53,7 +53,7 @@ struct MessageList: View {
             }
         }
     }
-    
+
     func handleSubmit(_ prompt: String) {
         Task {
             do {
@@ -70,7 +70,7 @@ struct MessageList: View {
 /// On iOS the `List` studders when text is streaming and the scroll position is updated.
 struct MessageListScrollView<Content: View>: View {
     @ViewBuilder let content: () -> Content
-    
+
     var body: some View {
         #if os(macOS)
         List {

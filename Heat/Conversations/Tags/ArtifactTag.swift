@@ -8,7 +8,7 @@ struct ArtifactTag: View {
     init(_ tag: ContentParser.Result.Tag) {
         self.tag = tag
     }
-    
+
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 12) {
@@ -32,12 +32,12 @@ struct ArtifactTag: View {
             }
         }
     }
-    
+
     var contents: [ContentParser.Result.Content] {
         guard let content = tag.content else { return [] }
         let results = try? parser.parse(input: content, tags: ["image_search_query", "news_search"])
         return results?.contents ?? []
     }
-    
+
     private let parser = ContentParser.shared
 }

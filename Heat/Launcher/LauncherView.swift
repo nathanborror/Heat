@@ -11,21 +11,21 @@ struct LauncherView: View {
     @Environment(AgentsProvider.self) var agentsProvider
     @Environment(ConversationsProvider.self) var conversationsProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
-    
+
     @Environment(\.modelContext) private var modelContext
-    
+
     @State private var content = ""
     @State private var isShowingContent = false
     @State private var isShowingError = false
-    
+
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
-    
+
     @Binding var selected: String?
-    
+
     @State private var conversationViewModel: ConversationViewModel? = nil
-    
+
     let delay: TimeInterval = 2.0
-    
+
     var body: some View {
         LauncherPanel(isShowingContent: $isShowingContent) {
             HStack {
@@ -51,12 +51,12 @@ struct LauncherView: View {
             handleInit()
         }
     }
-    
+
     @MainActor func handleInit() {
         guard conversationViewModel != nil else { return }
         isShowingContent = true
     }
-    
+
     func handleSubmit() {
         Task {
             // Create a new conversation if one isn't already selected
@@ -64,24 +64,24 @@ struct LauncherView: View {
                 guard let agentID = preferencesProvider.preferences.defaultAssistantID else { return }
                 let agent = try agentsProvider.get(agentID)
                 let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
-                
+
                 selected = conversation.id
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)
             }
-            
+
             // This should always exist since it was created above
             guard let conversationViewModel else { return }
-            
+
             // Context full of memories
             let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
-            
+
             // Try to generate a response
             do {
                 try conversationViewModel.generate(chat: content, context: context)
             } catch {
                 conversationViewModel.error = error
             }
-            
+
             content = ""
             isShowingContent = true
         }
@@ -90,14 +90,14 @@ struct LauncherView: View {
 
 struct LauncherPanel<Toolbar: View, Content: View>: View {
     @Binding var isShowingContent: Bool
-    
+
     @ViewBuilder let toolbar: () -> Toolbar
     @ViewBuilder let content: () -> Content
-    
+
     @Environment(\.floatingPanel) var panel
-    
+
     var body: some View {
-        
+
         VStack(spacing: 0) {
             toolbar()
             if isShowingContent {
@@ -117,7 +117,7 @@ struct LauncherPanel<Toolbar: View, Content: View>: View {
         )
         .clipShape(.rect(cornerRadius: 10))
     }
-    
+
     private let toolbarHeight: CGFloat = 60
 }
 #endif

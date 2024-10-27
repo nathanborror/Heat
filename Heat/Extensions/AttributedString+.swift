@@ -13,7 +13,7 @@ extension AttributedString {
             ),
             baseURL: nil
         )
-        
+
         // Base font and paragraph style for the whole string
         s.font = .body
         s.mergeAttributes(.init([.paragraphStyle: ParagraphStyle.default]))
@@ -63,12 +63,12 @@ extension AttributedString {
         var previousListID = 0
         for (intentBlock, intentRange) in s.runs[\.presentationIntent].reversed() {
             guard let intentBlock = intentBlock else { continue }
-            
+
             var block: MarkdownStyledBlock = .generic
             var currentElementOrdinal: Int = 0
-            
+
             var currentListID = 0
-            
+
             for intent in intentBlock.components {
                 switch intent.kind {
                 case .paragraph:
@@ -106,9 +106,9 @@ extension AttributedString {
                     break
                 }
             }
-            
+
             var numberBreaks = 0
-            
+
             switch block {
             case .generic:
                 assertionFailure(intentBlock.debugDescription)
@@ -145,17 +145,17 @@ extension AttributedString {
                 s[intentRange].mergeAttributes(.init([.paragraphStyle: ParagraphStyle.code]))
                 numberBreaks = 2
             }
-            
+
             // Remember the list ID so we can check if it’s identical in the next block
             previousListID = currentListID
-            
+
             // Add line breaks to separate blocks
             if intentRange.lowerBound != s.startIndex {
                 let breaks = String(repeating: "\n", count: numberBreaks)
                 s.characters.insert(contentsOf: breaks, at: intentRange.lowerBound)
             }
         }
-        
+
         self = s
     }
 }
@@ -195,7 +195,7 @@ struct ParagraphStyle {
         paragraphStyle.paragraphSpacing = 20.0 // The last element in a list needs extra paragraph spacing
         return paragraphStyle
     }()
-    
+
     nonisolated(unsafe) static let code: NSParagraphStyle = {
         var paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.minimumLineHeight = 20.0

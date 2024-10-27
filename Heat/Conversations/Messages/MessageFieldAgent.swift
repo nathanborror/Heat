@@ -3,10 +3,10 @@ import HeatKit
 
 struct MessageFieldAgent: View {
     @Environment(\.dismiss) private var dismiss
-    
+
     @State var agent: Agent
     let action: (Agent) -> Void
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
@@ -24,7 +24,7 @@ struct MessageFieldAgent: View {
                     .background(.primary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 10))
                 }
-                
+
                 Text(agent.instructions)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 4)
@@ -51,7 +51,7 @@ struct MessageFieldAgent: View {
             }
         }
     }
-    
+
     func handleSubmit() {
         action(agent)
     }

@@ -4,9 +4,9 @@ import HeatKit
 struct AssistantPicker: View {
     @Environment(AgentsProvider.self) var agentsProvider
     @Environment(PreferencesProvider.self) var preferencesProvider
-    
+
     @State var showWelcomeSheet = false
-    
+
     var body: some View {
         VStack {
             Menu {

@@ -3,13 +3,13 @@ import HeatKit
 
 struct MemoryForm: View {
     @Environment(\.dismiss) private var dismiss
-    
+
     @State var text: String = ""
-    
+
     let action: (String) -> Void
-    
+
     @FocusState private var isFocused: Bool
-    
+
     var body: some View {
         Form {
             TextField("Content", text: $text)
@@ -30,7 +30,7 @@ struct MemoryForm: View {
             isFocused = true
         }
     }
-    
+
     func handleSubmit() {
         action(text.trimmingCharacters(in: .whitespacesAndNewlines))
         text = ""

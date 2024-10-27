@@ -7,11 +7,11 @@ struct VisualEffectView: NSViewRepresentable {
     var blendingMode: NSVisualEffectView.BlendingMode = .behindWindow
     var state: NSVisualEffectView.State = .active
     var isEmphasized: Bool = false
- 
+
     func makeNSView(context: Context) -> NSVisualEffectView {
         context.coordinator.visualEffectView
     }
- 
+
     func updateNSView(_ view: NSVisualEffectView, context: Context) {
         context.coordinator.update(
             material: material,
@@ -20,18 +20,18 @@ struct VisualEffectView: NSViewRepresentable {
             isEmphasized: isEmphasized
         )
     }
- 
+
     func makeCoordinator() -> Coordinator {
         Coordinator()
     }
- 
+
     class Coordinator {
         let visualEffectView = NSVisualEffectView()
- 
+
         init() {
             visualEffectView.blendingMode = .withinWindow
         }
- 
+
         func update(material: NSVisualEffectView.Material,
                     blendingMode: NSVisualEffectView.BlendingMode,
                     state: NSVisualEffectView.State,

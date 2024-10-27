@@ -4,11 +4,11 @@ import SwiftUI
 @MainActor
 class HapticManager {
     static var shared = HapticManager()
-    
+
     enum FeedbackStyle {
         case heavy, light, medium, rigid, soft
     }
-    
+
     func tap(style: FeedbackStyle) {
         #if !os(macOS)
         switch style {

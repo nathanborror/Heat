@@ -4,10 +4,10 @@ import HeatKit
 
 struct ServiceList: View {
     @Environment(PreferencesProvider.self) var preferencesProvider
-    
+
     @State var services: [Service] = []
     @State var selectedService: Service?
-    
+
     var body: some View {
         Form {
             ForEach(services) { service in
@@ -35,7 +35,7 @@ struct ServiceList: View {
             services = preferencesProvider.services
         }
     }
-    
+
     func statusIndicatorColor(_ service: Service) -> Color {
         switch service.status {
         case .ready:

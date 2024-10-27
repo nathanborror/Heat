@@ -6,11 +6,11 @@ struct GenericTag: View {
     let tag: ContentParser.Result.Tag
 
     @State private var isCopied = false
-    
+
     init(_ tag: ContentParser.Result.Tag) {
         self.tag = tag
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -28,7 +28,7 @@ struct GenericTag: View {
                 .buttonStyle(.plain)
             }
             .padding(.bottom, 12)
-            
+
             ForEach(contents.indices, id: \.self) { index in
                 switch contents[index] {
                 case .text(let text):
@@ -46,19 +46,19 @@ struct GenericTag: View {
                 .stroke(Color.primary.opacity(0.1), lineWidth: 1)
         }
     }
-    
+
     var contents: [ContentParser.Result.Content] {
         guard let content = tag.content else { return [] }
         let tags = ["reflection", "image_search_query"]
         guard let results = try? parser.parse(input: content, tags: tags) else { return [] }
         return results.contents
     }
-    
+
     private let parser = ContentParser.shared
-    
+
     private func handleCopy() {
         guard let contents = tag.content?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
-        
+
         #if os(macOS)
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -67,9 +67,9 @@ struct GenericTag: View {
         let pasteboard = UIPasteboard.general
         pasteboard.string = contents
         #endif
-        
+
         isCopied = true
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             isCopied = false
         }

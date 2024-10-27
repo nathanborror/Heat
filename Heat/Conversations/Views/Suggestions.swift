@@ -4,7 +4,7 @@ import HeatKit
 struct SuggestionList<Content: View>: View {
     var suggestions: [String]
     var content: (String) -> Content
-    
+
     var body: some View {
         if !suggestions.isEmpty {
             VStack(alignment: .leading, spacing: 2) {
@@ -19,10 +19,10 @@ struct SuggestionList<Content: View>: View {
 
 struct SuggestionView: View {
     @Environment(\.colorScheme) var colorScheme
-    
+
     let suggestion: String
     let action: (String) -> Void
-    
+
     var body: some View {
         Button(action: { handleTap(suggestion) }) {
             Text(suggestion)
@@ -50,11 +50,11 @@ struct SuggestionView: View {
         }
         #endif
     }
-    
+
     func handleTap(_ text: String) {
         action(suggestion)
     }
-    
+
     #if os(macOS)
     private let fontSize: CGFloat = 14
     #else
