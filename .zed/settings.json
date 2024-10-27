@@ -1,0 +1,12 @@
+{
+  "wrap_guides": [120],
+  "languages": {
+    "Swift": {
+      "preferred_line_length": 120,
+      "format_on_save": "off"
+    },
+    "Markdown": {
+      "soft_wrap": "preferred_line_length"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "label": "Build for Simulator",
+    "command": "bash",
+    "args": [
+      "./build.sh --app Heat --bundle-id run.nathan.Heat --platform 'iOS Simulator'"
+    ],
+    "hide": "on_success"
+  },
+  {
+    "label": "Build for MacOS",
+    "command": "bash",
+    "args": [
+      "./build.sh --app Heat --bundle-id run.nathan.Heat --platform macOS"
+    ],
+    "hide": "on_success"
+  }
+]
