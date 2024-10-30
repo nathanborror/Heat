@@ -38,28 +38,11 @@ public actor WebBrowseSession {
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         request.cachePolicy = .returnCacheDataElseLoad
         
-        let resp = try await URLSession.shared.data(for: request)
-        
-        let proc = try FastHTMLProcessor(url: resp.1.url ?? url, data: resp.0)
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let proc = try FastHTMLProcessor(url: url, data: data)
         let markdown = proc.markdown(urlMode: urlMode, hideJSONLD: hideJSONLD, hideImages: hideImages)
         return markdown
     }
-    
-    private let session = {
-        let memoryCapacity = 500 * 1024 * 1024 // 500 MB
-        let diskCapacity = 500 * 1024 * 1024   // 500 MB
-        let cachesURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        let diskPath = cachesURL.appendingPathComponent("WebBrowseCache").path
-
-        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: diskPath)
-        URLCache.shared = cache
-
-        let configuration = URLSessionConfiguration.default
-        configuration.urlCache = cache
-        configuration.requestCachePolicy = .useProtocolCachePolicy
-
-        return URLSession(configuration: configuration)
-    }()
     
     private let userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3.1 Safari/605.1.15"
 }

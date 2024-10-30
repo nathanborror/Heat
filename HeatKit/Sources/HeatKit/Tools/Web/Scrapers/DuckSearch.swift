@@ -14,49 +14,34 @@ public struct DuckSearch: WebSearch {
         var request = URLRequest(url: urlComponents.url!)
         request.httpShouldHandleCookies = false
         request.setValue(userAgent.rawValue, forHTTPHeaderField: "User-Agent")
-        request.cachePolicy = .returnCacheDataElseLoad
 
-        let (data, response) = try await session.data(for: request)
-        guard let html = String(data: data, encoding: .utf8) else {
-            throw WebSearchError.invalidHTML
-        }
+        let (data, response) = try await URLSession.shared.data(for: request)
         let baseURL = response.url ?? urlComponents.url!
-        let resp = try extractResults(html: html, baseURL: baseURL, query: query)
+        let resp = try extractResults(data, baseURL: baseURL, query: query)
         return resp
     }
-
-    private let session = {
-        let memoryCapacity = 500 * 1024 * 1024 // 500 MB
-        let diskCapacity = 500 * 1024 * 1024   // 500 MB
-        let cachesURL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
-        let diskPath = cachesURL.appendingPathComponent("DuckSearchCache").path
-
-        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: diskPath)
-        URLCache.shared = cache
-
-        let configuration = URLSessionConfiguration.default
-        configuration.urlCache = cache
-        configuration.requestCachePolicy = .useProtocolCachePolicy
-
-        return URLSession(configuration: configuration)
-    }()
 }
 
 extension DuckSearch {
 
-    private func extractResults(html: String, baseURL: URL, query: String) throws -> WebSearchResponse {
-        var out = WebSearchResponse(
-            query: query,
-            results: []
-        )
-        let doc = try Fuzi.HTMLDocument(string: html)
-        out.results = doc.css("#links .result").map {
-            return WebSearchResult(
+    private func extractResults(_ data: Data, baseURL: URL, query: String) throws -> WebSearchResponse {
+
+        // Do not use the code path `Fuzi.HTMLDocument(string:)` because it will lead to silent parsing failures
+        // only on release builds. There be demons in this package.
+        let doc = try parse(data: data)
+        let results = doc.css("#links .result").map {
+            WebSearchResult(
                 url: .init(string: $0.firstChild(css: "h2 a")?.attr("href") ?? "")!,
                 title: $0.firstChild(css: "h2 a")?.stringValue ?? "",
                 description: $0.firstChild(css: ".result__snippet")?.stringValue ?? ""
             )
         }
-        return out
+        return WebSearchResponse(query: query, results: results)
+    }
+
+    private func parse(data: Data) throws -> Fuzi.HTMLDocument {
+        // Do not use the code path `Fuzi.HTMLDocument(string:)` because it will lead to silent parsing failures
+        // only on release builds. There be demons in this package.
+        try Fuzi.HTMLDocument(data: data)
     }
 }
