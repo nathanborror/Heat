@@ -6,36 +6,38 @@ struct MessageToolCalls: View {
     let toolCalls: [ToolCall]
     let lineLimit: Int
 
-    init(_ toolCalls: [ToolCall]?, lineLimit: Int = 4) {
+    init(_ toolCalls: [ToolCall]?, lineLimit: Int = 3) {
         self.toolCalls = toolCalls ?? []
         self.lineLimit = lineLimit
     }
 
     var body: some View {
         if !toolCalls.isEmpty {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 ForEach(toolCalls, id: \.id) { toolCall in
-                    if let tool = Toolbox(name: toolCall.function.name) {
-                        switch tool {
-                        case .generateImages:
-                            MessageToolCallContent("Generating images...")
-                        case .generateMemory:
-                            MessageToolCallContent("Remembering...")
-                        case .generateSuggestions:
-                            MessageToolCallContent("Generating suggestions...")
-                        case .generateTitle:
-                            MessageToolCallContent("Generating title...")
-                        case .searchCalendar:
-                            MessageToolCallContent("Searching calendar...")
-                        case .searchWeb:
-                            MessageToolCallContent("Searching the web...")
-                        case .browseWeb:
-                            MessageToolCallContent("Browsing the web...")
+                    VStack(spacing: 0) {
+                        if let tool = Toolbox(name: toolCall.function.name) {
+                            switch tool {
+                            case .generateImages:
+                                MessageToolCallContent("Generating images...")
+                            case .generateMemory:
+                                MessageToolCallContent("Remembering...")
+                            case .generateSuggestions:
+                                MessageToolCallContent("Generating suggestions...")
+                            case .generateTitle:
+                                MessageToolCallContent("Generating title...")
+                            case .searchCalendar:
+                                MessageToolCallContent("Searching calendar...")
+                            case .searchWeb:
+                                MessageToolCallContent("Searching the web...")
+                            case .browseWeb:
+                                MessageToolCallContent("Browsing the web...")
+                            }
+                        } else {
+                            Text("Missing tool calls.")
                         }
-                    } else {
-                        Text("Missing tool calls.")
+                        MessageToolCallArguments(toolCall.function, lineLimit: lineLimit)
                     }
-                    MessageToolCallArguments(toolCall.function, lineLimit: lineLimit)
                 }
             }
         }
@@ -56,9 +58,9 @@ struct MessageToolCallContent: View {
     }
 
     #if os(macOS)
-    let textFontSize: CGFloat = 14
+    let textFontSize: CGFloat = 12
     #else
-    let textFontSize: CGFloat = 16
+    let textFontSize: CGFloat = 14
     #endif
 }
 
@@ -66,17 +68,18 @@ struct MessageToolCallArguments: View {
     let function: ToolCall.FunctionCall
     let lineLimit: Int
 
-    init(_ function: ToolCall.FunctionCall, lineLimit: Int = 4) {
+    init(_ function: ToolCall.FunctionCall, lineLimit: Int = 3) {
         self.function = function
         self.lineLimit = lineLimit
     }
 
     var body: some View {
         Text(subtext)
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .textSelection(.enabled)
             .lineLimit(lineLimit)
+            .font(.system(size: textFontSize))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .textSelection(.enabled)
     }
 
     var subtext: String {
@@ -101,4 +104,10 @@ struct MessageToolCallArguments: View {
             return function.arguments
         }
     }
+
+    #if os(macOS)
+    let textFontSize: CGFloat = 12
+    #else
+    let textFontSize: CGFloat = 14
+    #endif
 }

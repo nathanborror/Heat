@@ -76,7 +76,7 @@ struct MessageListScrollView<Content: View>: View {
         List {
             content()
                 .listRowSeparator(.hidden)
-                .listRowInsets(.init())
+                .listRowInsets(.init(top: 6, leading: 0, bottom: 6, trailing: 0))
         }
         .listStyle(.plain)
         .scrollClipDisabled()

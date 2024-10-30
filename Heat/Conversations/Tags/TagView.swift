@@ -23,7 +23,7 @@ struct TagView: View {
         case "image_search_query":
             ImageSearchTag(tag)
         default:
-            GenericTag(tag)
+            PlainTag(tag)
         }
     }
 }

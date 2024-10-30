@@ -69,12 +69,12 @@ struct MessageContent: View {
 
     let content: String?
     let role: Message.Role
-    let agentID: String?
+    let agentID: Agent.ID?
 
     init(_ content: String?, for role: Message.Role, agentID: String? = nil) {
         self.content = content
         self.role = role
-        self.agentID = agentID
+        self.agentID = (agentID != nil) ? .init(agentID!) : nil
     }
 
     var body: some View {
@@ -125,19 +125,16 @@ struct MessageViewSpacing: ViewModifier {
     let message: Message
 
     func body(content: Content) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 4) {
-            switch message.role {
-            case .system, .tool, .assistant:
-                content
-                    .padding(.horizontal, 12)
-            case .user:
-                content
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(.tint, in: .rect(cornerRadius: 10))
-            }
+        switch message.role {
+        case .system, .tool, .assistant:
+            content
+                .padding(.horizontal, 12)
+        case .user:
+            content
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(.tint, in: .rect(cornerRadius: 10))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

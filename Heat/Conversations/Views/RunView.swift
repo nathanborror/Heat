@@ -86,7 +86,7 @@ struct RunStepsView: View {
                     MessageView(message)
                 }
                 .buttonStyle(.plain)
-                .listRowInsets(.init(top: 12, leading: 4, bottom: 12, trailing: 12))
+                .listRowInsets(.init(top: 6, leading: 0, bottom: 6, trailing: 0))
             }
         }
         .listStyle(.plain)
@@ -105,8 +105,8 @@ struct RunStepDetail: View {
     var body: some View {
         ScrollView {
             MessageView(message, lineLimit: .max)
-                .padding(24)
         }
         .navigationTitle("Details")
+        .background(.background)
     }
 }

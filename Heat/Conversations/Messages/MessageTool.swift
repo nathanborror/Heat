@@ -8,13 +8,13 @@ struct MessageTool: View {
 
     @State private var isShowingContext = false
 
-    init(_ message: Message, lineLimit: Int = 4) {
+    init(_ message: Message, lineLimit: Int = 3) {
         self.message = message
         self.lineLimit = lineLimit
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
@@ -29,22 +29,18 @@ struct MessageTool: View {
                         }
                         #endif
                 case .searchWeb:
-                    MessageToolTitle("Search results")
-                    MessageToolContent(message.content, lineLimit: lineLimit)
+                    MessageToolContent("Search results", message.content, lineLimit: lineLimit)
                 case .browseWeb:
-                    MessageToolTitle("Read webpage")
-                    MessageToolContent(message.content, lineLimit: lineLimit)
+                    MessageToolContent("Read webpage", message.content, lineLimit: lineLimit)
                 case .generateMemory:
-                    MessageToolTitle("Remembering")
-                    MessageToolContent(message.content, lineLimit: lineLimit)
+                    MessageToolContent("Remembering", message.content, lineLimit: lineLimit)
                 case .searchCalendar:
-                    MessageToolTitle("Calendar search results")
-                    MessageToolContent(message.content, lineLimit: lineLimit)
+                    MessageToolContent("Calendar search results", message.content, lineLimit: lineLimit)
                 case .generateTitle, .generateSuggestions:
-                    MessageToolTitle(message.metadata.label)
+                    MessageToolContent(message.metadata.label, nil)
                 }
             } else {
-                MessageToolTitle(message.metadata.label)
+                MessageToolContent(message.metadata.label, nil)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -73,49 +69,41 @@ struct MessageTool: View {
     }
 }
 
-struct MessageToolTitle: View {
-    @Environment(\.debug) private var debug
-
-    let content: String?
-
-    init(_ content: String?) {
-        self.content = content
-    }
-
-    var body: some View {
-        if let content {
-            Text(content)
-                .font(.system(size: textFontSize, weight: .medium))
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    #if os(macOS)
-    let textFontSize: CGFloat = 14
-    #else
-    let textFontSize: CGFloat = 16
-    #endif
-}
-
 struct MessageToolContent: View {
     @Environment(\.debug) private var debug
 
+    let title: String?
     let content: String?
     let lineLimit: Int
 
-    init(_ content: String?, lineLimit: Int = 4) {
+    init(_ title: String?, _ content: String?, lineLimit: Int = 3) {
+        self.title = title
         self.content = content
         self.lineLimit = lineLimit
     }
 
     var body: some View {
-        if let content {
-            Text(content)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .lineLimit(lineLimit)
+        VStack(spacing: 0) {
+            if let title {
+                Text(title)
+                    .font(.system(size: textFontSize, weight: .medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if let content {
+                Text(content)
+                    .lineLimit(lineLimit)
+                    .font(.system(size: textFontSize))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
+
+    #if os(macOS)
+    let textFontSize: CGFloat = 12
+    #else
+    let textFontSize: CGFloat = 14
+    #endif
 }
 
 struct MessageToolWebSearch: View {

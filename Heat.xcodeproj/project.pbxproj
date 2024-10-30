@@ -29,7 +29,7 @@
 		D4F518BF2CAF8BA8005E147E /* OutputTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F518BE2CAF8BA8005E147E /* OutputTag.swift */; };
 		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
 		D8015CC72CB8EDBF0068749D /* MessageFieldAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8015CC62CB8EDBF0068749D /* MessageFieldAgent.swift */; };
-		D8015CC92CB8F4D60068749D /* GenericTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8015CC82CB8F4D60068749D /* GenericTag.swift */; };
+		D8015CC92CB8F4D60068749D /* PlainTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8015CC82CB8F4D60068749D /* PlainTag.swift */; };
 		D80F73B62C95F0E0001B2778 /* AttributedString+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80F73B52C95F0E0001B2778 /* AttributedString+.swift */; };
 		D815698D2B9CF19000C53D4D /* MessageTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = D815698C2B9CF19000C53D4D /* MessageTool.swift */; };
 		D816DE7E2C7F9C6000F9D44F /* Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D816DE7D2C7F9C6000F9D44F /* Modifiers.swift */; };
@@ -92,7 +92,7 @@
 		D4F518BE2CAF8BA8005E147E /* OutputTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutputTag.swift; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D8015CC62CB8EDBF0068749D /* MessageFieldAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageFieldAgent.swift; sourceTree = "<group>"; };
-		D8015CC82CB8F4D60068749D /* GenericTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericTag.swift; sourceTree = "<group>"; };
+		D8015CC82CB8F4D60068749D /* PlainTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainTag.swift; sourceTree = "<group>"; };
 		D80F73B52C95F0E0001B2778 /* AttributedString+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributedString+.swift"; sourceTree = "<group>"; };
 		D815698C2B9CF19000C53D4D /* MessageTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageTool.swift; sourceTree = "<group>"; };
 		D816DE7D2C7F9C6000F9D44F /* Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifiers.swift; sourceTree = "<group>"; };
@@ -262,7 +262,7 @@
 				D85FAE032C84C7E500DA153F /* ImageSearchTag.swift */,
 				D4B4F9272C8BB17A00C82284 /* ReflectionTag.swift */,
 				D4F518BE2CAF8BA8005E147E /* OutputTag.swift */,
-				D8015CC82CB8F4D60068749D /* GenericTag.swift */,
+				D8015CC82CB8F4D60068749D /* PlainTag.swift */,
 			);
 			path = Tags;
 			sourceTree = "<group>";
@@ -423,7 +423,7 @@
 				D41E19402AE4CD4F002516C1 /* VideoView.swift in Sources */,
 				D884AB002BD9B9DE00B90E9B /* LocationManager.swift in Sources */,
 				D4B2D2692B6563DB0017FB52 /* MessageField.swift in Sources */,
-				D8015CC92CB8F4D60068749D /* GenericTag.swift in Sources */,
+				D8015CC92CB8F4D60068749D /* PlainTag.swift in Sources */,
 				D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */,
 				D8E1FC1A2B704CE3006C9366 /* ServiceList.swift in Sources */,
 				D8271A602C7CD5C3008C345B /* MemoryForm.swift in Sources */,

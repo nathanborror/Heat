@@ -2,7 +2,7 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct GenericTag: View {
+struct PlainTag: View {
     let tag: ContentParser.Result.Tag
 
     @State private var isCopied = false
