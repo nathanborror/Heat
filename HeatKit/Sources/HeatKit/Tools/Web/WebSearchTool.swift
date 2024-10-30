@@ -16,9 +16,8 @@ public struct WebSearchTool {
     }
     
     public enum Kind: String, Codable, CaseIterable {
-        case website
+        case web
         case image
-        case news
     }
     
     public static let function = Tool.Function(
@@ -33,7 +32,7 @@ public struct WebSearchTool {
                 ),
                 "kind": .init(
                     type: .string,
-                    description: "A kind of search (e.g. website or image)",
+                    description: "A kind of search (e.g. web or image)",
                     enumValues: Kind.allCases.map { $0.rawValue }
                 ),
             ],
@@ -59,7 +58,7 @@ extension WebSearchTool {
             let args = try Arguments(toolCall.function.arguments)
             
             switch args.kind {
-            case .website:
+            case .web:
                 let searchResponse = try await WebSearchSession.shared.search(query: args.query)
                 let results = Array(searchResponse.results.prefix(10)).map {
                     """
@@ -79,27 +78,6 @@ extension WebSearchTool {
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,
                     metadata: ["label": "Searched web for '\(args.query)'"]
-                )]
-            case .news:
-                let searchResponse = try await WebSearchSession.shared.searchNews(query: args.query)
-                let results = Array(searchResponse.results.prefix(10)).map {
-                    """
-                        <result>
-                            <title>\($0.title ?? "No title")</title>
-                            <url>\($0.url)</url>
-                            <description>\($0.description ?? "No description")</description>
-                        </result>
-                    """
-                }
-                return [.init(
-                    role: .tool,
-                    content: PromptTemplate(BrowseSearchResultsInstructions, with: [
-                        "QUERY": args.query,
-                        "RESULTS": results.joined(separator: "\n"),
-                    ]),
-                    toolCallID: toolCall.id,
-                    name: toolCall.function.name,
-                    metadata: ["label": "Searched web news for '\(args.query)'"]
                 )]
             case .image:
                 let searchResponse = try await WebSearchSession.shared.searchImages(query: args.query)
