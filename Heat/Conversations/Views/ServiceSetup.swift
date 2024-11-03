@@ -37,6 +37,7 @@ struct ServiceSetup: View {
                     Text("Mistral").tag(Service.ServiceID.mistral)
                     Text("Ollama").tag(Service.ServiceID.ollama)
                     Text("OpenAI").tag(Service.ServiceID.openAI)
+                    Text("Perplexity").tag(Service.ServiceID.perplexity)
                 }
 
                 // Hide API Key when Ollama is selected because it doesn't require one.
@@ -70,11 +71,28 @@ struct ServiceSetup: View {
         .onChange(of: serviceID) { oldValue, newValue in
             handleServiceChange()
         }
+        .onAppear {
+            handleServiceChange()
+        }
     }
 
     func handleServiceChange() {
-        guard serviceID == .ollama else { return }
-        Task { serviceModels = try await prepareModels(serviceID) }
+        switch serviceID {
+        case .anthropic:
+            serviceAPIKey = ProcessInfo.processInfo.environment["ANTHROPIC_API_KEY"] ?? serviceAPIKey
+        case .groq:
+            serviceAPIKey = ProcessInfo.processInfo.environment["GROQ_API_KEY"] ?? serviceAPIKey
+        case .mistral:
+            serviceAPIKey = ProcessInfo.processInfo.environment["MISTRAL_API_KEY"] ?? serviceAPIKey
+        case .ollama:
+            Task { serviceModels = try await prepareModels(serviceID) }
+        case .openAI:
+            serviceAPIKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"] ?? serviceAPIKey
+        case .perplexity:
+            serviceAPIKey = ProcessInfo.processInfo.environment["PERPLEXITY_API_KEY"] ?? serviceAPIKey
+        default:
+            break
+        }
     }
 
     func handleOpenPreferences() {

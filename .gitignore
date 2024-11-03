@@ -4,4 +4,8 @@ xcuserdata/
 DerivedData/
 .swiftpm/
 
-.secrets/
+.env
+*.env
+.env.local
+
+.data/
