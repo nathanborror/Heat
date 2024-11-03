@@ -50,9 +50,11 @@ actor PreferencesStore {
     
     private var dataURL: URL {
         get throws {
-            try FileManager.default
-                .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                .appendingPathComponent("PreferencesData.plist")
+            let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
+            if !FileManager.default.fileExists(atPath: dir.relativeString) {
+                try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            }
+            return dir.appendingPathComponent("preferences", conformingTo: .propertyList)
         }
     }
 }
@@ -78,8 +80,9 @@ actor ServicesStore {
     
     private var dataURL: URL {
         get throws {
-            try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                    .appendingPathComponent("ServicesData.plist")
+            let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            return dir.appendingPathComponent("services", conformingTo: .propertyList)
         }
     }
 }

@@ -70,8 +70,9 @@ actor AgentStore {
     
     private var dataURL: URL {
         get throws {
-            try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                    .appendingPathComponent("AgentData.plist")
+            let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            return dir.appendingPathComponent("agents", conformingTo: .propertyList)
         }
     }
 }
