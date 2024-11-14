@@ -48,11 +48,12 @@
 		D85FAE452C852E1100DA153F /* ConversationViewInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FAE442C852E1100DA153F /* ConversationViewInspector.swift */; };
 		D85FE37F2C8FCA0B004CA2F3 /* RunView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85FE37E2C8FCA0B004CA2F3 /* RunView.swift */; };
 		D85FE3822C8FDD4F004CA2F3 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = D85FE3812C8FDD4F004CA2F3 /* MarkdownUI */; };
+		D870C5E02CE5C2F400529EBE /* LauncherPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D870C5DF2CE5C2F400529EBE /* LauncherPanel.swift */; };
 		D87386092CB19EE1005625B9 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = D87386082CB19EE1005625B9 /* KeyboardShortcuts */; };
 		D87E4F9A2C7FE18800CF3205 /* MessageAttachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */; };
 		D884AAC32BD5741A00B90E9B /* MessageToolCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAC22BD5741A00B90E9B /* MessageToolCalls.swift */; };
 		D884AAF52BD7F50E00B90E9B /* FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */; };
-		D884AAF72BD7F52600B90E9B /* LauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF62BD7F52600B90E9B /* LauncherView.swift */; };
+		D884AAF72BD7F52600B90E9B /* LauncherPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF62BD7F52600B90E9B /* LauncherPanelView.swift */; };
 		D884AAF92BD7F54500B90E9B /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAF82BD7F54500B90E9B /* VisualEffectView.swift */; };
 		D884AAFE2BD9B40000B90E9B /* PermissionsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAFD2BD9B40000B90E9B /* PermissionsList.swift */; };
 		D884AB002BD9B9DE00B90E9B /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D884AAFF2BD9B9DE00B90E9B /* LocationManager.swift */; };
@@ -109,10 +110,11 @@
 		D85FAE072C84C83600DA153F /* ThinkingTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThinkingTag.swift; sourceTree = "<group>"; };
 		D85FAE442C852E1100DA153F /* ConversationViewInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewInspector.swift; sourceTree = "<group>"; };
 		D85FE37E2C8FCA0B004CA2F3 /* RunView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunView.swift; sourceTree = "<group>"; };
+		D870C5DF2CE5C2F400529EBE /* LauncherPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherPanel.swift; sourceTree = "<group>"; };
 		D87E4F992C7FE18800CF3205 /* MessageAttachments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageAttachments.swift; sourceTree = "<group>"; };
 		D884AAC22BD5741A00B90E9B /* MessageToolCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageToolCalls.swift; sourceTree = "<group>"; };
 		D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
-		D884AAF62BD7F52600B90E9B /* LauncherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherView.swift; sourceTree = "<group>"; };
+		D884AAF62BD7F52600B90E9B /* LauncherPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherPanelView.swift; sourceTree = "<group>"; };
 		D884AAF82BD7F54500B90E9B /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		D884AAFD2BD9B40000B90E9B /* PermissionsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsList.swift; sourceTree = "<group>"; };
 		D884AAFF2BD9B9DE00B90E9B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
@@ -270,7 +272,8 @@
 		D884AAFA2BD7F64A00B90E9B /* Launcher */ = {
 			isa = PBXGroup;
 			children = (
-				D884AAF62BD7F52600B90E9B /* LauncherView.swift */,
+				D884AAF62BD7F52600B90E9B /* LauncherPanelView.swift */,
+				D870C5DF2CE5C2F400529EBE /* LauncherPanel.swift */,
 			);
 			path = Launcher;
 			sourceTree = "<group>";
@@ -415,7 +418,8 @@
 				D85FAE062C84C80E00DA153F /* ArtifactTag.swift in Sources */,
 				D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */,
 				D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */,
-				D884AAF72BD7F52600B90E9B /* LauncherView.swift in Sources */,
+				D870C5E02CE5C2F400529EBE /* LauncherPanel.swift in Sources */,
+				D884AAF72BD7F52600B90E9B /* LauncherPanelView.swift in Sources */,
 				D8D050B12CBB1455004C66EE /* AssistantPicker.swift in Sources */,
 				D85FAE002C8402AC00DA153F /* TagView.swift in Sources */,
 				D41E191F2AE45C9B002516C1 /* MainApp.swift in Sources */,

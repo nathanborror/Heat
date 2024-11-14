@@ -24,7 +24,7 @@
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
       "state" : {
         "branch" : "main",
-        "revision" : "9203a8de359dc64259bdb28cc44af32c15b3fc5b"
+        "revision" : "c3c361f409b8dbe1eab186078b41c330a6a82c9a"
       }
     },
     {
@@ -42,7 +42,7 @@
       "location" : "https://github.com/jkrukowski/SQLiteVec",
       "state" : {
         "branch" : "main",
-        "revision" : "0c691f7d72517a6d01cc437f41d32117fb43a719"
+        "revision" : "84551ebaf0adee177bd5bf0945cfe258715fd148"
       }
     },
     {
@@ -51,7 +51,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "62c7da63e8c0da46323806f7f20f4077536adae3"
+        "revision" : "83433823c01677a18b667a71c9e0ef5be6ddc80a"
       }
     },
     {
@@ -60,7 +60,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "72bf21248fb6fbc146dc992fbf01c2e935377455"
+        "revision" : "e4009c1616ef861459fe56e05b579e29942fc3d3"
       }
     },
     {
@@ -96,7 +96,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "0ac1373f94cce288504472dfb92be309a9903a67"
+        "revision" : "df28cd16f7768d27c632dbc524ebd47fac9fab4b"
       }
     },
     {
@@ -141,7 +141,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "76d632ace7e035ec9fb8e0873457e272ad0a032a"
+        "revision" : "d9fcd32777cb3547873087df3ee2331c48812885"
       }
     },
     {
@@ -159,7 +159,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "f48b42ede257ce953e5981a7055d4ceeccfb315b"
+        "revision" : "7a0ef4690938ace2579d222fa5da7ea7f2c4c56e"
       }
     }
   ],

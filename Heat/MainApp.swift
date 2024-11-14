@@ -22,23 +22,25 @@ private let logger = Logger(subsystem: "MainApp", category: "App")
 @main
 struct MainApp: App {
     @Environment(\.openWindow) var openWindow
-    
+    @Environment(\.dismissWindow) private var dismissWindow
+
     // Providers
     private let agentsProvider = AgentsProvider.shared
     private let conversationsProvider = ConversationsProvider.shared
     private let messagesProvider = MessagesProvider.shared
     private let preferencesProvider = PreferencesProvider.shared
-    
+
     @State private var selectedConversationID: String? = nil
     @State private var showingLauncher = false
     @State private var sheet: Sheet? = nil
-    
+    @State private var launcherPanel: LauncherPanel? = nil
+
     enum Sheet: String, Identifiable {
         case conversationList
         case preferences
         var id: String { rawValue }
     }
-    
+
     var body: some Scene {
         #if os(macOS)
         Window("Heat", id: "heat") {
@@ -84,7 +86,7 @@ struct MainApp: App {
                 .keyboardShortcut(",", modifiers: .command)
             }
         }
-        
+
         Window("Setup", id: "setup") {
             Text("Setup preferences")
         }
@@ -94,20 +96,19 @@ struct MainApp: App {
         .defaultSize(width: 400, height: 400)
         .defaultPosition(.center)
         .restorationBehavior(.disabled)
-        
+
         Window("Launcher", id: "launcher") {
-            List {
-                Text("Hello")
-                Text("World")
-            }
+            LauncherPanelView()
+                .containerBackground(.ultraThinMaterial, for: .window)
+                .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
         }
         .windowManagerRole(.associated)
         .windowLevel(.floating)
         .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 400, height: 400)
+        .defaultSize(width: 400, height: 70)
         .defaultPosition(.center)
         .restorationBehavior(.disabled)
-        
+
         MenuBarExtra {
             Button("Quit") {
                 NSApplication.shared.terminate(nil)
@@ -162,12 +163,12 @@ struct MainApp: App {
         }
         #endif
     }
-    
+
     func handleInit() {
         handleReset()
         handleHotKeySetup()
     }
-    
+
     func handleReset() {
         if BundleVersion.shared.isBundleVersionNew() {
             Task {
@@ -175,19 +176,38 @@ struct MainApp: App {
                 try await conversationsProvider.reset()
                 try await messagesProvider.reset()
                 try await preferencesProvider.reset()
-                
+
                 try await preferencesProvider.initializeServices()
             }
         }
     }
-    
+
     func handleHotKeySetup() {
         #if os(macOS)
         KeyboardShortcuts.onKeyUp(for: .toggleLauncher) { [self] in
-            openWindow(id: "launcher")
+            if showingLauncher {
+                //dismissWindow(id: "launcher")
+                hideLauncherWindow()
+            } else {
+                //openWindow(id: "launcher")
+                showLauncherWindow()
+            }
             showingLauncher.toggle()
         }
         #endif
+    }
+
+    func showLauncherWindow() {
+        if launcherPanel == nil {
+            launcherPanel = LauncherPanel(LauncherPanelView())
+        }
+        if launcherPanel?.isVisible == false {
+            launcherPanel?.orderFrontRegardless()
+        }
+    }
+
+    func hideLauncherWindow() {
+        launcherPanel?.close()
     }
 }
 
