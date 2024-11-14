@@ -9,3 +9,5 @@ DerivedData/
 .env.local
 
 .data/
+.secrets/
+
