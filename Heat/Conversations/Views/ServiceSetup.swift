@@ -6,7 +6,7 @@ struct ServiceSetup: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(PreferencesProvider.self) var preferencesProvider
 
-    @State var serviceID: Service.ServiceID = .openAI
+    @State var serviceID: Service.ServiceID = .ollama
     @State var serviceAPIKey: String = ""
     @State var serviceModels: [Model] = []
     @State var serviceModelID: Model.ID? = nil
