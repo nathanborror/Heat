@@ -7,6 +7,7 @@ public struct Defaults {
 
     public static let agents = [
         agentAssistant,
+        agentAssistantWithTools,
         agentAssistantThoughtful,
         agentAssistantCreator,
         agentInvestigator,
@@ -20,6 +21,13 @@ public struct Defaults {
         id: "bundle-assistant",
         kind: .assistant,
         name: "Basic Assistant",
+        instructions: AssistantInstructions
+    )
+
+    public static let agentAssistantWithTools = Agent(
+        id: "bundle-assistant-with-tools",
+        kind: .assistant,
+        name: "Basic Assistant (with tools)",
         instructions: AssistantInstructions,
         toolIDs: [
             Toolbox.generateImages.name,
