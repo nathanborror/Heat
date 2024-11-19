@@ -42,7 +42,6 @@ struct MainApp: App {
     }
 
     var body: some Scene {
-        #if os(macOS)
         Window("Heat", id: "heat") {
             NavigationSplitView {
                 ConversationList(selected: $selectedConversationID)
@@ -117,51 +116,6 @@ struct MainApp: App {
         } label: {
             Label("Heat", systemImage: "flame.fill")
         }
-        #else
-        WindowGroup {
-            NavigationStack {
-                ConversationView(selected: $selectedConversationID)
-                    .toolbar {
-                        ToolbarItem {
-                            Menu {
-                                Button {
-                                    sheet = .conversationList
-                                } label: {
-                                    Label("History", systemImage: "clock")
-                                }
-                                Button {
-                                    sheet = .preferences
-                                } label: {
-                                    Label("Preferences", systemImage: "slider.horizontal.3")
-                                }
-                            } label: {
-                                Label("Menu", systemImage: "ellipsis")
-                            }
-                        }
-                    }
-                    .sheet(item: $sheet) { sheet in
-                        NavigationStack {
-                            switch sheet {
-                            case .preferences:
-                                PreferencesForm(preferences: preferencesProvider.preferences)
-                            case .conversationList:
-                                ConversationList(selected: $selectedConversationID)
-                            }
-                        }
-                    }
-            }
-            .environment(agentsProvider)
-            .environment(conversationsProvider)
-            .environment(messagesProvider)
-            .environment(preferencesProvider)
-            .environment(\.debug, preferencesProvider.preferences.debug)
-            .environment(\.textRendering, preferencesProvider.preferences.textRendering)
-            .modelContainer(for: Memory.self)
-            .onAppear {
-                handleInit()
-            }
-        }
-        #endif
     }
 
     func handleInit() {
@@ -183,7 +137,6 @@ struct MainApp: App {
     }
 
     func handleHotKeySetup() {
-        #if os(macOS)
         KeyboardShortcuts.onKeyUp(for: .toggleLauncher) { [self] in
             if showingLauncher {
                 //dismissWindow(id: "launcher")
@@ -194,7 +147,6 @@ struct MainApp: App {
             }
             showingLauncher.toggle()
         }
-        #endif
     }
 
     func showLauncherWindow() {
@@ -211,8 +163,6 @@ struct MainApp: App {
     }
 }
 
-#if os(macOS)
 extension KeyboardShortcuts.Name {
     static let toggleLauncher = Self("toggleLauncher", default: .init(.h, modifiers: [.shift, .command]))
 }
-#endif
