@@ -144,13 +144,11 @@ struct ServiceSetup: View {
     }
 
     private func prepareModels(_ serviceID: Service.ServiceID) async throws -> [Model] {
+        // Initialize fetches the latest models and updates the service status
+        try await preferencesProvider.initialize(serviceID: serviceID)
+
+        // Return the service's models
         let service = try preferencesProvider.get(serviceID: serviceID)
-        let modelService = service.modelService()
-        let models =  try await modelService.models()
-
-        // Save models for service
-        try await preferencesProvider.upsert(models: models, serviceID: serviceID)
-
-        return models
+        return service.models
     }
 }

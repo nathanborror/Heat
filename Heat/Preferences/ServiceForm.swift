@@ -73,7 +73,9 @@ struct ServiceForm: View {
 
             if showSelections {
                 Section {
-                    Button(action: handleLoadModels) {
+                    Button {
+                        Task { try await handleInitializeService() }
+                    } label: {
                         Text("Load Models")
                     }
                     #if os(macOS)
@@ -86,10 +88,10 @@ struct ServiceForm: View {
         .scrollDismissesKeyboard(.immediately)
         .navigationTitle("Service")
         .onChange(of: service.token) { _, _ in
-            handleLoadModels()
+            Task { try await handleInitializeService() }
         }
         .onAppear {
-            handleLoadModels()
+            Task { try await handleInitializeService() }
         }
         .onDisappear {
             handleSave()
@@ -101,37 +103,34 @@ struct ServiceForm: View {
     }
 
     func handleSetDefaults() {
-        handleLoadModels()
+        Task {
+            try await handleInitializeService()
 
-        switch service.id {
-        case .openAI:
-            service.applyPreferredModels(Defaults.openAI)
-        case .anthropic:
-            service.applyPreferredModels(Defaults.anthropic)
-        case .mistral:
-            service.applyPreferredModels(Defaults.mistral)
-        case .perplexity:
-            service.applyPreferredModels(Defaults.perplexity)
-        case .google:
-            service.applyPreferredModels(Defaults.google)
-        default:
-            break
+            self.service = try preferencesProvider.get(serviceID: service.id)
+
+            switch service.id {
+            case .openAI:
+                service.applyPreferredModels(Defaults.openAI)
+            case .anthropic:
+                service.applyPreferredModels(Defaults.anthropic)
+            case .mistral:
+                service.applyPreferredModels(Defaults.mistral)
+            case .perplexity:
+                service.applyPreferredModels(Defaults.perplexity)
+            case .google:
+                service.applyPreferredModels(Defaults.google)
+            default:
+                break
+            }
         }
     }
 
-    func handleLoadModels() {
-        Task {
-            // Save any changes before loading models
-            try await preferencesProvider.upsert(service: service)
+    func handleInitializeService() async throws {
+        // Save any changes before loading models
+        try await preferencesProvider.upsert(service: service)
 
-            // Load models
-            let client = service.modelService()
-            let models = try await client.models()
-            service.models = models
-
-            // Save service models
-            try await preferencesProvider.upsert(models: models, serviceID: service.id)
-        }
+        // Initialize
+        try await preferencesProvider.initialize(serviceID: service.id)
     }
 }
 

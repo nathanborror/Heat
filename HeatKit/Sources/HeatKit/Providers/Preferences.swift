@@ -137,31 +137,19 @@ public final class PreferencesProvider {
         var service = try get(serviceID: serviceID)
         service.token = token
         try await upsert(service: service)
-        try await initialize(serviceID: serviceID)
-    }
-    
-    public func upsert(models: [Model], serviceID: Service.ServiceID) async throws {
-        var service = try get(serviceID: serviceID)
-        service.models = models
-        try await upsert(service: service)
-    }
-    
-    public func upsert(status: Service.Status, serviceID: Service.ServiceID) async throws {
-        var service = try get(serviceID: serviceID)
-        service.status = status
-        try await upsert(service: service)
     }
     
     public func initialize(serviceID: Service.ServiceID) async throws {
-        let service = try get(serviceID: serviceID)
+        var service = try get(serviceID: serviceID)
         do {
             let client = service.modelService()
-            let models = try await client.models()
-            try await upsert(models: models, serviceID: service.id)
-            try await upsert(status: .ready, serviceID: service.id)
+            service.models = try await client.models()
+            service.status = .ready
+            try await upsert(service: service)
         } catch {
             logger.error("Service error (\(service.name)): \(error)")
-            try await upsert(status: .unknown, serviceID: service.id)
+            service.status = .unknown
+            try await upsert(service: service)
         }
     }
     
