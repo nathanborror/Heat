@@ -42,7 +42,7 @@
       "location" : "https://github.com/jkrukowski/SQLiteVec",
       "state" : {
         "branch" : "main",
-        "revision" : "84551ebaf0adee177bd5bf0945cfe258715fd148"
+        "revision" : "6ddf0d609282ebd67dbb94ae6853e3557cf74629"
       }
     },
     {
@@ -60,7 +60,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "e4009c1616ef861459fe56e05b579e29942fc3d3"
+        "revision" : "d6836f4508b0a6a3c7f5e9db614a031db914cacd"
       }
     },
     {
@@ -96,7 +96,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "df28cd16f7768d27c632dbc524ebd47fac9fab4b"
+        "revision" : "5c053fa1ad11ddb4006692c3fd82dccbf08e3c56"
       }
     },
     {

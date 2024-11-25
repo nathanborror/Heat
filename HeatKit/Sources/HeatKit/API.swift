@@ -45,17 +45,17 @@ public final class API {
             let stream = ChatSession.shared.stream(req)
             for try await message in stream {
                 try Task.checkCancellation()
-                
+
                 // Indicate which agent was used
                 var message = message
                 if let agentID {
                     message.metadata.agentID = agentID
                 }
-                
+
                 try await messagesProvider.upsert(message: message, parentID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             }
-            
+
             // Save messages
             try await messagesProvider.flush()
             
