@@ -160,7 +160,7 @@ public struct Defaults {
         Service(
             id: .ollama,
             name: "Ollama",
-            host: "http://127.0.0.1:11434/v1"
+            host: "http://127.0.0.1:11434/api"
         )
 
     public static let openAI =
