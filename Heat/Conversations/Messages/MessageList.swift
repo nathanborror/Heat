@@ -4,8 +4,8 @@ import SharedKit
 import HeatKit
 
 struct MessageList: View {
+    @Environment(AppState.self) var state
     @Environment(ConversationViewModel.self) var conversationViewModel
-    @Environment(MessagesProvider.self) var messagesProvider
     @Environment(\.modelContext) private var modelContext
 
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
@@ -39,7 +39,7 @@ struct MessageList: View {
                 }
                 .id("bottom")
             }
-            .onChange(of: messagesProvider.updated) { _, _ in
+            .onChange(of: state.messagesProvider.updated) { _, _ in
                 proxy.scrollTo("bottom")
             }
             .onAppear {

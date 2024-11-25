@@ -2,7 +2,7 @@ import HeatKit
 import SwiftUI
 
 struct ConversationList: View {
-    @Environment(ConversationsProvider.self) var conversationsProvider
+    @Environment(AppState.self) var state
     @Environment(\.dismiss) private var dismiss
 
     @Binding var selected: String?
@@ -10,14 +10,14 @@ struct ConversationList: View {
     var body: some View {
         List(selection: $selected) {
             Section {
-                ForEach(conversationsProvider.conversations) { conversation in
+                ForEach(state.conversationsProvider.conversations) { conversation in
                     VStack(alignment: .leading) {
                         Text(conversation.title ?? "Untitled")
                     }
                     .tag(conversation.id)
                     .swipeActions {
                         Button(role: .destructive) {
-                            Task { try await conversationsProvider.delete(conversation.id) }
+                            Task { try await state.conversationsProvider.delete(conversation.id) }
                         } label: {
                             Label("Trash", systemImage: "trash")
                         }
@@ -33,7 +33,7 @@ struct ConversationList: View {
             if newValue != nil { dismiss() }
         }
         .overlay {
-            if conversationsProvider.conversations.isEmpty {
+            if state.conversationsProvider.conversations.isEmpty {
                 ContentUnavailableView {
                     Label("Conversation history", systemImage: "clock")
                 } description: {

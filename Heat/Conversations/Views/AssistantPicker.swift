@@ -2,26 +2,25 @@ import SwiftUI
 import HeatKit
 
 struct AssistantPicker: View {
-    @Environment(AgentsProvider.self) var agentsProvider
-    @Environment(PreferencesProvider.self) var preferencesProvider
+    @Environment(AppState.self) var state
 
     @State var showWelcomeSheet = false
 
     var body: some View {
         VStack {
             Menu {
-                ForEach(agentsProvider.agents.filter { $0.kind == .assistant }) { agent in
+                ForEach(state.agentsProvider.agents.filter { $0.kind == .assistant }) { agent in
                     Button(agent.name) {
                         Task {
-                            var preferences = preferencesProvider.preferences
+                            var preferences = state.preferencesProvider.preferences
                             preferences.defaultAssistantID = agent.id
-                            try await preferencesProvider.upsert(preferences)
+                            try await state.preferencesProvider.upsert(preferences)
                         }
                     }
                 }
             } label: {
                 HStack {
-                    if let agentID = preferencesProvider.preferences.defaultAssistantID, let agent = try? agentsProvider.get(agentID) {
+                    if let agentID = state.preferencesProvider.preferences.defaultAssistantID, let agent = try? state.agentsProvider.get(agentID) {
                         Text(agent.name)
                     } else {
                         Text("Pick assistant")
@@ -48,7 +47,7 @@ struct AssistantPicker: View {
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                showWelcomeSheet = preferencesProvider.preferences.preferred.chatServiceID == nil
+                showWelcomeSheet = state.preferencesProvider.preferences.preferred.chatServiceID == nil
             }
         }
     }

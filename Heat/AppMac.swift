@@ -1,13 +1,3 @@
-/*
- ___   ___   ______   ________   _________
-/__/\ /__/\ /_____/\ /_______/\ /________/\
-\::\ \\  \ \\::::_\/_\::: _  \ \\__.::.__\/
- \::\/_\ .\ \\:\/___/\\::(_)  \ \  \::\ \
-  \:: ___::\ \\::___\/_\:: __  \ \  \::\ \
-   \: \ \\::\ \\:\____/\\:.\ \  \ \  \::\ \
-    \__\/ \::\/ \_____\/ \__\/\__\/   \__\/
- */
-
 import SwiftUI
 import SwiftData
 import OSLog
@@ -24,11 +14,7 @@ struct MainApp: App {
     @Environment(\.openWindow) var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
-    // Providers
-    private let agentsProvider = AgentsProvider.shared
-    private let conversationsProvider = ConversationsProvider.shared
-    private let messagesProvider = MessagesProvider.shared
-    private let preferencesProvider = PreferencesProvider.shared
+    @State private var state = AppState.shared
 
     @State private var selectedConversationID: String? = nil
     @State private var showingLauncher = false
@@ -55,7 +41,7 @@ struct MainApp: App {
                 NavigationStack {
                     switch sheet {
                     case .preferences:
-                        PreferencesForm(preferences: preferencesProvider.preferences)
+                        PreferencesForm(preferences: state.preferencesProvider.preferences)
                     case .conversationList:
                         ConversationList(selected: $selectedConversationID)
                     }
@@ -68,12 +54,7 @@ struct MainApp: App {
         .defaultSize(width: 600, height: 700)
         .defaultPosition(.center)
         .defaultLaunchBehavior(.presented)
-        .environment(agentsProvider)
-        .environment(conversationsProvider)
-        .environment(messagesProvider)
-        .environment(preferencesProvider)
-        .environment(\.debug, preferencesProvider.preferences.debug)
-        .environment(\.textRendering, preferencesProvider.preferences.textRendering)
+        .environment(state)
         .modelContainer(for: Memory.self)
         .commands {
             CommandGroup(replacing: .appSettings) {
@@ -83,6 +64,11 @@ struct MainApp: App {
                     Label("Preferences", systemImage: "slider.horizontal.3")
                 }
                 .keyboardShortcut(",", modifiers: .command)
+            }
+            CommandGroup(after: .appInfo) {
+                Button("Reset") {
+                    handleReset(true)
+                }
             }
         }
 
@@ -123,16 +109,9 @@ struct MainApp: App {
         handleHotKeySetup()
     }
 
-    func handleReset() {
-        if BundleVersion.shared.isBundleVersionNew() {
-            Task {
-                try await agentsProvider.reset()
-                try await conversationsProvider.reset()
-                try await messagesProvider.reset()
-                try await preferencesProvider.reset()
-
-                try await preferencesProvider.initializeServices()
-            }
+    func handleReset(_ force: Bool = false) {
+        if BundleVersion.shared.isBundleVersionNew() || force {
+            Task { try await state.reset() }
         }
     }
 

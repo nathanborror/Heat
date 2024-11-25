@@ -3,47 +3,52 @@ import GenKit
 import SharedKit
 import OSLog
 
-private let logger = Logger(subsystem: "Messages", category: "Kit")
+private let logger = Logger(subsystem: "Messages", category: "Providers")
 
 actor MessageStore {
     private var messages: [Message] = []
     
     func save(_ messages: [Message]) throws {
+        logger.debug("[MessageStore] Saving \(Self.dataURL.absoluteString)")
+
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .binary
         
         let data = try encoder.encode(messages)
-        try data.write(to: self.dataURL, options: [.atomic])
+        try data.write(to: Self.dataURL, options: [.atomic])
         self.messages = messages
     }
     
     func load() throws -> [Message] {
-        let data = try Data(contentsOf: dataURL)
+        logger.debug("[MessageStore] Loading \(Self.dataURL.absoluteString)")
+
+        let data = try Data(contentsOf: Self.dataURL)
         let decoder = PropertyListDecoder()
         messages = try decoder.decode([Message].self, from: data)
         return messages
     }
     
-    private var dataURL: URL {
-        get throws {
-            let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
-            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            return dir.appendingPathComponent("messages", conformingTo: .propertyList)
-        }
-    }
+    private static let dataURL = {
+        let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("messages", conformingTo: .propertyList)
+    }()
 }
 
-@MainActor
-@Observable
+@MainActor @Observable
 public final class MessagesProvider {
     public static let shared = MessagesProvider()
     
     public private(set) var messages: [Message] = []
     public private(set) var updated: Date = .now
-    
+
+    public enum Error: Swift.Error {
+        case notFound
+    }
+
     public func get(_ id: Message.ID) throws -> Message {
         guard let message = messages.first(where: { $0.id == id }) else {
-            throw MessagesProviderError.notFound
+            throw Error.notFound
         }
         return message
     }
@@ -80,9 +85,9 @@ public final class MessagesProvider {
     }
     
     public func reset() async throws {
-        logger.debug("Resetting messages...")
         messages = []
         try await save()
+        logger.debug("[MessagesProvider] Reset")
     }
     
     public func flush() async throws {
@@ -111,8 +116,4 @@ public final class MessagesProvider {
         try await messageStore.save(messages)
         ping()
     }
-}
-
-public enum MessagesProviderError: Error {
-    case notFound
 }

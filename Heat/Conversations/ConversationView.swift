@@ -7,10 +7,7 @@ import HeatKit
 private let logger = Logger(subsystem: "ConversationView", category: "App")
 
 struct ConversationView: View {
-    @Environment(AgentsProvider.self) var agentsProvider
-    @Environment(ConversationsProvider.self) var conversationsProvider
-    @Environment(PreferencesProvider.self) var preferencesProvider
-
+    @Environment(AppState.self) var state
     @Environment(\.modelContext) private var modelContext
 
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
@@ -85,9 +82,9 @@ struct ConversationView: View {
         Task {
             // Create a new conversation if one isn't already selected
             if conversationViewModel == nil {
-                guard let agentID = preferencesProvider.preferences.defaultAssistantID else { return }
-                let agent = try agentsProvider.get(agentID)
-                let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
+                guard let agentID = state.preferencesProvider.preferences.defaultAssistantID else { return }
+                let agent = try state.agentsProvider.get(agentID)
+                let conversation = try await state.conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
 
                 selected = conversation.id
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)
@@ -119,9 +116,9 @@ struct ConversationView: View {
         Task {
             // Create a new conversation if one isn't already selected
             if conversationViewModel == nil {
-                guard let agentID = preferencesProvider.preferences.defaultAssistantID else { return }
-                let agent = try agentsProvider.get(agentID)
-                let conversation = try await conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
+                guard let agentID = state.preferencesProvider.preferences.defaultAssistantID else { return }
+                let agent = try state.agentsProvider.get(agentID)
+                let conversation = try await state.conversationsProvider.create(instructions: agent.instructions, toolIDs: agent.toolIDs)
 
                 selected = conversation.id
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)

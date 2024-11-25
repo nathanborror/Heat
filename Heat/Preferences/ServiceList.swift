@@ -3,7 +3,7 @@ import GenKit
 import HeatKit
 
 struct ServiceList: View {
-    @Environment(PreferencesProvider.self) var preferencesProvider
+    @Environment(AppState.self) var state
 
     @State var services: [Service] = []
     @State var selectedService: Service?
@@ -32,7 +32,7 @@ struct ServiceList: View {
             }
         }
         .onAppear {
-            services = preferencesProvider.services
+            services = state.preferencesProvider.services
         }
     }
 

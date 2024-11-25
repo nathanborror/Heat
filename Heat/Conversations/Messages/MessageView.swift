@@ -3,8 +3,6 @@ import GenKit
 import HeatKit
 
 struct MessageView: View {
-    @Environment(\.debug) private var debug
-
     let message: Message
     let lineLimit: Int
 
@@ -46,7 +44,7 @@ struct MessageView: View {
 }
 
 struct MessageRole: View {
-    @Environment(\.debug) private var debug
+    @Environment(AppState.self) private var state
 
     let role: Message.Role
 
@@ -55,7 +53,7 @@ struct MessageRole: View {
     }
 
     var body: some View {
-        if debug {
+        if state.debug {
             Text(role.rawValue)
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -64,7 +62,7 @@ struct MessageRole: View {
 }
 
 struct MessageContent: View {
-    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(AppState.self) var state
     @Environment(\.colorScheme) private var colorScheme
 
     let content: String?
@@ -82,7 +80,7 @@ struct MessageContent: View {
             VStack(alignment: .leading, spacing: 12) {
                 switch role {
                 case .system:
-                    RenderText(content, formatter: .text)
+                    RenderText(content)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 case .user:
@@ -108,7 +106,7 @@ struct MessageContent: View {
         // Start with default tags to look for, if the message has a agentID associated with it
         // look for the tags its agent is expecting to output.
         var tags = ["thinking", "artifact", "output", "reflection", "image_search_query"]
-        if let agentID, let agent = try? agentsProvider.get(agentID) {
+        if let agentID, let agent = try? state.agentsProvider.get(agentID) {
             tags = agent.tags
         }
 

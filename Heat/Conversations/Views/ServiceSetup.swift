@@ -3,8 +3,8 @@ import GenKit
 import HeatKit
 
 struct ServiceSetup: View {
+    @Environment(AppState.self) var state
     @Environment(\.dismiss) private var dismiss
-    @Environment(PreferencesProvider.self) var preferencesProvider
 
     @State var serviceID: Service.ServiceID = .ollama
     @State var serviceAPIKey: String = ""
@@ -102,7 +102,7 @@ struct ServiceSetup: View {
     func handleContinue() async throws {
 
         // Set API token for service
-        try await preferencesProvider.upsert(token: serviceAPIKey, serviceID: serviceID)
+        try await state.preferencesProvider.upsert(token: serviceAPIKey, serviceID: serviceID)
 
         // Establish preferred models to use from the service
         // Since these are hard-coded they could become out-of-dated
@@ -129,26 +129,26 @@ struct ServiceSetup: View {
         }
 
         // Set preferred models on service
-        var service = try preferencesProvider.get(serviceID: serviceID)
+        var service = try state.preferencesProvider.get(serviceID: serviceID)
         service.preferredChatModel = preferredChatModel
         service.preferredSummarizationModel = preferredSummarizationModel
-        try await preferencesProvider.upsert(service: service)
+        try await state.preferencesProvider.upsert(service: service)
 
         // Set preferred service and save preferences
-        var preferences = preferencesProvider.preferences
+        var preferences = state.preferencesProvider.preferences
         preferences.preferred.chatServiceID = serviceID
         preferences.preferred.summarizationServiceID = serviceID
-        try await preferencesProvider.upsert(preferences)
+        try await state.preferencesProvider.upsert(preferences)
 
         dismiss()
     }
 
     private func prepareModels(_ serviceID: Service.ServiceID) async throws -> [Model] {
         // Initialize fetches the latest models and updates the service status
-        try await preferencesProvider.initialize(serviceID: serviceID)
+        try await state.preferencesProvider.initialize(serviceID: serviceID)
 
         // Return the service's models
-        let service = try preferencesProvider.get(serviceID: serviceID)
+        let service = try state.preferencesProvider.get(serviceID: serviceID)
         return service.models
     }
 }

@@ -3,7 +3,7 @@ import SharedKit
 import GenKit
 import OSLog
 
-private let logger = Logger(subsystem: "Preferences", category: "Kit")
+private let logger = Logger(subsystem: "Preferences", category: "Providers")
 
 public struct Preferences: Codable, Sendable {
     public var defaultAssistantID: String? = Defaults.assistantDefaultID
@@ -33,62 +33,63 @@ actor PreferencesStore {
     private var preferences: Preferences = .init()
     
     func save(_ preferences: Preferences) throws {
+        logger.debug("[PreferencesStore] Saving \(Self.dataURL.absoluteString)")
+
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .binary
         
         let data = try encoder.encode(preferences)
-        try data.write(to: self.dataURL, options: [.atomic])
+        try data.write(to: Self.dataURL, options: [.atomic])
         self.preferences = preferences
     }
     
     func load() throws -> Preferences {
-        let data = try Data(contentsOf: dataURL)
+        logger.debug("[PreferencesStore] Loading \(Self.dataURL.absoluteString)")
+
+        let data = try Data(contentsOf: Self.dataURL)
         let decoder = PropertyListDecoder()
         preferences = try decoder.decode(Preferences.self, from: data)
         return preferences
     }
     
-    private var dataURL: URL {
-        get throws {
-            let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
-            if !FileManager.default.fileExists(atPath: dir.relativeString) {
-                try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            }
-            return dir.appendingPathComponent("preferences", conformingTo: .propertyList)
-        }
-    }
+    private static let dataURL = {
+        let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("preferences", conformingTo: .propertyList)
+    }()
 }
 
 actor ServicesStore {
     private var services: [Service] = Defaults.services
     
     func save(_ services: [Service]) throws {
+        logger.debug("[ServicesStore] Saving \(Self.dataURL.absoluteString)")
+
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .binary
         
         let data = try encoder.encode(services)
-        try data.write(to: self.dataURL, options: [.atomic])
+        try data.write(to: Self.dataURL, options: [.atomic])
         self.services = services
     }
     
     func load() throws -> [Service] {
-        let data = try Data(contentsOf: dataURL)
+        logger.debug("[ServicesStore] Loading \(Self.dataURL.absoluteString)")
+
+        let data = try Data(contentsOf: Self.dataURL)
         let decoder = PropertyListDecoder()
         services = try decoder.decode([Service].self, from: data)
         return services
     }
     
-    private var dataURL: URL {
-        get throws {
-            let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
-            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            return dir.appendingPathComponent("services", conformingTo: .propertyList)
-        }
-    }
+    private static let dataURL = {
+        let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("services", conformingTo: .propertyList)
+    }()
 }
 
-@MainActor
-@Observable
+@MainActor @Observable
 public final class PreferencesProvider {
     public static let shared = PreferencesProvider()
     
@@ -103,10 +104,15 @@ public final class PreferencesProvider {
         case needsServiceSetup
         case needsPreferredService
     }
-    
+
+    public enum Error: Swift.Error {
+        case serviceNotFound
+        case modelNotFound
+    }
+
     public func get(serviceID: Service.ServiceID?) throws -> Service {
         guard let service = services.first(where: { $0.id == serviceID }) else {
-            throw PreferencesProviderError.serviceNotFound
+            throw Error.serviceNotFound
         }
         return service
     }
@@ -114,7 +120,7 @@ public final class PreferencesProvider {
     public func get(modelID: Model.ID?, serviceID: Service.ServiceID?) throws -> Model {
         let service = try get(serviceID: serviceID)
         guard let model = service.models.first(where: { $0.id == modelID }) else {
-            throw PreferencesProviderError.modelNotFound
+            throw Error.modelNotFound
         }
         return model
     }
@@ -155,15 +161,17 @@ public final class PreferencesProvider {
     
     public func initializeServices() async throws {
         for service in services {
-            try await initialize(serviceID: service.id)
+            if service.id == .ollama || !service.token.isEmpty {
+                try await initialize(serviceID: service.id)
+            }
         }
     }
     
     public func reset() async throws {
-        logger.debug("Resetting preferences...")
         self.preferences = .init()
         self.services = Defaults.services
         try await save()
+        logger.debug("[PreferencesProvider] Reset")
     }
     
     public func flush() async throws {
@@ -262,7 +270,7 @@ public final class PreferencesProvider {
             services = try await servicesStore.load()
             statusCheck()
         } catch {
-            logger.error("Failed to load preferences: \(error)")
+            logger.error("[PreferencesProvider] Failed to load — \(error)")
             try await reset()
         }
         ping()
@@ -293,9 +301,4 @@ public final class PreferencesProvider {
         // Minimal services ready to go
         status = .ready
     }
-}
-
-enum PreferencesProviderError: Error {
-    case serviceNotFound
-    case modelNotFound
 }

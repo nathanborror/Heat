@@ -4,18 +4,18 @@ import GenKit
 import HeatKit
 
 struct RenderText: View {
+    @Environment(AppState.self) var state
+
     let text: String?
     let role: Message.Role
-    let formatter: Preferences.TextRendering!
 
-    init(_ text: String?, role: Message.Role = .assistant, formatter: Preferences.TextRendering? = nil) {
+    init(_ text: String?, role: Message.Role = .assistant) {
         self.text = text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         self.role = role
-        self.formatter = formatter ?? PreferencesProvider.shared.preferences.textRendering
     }
 
     var body: some View {
-        switch formatter {
+        switch state.textRendering {
         case .markdown:
             if role == .user {
                 Markdown(text ?? "")

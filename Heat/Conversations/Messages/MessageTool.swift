@@ -70,8 +70,6 @@ struct MessageTool: View {
 }
 
 struct MessageToolContent: View {
-    @Environment(\.debug) private var debug
-
     let title: String?
     let content: String?
     let lineLimit: Int

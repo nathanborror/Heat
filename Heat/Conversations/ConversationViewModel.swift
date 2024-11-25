@@ -5,7 +5,7 @@ import SwiftUI
 
 private let logger = Logger(subsystem: "ConversationViewModel", category: "App")
 
-@Observable @MainActor
+@MainActor @Observable
 final class ConversationViewModel {
     var conversationID: String? = nil
     var streamingTokens: String? = nil

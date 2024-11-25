@@ -2,12 +2,12 @@ import SwiftUI
 import HeatKit
 
 struct ConversationViewInspector: View {
-    @Environment(ConversationsProvider.self) var conversationsProvider
+    @Environment(AppState.self) var state
 
     let conversationID: String
 
     private var conversation: Conversation? {
-        try? conversationsProvider.get(conversationID)
+        try? state.conversationsProvider.get(conversationID)
     }
 
     var body: some View {

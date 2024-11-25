@@ -3,7 +3,7 @@ import GenKit
 import SharedKit
 import OSLog
 
-private let logger = Logger(subsystem: "Conversations", category: "Kit")
+private let logger = Logger(subsystem: "Conversations", category: "Providers")
 
 public struct Conversation: Codable, Identifiable, Sendable {
     public var id: String
@@ -58,41 +58,46 @@ actor ConversationStore {
     private var conversations: [Conversation] = []
     
     func save(_ conversations: [Conversation]) throws {
+        logger.debug("[ConversationStore] Saving \(Self.dataURL.absoluteString)")
+
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .binary
         
         let data = try encoder.encode(conversations)
-        try data.write(to: self.dataURL, options: [.atomic])
+        try data.write(to: Self.dataURL, options: [.atomic])
         self.conversations = conversations
     }
     
     func load() throws -> [Conversation] {
-        let data = try Data(contentsOf: dataURL)
+        logger.debug("[ConversationStore] Loading \(Self.dataURL.absoluteString)")
+
+        let data = try Data(contentsOf: Self.dataURL)
         let decoder = PropertyListDecoder()
         conversations = try decoder.decode([Conversation].self, from: data)
         return conversations
     }
     
-    private var dataURL: URL {
-        get throws {
-            let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
-            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            return dir.appendingPathComponent("conversations", conformingTo: .propertyList)
-        }
-    }
+    private static let dataURL = {
+        let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("conversations", conformingTo: .propertyList)
+    }()
 }
 
-@MainActor
-@Observable
+@MainActor @Observable
 public final class ConversationsProvider {
     public static let shared = ConversationsProvider()
     
     public private(set) var conversations: [Conversation] = []
     public private(set) var updated: Date = .now
-    
+
+    public enum Error: Swift.Error {
+        case notFound
+    }
+
     public func get(_ id: String) throws -> Conversation {
         guard let conversation = conversations.first(where: { $0.id == id }) else {
-            throw ConversationsProviderError.notFound
+            throw Error.notFound
         }
         return conversation
     }
@@ -146,9 +151,9 @@ public final class ConversationsProvider {
     }
     
     public func reset() async throws {
-        logger.debug("Resetting conversations...")
         conversations = []
         try await save()
+        logger.debug("[ConversationsProvider] Reset")
     }
     
     public func flush() async throws {
@@ -176,8 +181,4 @@ public final class ConversationsProvider {
     private func ping() {
         updated = .now
     }
-}
-
-public enum ConversationsProviderError: Error {
-    case notFound
 }

@@ -4,11 +4,7 @@ import GenKit
 import HeatKit
 
 struct PreferencesForm: View {
-    @Environment(AgentsProvider.self) var agentsProvider
-    @Environment(ConversationsProvider.self) var conversationsProvider
-    @Environment(MessagesProvider.self) var messagesProvider
-    @Environment(PreferencesProvider.self) var preferencesProvider
-
+    @Environment(AppState.self) var state
     @Environment(\.dismiss) private var dismiss
 
     @State var preferences: Preferences
@@ -34,7 +30,7 @@ struct PreferencesForm: View {
                 Picker("Default Assistant", selection: $preferences.defaultAssistantID) {
                     Text("None").tag(String?.none)
                     Divider()
-                    ForEach(agentsProvider.agents.filter { $0.kind == .assistant }) { agent in
+                    ForEach(state.agentsProvider.agents.filter { $0.kind == .assistant }) { agent in
                         Text(agent.name).tag(agent.id)
                     }
                 }
@@ -142,7 +138,7 @@ struct PreferencesForm: View {
         Group {
             Text("None").tag(Service.ServiceID?.none)
             Divider()
-            ForEach(preferencesProvider.services.filter { $0[keyPath: prop] }) { service in
+            ForEach(state.preferencesProvider.services.filter { $0[keyPath: prop] }) { service in
                 Text(service.name).tag(service.id)
             }
         }
@@ -150,23 +146,23 @@ struct PreferencesForm: View {
 
     func handleAgentReset() {
         Task {
-            try await agentsProvider.reset()
+            try await state.agentsProvider.reset()
         }
     }
 
     func handleConversationReset() {
         Task {
-            try await conversationsProvider.reset()
-            try await messagesProvider.reset()
+            try await state.conversationsProvider.reset()
+            try await state.messagesProvider.reset()
         }
     }
 
     func handlePreferencesReset() {
         Task {
-            try await preferencesProvider.reset()
+            try await state.preferencesProvider.reset()
 
             // Restablish preferences in the form
-            preferences = preferencesProvider.preferences
+            preferences = state.preferencesProvider.preferences
         }
     }
 
@@ -178,7 +174,7 @@ struct PreferencesForm: View {
 
     func handleSave() {
         Task {
-            try await preferencesProvider.upsert(preferences)
+            try await state.preferencesProvider.upsert(preferences)
             dismiss()
         }
     }

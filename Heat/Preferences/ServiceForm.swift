@@ -3,7 +3,7 @@ import GenKit
 import HeatKit
 
 struct ServiceForm: View {
-    @Environment(PreferencesProvider.self) var preferencesProvider
+    @Environment(AppState.self) var state
     @Environment(\.dismiss) private var dismiss
 
     @State var service: Service
@@ -36,6 +36,16 @@ struct ServiceForm: View {
                     #endif
                     .submitLabel(.next)
                     .onSubmit { handleSetDefaults() }
+
+                Button {
+                    handleSetDefaults()
+                } label: {
+                    Text("Load Models")
+                }
+                #if os(macOS)
+                .buttonStyle(.link)
+                #endif
+                .disabled(service.host.isEmpty && service.token.isEmpty)
             }
 
             Section {
@@ -70,19 +80,6 @@ struct ServiceForm: View {
             } header: {
                 Text("Model Selection")
             }
-
-            if showSelections {
-                Section {
-                    Button {
-                        Task { try await handleInitializeService() }
-                    } label: {
-                        Text("Load Models")
-                    }
-                    #if os(macOS)
-                    .buttonStyle(.link)
-                    #endif
-                }
-            }
         }
         .appFormStyle()
         .scrollDismissesKeyboard(.immediately)
@@ -99,14 +96,14 @@ struct ServiceForm: View {
     }
 
     func handleSave() {
-        Task { try await preferencesProvider.upsert(service: service) }
+        Task { try await state.preferencesProvider.upsert(service: service) }
     }
 
     func handleSetDefaults() {
         Task {
             try await handleInitializeService()
 
-            self.service = try preferencesProvider.get(serviceID: service.id)
+            service = try state.preferencesProvider.get(serviceID: service.id)
 
             switch service.id {
             case .openAI:
@@ -127,10 +124,10 @@ struct ServiceForm: View {
 
     func handleInitializeService() async throws {
         // Save any changes before loading models
-        try await preferencesProvider.upsert(service: service)
+        try await state.preferencesProvider.upsert(service: service)
 
         // Initialize
-        try await preferencesProvider.initialize(serviceID: service.id)
+        try await state.preferencesProvider.initialize(serviceID: service.id)
     }
 }
 
@@ -179,7 +176,12 @@ struct ModelPicker: View {
                     if let selection, let model = models.first(where: { $0.id == selection }) {
                         Text(model.name ?? model.id.rawValue)
                     } else {
-                        Text("Select Model")
+                        HStack {
+                            Text("Select Model")
+                            Image(systemName: "chevron.up.chevron.down")
+                                .imageScale(.small)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 .foregroundStyle(.secondary)

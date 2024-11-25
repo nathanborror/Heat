@@ -5,7 +5,7 @@ import GenKit
 import HeatKit
 
 struct AgentForm: View {
-    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(AppState.self) var state
     @Environment(\.dismiss) private var dismiss
 
     @State var agent: Agent
@@ -68,7 +68,7 @@ struct AgentForm: View {
     }
 
     private func handleDone() {
-        Task { try await agentsProvider.upsert(agent) }
+        Task { try await state.agentsProvider.upsert(agent) }
         dismiss()
     }
 }

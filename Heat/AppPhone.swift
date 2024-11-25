@@ -1,13 +1,3 @@
-/*
- ___   ___   ______   ________   _________
-/__/\ /__/\ /_____/\ /_______/\ /________/\
-\::\ \\  \ \\::::_\/_\::: _  \ \\__.::.__\/
- \::\/_\ .\ \\:\/___/\\::(_)  \ \  \::\ \
-  \:: ___::\ \\::___\/_\:: __  \ \  \::\ \
-   \: \ \\::\ \\:\____/\\:.\ \  \ \  \::\ \
-    \__\/ \::\/ \_____\/ \__\/\__\/   \__\/
- */
-
 import SwiftUI
 import SwiftData
 import OSLog
@@ -24,11 +14,7 @@ struct MainApp: App {
     @Environment(\.openWindow) var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
-    // Providers
-    private let agentsProvider = AgentsProvider.shared
-    private let conversationsProvider = ConversationsProvider.shared
-    private let messagesProvider = MessagesProvider.shared
-    private let preferencesProvider = PreferencesProvider.shared
+    @State private var state = AppState.shared
 
     @State private var selectedConversationID: String? = nil
     @State private var sheet: Sheet? = nil
@@ -65,19 +51,14 @@ struct MainApp: App {
                         NavigationStack {
                             switch sheet {
                             case .preferences:
-                                PreferencesForm(preferences: preferencesProvider.preferences)
+                                PreferencesForm(preferences: state.preferencesProvider.preferences)
                             case .conversationList:
                                 ConversationList(selected: $selectedConversationID)
                             }
                         }
                     }
             }
-            .environment(agentsProvider)
-            .environment(conversationsProvider)
-            .environment(messagesProvider)
-            .environment(preferencesProvider)
-            .environment(\.debug, preferencesProvider.preferences.debug)
-            .environment(\.textRendering, preferencesProvider.preferences.textRendering)
+            .environment(state)
             .modelContainer(for: Memory.self)
             .onAppear {
                 handleInit()
@@ -89,16 +70,9 @@ struct MainApp: App {
         handleReset()
     }
 
-    func handleReset() {
-        if BundleVersion.shared.isBundleVersionNew() {
-            Task {
-                try await agentsProvider.reset()
-                try await conversationsProvider.reset()
-                try await messagesProvider.reset()
-                try await preferencesProvider.reset()
-
-                try await preferencesProvider.initializeServices()
-            }
+    func handleReset(_ force: Bool = false) {
+        if BundleVersion.shared.isBundleVersionNew() || force {
+            Task { try await state.reset() }
         }
     }
 }

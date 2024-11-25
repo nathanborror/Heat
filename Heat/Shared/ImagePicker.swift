@@ -5,8 +5,7 @@ import PhotosUI
 
 private let logger = Logger(subsystem: "ImagePicker", category: "App")
 
-@MainActor
-@Observable
+@MainActor @Observable
 final class ImagePickerViewModel {
 
     struct SelectedImage: Identifiable {

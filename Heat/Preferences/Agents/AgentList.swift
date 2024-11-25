@@ -2,7 +2,7 @@ import SwiftUI
 import HeatKit
 
 struct AgentList: View {
-    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(AppState.self) var state
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -13,7 +13,7 @@ struct AgentList: View {
                 }
             }
             Section {
-                ForEach(agentsProvider.agents) { agent in
+                ForEach(state.agentsProvider.agents) { agent in
                     NavigationLink(agent.name) {
                         AgentForm(agent: agent)
                     }
@@ -30,6 +30,6 @@ struct AgentList: View {
     }
 
     func handleDelete(_ agent: Agent) {
-        Task { try await agentsProvider.delete(agent.id)}
+        Task { try await state.agentsProvider.delete(agent.id)}
     }
 }

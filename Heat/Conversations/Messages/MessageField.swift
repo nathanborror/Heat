@@ -7,7 +7,7 @@ import HeatKit
 private let logger = Logger(subsystem: "MessageField", category: "App")
 
 struct MessageField: View {
-    @Environment(AgentsProvider.self) var agentsProvider
+    @Environment(AppState.self) var state
     @Environment(\.colorScheme) var colorScheme
 
     typealias ActionHandler = (String, [Data], Command) -> Void
@@ -68,7 +68,7 @@ struct MessageField: View {
                                 Label("Create Image", systemImage: "paintpalette")
                             }
                             Menu {
-                                ForEach(agentsProvider.agents.filter { $0.kind == .prompt }) { agent in
+                                ForEach(state.agentsProvider.agents.filter { $0.kind == .prompt }) { agent in
                                     Button {
                                         showingAgent = agent
                                     } label: {

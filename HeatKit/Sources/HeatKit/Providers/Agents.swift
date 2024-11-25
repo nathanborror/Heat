@@ -3,7 +3,7 @@ import GenKit
 import SharedKit
 import OSLog
 
-private let logger = Logger(subsystem: "Agents", category: "Kit")
+private let logger = Logger(subsystem: "Agents", category: "Providers")
 
 public struct Agent: Codable, Identifiable, Sendable {
     public var id: String
@@ -53,41 +53,46 @@ actor AgentStore {
     private var agents: [Agent] = []
     
     func save(_ agents: [Agent]) throws {
+        logger.debug("[AgentStore] Saving \(Self.dataURL.absoluteString)")
+
         let encoder = PropertyListEncoder()
         encoder.outputFormat = .binary
         
         let data = try encoder.encode(agents)
-        try data.write(to: self.dataURL, options: [.atomic])
+        try data.write(to: Self.dataURL, options: [.atomic])
         self.agents = agents
     }
     
     func load() throws -> [Agent] {
-        let data = try Data(contentsOf: dataURL)
+        logger.debug("[AgentStore] Loading \(Self.dataURL.absoluteString)")
+
+        let data = try Data(contentsOf: Self.dataURL)
         let decoder = PropertyListDecoder()
         agents = try decoder.decode([Agent].self, from: data)
         return agents
     }
     
-    private var dataURL: URL {
-        get throws {
-            let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
-            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-            return dir.appendingPathComponent("agents", conformingTo: .propertyList)
-        }
-    }
+    private static let dataURL = {
+        let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir.appendingPathComponent("agents", conformingTo: .propertyList)
+    }()
 }
 
-@MainActor
-@Observable
+@MainActor @Observable
 public final class AgentsProvider {
     public static let shared = AgentsProvider()
     
     public private(set) var agents: [Agent] = []
     public private(set) var updated: Date = .now
-    
+
+    public enum Error: Swift.Error {
+        case notFound
+    }
+
     public func get(_ id: String) throws -> Agent {
         guard let agent = agents.first(where: { $0.id == id }) else {
-            throw AgentsProviderError.notFound
+            throw Error.notFound
         }
         return agent
     }
@@ -111,9 +116,9 @@ public final class AgentsProvider {
     }
     
     public func reset() async throws {
-        logger.debug("Resetting agents...")
         agents = Defaults.agents
         try await save()
+        logger.debug("[AgentsProvider] Reset")
     }
     
     public func flush() async throws {
@@ -141,8 +146,4 @@ public final class AgentsProvider {
     public func ping() {
         updated = .now
     }
-}
-
-public enum AgentsProviderError: Error {
-    case notFound
 }
