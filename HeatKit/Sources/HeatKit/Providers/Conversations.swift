@@ -54,46 +54,51 @@ public struct Conversation: Codable, Identifiable, Sendable {
     }
 }
 
-actor ConversationStore {
-    private var conversations: [Conversation] = []
-    
-    func save(_ conversations: [Conversation]) throws {
-        logger.debug("[ConversationStore] Saving \(Self.dataURL.absoluteString)")
-
-        let encoder = PropertyListEncoder()
-        encoder.outputFormat = .binary
-        
-        let data = try encoder.encode(conversations)
-        try data.write(to: Self.dataURL, options: [.atomic])
-        self.conversations = conversations
-    }
-    
-    func load() throws -> [Conversation] {
-        logger.debug("[ConversationStore] Loading \(Self.dataURL.absoluteString)")
-
-        let data = try Data(contentsOf: Self.dataURL)
-        let decoder = PropertyListDecoder()
-        conversations = try decoder.decode([Conversation].self, from: data)
-        return conversations
-    }
-    
-    private static let dataURL = {
-        let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
-        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir.appendingPathComponent("conversations", conformingTo: .propertyList)
-    }()
-}
-
 @MainActor @Observable
 public final class ConversationsProvider {
     public static let shared = ConversationsProvider()
-    
+
     public private(set) var conversations: [Conversation] = []
     public private(set) var updated: Date = .now
 
     public enum Error: Swift.Error {
         case notFound
     }
+
+    private let conversationStore: PropertyStore<[Conversation]>
+    private var conversationInitTask: Task<Void, Swift.Error>?
+
+    private init(location: String? = nil) {
+        self.conversationStore = .init(location: location ?? ".app/conversations")
+        self.conversationInitTask = Task {
+            try await load()
+        }
+    }
+
+    private func load() async throws {
+        self.conversations = try await conversationStore.read() ?? []
+        ping()
+    }
+
+    private func save() async throws {
+        try await conversationStore.write(conversations)
+        ping()
+    }
+
+    // Update the `updated` timestamp and may do other things in the future.
+    private func ping() {
+        updated = .now
+    }
+
+    // Ensures cached data has loaded before continuing.
+    private func ready() async throws {
+        if let task = conversationInitTask {
+            try await task.value
+        }
+    }
+}
+
+extension ConversationsProvider {
 
     public func get(_ id: String) throws -> Conversation {
         guard let conversation = conversations.first(where: { $0.id == id }) else {
@@ -109,6 +114,7 @@ public final class ConversationsProvider {
     }
     
     public func upsert(_ conversation: Conversation) async throws {
+        try await ready()
         var conversations = self.conversations
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
             var existing = conversations[index]
@@ -122,63 +128,48 @@ public final class ConversationsProvider {
     }
     
     public func upsert(title: String, conversationID: String) async throws {
+        try await ready()
         var conversation = try get(conversationID)
         conversation.title = title.isEmpty ? nil : title
         try await upsert(conversation)
     }
     
     public func upsert(instructions: String, conversationID: String) async throws {
+        try await ready()
         var conversation = try get(conversationID)
         conversation.instructions = instructions
         try await upsert(conversation)
     }
     
     public func upsert(suggestions: [String], conversationID: String) async throws {
+        try await ready()
         var conversation = try get(conversationID)
         conversation.suggestions = suggestions
         try await upsert(conversation)
     }
     
     public func upsert(state: Conversation.State, conversationID: String) async throws {
+        try await ready()
         var conversation = try get(conversationID)
         conversation.state = state
         try await upsert(conversation)
     }
     
     public func delete(_ id: String) async throws {
+        try await ready()
         conversations.removeAll(where: { $0.id == id })
         try await save()
     }
     
     public func reset() async throws {
+        try await ready()
         conversations = []
         try await save()
         logger.debug("[ConversationsProvider] Reset")
     }
     
     public func flush() async throws {
+        try await ready()
         try await save()
-    }
-    
-    // MARK: - Private
-    
-    private let conversationStore = ConversationStore()
-    
-    private init() {
-        Task { try await load() }
-    }
-    
-    private func load() async throws {
-        self.conversations = try await conversationStore.load()
-        ping()
-    }
-    
-    private func save() async throws {
-        try await conversationStore.save(conversations)
-        ping()
-    }
-    
-    private func ping() {
-        updated = .now
     }
 }

@@ -29,75 +29,15 @@ public struct Preferences: Codable, Sendable {
     }
 }
 
-actor PreferencesStore {
-    private var preferences: Preferences = .init()
-    
-    func save(_ preferences: Preferences) throws {
-        logger.debug("[PreferencesStore] Saving \(Self.dataURL.absoluteString)")
-
-        let encoder = PropertyListEncoder()
-        encoder.outputFormat = .binary
-        
-        let data = try encoder.encode(preferences)
-        try data.write(to: Self.dataURL, options: [.atomic])
-        self.preferences = preferences
-    }
-    
-    func load() throws -> Preferences {
-        logger.debug("[PreferencesStore] Loading \(Self.dataURL.absoluteString)")
-
-        let data = try Data(contentsOf: Self.dataURL)
-        let decoder = PropertyListDecoder()
-        preferences = try decoder.decode(Preferences.self, from: data)
-        return preferences
-    }
-    
-    private static let dataURL = {
-        let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
-        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir.appendingPathComponent("preferences", conformingTo: .propertyList)
-    }()
-}
-
-actor ServicesStore {
-    private var services: [Service] = Defaults.services
-    
-    func save(_ services: [Service]) throws {
-        logger.debug("[ServicesStore] Saving \(Self.dataURL.absoluteString)")
-
-        let encoder = PropertyListEncoder()
-        encoder.outputFormat = .binary
-        
-        let data = try encoder.encode(services)
-        try data.write(to: Self.dataURL, options: [.atomic])
-        self.services = services
-    }
-    
-    func load() throws -> [Service] {
-        logger.debug("[ServicesStore] Loading \(Self.dataURL.absoluteString)")
-
-        let data = try Data(contentsOf: Self.dataURL)
-        let decoder = PropertyListDecoder()
-        services = try decoder.decode([Service].self, from: data)
-        return services
-    }
-    
-    private static let dataURL = {
-        let dir = URL.documentsDirectory.appending(path: ".app", directoryHint: .isDirectory)
-        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir.appendingPathComponent("services", conformingTo: .propertyList)
-    }()
-}
-
 @MainActor @Observable
 public final class PreferencesProvider {
     public static let shared = PreferencesProvider()
-    
+
     public private(set) var preferences: Preferences = .init()
     public private(set) var services: [Service] = []
     public private(set) var status: Status = .waiting
     public private(set) var updated: Date = .now
-    
+
     public enum Status {
         case ready
         case waiting
@@ -110,13 +50,75 @@ public final class PreferencesProvider {
         case modelNotFound
     }
 
+    private let preferencesStore: PropertyStore<Preferences>
+    private let servicesStore: PropertyStore<[Service]>
+    private var preferencesInitTask: Task<Void, Swift.Error>?
+
+    private init() {
+        self.preferencesStore = .init(location: ".app/preferences")
+        self.servicesStore = .init(location: ".app/services")
+
+        self.preferencesInitTask = Task {
+            try await load()
+        }
+    }
+
+    private func load() async throws {
+        do {
+            preferences = try await preferencesStore.read() ?? .init()
+            services = try await servicesStore.read() ?? []
+            statusCheck()
+        } catch {
+            logger.error("[PreferencesProvider] Failed to load — \(error)")
+            try await reset()
+        }
+        ping()
+    }
+
+    private func save() async throws {
+        try await preferencesStore.write(preferences)
+        try await servicesStore.write(services)
+        statusCheck()
+        ping()
+    }
+
+    // Update the `updated` timestamp and may do other things in the future.
+    private func ping() {
+        updated = .now
+    }
+
+    // Ensures cached data has loaded before continuing.
+    private func ready() async throws {
+        if let task = preferencesInitTask {
+            try await task.value
+        }
+    }
+
+    private func statusCheck() {
+        // Check for chat service support
+        if services.filter({ $0.supportsChats }).isEmpty {
+            status = .needsServiceSetup
+            return
+        }
+        // Check for preferred chat service
+        if preferences.preferred.chatServiceID == nil {
+            status = .needsPreferredService
+            return
+        }
+        // Minimal services ready to go
+        status = .ready
+    }
+}
+
+extension PreferencesProvider {
+
     public func get(serviceID: Service.ServiceID?) throws -> Service {
         guard let service = services.first(where: { $0.id == serviceID }) else {
             throw Error.serviceNotFound
         }
         return service
     }
-    
+
     public func get(modelID: Model.ID?, serviceID: Service.ServiceID?) throws -> Model {
         let service = try get(serviceID: serviceID)
         guard let model = service.models.first(where: { $0.id == modelID }) else {
@@ -124,13 +126,15 @@ public final class PreferencesProvider {
         }
         return model
     }
-    
+
     public func upsert(_ preferences: Preferences) async throws {
+        try await ready()
         self.preferences = preferences
         try await save()
     }
-    
+
     public func upsert(service: Service) async throws {
+        try await ready()
         if let index = services.firstIndex(where: { $0.id == service.id }) {
             services[index] = service
         } else {
@@ -138,14 +142,16 @@ public final class PreferencesProvider {
         }
         try await save()
     }
-    
+
     public func upsert(token: String, serviceID: Service.ServiceID) async throws {
+        try await ready()
         var service = try get(serviceID: serviceID)
         service.token = token
         try await upsert(service: service)
     }
-    
+
     public func initialize(serviceID: Service.ServiceID) async throws {
+        try await ready()
         var service = try get(serviceID: serviceID)
         do {
             let client = service.modelService()
@@ -158,65 +164,74 @@ public final class PreferencesProvider {
             try await upsert(service: service)
         }
     }
-    
+
     public func initializeServices() async throws {
+        try await ready()
         for service in services {
             if service.id == .ollama || !service.token.isEmpty {
                 try await initialize(serviceID: service.id)
             }
         }
     }
-    
+
     public func reset() async throws {
+        try await ready()
         self.preferences = .init()
         self.services = Defaults.services
         try await save()
         logger.debug("[PreferencesProvider] Reset")
     }
-    
+
     public func flush() async throws {
+        try await ready()
         try await save()
     }
-    
-    // MARK: - Service Preferences
-    
+}
+
+// MARK: - Service Preferences
+
+extension PreferencesProvider {
+
     public func preferredChatService() throws -> ChatService {
         let service = try get(serviceID: preferences.preferred.chatServiceID)
         return try service.chatService()
     }
-    
+
     public func preferredImageService() throws -> ImageService {
         let service = try get(serviceID: preferences.preferred.imageServiceID)
         return try service.imageService()
     }
-    
+
     public func preferredEmbeddingService() throws -> EmbeddingService {
         let service = try get(serviceID: preferences.preferred.embeddingServiceID)
         return try service.embeddingService()
     }
-    
+
     public func preferredTranscriptionService() throws -> TranscriptionService {
         let service = try get(serviceID: preferences.preferred.transcriptionServiceID)
         return try service.transcriptionService()
     }
-    
+
     public func preferredVisionService() throws -> VisionService {
         let service = try get(serviceID: preferences.preferred.visionServiceID)
         return try service.visionService()
     }
-    
+
     public func preferredSpeechService() throws -> SpeechService {
         let service = try get(serviceID: preferences.preferred.speechServiceID)
         return try service.speechService()
     }
-    
+
     public func preferredSummarizationService() throws -> ChatService {
         let service = try get(serviceID: preferences.preferred.summarizationServiceID)
         return try service.summarizationService()
     }
-    
-    // MARK: - Model Preferences
-    
+}
+
+// MARK: - Model Preferences
+
+extension PreferencesProvider {
+
     public func preferredChatModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.chatServiceID)
         return try get(modelID: service.preferredChatModel, serviceID: service.id)
@@ -250,55 +265,5 @@ public final class PreferencesProvider {
     public func preferredSummarizationModel() throws -> Model {
         let service = try get(serviceID: preferences.preferred.summarizationServiceID)
         return try get(modelID: service.preferredSummarizationModel, serviceID: service.id)
-    }
-    
-    // MARK: - Private
-    
-    private let preferencesStore = PreferencesStore()
-    private let servicesStore = ServicesStore()
-    
-    private init() {
-        Task {
-            try await load()
-            try await initializeServices()
-        }
-    }
-    
-    private func load() async throws {
-        do {
-            preferences = try await preferencesStore.load()
-            services = try await servicesStore.load()
-            statusCheck()
-        } catch {
-            logger.error("[PreferencesProvider] Failed to load — \(error)")
-            try await reset()
-        }
-        ping()
-    }
-    
-    private func save() async throws {
-        try await preferencesStore.save(preferences)
-        try await servicesStore.save(services)
-        statusCheck()
-        ping()
-    }
-    
-    private func ping() {
-        updated = .now
-    }
-    
-    private func statusCheck() {
-        // Check for chat service support
-        if services.filter({ $0.supportsChats }).isEmpty {
-            status = .needsServiceSetup
-            return
-        }
-        // Check for preferred chat service
-        if preferences.preferred.chatServiceID == nil {
-            status = .needsPreferredService
-            return
-        }
-        // Minimal services ready to go
-        status = .ready
     }
 }
