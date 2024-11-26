@@ -9,7 +9,7 @@ let mock_conversation = Conversation(
 
 let mock_messages: [Message] = [
     .init(
-        parent: mock_conversation.id,
+        parent: mock_conversation.id.rawValue,
         role: .user,
         content: "Write a report on the latest o1 model release from OpenAI"
     )
@@ -20,7 +20,7 @@ let mock_run_id = Run.ID.id
 let mock_run = Run(
     messages: [
         .init(
-            parent: mock_conversation.id,
+            parent: mock_conversation.id.rawValue,
             role: .assistant,
             content: """
                 To provide you with the most up-to-date and accurate information about OpenAI's latest model \
@@ -39,7 +39,7 @@ let mock_run = Run(
             runID: mock_run_id
         ),
         .init(
-            parent: mock_conversation.id,
+            parent: mock_conversation.id.rawValue,
             role: .tool,
             content: """
                 Select relevant website results, scrape their page and summarize it. Use the <search_results> below \
@@ -124,7 +124,7 @@ let mock_run = Run(
             ]
         ),
         .init(
-            parent: mock_conversation.id,
+            parent: mock_conversation.id.rawValue,
             role: .assistant,
             content: """
                 Thank you for providing the search results. I'll now summarize the key information from the most \
@@ -143,7 +143,7 @@ let mock_run = Run(
             runID: mock_run_id
         ),
         .init(
-            parent: mock_conversation.id,
+            parent: mock_conversation.id.rawValue,
             role: .tool,
             content: """
                 <website>
@@ -178,7 +178,7 @@ let mock_run = Run(
             ]
         ),
         .init(
-            parent: mock_conversation.id,
+            parent: mock_conversation.id.rawValue,
             role: .assistant,
             content: """
                 Based on the information provided, I'll now write a comprehensive report on OpenAI's latest o1 \

@@ -9,11 +9,30 @@
  */
 
 import SwiftUI
+import OSLog
 import HeatKit
+
+private let logger = Logger(subsystem: "AppState", category: "App")
 
 @MainActor @Observable
 final class AppState {
-    static let shared = AppState()
+
+    static let release = AppState()
+    static let development = AppState()
+
+    enum Error: Swift.Error, CustomStringConvertible {
+        case restorationError(String)
+        case serviceError(String)
+
+        public var description: String {
+            switch self {
+            case .restorationError(let detail):
+                "Restoration error: \(detail)"
+            case .serviceError(let detail):
+                "Service error: \(detail)"
+            }
+        }
+    }
 
     // Providers oversee a specific top-level kind of data and provide methods
     // for mutating and storing the data they're responsible for.
@@ -30,7 +49,13 @@ final class AppState {
 
     private let storage = UserDefaults.standard
 
-    private init() {
+    enum Kind {
+        case preview
+        case development
+        case release
+    }
+
+    private init(kind: Kind = .development) {
         self.agentsProvider = .shared
         self.conversationsProvider = .shared
         self.messagesProvider = .shared
@@ -38,11 +63,18 @@ final class AppState {
     }
 
     func reset() async throws {
-        try await agentsProvider.reset()
-        try await conversationsProvider.reset()
-        try await messagesProvider.reset()
-        try await preferencesProvider.reset()
-
-        try await preferencesProvider.initializeServices()
+        do {
+            try await agentsProvider.reset()
+            try await conversationsProvider.reset()
+            try await messagesProvider.reset()
+            try await preferencesProvider.reset()
+        } catch {
+            throw Error.restorationError("\(error)")
+        }
+        do {
+            try await preferencesProvider.initializeServices()
+        } catch {
+            throw Error.serviceError("\(error)")
+        }
     }
 }

@@ -13,39 +13,51 @@ public final class MessagesProvider {
     public private(set) var updated: Date = .now
 
     public enum Error: Swift.Error {
-        case notFound
-    }
+        case notFound(Message.ID)
+        case persistenceError(String)
 
-    private let messageStore: PropertyStore<[Message]>
-    private var messageInitTask: Task<Void, Swift.Error>?
-
-    private init(location: String? = nil) {
-        self.messageStore = .init(location: location ?? ".app/messages")
-        self.messageInitTask = Task {
-            try await load()
+        public var description: String {
+            switch self {
+            case .notFound(let id):
+                "Message not found: \(id.rawValue)"
+            case .persistenceError(let detail):
+                "Message persistence error: \(detail)"
+            }
         }
     }
 
-    private func load() async throws {
-        messages = try await messageStore.read() ?? []
-        ping()
+    private let store: DataStore<[Message]>
+    private var storeRestoreTask: Task<Void, Never>?
+
+    private init(location: String? = nil) {
+        self.store = .init(location: location ?? ".app/messages")
+        self.storeRestoreTask = Task { await restore() }
+    }
+
+    private func restore() async {
+        do {
+            messages = try await store.read() ?? []
+            ping()
+        } catch {
+            logger.error("[MessagesProvider] Error restoring: \(error)")
+        }
     }
 
     private func save() async throws {
-        try await messageStore.write(messages)
-        ping()
+        do {
+            try await store.write(messages)
+            ping()
+        } catch {
+            throw Error.persistenceError("\(error)")
+        }
     }
 
-    // Update the `updated` timestamp and may do other things in the future.
     private func ping() {
         updated = .now
     }
 
-    // Ensures cached data has loaded before continuing.
-    private func ready() async throws {
-        if let task = messageInitTask {
-            try await task.value
-        }
+    public func ready() async {
+        await storeRestoreTask?.value
     }
 }
 
@@ -53,24 +65,24 @@ extension MessagesProvider {
 
     public func get(_ id: Message.ID) throws -> Message {
         guard let message = messages.first(where: { $0.id == id }) else {
-            throw Error.notFound
+            throw Error.notFound(id)
         }
         return message
     }
-    
+
     public func get(parentID: String) throws -> [Message] {
         messages.filter { $0.parent == parentID }
     }
-    
+
     public func upsert(messages: [Message], parentID: String) async throws {
-        try await ready()
+        await ready()
         for message in messages {
             try await upsert(message: message, parentID: parentID)
         }
     }
-    
+
     public func upsert(message: Message, parentID: String) async throws {
-        try await ready()
+        await ready()
         var message = message
         message.parent = parentID
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
@@ -80,28 +92,26 @@ extension MessagesProvider {
         }
         ping() // intentionally not saving here due to streaming
     }
-    
+
     public func delete(_ id: Message.ID) async throws {
-        try await ready()
+        await ready()
         messages.removeAll(where: { $0.id == id })
         try await save()
     }
-    
+
     public func delete(parentID: String) async throws {
-        try await ready()
+        await ready()
         messages.removeAll(where: { $0.parent == parentID })
         try await save()
     }
-    
+
     public func reset() async throws {
-        try await ready()
         messages = []
         try await save()
-        logger.debug("[MessagesProvider] Reset")
     }
-    
+
     public func flush() async throws {
-        try await ready()
+        await ready()
         try await save()
     }
 }

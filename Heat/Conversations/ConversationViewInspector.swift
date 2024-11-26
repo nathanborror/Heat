@@ -4,7 +4,7 @@ import HeatKit
 struct ConversationViewInspector: View {
     @Environment(AppState.self) var state
 
-    let conversationID: String
+    let conversationID: Conversation.ID
 
     private var conversation: Conversation? {
         try? state.conversationsProvider.get(conversationID)

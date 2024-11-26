@@ -17,7 +17,6 @@ struct AgentForm: View {
     var body: some View {
         Form {
             Section("Info") {
-                TextField("ID", text: $agent.id)
                 TextField("Name", text: $agent.name)
                 Picker("Kind", selection: $agent.kind) {
                     ForEach(Agent.Kind.allCases, id: \.self) {

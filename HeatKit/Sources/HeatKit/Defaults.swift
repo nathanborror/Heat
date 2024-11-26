@@ -1,5 +1,6 @@
 import Foundation
 import GenKit
+import SharedKit
 
 public struct Defaults {
 
@@ -18,14 +19,14 @@ public struct Defaults {
     public static let assistantDefaultID = agentAssistant.id
 
     public static let agentAssistant = Agent(
-        id: "bundle-assistant",
+        id: .init("bundle-assistant"),
         kind: .assistant,
         name: "Basic Assistant",
         instructions: AssistantInstructions
     )
 
     public static let agentAssistantWithTools = Agent(
-        id: "bundle-assistant-with-tools",
+        id: .init("bundle-assistant-with-tools"),
         kind: .assistant,
         name: "Basic Assistant (with tools)",
         instructions: AssistantInstructions,
@@ -38,7 +39,7 @@ public struct Defaults {
     )
 
     public static let agentAssistantThoughtful = Agent(
-        id: "bundle-assistant-thoughtful",
+        id: .init("bundle-assistant-thoughtful"),
         kind: .assistant,
         name: "Thoughtful Assistant",
         instructions: AssistantThoughtfulInstructions,
@@ -51,7 +52,7 @@ public struct Defaults {
     )
 
     public static let agentAssistantCreator = Agent(
-        id: "bundle-assistant-creator",
+        id: .init("bundle-assistant-creator"),
         kind: .assistant,
         name: "Creator Assistant",
         instructions: AssistantCreatorInstructions,
@@ -64,7 +65,7 @@ public struct Defaults {
     )
 
     public static let agentInvestigator = Agent(
-        id: "bundle-investigator",
+        id: .init("bundle-investigator"),
         kind: .prompt,
         name: "Investigate",
         instructions: InvestigatorInstructions,
@@ -78,7 +79,7 @@ public struct Defaults {
     )
 
     public static let agentReporter = Agent(
-        id: "bundle-reporter",
+        id: .init("bundle-reporter"),
         kind: .prompt,
         name: "Report",
         instructions: ReporterInstructions,
@@ -92,7 +93,7 @@ public struct Defaults {
     )
 
     public static let agentCreativeWriter = Agent(
-        id: "bundle-creative-writer",
+        id: .init("bundle-creative-writer"),
         kind: .prompt,
         name: "Creative Writer",
         instructions: CreativeWriterInstructions,

@@ -12,7 +12,7 @@ struct ConversationView: View {
 
     @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
 
-    @Binding var selected: String?
+    @Binding var selected: Conversation.ID?
 
     @State private var conversationViewModel: ConversationViewModel? = nil
     @State private var showingInspector = false

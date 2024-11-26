@@ -5,7 +5,7 @@ struct ConversationList: View {
     @Environment(AppState.self) var state
     @Environment(\.dismiss) private var dismiss
 
-    @Binding var selected: String?
+    @Binding var selected: Conversation.ID?
 
     var body: some View {
         List(selection: $selected) {

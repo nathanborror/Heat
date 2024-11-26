@@ -1,89 +1,57 @@
 import Foundation
-import NaturalLanguage
-import SQLiteVec
+import OSLog
 
-@MainActor @Observable
-public final class DataStore {
-    public static let shared = DataStore()
-    
-    let db: Database
-    let embeddingProvider: EmbeddingProvider
-    
-    public func initialize() async throws {
-        try SQLiteVec.initialize()
-        
+public actor DataStore<Register: Codable> {
+
+    private var location: URL
+    private var register: Register? = nil
+
+    enum Error: Swift.Error, CustomStringConvertible {
+        case encodingError(String)
+        case decodingError(String)
+
+        public var description: String {
+            switch self {
+            case .encodingError(let detail):
+                "Encoding error: \(detail)"
+            case .decodingError(let detail):
+                "Decoding error: \(detail)"
+            }
+        }
+    }
+
+    public init(location: String) {
+        let url = URL.documentsDirectory.appendingPathComponent(location)
+        let dir = url.deletingLastPathComponent()
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        self.location = dir.appendingPathComponent(url.lastPathComponent, conformingTo: .propertyList)
+    }
+
+    public func write(_ register: Register) throws {
         do {
-            try await db.execute("""
-                CREATE TABLE IF NOT EXISTS documents (
-                    id INTEGER PRIMARY KEY,
-                    text TEXT NOT NULL UNIQUE
-                );
-                """)
-            try await db.execute("""
-                CREATE VIRTUAL TABLE IF NOT EXISTS embeddings USING vec0(
-                    id INTEGER PRIMARY KEY,
-                    embedding float[512]
-                );
-                """)
+            let data = try encoder.encode(register)
+            try data.write(to: location, options: [.atomic])
+            self.register = register
         } catch {
-            print(error)
+            throw Error.encodingError(error.localizedDescription)
         }
     }
-    
-    public func write(text: String) async throws {
-        guard let vector = embeddingProvider.vector(for: text) else {
-            throw Error.cannotCreateVector
-        }
-        try await db.execute("INSERT INTO documents(text) VALUES(?);", params: [text])
-        let lastInsertRowId = await db.lastInsertRowId
-        let vectorEmbeddings = vector.map { Float($0) }
-        try await db.execute("INSERT INTO embeddings(id, embedding) VALUES (?, ?);", params: [lastInsertRowId, vectorEmbeddings])
-    }
-    
-    public func similar(to text: String, k: Int = 5) async throws -> [[String: Any]] {
-        guard let vector = embeddingProvider.vector(for: text) else {
-            throw Error.cannotCreateVector
-        }
-        let vectorEmbeddings = vector.map { Float($0) }
-        return try await db.query(
-            """
-            SELECT
-                embeddings.id as id, distance, text
-            FROM
-                embeddings
-            LEFT JOIN documents ON
-                documents.id = embeddings.id
-            WHERE
-                embedding MATCH ? AND k = ?
-            ORDER BY
-                distance
-            """,
-            params: [vectorEmbeddings, k]
-        )
-    }
-    
-    // Private
-    
-    private init() {
+
+    public func read() throws -> Register? {
         do {
-            self.db = try Database(.inMemory)
-            self.embeddingProvider = NLEmbedding.sentenceEmbedding(for: .english)!
+            let data = try Data(contentsOf: location)
+            register = try decoder.decode(Register.self, from: data)
+            return register
         } catch {
-            fatalError("failed to establish sqlite database")
+            throw Error.decodingError(error.localizedDescription)
         }
     }
+
+    private let encoder = {
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .binary
+        return encoder
+    }()
+
+    private let decoder = PropertyListDecoder()
 }
-
-extension DataStore {
-    enum Error: Swift.Error {
-        case cannotCreateVector
-    }
-}
-
-// MARK: - Embeddings
-
-protocol EmbeddingProvider {
-    func vector(for string: String) -> [Double]?
-}
-
-extension NLEmbedding: EmbeddingProvider {}

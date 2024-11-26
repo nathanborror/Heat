@@ -6,7 +6,7 @@ import OSLog
 private let logger = Logger(subsystem: "Conversations", category: "Providers")
 
 public struct Conversation: Codable, Identifiable, Sendable {
-    public var id: String
+    public var id: ID<Conversation>
     public var title: String?
     public var subtitle: String?
     public var picture: Asset?
@@ -16,15 +16,15 @@ public struct Conversation: Codable, Identifiable, Sendable {
     public var state: State
     public var created: Date
     public var modified: Date
-    
+
     public enum State: Codable, Sendable {
         case processing
         case streaming
         case suggesting
         case none
     }
-    
-    public init(id: String = .id, title: String? = nil, subtitle: String? = nil, picture: Asset? = nil,
+
+    public init(id: Conversation.ID = .id, title: String? = nil, subtitle: String? = nil, picture: Asset? = nil,
                 instructions: String = "", suggestions: [String] = [], toolIDs: Set<String> = [], state: State = .none) {
         self.id = id
         self.title = title
@@ -37,7 +37,7 @@ public struct Conversation: Codable, Identifiable, Sendable {
         self.created = .now
         self.modified = .now
     }
-    
+
     mutating func apply(conversation: Conversation) {
         self.title = conversation.title
         self.subtitle = conversation.subtitle
@@ -48,7 +48,7 @@ public struct Conversation: Codable, Identifiable, Sendable {
         self.state = conversation.state
         self.modified = .now
     }
-    
+
     public static var empty: Self {
         .init()
     }
@@ -62,59 +62,71 @@ public final class ConversationsProvider {
     public private(set) var updated: Date = .now
 
     public enum Error: Swift.Error {
-        case notFound
-    }
+        case notFound(Conversation.ID)
+        case persistenceError(String)
 
-    private let conversationStore: PropertyStore<[Conversation]>
-    private var conversationInitTask: Task<Void, Swift.Error>?
-
-    private init(location: String? = nil) {
-        self.conversationStore = .init(location: location ?? ".app/conversations")
-        self.conversationInitTask = Task {
-            try await load()
+        public var description: String {
+            switch self {
+            case .notFound(let id):
+                "Conversation not found: \(id.rawValue)"
+            case .persistenceError(let detail):
+                "Conversation persistence error: \(detail)"
+            }
         }
     }
 
-    private func load() async throws {
-        self.conversations = try await conversationStore.read() ?? []
-        ping()
+    private let store: DataStore<[Conversation]>
+    private var storeRestoreTask: Task<Void, Never>?
+
+    private init(location: String? = nil) {
+        self.store = .init(location: location ?? ".app/conversations")
+        self.storeRestoreTask = Task { await restore() }
+    }
+
+    private func restore() async {
+        do {
+            self.conversations = try await store.read() ?? []
+            ping()
+        } catch {
+            logger.error("[ConversationsProvider] Error restoring: \(error)")
+        }
     }
 
     private func save() async throws {
-        try await conversationStore.write(conversations)
-        ping()
+        do {
+            try await store.write(conversations)
+            ping()
+        } catch {
+            throw Error.persistenceError("\(error)")
+        }
     }
 
-    // Update the `updated` timestamp and may do other things in the future.
     private func ping() {
         updated = .now
     }
 
-    // Ensures cached data has loaded before continuing.
-    private func ready() async throws {
-        if let task = conversationInitTask {
-            try await task.value
-        }
+    public func ready() async {
+        await storeRestoreTask?.value
     }
 }
 
-extension ConversationsProvider {
+extension  ConversationsProvider {
 
-    public func get(_ id: String) throws -> Conversation {
+    public func get(_ id: Conversation.ID) throws -> Conversation {
         guard let conversation = conversations.first(where: { $0.id == id }) else {
-            throw Error.notFound
+            throw Error.notFound(id)
         }
         return conversation
     }
-    
+
     public func create(instructions: String, toolIDs: Set<String>, state: Conversation.State = .none) async throws -> Conversation {
         let conversation = Conversation(instructions: instructions, toolIDs: toolIDs, state: state)
         try await upsert(conversation)
         return conversation
     }
-    
+
     public func upsert(_ conversation: Conversation) async throws {
-        try await ready()
+        await ready()
         var conversations = self.conversations
         if let index = conversations.firstIndex(where: { $0.id == conversation.id }) {
             var existing = conversations[index]
@@ -126,50 +138,43 @@ extension ConversationsProvider {
         self.conversations = conversations
         try await save()
     }
-    
-    public func upsert(title: String, conversationID: String) async throws {
-        try await ready()
+
+    public func upsert(title: String, conversationID: Conversation.ID) async throws {
+        await ready()
         var conversation = try get(conversationID)
         conversation.title = title.isEmpty ? nil : title
         try await upsert(conversation)
     }
-    
-    public func upsert(instructions: String, conversationID: String) async throws {
-        try await ready()
+
+    public func upsert(instructions: String, conversationID: Conversation.ID) async throws {
+        await ready()
         var conversation = try get(conversationID)
         conversation.instructions = instructions
         try await upsert(conversation)
     }
-    
-    public func upsert(suggestions: [String], conversationID: String) async throws {
-        try await ready()
+
+    public func upsert(suggestions: [String], conversationID: Conversation.ID) async throws {
+        await ready()
         var conversation = try get(conversationID)
         conversation.suggestions = suggestions
         try await upsert(conversation)
     }
-    
-    public func upsert(state: Conversation.State, conversationID: String) async throws {
-        try await ready()
+
+    public func upsert(state: Conversation.State, conversationID: Conversation.ID) async throws {
+        await ready()
         var conversation = try get(conversationID)
         conversation.state = state
         try await upsert(conversation)
     }
-    
-    public func delete(_ id: String) async throws {
-        try await ready()
+
+    public func delete(_ id: Conversation.ID) async throws {
+        await ready()
         conversations.removeAll(where: { $0.id == id })
         try await save()
     }
-    
+
     public func reset() async throws {
-        try await ready()
         conversations = []
-        try await save()
-        logger.debug("[ConversationsProvider] Reset")
-    }
-    
-    public func flush() async throws {
-        try await ready()
         try await save()
     }
 }

@@ -6,7 +6,7 @@ import OSLog
 private let logger = Logger(subsystem: "Agents", category: "Providers")
 
 public struct Agent: Codable, Identifiable, Sendable {
-    public var id: String
+    public var id: ID<Agent>
     public var kind: Kind
     public var name: String
     public var instructions: String
@@ -15,13 +15,13 @@ public struct Agent: Codable, Identifiable, Sendable {
     public var toolIDs: Set<String>
     public var created: Date
     public var modified: Date
-    
+
     public enum Kind: String, Codable, Sendable, CaseIterable {
         case assistant
         case prompt
     }
-    
-    public init(id: String = .id, kind: Kind, name: String, instructions: String, context: [String: String] = [:],
+
+    public init(id: Agent.ID = .id, kind: Kind, name: String, instructions: String, context: [String: String] = [:],
                 tags: [String] = [], toolIDs: Set<String> = []) {
         self.id = id
         self.kind = kind
@@ -33,11 +33,11 @@ public struct Agent: Codable, Identifiable, Sendable {
         self.created = .now
         self.modified = .now
     }
-    
+
     public static var empty: Self {
         .init(kind: .prompt, name: "", instructions: "")
     }
-    
+
     mutating func apply(agent: Agent) {
         kind = agent.kind
         name = agent.name
@@ -56,54 +56,66 @@ public final class AgentsProvider {
     public private(set) var agents: [Agent] = []
     public private(set) var updated: Date = .now
 
-    public enum Error: Swift.Error {
-        case notFound
-    }
+    public enum Error: Swift.Error, CustomStringConvertible {
+        case notFound(Agent.ID)
+        case persistenceError(String)
 
-    private let agentStore: PropertyStore<[Agent]>
-    private var agentInitTask: Task<Void, Swift.Error>?
-
-    private init(location: String? = nil) {
-        self.agentStore = .init(location: location ?? ".app/agents")
-        self.agentInitTask = Task {
-            try await load()
+        public var description: String {
+            switch self {
+            case .notFound(let id):
+                "Agent not found: \(id.rawValue)"
+            case .persistenceError(let detail):
+                "Agent persistence error: \(detail)"
+            }
         }
     }
 
-    private func load() async throws {
-        agents = try await agentStore.read() ?? []
-        ping()
+    private let store: DataStore<[Agent]>
+    private var storeRestoreTask: Task<Void, Never>?
+
+    private init(location: String? = nil) {
+        self.store = .init(location: location ?? ".app/agents")
+        self.storeRestoreTask = Task { await restore() }
+    }
+
+    private func restore() async {
+        do {
+            agents = try await store.read() ?? []
+            ping()
+        } catch {
+            logger.error("[AgentsProvider] Error restoring: \(error)")
+        }
     }
 
     private func save() async throws {
-        try await agentStore.write(agents)
-        ping()
+        do {
+            try await store.write(agents)
+            ping()
+        } catch {
+            throw Error.persistenceError("\(error)")
+        }
     }
 
-    // Update the `updated` timestamp and may do other things in the future.
     private func ping() {
         updated = .now
     }
 
-    // Ensures cached data has loaded before continuing.
-    private func ready() async throws {
-        if let task = agentInitTask {
-            try await task.value
-        }
+    public func ready() async {
+        await storeRestoreTask?.value
     }
 }
 
 extension AgentsProvider {
 
-    public func get(_ id: String) throws -> Agent {
+    public func get(_ id: Agent.ID) throws -> Agent {
         guard let agent = agents.first(where: { $0.id == id }) else {
-            throw Error.notFound
+            throw Error.notFound(id)
         }
         return agent
     }
-    
+
     public func upsert(_ agent: Agent) async throws {
-        try await ready()
+        await ready()
         var agents = self.agents
         if let index = agents.firstIndex(where: { $0.id == agent.id }) {
             var existing = agents[index]
@@ -115,22 +127,15 @@ extension AgentsProvider {
         self.agents = agents
         try await save()
     }
-    
-    public func delete(_ id: String) async throws {
-        try await ready()
+
+    public func delete(_ id: Agent.ID) async throws {
+        await ready()
         agents.removeAll(where: { $0.id == id })
         try await save()
     }
-    
+
     public func reset() async throws {
-        try await ready()
         agents = Defaults.agents
-        try await save()
-        logger.debug("[AgentsProvider] Reset")
-    }
-    
-    public func flush() async throws {
-        try await ready()
         try await save()
     }
 }
