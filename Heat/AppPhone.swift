@@ -14,10 +14,13 @@ struct MainApp: App {
     @Environment(\.openWindow) var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
-    @State private var state = AppState.shared
+    @State private var state = AppState.development
 
-    @State private var selectedConversationID: String? = nil
+    @State private var selectedConversationID: Conversation.ID? = nil
     @State private var sheet: Sheet? = nil
+
+    @State private var showingError = false
+    @State private var error: (any CustomStringConvertible)? = nil
 
     enum Sheet: String, Identifiable {
         case conversationList
@@ -60,6 +63,11 @@ struct MainApp: App {
             }
             .environment(state)
             .modelContainer(for: Memory.self)
+            .alert("Error", isPresented: $showingError, presenting: error) { _ in
+                Button("OK", role: .cancel) {}
+            } message: { error in
+                Text(error.description)
+            }
             .onAppear {
                 handleInit()
             }
