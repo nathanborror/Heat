@@ -70,21 +70,21 @@ extension MessagesProvider {
         return message
     }
 
-    public func get(parentID: String) throws -> [Message] {
-        messages.filter { $0.parent == parentID }
+    public func get(referenceID: String) throws -> [Message] {
+        messages.filter { $0.referenceID == referenceID }
     }
 
-    public func upsert(messages: [Message], parentID: String) async throws {
+    public func upsert(messages: [Message], referenceID: String) async throws {
         await ready()
         for message in messages {
-            try await upsert(message: message, parentID: parentID)
+            try await upsert(message: message, referenceID: referenceID)
         }
     }
 
-    public func upsert(message: Message, parentID: String) async throws {
+    public func upsert(message: Message, referenceID: String) async throws {
         await ready()
         var message = message
-        message.parent = parentID
+        message.referenceID = referenceID
         if let index = messages.firstIndex(where: { $0.id == message.id }) {
             messages[index] = message
         } else {
@@ -99,9 +99,9 @@ extension MessagesProvider {
         try await save()
     }
 
-    public func delete(parentID: String) async throws {
+    public func delete(referenceID: String) async throws {
         await ready()
-        messages.removeAll(where: { $0.parent == parentID })
+        messages.removeAll(where: { $0.referenceID == referenceID })
         try await save()
     }
 

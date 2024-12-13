@@ -58,9 +58,10 @@ struct MessageList: View {
         Task {
             do {
                 let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
-                try conversationViewModel.generate(chat: prompt, context: context)
+                try await conversationViewModel.generate(chat: prompt, context: context)
             } catch {
-                conversationViewModel.error = error
+                print(error)
+//                conversationViewModel.error = error
             }
         }
     }

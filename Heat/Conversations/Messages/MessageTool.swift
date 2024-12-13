@@ -18,16 +18,7 @@ struct MessageTool: View {
             if let name = message.name, let tool = Toolbox(name: name) {
                 switch tool {
                 case .generateImages:
-                    MessageAttachments(message.attachments)
-                        #if os(macOS)
-                        .frame(width: 300, height: 300)
-                        .scaleEffect(1.05)
-                        .clipShape(.rect(cornerRadius: 10))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
-                        }
-                        #endif
+                    MessageToolContent("Generate Images", message.content, lineLimit: lineLimit)
                 case .searchWeb:
                     MessageToolContent("Search results", message.content, lineLimit: lineLimit)
                 case .browseWeb:
@@ -37,10 +28,10 @@ struct MessageTool: View {
                 case .searchCalendar:
                     MessageToolContent("Calendar search results", message.content, lineLimit: lineLimit)
                 case .generateTitle, .generateSuggestions:
-                    MessageToolContent(message.metadata.label, nil)
+                    MessageToolContent(message.metadata?.label, nil)
                 }
             } else {
-                MessageToolContent(message.metadata.label, nil)
+                MessageToolContent(message.metadata?.label, nil)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,15 +41,34 @@ struct MessageTool: View {
                     switch message.name {
                     case Toolbox.searchWeb.name:
                         VStack {
-                            Text(message.content ?? "None")
-                                .textSelection(.enabled)
-                                .padding()
+                            if let content = message.content {
+                                ForEach(content.indices, id: \.self) { index in
+                                    switch content[index] {
+                                    case .text(let text):
+                                        Text(text)
+                                            .textSelection(.enabled)
+                                            .padding()
+                                    default:
+                                        Text("Unhandled content type")
+                                    }
+                                }
+                            }
                         }
                     case Toolbox.browseWeb.name:
                         VStack {
-                            RenderText(message.content)
-                                .textSelection(.enabled)
-                                .padding()
+                            if let content = message.content {
+                                ForEach(content.indices, id: \.self) { index in
+                                    switch content[index] {
+                                    case .text(let text):
+                                        RenderText(text)
+                                            .textSelection(.enabled)
+                                            .padding()
+                                    default:
+                                        Text("Unhandled content type")
+                                    }
+                                }
+                            }
+
                         }
                     default:
                         EmptyView()
@@ -71,10 +81,10 @@ struct MessageTool: View {
 
 struct MessageToolContent: View {
     let title: String?
-    let content: String?
+    let content: [Message.Content]?
     let lineLimit: Int
 
-    init(_ title: String?, _ content: String?, lineLimit: Int = 3) {
+    init(_ title: String?, _ content: [Message.Content]?, lineLimit: Int = 3) {
         self.title = title
         self.content = content
         self.lineLimit = lineLimit
@@ -88,11 +98,18 @@ struct MessageToolContent: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             if let content {
-                Text(content)
-                    .lineLimit(lineLimit)
-                    .font(.system(size: textFontSize))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                ForEach(content.indices, id: \.self) { index in
+                    switch content[index] {
+                    case .text(let text):
+                        Text(text)
+                            .lineLimit(lineLimit)
+                            .font(.system(size: textFontSize))
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    default:
+                        Text("Unhandled content type")
+                    }
+                }
             }
         }
     }
@@ -110,7 +127,8 @@ struct MessageToolWebSearch: View {
 
     init(message: Message) {
         self.message = message
-        guard let content = message.content, let data = content.data(using: .utf8) else { return }
+        guard case .text(let text) = message.content?.first else { return }
+        guard let data = text.data(using: .utf8) else { return }
         self.response = try? JSONDecoder().decode(WebSearchTool.Response.self, from: data)
     }
 
@@ -130,13 +148,15 @@ struct MessageToolWebSearchImages: View {
         ScrollView(.horizontal) {
             HStack {
                 ForEach(images.indices, id: \.self) { index in
-                    PictureView(asset: .init(name: images[index].image?.absoluteString ?? "", kind: .image, location: .url))
-                        .aspectRatio(1.0, contentMode: .fit)    // Forces a square aspect ratio.
-                        .containerRelativeFrame([.horizontal])  // Makes the frame width fill the scroll view.
-                        .clipped()
-                        .onTapGesture {
-                            openURL(images[index].url)
-                        }
+                    if let url = images[index].image {
+                        PictureView(url: url)
+                            .aspectRatio(1.0, contentMode: .fit)    // Forces a square aspect ratio.
+                            .containerRelativeFrame([.horizontal])  // Makes the frame width fill the scroll view.
+                            .clipped()
+                            .onTapGesture {
+                                openURL(images[index].url)
+                            }
+                    }
                 }
                 Spacer()
             }

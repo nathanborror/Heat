@@ -20,17 +20,13 @@ struct MessageView: View {
             // Render message content
             switch message.role {
             case .system:
-                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
+                MessageContent(message.content, for: message.role, agentID: message.metadata?.agentID)
                     .messageSpacing(message)
             case .user:
-                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
-                    .messageSpacing(message)
-                MessageAttachments(message.attachments)
+                MessageContent(message.content, for: message.role, agentID: message.metadata?.agentID)
                     .messageSpacing(message)
             case .assistant:
-                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
-                    .messageSpacing(message)
-                MessageAttachments(message.attachments)
+                MessageContent(message.content, for: message.role, agentID: message.metadata?.agentID)
                     .messageSpacing(message)
                 MessageToolCalls(message.toolCalls, lineLimit: lineLimit)
                     .messageSpacing(message)
@@ -65,11 +61,11 @@ struct MessageContent: View {
     @Environment(AppState.self) var state
     @Environment(\.colorScheme) private var colorScheme
 
-    let content: String?
+    let content: [Message.Content]?
     let role: Message.Role
     let agentID: Agent.ID?
 
-    init(_ content: String?, for role: Message.Role, agentID: String? = nil) {
+    init(_ content: [Message.Content]?, for role: Message.Role, agentID: String? = nil) {
         self.content = content
         self.role = role
         self.agentID = (agentID != nil) ? .init(agentID!) : nil
@@ -80,11 +76,9 @@ struct MessageContent: View {
             VStack(alignment: .leading, spacing: 12) {
                 switch role {
                 case .system:
-                    RenderText(content)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    contentBody
                 case .user:
-                    RenderText(content, role: .user)
+                    contentBody
                 case .assistant, .tool:
                     ForEach(contents.indices, id: \.self) { index in
                         switch contents[index] {
@@ -100,8 +94,30 @@ struct MessageContent: View {
         }
     }
 
+    var contentBody: some View {
+        Group {
+            if let content {
+                ForEach(content.indices, id: \.self) { index in
+                    switch content[index] {
+                    case .text(let text):
+                        RenderText(text, role: role)
+                    case .image(let data, _):
+                        PictureView(data: data)
+                            .frame(width: 200, height: 200)
+                            .clipShape(.rect(cornerRadius: 5))
+                            .padding(.bottom, 6)
+                        //RenderText("{Image}", role: role)
+                    case .audio:
+                        RenderText("{Audio}", role: role)
+                    }
+                }
+            }
+        }
+    }
+
     var contents: [ContentParser.Result.Content] {
-        guard let content = content else { return [] }
+        // TODO: Handle multiple content items
+        guard case .text(let text) = content?.first else { return [] }
 
         // Start with default tags to look for, if the message has a agentID associated with it
         // look for the tags its agent is expecting to output.
@@ -110,7 +126,7 @@ struct MessageContent: View {
             tags = agent.tags
         }
 
-        guard let results = try? parser.parse(input: content, tags: tags) else { return [] }
+        guard let results = try? parser.parse(input: text, tags: tags) else { return [] }
         return results.contents
     }
 

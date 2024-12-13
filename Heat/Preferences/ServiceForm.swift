@@ -52,11 +52,9 @@ struct ServiceForm: View {
                 if showSelections {
                     ModelPicker("Chats", models: service.models, selection: $service.preferredChatModel)
                     ModelPicker("Images", models: service.models, selection: $service.preferredImageModel)
-                    ModelPicker("Vision", models: service.models, selection: $service.preferredVisionModel)
                     ModelPicker("Summarization", models: service.models, selection: $service.preferredSummarizationModel)
 
                     if showingAdditionalServices {
-                        ModelPicker("Tools", models: service.models, selection: $service.preferredToolModel)
                         ModelPicker("Embeddings", models: service.models, selection: $service.preferredEmbeddingModel)
                         ModelPicker("Transcriptions", models: service.models, selection: $service.preferredTranscriptionModel)
                         ModelPicker("Speech", models: service.models, selection: $service.preferredSpeechModel)
@@ -114,8 +112,6 @@ struct ServiceForm: View {
                 service.applyPreferredModels(Defaults.mistral)
             case .perplexity:
                 service.applyPreferredModels(Defaults.perplexity)
-            case .google:
-                service.applyPreferredModels(Defaults.google)
             default:
                 break
             }

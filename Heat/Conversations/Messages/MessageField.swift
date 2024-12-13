@@ -184,12 +184,10 @@ struct MessageField: View {
 
         // If there are images in the image picker, return a vision action
         if !imagePickerViewModel.imagesSelected.isEmpty {
-
             // Resize image so we're not sending huge amounts of data to the services.
             let images = imagePickerViewModel.imagesSelected.map {
-                $0.image?.resize(to: .init(width: 512, height: 512))
+                $0.image?.resizedToMaxDimension(1568)?.jpegData(compressionQuality: 0.8)
             }.compactMap { $0 }
-
             action(content, images, .vision)
             return
         }
@@ -276,6 +274,7 @@ struct ConversationInputImage: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 100, height: 100)
+                    .clipShape(.rect(cornerRadius: 10))
                 #else
                 Image(uiImage: image)
                     .resizable()
@@ -297,6 +296,7 @@ struct ConversationInputImage: View {
                     .imageScale(.medium)
                     .padding(4)
             }
+            .buttonStyle(.plain)
             .foregroundStyle(.regularMaterial)
             .shadow(color: .primary.opacity(0.25), radius: 5)
         }

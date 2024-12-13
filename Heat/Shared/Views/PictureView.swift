@@ -4,94 +4,46 @@ import GenKit
 import HeatKit
 
 struct PictureView: View {
-    let asset: Asset
+    let url: URL?
+    let data: Data?
 
     var scale: Double = 1.0
     var offset: CGSize = .zero
 
+    init(url: URL? = nil, data: Data? = nil) {
+        self.url = url
+        self.data = data
+    }
+
     var body: some View {
         GeometryReader { geo in
-            switch asset.kind {
-            case .image:
-                switch asset.location {
-                case .filesystem, .cache, .url:
-                    if let url = asset.url {
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: geo.size.width, height: geo.size.height)
-                        } placeholder: {
-                            Rectangle()
-                                .fill(.primary.opacity(0.05))
-                                .frame(width: geo.size.width, height: geo.size.height)
-                        }
-                    } else {
-                        empty(size: geo.size)
-                    }
-                case .bundle:
-                    Image(asset.name)
+            if let url {
+                AsyncImage(url: url) { image in
+                    image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: geo.size.width, height: geo.size.height)
-                        .scaleEffect(scale, anchor: .top)
-                        .offset(offset)
-                case .none:
-                    if let data = asset.data {
-                        #if os(macOS)
-                        if let image = NSImage(data: data) {
-                            Image(nsImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: geo.size.width, height: geo.size.height)
-                        } else {
-                            Rectangle()
-                                .fill(.secondary)
-                                .frame(width: geo.size.width, height: geo.size.height)
-                        }
-                        #else
-                        if let image = UIImage(data: data) {
-                            Image(uiImage: image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: geo.size.width, height: geo.size.height)
-                        } else {
-                            Rectangle()
-                                .fill(.secondary)
-                                .frame(width: geo.size.width, height: geo.size.height)
-                        }
-                        #endif
-                    } else {
-                        empty(size: geo.size)
-                    }
+                } placeholder: {
+                    Rectangle()
+                        .fill(.primary.opacity(0.05))
+                        .frame(width: geo.size.width, height: geo.size.height)
                 }
-
-            case .video:
-                VideoView(name: asset.name)
-                    .frame(width: geo.size.width, height: geo.size.height)
-                    .scaleEffect(scale, anchor: .top)
-                    .offset(offset)
-
-            case .audio:
-                empty(size: geo.size)
-
-            case .symbol:
-                ZStack {
-                    Image(systemName: asset.name)
-                        .resizable()
-                        .foregroundStyle(.white)
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geo.size.width/2.5, height: geo.size.width/2.5)
-                }
-                .frame(width: geo.size.width, height: geo.size.height)
-                .background(asset.backgroundColor ?? .secondary)
             }
+            #if os(macOS)
+            if let data, let image = NSImage(data: data) {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geo.size.width, height: geo.size.height)
+            }
+            #else
+            if let data, let image = UIImage(data: data) {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geo.size.width, height: geo.size.height)
+            }
+            #endif
         }
-    }
-
-    func empty(size: CGSize) -> some View {
-        Rectangle()
-            .fill(asset.backgroundColor ?? .secondary)
-            .frame(width: size.width, height: size.height)
     }
 }

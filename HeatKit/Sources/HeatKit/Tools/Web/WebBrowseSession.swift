@@ -28,7 +28,10 @@ public actor WebBrowseSession {
             """)
         
         let resp = try await ChatSession.shared.completion(req)
-        return resp.messages.first?.content
+        guard case .text(let text) = resp.messages.first?.content?.first else {
+            return nil
+        }
+        return text
     }
     
     // MARK: - Private

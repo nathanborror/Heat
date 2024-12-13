@@ -7,6 +7,7 @@ public struct Defaults {
     // MARK: - Agents
 
     public static let agents = [
+        agentReasoner,
         agentAssistant,
         agentAssistantWithTools,
         agentAssistantThoughtful,
@@ -17,6 +18,13 @@ public struct Defaults {
     ]
 
     public static let assistantDefaultID = agentAssistant.id
+
+    public static let agentReasoner = Agent(
+        id: .init("bundle-assistant-reasoner"),
+        kind: .assistant,
+        name: "Advanced Reasoner",
+        instructions: AdvancedReasoningInstructions
+    )
 
     public static let agentAssistant = Agent(
         id: .init("bundle-assistant"),
@@ -112,7 +120,6 @@ public struct Defaults {
         anthropic,
         elevenlabs,
         fal,
-        google,
         groq,
         mistral,
         ollama,
@@ -136,12 +143,6 @@ public struct Defaults {
         Service(
             id: .fal,
             name: "Fal"
-        )
-
-    public static let google =
-        Service(
-            id: .google,
-            name: "Google"
         )
 
     public static let groq =

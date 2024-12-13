@@ -19,7 +19,7 @@ struct ImageSearchTag: View {
                 HStack(spacing: 6) {
                     ForEach(results.prefix(10).indices, id: \.self) { index in
                         if let imageURL = results[index].image {
-                            PictureView(asset: .init(name: imageURL.absoluteString, kind: .image, location: .url))
+                            PictureView(url: imageURL)
                                 .scaleEffect(1.1)
                                 .frame(width: width, height: height)
                                 .clipShape(.rect(cornerRadius: 5))
