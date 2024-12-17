@@ -103,11 +103,13 @@ struct ServiceSetup: View {
 
         // Set API token for service
         try await state.preferencesProvider.upsert(token: serviceAPIKey, serviceID: serviceID)
+        try await state.preferencesProvider.initialize(serviceID: serviceID)
 
         // Establish preferred models to use from the service
         // Since these are hard-coded they could become out-of-dated
         var preferredChatModel: Model.ID = .init("")
         var preferredSummarizationModel: Model.ID = .init("")
+
         switch serviceID {
         case .anthropic:
             preferredChatModel = .init("claude-3-5-sonnet-20240620")

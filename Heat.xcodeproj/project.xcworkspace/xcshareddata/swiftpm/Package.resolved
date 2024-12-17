@@ -24,7 +24,7 @@
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
       "state" : {
         "branch" : "main",
-        "revision" : "323d9f882ea060e28183ad67d9a9053317751071"
+        "revision" : "7ecc38bb6edf7d087d30e737057b8d8a9b7f51eb"
       }
     },
     {
@@ -96,7 +96,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "simplify",
-        "revision" : "a075a30c02d8dd32761c20b5b1f6a866e483893f"
+        "revision" : "49e372ee671791a75110f8c37a5d3e73a59c9aee"
       }
     },
     {

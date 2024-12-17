@@ -19,7 +19,6 @@ struct MessageField: View {
     enum Command: String {
         case text
         case imagine
-        case vision
     }
 
     @State private var imagePickerViewModel = ImagePickerViewModel()
@@ -188,7 +187,7 @@ struct MessageField: View {
             let images = imagePickerViewModel.imagesSelected.map {
                 $0.image?.resizedToMaxDimension(1568)?.jpegData(compressionQuality: 0.8)
             }.compactMap { $0 }
-            action(content, images, .vision)
+            action(content, images, .text)
             return
         }
 

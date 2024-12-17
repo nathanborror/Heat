@@ -55,31 +55,22 @@ extension PlatformImage {
 // MARK: Format
 
 extension PlatformImage {
+
+    #if os(macOS)
     func jpegData(compressionQuality: CGFloat = 0.8) -> Data? {
-        #if os(iOS)
-        // UIImage already has jpegData method
-        return self.jpegData(compressionQuality: compressionQuality)
-        #else
-        // Convert NSImage to JPEG
         guard let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return nil
         }
         let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
         return bitmapRep.representation(using: .jpeg, properties: [.compressionFactor: compressionQuality])
-        #endif
     }
 
     func pngData() -> Data? {
-        #if os(iOS)
-        // UIImage already has pngData method
-        return self.pngData()
-        #else
-        // Convert NSImage to PNG
         guard let cgImage = self.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return nil
         }
         let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
         return bitmapRep.representation(using: .png, properties: [:])
-        #endif
     }
+    #endif
 }

@@ -100,8 +100,6 @@ struct ConversationView: View {
             do {
                 switch command {
                 case .text:
-                    try await conversationViewModel.generate(chat: prompt, context: context)
-                case .vision:
                     try await conversationViewModel.generate(chat: prompt, images: images, context: context)
                 case .imagine:
                     try await conversationViewModel.generate(image: prompt)

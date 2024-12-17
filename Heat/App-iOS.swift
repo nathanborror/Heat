@@ -5,7 +5,6 @@ import CoreServices
 import EventKit
 import SharedKit
 import HeatKit
-import KeyboardShortcuts
 
 private let logger = Logger(subsystem: "MainApp", category: "App")
 
