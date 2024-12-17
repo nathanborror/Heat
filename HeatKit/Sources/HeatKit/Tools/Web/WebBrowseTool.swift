@@ -80,7 +80,7 @@ extension WebBrowseTool {
                 role: .tool,
                 content: """
                     <error>
-                        \(error.localizedDescription)
+                        \(error)
                     </error>
                     """,
                 toolCallID: toolCall.id,
@@ -112,7 +112,7 @@ extension WebBrowseTool {
                 url: args.url,
                 content: """
                 <error>
-                    \(error.localizedDescription)
+                    \(error)
                 </error>
                 """,
                 success: false
