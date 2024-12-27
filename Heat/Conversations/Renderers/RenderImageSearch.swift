@@ -2,7 +2,7 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct ImageSearchTag: View {
+struct RenderImageSearch: View {
     @Environment(\.openURL) var openURL
 
     let tag: ContentParser.Result.Tag

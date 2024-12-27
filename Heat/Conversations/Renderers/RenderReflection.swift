@@ -2,7 +2,7 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct ReflectionTag: View {
+struct RenderReflection: View {
     let tag: ContentParser.Result.Tag
 
     init(_ tag: ContentParser.Result.Tag) {

@@ -44,7 +44,7 @@ final class ConversationViewModel {
     /// The instructions (system prompt) that's sent with every request.'
     var instructions: [Message] {
         guard let conversation else { return [] }
-        let instructions = Message(role: .system, content: [.text(conversation.instructions)])
+        let instructions = Message(role: .system, content: conversation.instructions)
         return [instructions]
     }
 

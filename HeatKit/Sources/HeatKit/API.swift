@@ -29,7 +29,7 @@ public final class API {
             let imageContent = images.map { Message.Content.image(data: $0, format: .jpeg) }
             let textContent = Message.Content.text(PromptTemplate(prompt, with: context))
 
-            let userMessage = Message(role: .user, content: [textContent] + imageContent)
+            let userMessage = Message(role: .user, contents: [textContent] + imageContent)
             try await messagesProvider.upsert(message: userMessage, referenceID: conversation.id.rawValue)
             try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
@@ -101,7 +101,7 @@ public final class API {
             let contents: [Message.Content] = data.map { .image(data: $0, format: .jpeg) }
             let message = Message(
                 role: .assistant,
-                content: contents + [
+                contents: contents + [
                     .text("A generated image using the prompt:\n\(prompt)")
                 ]
             )
@@ -141,10 +141,10 @@ public final class API {
         let stream = ChatSession.shared.stream(req)
         for try await message in stream {
             try Task.checkCancellation()
-            guard case .text(let text) = message.content?.first else { continue }
+            guard let content = message.content else { continue }
 
             let name = "title"
-            let result = try ContentParser.shared.parse(input: text, tags: [name])
+            let result = try ContentParser.shared.parse(input: content, tags: [name])
             let tag = result.first(tag: name)
             
             guard let title = tag?.content else { continue }
@@ -182,10 +182,10 @@ public final class API {
         let stream = ChatSession.shared.stream(req)
         for try await message in stream {
             try Task.checkCancellation()
-            guard case .text(let text) = message.content?.first else { continue }
+            guard let content = message.content else { continue }
 
             let name = "suggested_replies"
-            let result = try ContentParser.shared.parse(input: text, tags: [name])
+            let result = try ContentParser.shared.parse(input: content, tags: [name])
             let tag = result.first(tag: name)
 
             guard let content = tag?.content else { continue }
@@ -230,7 +230,7 @@ public final class API {
         } else {
             let toolResponse = Message(
                 role: .tool,
-                content: [.text("Unknown tool.")],
+                content: "Unknown tool.",
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
                 metadata: .init(["label": "Unknown tool"])
@@ -242,12 +242,11 @@ public final class API {
     private func plainTextHistory(_ messages: [Message]) -> String {
         var out = ""
         for message in messages {
-            out += message.role.rawValue + ":\n"
-            for content in message.content ?? [] {
-                guard case .text(let text) = content else { continue }
-                out += text + "\n"
-            }
-            out += "\n"
+            out += """
+                \(message.role.rawValue):
+                \(message.content ?? "")
+                
+                """
         }
         return out
     }

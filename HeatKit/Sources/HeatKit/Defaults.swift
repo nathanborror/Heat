@@ -7,10 +7,10 @@ public struct Defaults {
     // MARK: - Agents
 
     public static let agents = [
-        agentReasoner,
         agentAssistant,
         agentAssistantWithTools,
         agentAssistantThoughtful,
+        agentReasoner,
         agentAssistantCreator,
         agentInvestigator,
         agentReporter,
@@ -18,13 +18,6 @@ public struct Defaults {
     ]
 
     public static let assistantDefaultID = agentAssistant.id
-
-    public static let agentReasoner = Agent(
-        id: .init("bundle-assistant-reasoner"),
-        kind: .assistant,
-        name: "Advanced Reasoner",
-        instructions: AdvancedReasoningInstructions
-    )
 
     public static let agentAssistant = Agent(
         id: .init("bundle-assistant"),
@@ -46,10 +39,17 @@ public struct Defaults {
         ]
     )
 
+    public static let agentReasoner = Agent(
+        id: .init("bundle-assistant-reasoner"),
+        kind: .assistant,
+        name: "Basic Assistant (CoT)",
+        instructions: AdvancedReasoningInstructions
+    )
+
     public static let agentAssistantThoughtful = Agent(
         id: .init("bundle-assistant-thoughtful"),
         kind: .assistant,
-        name: "Thoughtful Assistant",
+        name: "Basic Assistant (Thoughtful)",
         instructions: AssistantThoughtfulInstructions,
         toolIDs: [
             Toolbox.generateImages.name,

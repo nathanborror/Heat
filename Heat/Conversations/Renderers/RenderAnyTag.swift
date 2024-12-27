@@ -2,7 +2,7 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct PlainTag: View {
+struct RenderAnyTag: View {
     let tag: ContentParser.Result.Tag
 
     @State private var isCopied = false
@@ -29,15 +29,7 @@ struct PlainTag: View {
             }
             .padding(.bottom, 12)
 
-            ForEach(contents.indices, id: \.self) { index in
-                switch contents[index] {
-                case .text(let text):
-                    RenderText(text)
-                case .tag(let tag):
-                    TagView(tag)
-                        .foregroundStyle(.secondary)
-                }
-            }
+            RenderText(tag.content, tags: ["reflection", "image_search_query"])
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -46,15 +38,6 @@ struct PlainTag: View {
                 .stroke(Color.primary.opacity(0.1), lineWidth: 1)
         }
     }
-
-    var contents: [ContentParser.Result.Content] {
-        guard let content = tag.content else { return [] }
-        let tags = ["reflection", "image_search_query"]
-        guard let results = try? parser.parse(input: content, tags: tags) else { return [] }
-        return results.contents
-    }
-
-    private let parser = ContentParser.shared
 
     private func handleCopy() {
         guard let contents = tag.content?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }

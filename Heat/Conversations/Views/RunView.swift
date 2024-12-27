@@ -104,7 +104,7 @@ struct RunStepDetail: View {
 
     var body: some View {
         ScrollView {
-            MessageView(message, lineLimit: .max)
+            MessageView(message)
         }
         .navigationTitle("Details")
         .background(.background)
