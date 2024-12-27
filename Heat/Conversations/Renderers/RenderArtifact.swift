@@ -8,7 +8,7 @@ struct RenderArtifact: View {
     init(_ tag: ContentParser.Result.Tag) {
         self.tag = tag
     }
-
+    
     var body: some View {
         RenderText(tag.content, tags: ["image_search_query"])
             .padding(24)

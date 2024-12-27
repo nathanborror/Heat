@@ -15,7 +15,7 @@ struct RenderText: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 12) {
             ForEach(toTaggedContents.indices, id: \.self) { index in
                 switch toTaggedContents[index] {
                 case let .text(text):
@@ -68,28 +68,25 @@ struct RenderModifier: ViewModifier {
                 content
             }
         case .user:
-            HStack {
-                Spacer()
-                switch state.textRendering {
-                case .markdown:
-                    content
-                        .markdownTheme(.user)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(.tint, in: .rect(cornerRadius: 10))
-                case .attributed:
-                    content
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(.tint, in: .rect(cornerRadius: 10))
-                case .text:
-                    content
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(.tint, in: .rect(cornerRadius: 10))
-                }
+            switch state.textRendering {
+            case .markdown:
+                content
+                    .markdownTheme(.user)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.tint, in: .rect(cornerRadius: 10))
+            case .attributed:
+                content
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.tint, in: .rect(cornerRadius: 10))
+            case .text:
+                content
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.tint, in: .rect(cornerRadius: 10))
             }
         case .tool:
             content

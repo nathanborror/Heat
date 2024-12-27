@@ -10,7 +10,7 @@ struct MessageView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 12) {
            switch message.role {
             case .system:
                SystemContentsView(message.contents)
@@ -27,6 +27,27 @@ struct MessageView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+}
+
+#Preview {
+    let message1 = Message(role: .assistant, contents: [
+        .text("""
+            <thinking>Hello I'm thinking</thinking>
+            <output>This is fun</output>
+            """),
+    ])
+    let message2 = Message(role: .assistant, contents: [
+        .text("""
+            <thinking>Hello I'm thinking</thinking>
+            
+            This is fun
+            """),
+    ])
+    return VStack(alignment: .leading, spacing: 24) {
+        MessageView(message1)
+        MessageView(message2)
+    }
+    .environment(AppState.development)
 }
 
 // Contents
@@ -106,6 +127,7 @@ struct ContentsView: View {
                     }
                 }
             }
+            .fixedSize(horizontal: false, vertical: true) // HACK: Prevents occasional word truncation
         }
     }
 }

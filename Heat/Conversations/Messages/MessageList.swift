@@ -20,6 +20,7 @@ struct MessageList: View {
                         RunView(run)
                     }
                 }
+                .padding(.horizontal, 12)
 
                 VStack(alignment: .leading, spacing: 0) {
                     // Assistant typing indicator when processing
@@ -39,9 +40,9 @@ struct MessageList: View {
                         }
                     }
                 }
+                .padding(.horizontal, 12)
                 .id("bottom")
             }
-            .padding(.horizontal, 12)
             .onChange(of: state.messagesProvider.updated) { _, _ in
                 proxy.scrollTo("bottom")
             }
@@ -80,7 +81,7 @@ struct MessageListScrollView<Content: View>: View {
         List {
             content()
                 .listRowSeparator(.hidden)
-                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                .listRowInsets(.init(top: 6, leading: 0, bottom: 6, trailing: 0))
         }
         .listStyle(.plain)
         .scrollClipDisabled()
