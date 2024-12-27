@@ -10,10 +10,7 @@ struct RenderArtifact: View {
     }
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 12) {
-                RenderText(tag.content, tags: ["image_search_query"])
-            }
+        RenderText(tag.content, tags: ["image_search_query"])
             .padding(24)
             .frame(maxWidth: 700)
             .background {
@@ -22,6 +19,5 @@ struct RenderArtifact: View {
                     .stroke(Color.primary.opacity(0.1), lineWidth: 1)
                     .shadow(color: .primary.opacity(0.1), radius: 20, y: 10)
             }
-        }
     }
 }

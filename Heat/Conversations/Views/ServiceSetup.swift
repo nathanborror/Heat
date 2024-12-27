@@ -27,7 +27,7 @@ struct ServiceSetup: View {
                 Text("Pick a Chat Service and provide an API key. For Ollama there's no need for an API key but you will need to pick an installed model to use.")
                     .font(.subheadline)
                     .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
+                    .fixedSize(horizontal: false, vertical: true) // HACK: Prevents occasional word truncation
             }
 
             VStack {

@@ -15,25 +15,25 @@ struct RenderText: View {
     }
 
     var body: some View {
-        ForEach(toTaggedContents.indices, id: \.self) { index in
-            switch toTaggedContents[index] {
-            case let .text(text):
-                switch state.textRendering {
-                case .markdown:
-                    Markdown(text)
-                        .markdownCodeSyntaxHighlighter(.app)
-                        .textSelection(.enabled)
-                case .attributed:
-                    Text(toAttributedString)
-                        .textSelection(.enabled)
-                default:
-                    Text(text)
-                        .textSelection(.enabled)
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(toTaggedContents.indices, id: \.self) { index in
+                switch toTaggedContents[index] {
+                case let .text(text):
+                    switch state.textRendering {
+                    case .markdown:
+                        Markdown(text)
+                            .markdownCodeSyntaxHighlighter(.app)
+                    case .attributed:
+                        Text(toAttributedString)
+                    default:
+                        Text(text)
+                    }
+                case let .tag(tag):
+                    RenderTag(tag)
                 }
-            case let .tag(tag):
-                RenderTag(tag)
             }
         }
+        .textSelection(.enabled)
     }
 
     var toAttributedString: AttributedString {
@@ -57,40 +57,39 @@ struct RenderModifier: ViewModifier {
         switch role {
         case .system:
             content
-                .padding(.horizontal, 12)
         case .assistant:
             switch state.textRendering {
             case .markdown:
                 content
                     .markdownTheme(.assistant)
-                    .padding(.horizontal, 12)
             case .attributed:
                 content
-                    .padding(.horizontal, 12)
             case .text:
                 content
-                    .padding(.horizontal, 12)
             }
         case .user:
-            switch state.textRendering {
-            case .markdown:
-                content
-                    .markdownTheme(.user)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(.tint, in: .rect(cornerRadius: 10))
-            case .attributed:
-                content
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(.tint, in: .rect(cornerRadius: 10))
-            case .text:
-                content
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(.tint, in: .rect(cornerRadius: 10))
+            HStack {
+                Spacer()
+                switch state.textRendering {
+                case .markdown:
+                    content
+                        .markdownTheme(.user)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.tint, in: .rect(cornerRadius: 10))
+                case .attributed:
+                    content
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.tint, in: .rect(cornerRadius: 10))
+                case .text:
+                    content
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.tint, in: .rect(cornerRadius: 10))
+                }
             }
         case .tool:
             content

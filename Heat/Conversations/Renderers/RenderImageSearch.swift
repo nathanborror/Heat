@@ -49,7 +49,7 @@ struct RenderImageSearch: View {
 
     func performQuery() async throws {
         guard let content = tag.content else {
-            throw TagViewError.missingContent
+            throw RenderTagError.missingContent
         }
         let resp = try await WebSearchSession.shared.searchImages(query: content)
         results = resp.results

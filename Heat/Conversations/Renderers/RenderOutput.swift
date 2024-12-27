@@ -10,9 +10,6 @@ struct RenderOutput: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            RenderText(tag.content, tags: ["reflection", "image_search_query"])
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        RenderText(tag.content, tags: ["reflection", "image_search_query"])
     }
 }

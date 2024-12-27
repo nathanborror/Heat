@@ -15,11 +15,13 @@ struct MessageList: View {
             MessageListScrollView {
 
                 // Show message run history
-                ForEach(conversationViewModel.runs) { run in
-                    RunView(run)
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(conversationViewModel.runs) { run in
+                        RunView(run)
+                    }
                 }
 
-                VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
                     // Assistant typing indicator when processing
                     if conversationViewModel.conversation?.state == .processing {
                         TypingIndicator()
@@ -39,6 +41,7 @@ struct MessageList: View {
                 }
                 .id("bottom")
             }
+            .padding(.horizontal, 12)
             .onChange(of: state.messagesProvider.updated) { _, _ in
                 proxy.scrollTo("bottom")
             }
@@ -77,7 +80,7 @@ struct MessageListScrollView<Content: View>: View {
         List {
             content()
                 .listRowSeparator(.hidden)
-                .listRowInsets(.init(top: 6, leading: 0, bottom: 6, trailing: 0))
+                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
         }
         .listStyle(.plain)
         .scrollClipDisabled()
@@ -85,10 +88,7 @@ struct MessageListScrollView<Content: View>: View {
         .defaultScrollAnchor(.bottom)
         #else
         ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                content()
-            }
-            .padding(.horizontal, 12)
+            content()
         }
         .scrollClipDisabled()
         .scrollDismissesKeyboard(.interactively)

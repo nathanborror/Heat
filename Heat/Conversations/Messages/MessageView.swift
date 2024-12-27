@@ -10,7 +10,7 @@ struct MessageView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
            switch message.role {
             case .system:
                SystemContentsView(message.contents)
@@ -18,9 +18,8 @@ struct MessageView: View {
                UserContentsView(message.contents)
             case .assistant:
                AssistantContentsView(message.contents)
-               ToolCalls(message.toolCalls) { toolCall in
-                   Text(toolCall.function.name)
-                   Text(toolCall.function.arguments)
+               ForEachToolCall(message.toolCalls) { toolCall in
+                   ToolCallView(toolCall)
                }
             case .tool:
                ToolContentsView(message.contents)
@@ -79,23 +78,8 @@ struct ToolContentsView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            ForEach(contents.indices, id: \.self) {
-                switch contents[$0] {
-                case .text(let text):
-                    Text(text)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 12)
-                case .image(let data, _):
-                    PictureView(data: data)
-                        .frame(width: 200, height: 200)
-                        .clipShape(.rect(cornerRadius: 5))
-                case .audio:
-                    Text("Audio is unhandled right now.")
-                }
-            }
-        }
+        ContentsView(contents)
+            .render(role: .tool)
     }
 }
 
@@ -107,16 +91,19 @@ struct ContentsView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
-            ForEach(contents.indices, id: \.self) {
-                switch contents[$0] {
-                case .text(let text):
-                    RenderText(text, tags: ["thinking", "artifact", "output", "image_search_query"])
-                case .image(let data, _):
-                    PictureView(data: data)
-                        .frame(width: 200, height: 200)
-                case .audio:
-                    Text("Audio is unhandled right now.")
+        if !contents.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(contents.indices, id: \.self) {
+                    switch contents[$0] {
+                    case .text(let text):
+                        RenderText(text, tags: ["thinking", "artifact", "output", "image_search_query"])
+                    case .image(let data, _):
+                        PictureView(data: data)
+                            .frame(width: 200, height: 200)
+                            .clipShape(.rect(cornerRadius: 10))
+                    case .audio:
+                        Text("Audio is unhandled right now.")
+                    }
                 }
             }
         }
@@ -125,7 +112,7 @@ struct ContentsView: View {
 
 // Tool Calls
 
-struct ToolCalls<Content: View>: View {
+struct ForEachToolCall<Content: View>: View {
     let toolCalls: [ToolCall]
     let content: (ToolCall) -> Content
 
@@ -137,6 +124,63 @@ struct ToolCalls<Content: View>: View {
     var body: some View {
         ForEach(toolCalls, id: \.id) { toolCall in
             content(toolCall)
+        }
+    }
+}
+
+struct ToolCallView: View {
+    let toolCall: ToolCall
+
+    @State var disclosed = false
+
+    init(_ toolCall: ToolCall) {
+        self.toolCall = toolCall
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
+                disclosed.toggle()
+            } label: {
+                ToolCallName(toolCall.function.name)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+
+            if disclosed {
+                Text(toolCall.function.arguments)
+            }
+        }
+    }
+}
+
+struct ToolCallName: View {
+    let name: String
+
+    init(_ name: String) {
+        self.name = name
+    }
+
+    var body: some View {
+        if let tool = Toolbox(name: name) {
+            switch tool {
+            case .generateImages:
+                Text("Generating image(s)...")
+            case .generateMemory:
+                Text("Saving memory...")
+            case .generateSuggestions:
+                Text("Preparing suggestions...")
+            case .generateTitle:
+                Text("Preparing title...")
+            case .searchCalendar:
+                Text("Searching calendar...")
+            case .searchWeb:
+                Text("Searching web...")
+            case .browseWeb:
+                Text("Browsing website...")
+            }
+        } else {
+            Text("Unknown tool...")
         }
     }
 }

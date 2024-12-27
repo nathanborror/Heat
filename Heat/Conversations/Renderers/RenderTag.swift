@@ -19,7 +19,6 @@ struct RenderTag: View {
             RenderReflection(tag)
         case "output":
             RenderOutput(tag)
-                .padding(.leading, 12)
         case "image_search_query":
             RenderImageSearch(tag)
         default:
@@ -28,6 +27,6 @@ struct RenderTag: View {
     }
 }
 
-enum TagViewError: Error {
+enum RenderTagError: Error {
     case missingContent
 }
