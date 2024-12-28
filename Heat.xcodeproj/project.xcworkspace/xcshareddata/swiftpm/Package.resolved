@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
-        "branch" : "simplify",
-        "revision" : "6898266edd2a9f387c608ec6aa23059e5f30854b"
+        "branch" : "main",
+        "revision" : "bdef3c0c76601a62a8f702370fc05ee3d789c8a4"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
-        "branch" : "simplify",
-        "revision" : "3fa805fda308f44ed5325b21cd2646e06a661c0e"
+        "branch" : "main",
+        "revision" : "2e14dd0797d922111fdae75eea97059b6e022e74"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
-        "branch" : "simplify",
-        "revision" : "b4fd1482d5251169aba2b5a7ec54edf62a33e81f"
+        "branch" : "main",
+        "revision" : "1b57cab1adf9c89ea99cf05b8ff858c42c5fad64"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
-        "branch" : "simplify",
-        "revision" : "ce683f9e27268f0f8852989957e12ef763105bf0"
+        "branch" : "main",
+        "revision" : "4480bf945e44b083d262a69c4a423db22a3cf54b"
       }
     },
     {
@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
-        "branch" : "simplify",
-        "revision" : "39fc992ea32a97c9ba392c2e38d67e2334ce9375"
+        "branch" : "main",
+        "revision" : "17873133d611012638c99562a24a1877609b8d4b"
       }
     },
     {

@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/nathanborror/swift-shared-kit", from: "0.1.0"),
-        .package(url: "https://github.com/nathanborror/swift-gen-kit", branch: "simplify"),
+        .package(url: "https://github.com/nathanborror/swift-gen-kit", branch: "main"),
         .package(url: "https://github.com/cezheng/Fuzi", branch: "master"),
         .package(url: "https://github.com/jkrukowski/SQLiteVec", branch: "main"),
     ],
