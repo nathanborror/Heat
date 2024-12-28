@@ -29,27 +29,6 @@ struct MessageView: View {
     }
 }
 
-#Preview {
-    let message1 = Message(role: .assistant, contents: [
-        .text("""
-            <thinking>Hello I'm thinking</thinking>
-            <output>This is fun</output>
-            """),
-    ])
-    let message2 = Message(role: .assistant, contents: [
-        .text("""
-            <thinking>Hello I'm thinking</thinking>
-            
-            This is fun
-            """),
-    ])
-    return VStack(alignment: .leading, spacing: 24) {
-        MessageView(message1)
-        MessageView(message2)
-    }
-    .environment(AppState.development)
-}
-
 // Contents
 
 struct SystemContentsView: View {
