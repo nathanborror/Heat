@@ -100,14 +100,12 @@ struct ConversationView: View {
             do {
                 switch command {
                 case .text:
-                    try conversationViewModel.generate(chat: prompt, context: context)
-                case .vision:
-                    try conversationViewModel.generate(chat: prompt, images: images, context: context)
+                    try await conversationViewModel.generate(chat: prompt, images: images, context: context)
                 case .imagine:
-                    try conversationViewModel.generate(image: prompt)
+                    try await conversationViewModel.generate(image: prompt)
                 }
             } catch {
-                conversationViewModel.error = error
+                print(error)
             }
         }
     }
@@ -124,7 +122,11 @@ struct ConversationView: View {
                 conversationViewModel = ConversationViewModel(conversationID: conversation.id)
             }
             guard let conversationViewModel else { return }
-            try conversationViewModel.generate(chat: agent.instructions, context: agent.context, agentID: agent.id)
+            do {
+                try await conversationViewModel.generate(chat: agent.instructions, context: agent.context, agentID: agent.id)
+            } catch {
+                print(error)
+            }
         }
     }
 }

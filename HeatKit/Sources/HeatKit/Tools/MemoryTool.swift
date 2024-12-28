@@ -56,7 +56,7 @@ extension MemoryTool {
                 content: "Saved to memory.",
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
-                metadata: ["label": args.items.count == 1 ? "Stored memory" : "Stored \(args.items.count) memories"]
+                metadata: .init(["label": args.items.count == 1 ? "Stored memory" : "Stored \(args.items.count) memories"])
             )]
         } catch {
             return [.init(

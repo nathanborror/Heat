@@ -2,7 +2,7 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct ImageSearchTag: View {
+struct RenderImageSearch: View {
     @Environment(\.openURL) var openURL
 
     let tag: ContentParser.Result.Tag
@@ -19,7 +19,7 @@ struct ImageSearchTag: View {
                 HStack(spacing: 6) {
                     ForEach(results.prefix(10).indices, id: \.self) { index in
                         if let imageURL = results[index].image {
-                            PictureView(asset: .init(name: imageURL.absoluteString, kind: .image, location: .url))
+                            PictureView(url: imageURL)
                                 .scaleEffect(1.1)
                                 .frame(width: width, height: height)
                                 .clipShape(.rect(cornerRadius: 5))
@@ -49,7 +49,7 @@ struct ImageSearchTag: View {
 
     func performQuery() async throws {
         guard let content = tag.content else {
-            throw TagViewError.missingContent
+            throw RenderTagError.missingContent
         }
         let resp = try await WebSearchSession.shared.searchImages(query: content)
         results = resp.results

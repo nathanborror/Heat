@@ -19,16 +19,21 @@ public actor WebBrowseSession {
         markdown = markdown.trimmingCharacters(in: .whitespacesAndNewlines)
         
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: """
-            \(instructions)
-            
-            The website markup was converted to markdown:
-            
-            \(markdown)
-            """)
+        req.with(history: [
+            .init(role: .user, content: """
+                \(instructions)
+                
+                The website markup was converted to markdown:
+                
+                \(markdown)
+                """)
+        ])
         
         let resp = try await ChatSession.shared.completion(req)
-        return resp.messages.first?.content
+        guard let content = resp.messages.first?.content else {
+            return nil
+        }
+        return content
     }
     
     // MARK: - Private

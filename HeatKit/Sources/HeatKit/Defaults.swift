@@ -10,6 +10,7 @@ public struct Defaults {
         agentAssistant,
         agentAssistantWithTools,
         agentAssistantThoughtful,
+        agentReasoner,
         agentAssistantCreator,
         agentInvestigator,
         agentReporter,
@@ -38,10 +39,17 @@ public struct Defaults {
         ]
     )
 
+    public static let agentReasoner = Agent(
+        id: .init("bundle-assistant-reasoner"),
+        kind: .assistant,
+        name: "Basic Assistant (CoT)",
+        instructions: AdvancedReasoningInstructions
+    )
+
     public static let agentAssistantThoughtful = Agent(
         id: .init("bundle-assistant-thoughtful"),
         kind: .assistant,
-        name: "Thoughtful Assistant",
+        name: "Basic Assistant (Thoughtful)",
         instructions: AssistantThoughtfulInstructions,
         toolIDs: [
             Toolbox.generateImages.name,
@@ -112,7 +120,6 @@ public struct Defaults {
         anthropic,
         elevenlabs,
         fal,
-        google,
         groq,
         mistral,
         ollama,
@@ -136,12 +143,6 @@ public struct Defaults {
         Service(
             id: .fal,
             name: "Fal"
-        )
-
-    public static let google =
-        Service(
-            id: .google,
-            name: "Google"
         )
 
     public static let groq =

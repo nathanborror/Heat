@@ -45,19 +45,16 @@ extension ImageGeneratorTool {
             let imageModel = try await PreferencesProvider.shared.preferredImageModel()
             
             // Generate image attachments
-            var attachments = [Message.Attachment]()
+            var content = [Message.Content]()
             for prompt in args.prompts {
-                if let attachment = try await makeImageAttachment(prompt: prompt, service: imageService, model: imageModel) {
-                    attachments.append(attachment)
-                }
+                content += try await makeImages(prompt: prompt, service: imageService, model: imageModel)
             }
             return [.init(
                 role: .tool,
-                content: args.prompts.joined(separator: "\n\n"),
-                attachments: attachments,
+                contents: content + [.text(args.prompts.joined(separator: "\n\n"))],
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
-                metadata: ["label": args.prompts.count == 1 ? "Generating an image" : "Generating \(args.prompts.count) images"]
+                metadata: .init(["label": args.prompts.count == 1 ? "Generating an image" : "Generating \(args.prompts.count) images"])
             )]
         } catch {
             return [.init(
@@ -69,14 +66,12 @@ extension ImageGeneratorTool {
         }
     }
     
-    private static func makeImageAttachment(prompt: String, service: ImageService, model: Model) async throws -> Message.Attachment? {
-        var attachments = [Message.Attachment]()
-        try await ImageSession.shared
-            .generate(service: service, model: model, prompt: prompt) { images in
-                attachments = images.map {
-                    Message.Attachment.asset(.init(name: "image", data: $0, kind: .image, location: .none, description: prompt))
-                }
-            }
-        return attachments.first
+    private static func makeImages(prompt: String, service: ImageService, model: Model) async throws -> [Message.Content] {
+        var out = [Message.Content]()
+        try await ImageSession.shared.generate(service: service, model: model, prompt: prompt) { images in
+            // TODO: Add prompt info to `image`
+            out = images.map { .image(data: $0, format: .jpeg) }
+        }
+        return out
     }
 }

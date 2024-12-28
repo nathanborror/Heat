@@ -9,7 +9,6 @@ public struct Conversation: Codable, Identifiable, Sendable {
     public var id: ID<Conversation>
     public var title: String?
     public var subtitle: String?
-    public var picture: Asset?
     public var instructions: String
     public var suggestions: [String]
     public var toolIDs: Set<String>
@@ -24,12 +23,11 @@ public struct Conversation: Codable, Identifiable, Sendable {
         case none
     }
 
-    public init(id: Conversation.ID = .id, title: String? = nil, subtitle: String? = nil, picture: Asset? = nil,
-                instructions: String = "", suggestions: [String] = [], toolIDs: Set<String> = [], state: State = .none) {
+    public init(id: Conversation.ID = .id, title: String? = nil, subtitle: String? = nil, instructions: String = "",
+                suggestions: [String] = [], toolIDs: Set<String> = [], state: State = .none) {
         self.id = id
         self.title = title
         self.subtitle = subtitle
-        self.picture = picture
         self.instructions = instructions
         self.suggestions = suggestions
         self.toolIDs = toolIDs
@@ -41,7 +39,6 @@ public struct Conversation: Codable, Identifiable, Sendable {
     mutating func apply(conversation: Conversation) {
         self.title = conversation.title
         self.subtitle = conversation.subtitle
-        self.picture = conversation.picture
         self.instructions = conversation.instructions
         self.suggestions = conversation.suggestions
         self.toolIDs = conversation.toolIDs

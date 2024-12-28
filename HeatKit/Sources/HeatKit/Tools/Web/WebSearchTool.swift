@@ -77,7 +77,7 @@ extension WebSearchTool {
                     ]),
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,
-                    metadata: ["label": "Searched web for '\(args.query)'"]
+                    metadata: .init(["label": "Searched web for '\(args.query)'"])
                 )]
             case .image:
                 let searchResponse = try await WebSearchSession.shared.searchImages(query: args.query)
@@ -91,12 +91,13 @@ extension WebSearchTool {
                     results: Array(searchResponse.results.prefix(10))
                 )
                 let data = try JSONEncoder().encode(response)
+                let content = String(data: data, encoding: .utf8)
                 return [.init(
                     role: .tool,
-                    content: String(data: data, encoding: .utf8),
+                    content: content,
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,
-                    metadata: ["label": "Searched web images for '\(args.query)'"]
+                    metadata: .init(["label": "Searched web images for '\(args.query)'"])
                 )]
             }
             
@@ -104,10 +105,10 @@ extension WebSearchTool {
             return [.init(
                 role: .tool,
                 content: """
-                <error>
-                    \(error.localizedDescription)
-                </error>
-                """,
+                    <error>
+                        \(error.localizedDescription)
+                    </error>
+                    """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name
             )]

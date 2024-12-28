@@ -63,26 +63,26 @@ extension WebBrowseTool {
             return [.init(
                 role: .tool,
                 content: """
-                <website>
-                    <title>\(summary.title)</title>
-                    <url>\(args.url)</url>
-                    <summary>
-                        \(summary.content ?? "No Content")
-                    </summary>
-                </website>
-                """,
+                    <website>
+                        <title>\(summary.title)</title>
+                        <url>\(args.url)</url>
+                        <summary>
+                            \(summary.content ?? "No Content")
+                        </summary>
+                    </website>
+                    """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
-                metadata: ["label": label]
+                metadata: .init(["label": label])
             )]
         } catch {
             return [.init(
                 role: .tool,
                 content: """
-                <error>
-                    \(error.localizedDescription)
-                </error>
-                """,
+                    <error>
+                        \(error)
+                    </error>
+                    """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name
             )]
@@ -112,7 +112,7 @@ extension WebBrowseTool {
                 url: args.url,
                 content: """
                 <error>
-                    \(error.localizedDescription)
+                    \(error)
                 </error>
                 """,
                 success: false

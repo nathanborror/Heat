@@ -12,7 +12,6 @@ struct SuggestionList<Content: View>: View {
                     content(suggestion)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
@@ -25,19 +24,22 @@ struct SuggestionView: View {
 
     var body: some View {
         Button(action: { handleTap(suggestion) }) {
-            Text(suggestion)
-                .font(.system(size: fontSize))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.tint.opacity(0.05), in: .rect(cornerRadius: 10))
-                .foregroundStyle(.tint)
-                .overlay {
-                    if colorScheme == .dark {
-                        RoundedRectangle(cornerRadius: 10)
-                            .inset(by: 1)
-                            .stroke(.tint.opacity(0.5), lineWidth: 1)
+            HStack {
+                Spacer()
+                Text(suggestion)
+                    .font(.system(size: fontSize))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.tint.opacity(0.05), in: .rect(cornerRadius: 10))
+                    .foregroundStyle(.tint)
+                    .overlay {
+                        if colorScheme == .dark {
+                            RoundedRectangle(cornerRadius: 10)
+                                .inset(by: 1)
+                                .stroke(.tint.opacity(0.5), lineWidth: 1)
+                        }
                     }
-                }
+            }
         }
         .buttonStyle(.plain)
         #if os(macOS)

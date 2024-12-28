@@ -4,141 +4,184 @@ import HeatKit
 
 struct MessageView: View {
     let message: Message
-    let lineLimit: Int
 
-    init(_ message: Message, lineLimit: Int = 4) {
+    init(_ message: Message) {
         self.message = message
-        self.lineLimit = lineLimit
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-
-            // Render role for all messages in debug mode
-            MessageRole(message.role)
-
-            // Render message content
-            switch message.role {
+           switch message.role {
             case .system:
-                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
-                    .messageSpacing(message)
+               SystemContentsView(message.contents)
             case .user:
-                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
-                    .messageSpacing(message)
-                MessageAttachments(message.attachments)
-                    .messageSpacing(message)
+               UserContentsView(message.contents)
             case .assistant:
-                MessageContent(message.content, for: message.role, agentID: message.metadata.agentID)
-                    .messageSpacing(message)
-                MessageAttachments(message.attachments)
-                    .messageSpacing(message)
-                MessageToolCalls(message.toolCalls, lineLimit: lineLimit)
-                    .messageSpacing(message)
+               AssistantContentsView(message.contents)
+               ForEachToolCall(message.toolCalls) { toolCall in
+                   ToolCallView(toolCall)
+               }
             case .tool:
-                MessageTool(message, lineLimit: lineLimit)
-                    .messageSpacing(message)
+               ToolContentsView(message.contents)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-struct MessageRole: View {
-    @Environment(AppState.self) private var state
+// Contents
 
-    let role: Message.Role
+struct SystemContentsView: View {
+    let contents: [Message.Content]
 
-    init(_ role: Message.Role) {
-        self.role = role
+    init(_ contents: [Message.Content]?) {
+        self.contents = contents ?? []
     }
 
     var body: some View {
-        if state.debug {
-            Text(role.rawValue)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        }
+        ContentsView(contents)
+            .render(role: .system)
     }
 }
 
-struct MessageContent: View {
-    @Environment(AppState.self) var state
-    @Environment(\.colorScheme) private var colorScheme
+struct AssistantContentsView: View {
+    let contents: [Message.Content]
 
-    let content: String?
-    let role: Message.Role
-    let agentID: Agent.ID?
-
-    init(_ content: String?, for role: Message.Role, agentID: String? = nil) {
-        self.content = content
-        self.role = role
-        self.agentID = (agentID != nil) ? .init(agentID!) : nil
+    init(_ contents: [Message.Content]?) {
+        self.contents = contents ?? []
     }
 
     var body: some View {
-        if let content {
+        ContentsView(contents)
+            .render(role: .assistant)
+    }
+}
+
+struct UserContentsView: View {
+    let contents: [Message.Content]
+
+    init(_ contents: [Message.Content]?) {
+        self.contents = contents ?? []
+    }
+
+    var body: some View {
+        ContentsView(contents)
+            .render(role: .user)
+    }
+}
+
+struct ToolContentsView: View {
+    let contents: [Message.Content]
+
+    init(_ contents: [Message.Content]?) {
+        self.contents = contents ?? []
+    }
+
+    var body: some View {
+        ContentsView(contents)
+            .render(role: .tool)
+    }
+}
+
+struct ContentsView: View {
+    let contents: [Message.Content]
+
+    init(_ contents: [Message.Content]?) {
+        self.contents = contents ?? []
+    }
+
+    var body: some View {
+        if !contents.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                switch role {
-                case .system:
-                    RenderText(content)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                case .user:
-                    RenderText(content, role: .user)
-                case .assistant, .tool:
-                    ForEach(contents.indices, id: \.self) { index in
-                        switch contents[index] {
-                        case let .text(text):
-                            RenderText(text)
-                        case let .tag(tag):
-                            TagView(tag)
-                        }
+                ForEach(contents.indices, id: \.self) {
+                    switch contents[$0] {
+                    case .text(let text):
+                        RenderText(text, tags: ["thinking", "artifact", "output", "image_search_query"])
+                    case .image(let data, _):
+                        PictureView(data: data)
+                            .frame(width: 200, height: 200)
+                            .clipShape(.rect(cornerRadius: 10))
+                    case .audio:
+                        Text("Audio is unhandled right now.")
                     }
                 }
             }
-            .fixedSize(horizontal: false, vertical: true) // Prevents occasional word truncation
-        }
-    }
-
-    var contents: [ContentParser.Result.Content] {
-        guard let content = content else { return [] }
-
-        // Start with default tags to look for, if the message has a agentID associated with it
-        // look for the tags its agent is expecting to output.
-        var tags = ["thinking", "artifact", "output", "reflection", "image_search_query"]
-        if let agentID, let agent = try? state.agentsProvider.get(agentID) {
-            tags = agent.tags
-        }
-
-        guard let results = try? parser.parse(input: content, tags: tags) else { return [] }
-        return results.contents
-    }
-
-    private let parser = ContentParser.shared
-}
-
-// Modifiers
-
-struct MessageViewSpacing: ViewModifier {
-    let message: Message
-
-    func body(content: Content) -> some View {
-        switch message.role {
-        case .system, .tool, .assistant:
-            content
-                .padding(.horizontal, 12)
-        case .user:
-            content
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.tint, in: .rect(cornerRadius: 10))
+            .fixedSize(horizontal: false, vertical: true) // HACK: Prevents occasional word truncation
         }
     }
 }
 
-extension View {
+// Tool Calls
 
-    func messageSpacing(_ message: Message) -> some View {
-        self.modifier(MessageViewSpacing(message: message))
+struct ForEachToolCall<Content: View>: View {
+    let toolCalls: [ToolCall]
+    let content: (ToolCall) -> Content
+
+    init(_ toolCalls: [ToolCall]?, @ViewBuilder content: @escaping (ToolCall) -> Content) {
+        self.toolCalls = toolCalls ?? []
+        self.content = content
+    }
+
+    var body: some View {
+        ForEach(toolCalls, id: \.id) { toolCall in
+            content(toolCall)
+        }
+    }
+}
+
+struct ToolCallView: View {
+    let toolCall: ToolCall
+
+    @State var disclosed = false
+
+    init(_ toolCall: ToolCall) {
+        self.toolCall = toolCall
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
+                disclosed.toggle()
+            } label: {
+                ToolCallName(toolCall.function.name)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+
+            if disclosed {
+                Text(toolCall.function.arguments)
+            }
+        }
+    }
+}
+
+struct ToolCallName: View {
+    let name: String
+
+    init(_ name: String) {
+        self.name = name
+    }
+
+    var body: some View {
+        if let tool = Toolbox(name: name) {
+            switch tool {
+            case .generateImages:
+                Text("Generating image(s)...")
+            case .generateMemory:
+                Text("Saving memory...")
+            case .generateSuggestions:
+                Text("Preparing suggestions...")
+            case .generateTitle:
+                Text("Preparing title...")
+            case .searchCalendar:
+                Text("Searching calendar...")
+            case .searchWeb:
+                Text("Searching web...")
+            case .browseWeb:
+                Text("Browsing website...")
+            }
+        } else {
+            Text("Unknown tool...")
+        }
     }
 }

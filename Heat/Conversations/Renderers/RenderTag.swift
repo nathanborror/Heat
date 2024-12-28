@@ -2,7 +2,7 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct TagView: View {
+struct RenderTag: View {
     let tag: ContentParser.Result.Tag
 
     init(_ tag: ContentParser.Result.Tag) {
@@ -12,22 +12,21 @@ struct TagView: View {
     var body: some View {
         switch tag.name {
         case "artifact":
-            ArtifactTag(tag)
+            RenderArtifact(tag)
         case "thinking":
-            ThinkingTag(tag)
+            RenderThinking(tag)
         case "reflection":
-            ReflectionTag(tag)
+            RenderReflection(tag)
         case "output":
-            OutputTag(tag)
-                .padding(.leading, 12)
+            RenderOutput(tag)
         case "image_search_query":
-            ImageSearchTag(tag)
+            RenderImageSearch(tag)
         default:
-            PlainTag(tag)
+            RenderAnyTag(tag)
         }
     }
 }
 
-enum TagViewError: Error {
+enum RenderTagError: Error {
     case missingContent
 }

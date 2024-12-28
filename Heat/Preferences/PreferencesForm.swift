@@ -45,9 +45,6 @@ struct PreferencesForm: View {
                 Picker("Images", selection: $preferences.preferred.imageServiceID) {
                     servicePickerView(\.supportsImages)
                 }
-                Picker("Vision", selection: $preferences.preferred.visionServiceID) {
-                    servicePickerView(\.supportsVision)
-                }
                 Picker("Summarization", selection: $preferences.preferred.summarizationServiceID) {
                     servicePickerView(\.supportsSummarization)
                 }

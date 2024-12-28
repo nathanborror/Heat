@@ -8,14 +8,24 @@ private let logger = Logger(subsystem: "ConversationViewModel", category: "App")
 @MainActor @Observable
 final class ConversationViewModel {
     var conversationID: Conversation.ID? = nil
-    var streamingTokens: String? = nil
-    var error: Error? = nil
 
     private let conversationsProvider = ConversationsProvider.shared
     private let messagesProvider = MessagesProvider.shared
     private let preferencesProvider = PreferencesProvider.shared
 
-    private var generateTask: Task<(), Error>? = nil
+    enum Error: Swift.Error, CustomStringConvertible {
+        case generationError(String)
+        case unexpectedError(String)
+
+        public var description: String {
+            switch self {
+            case .generationError(let detail):
+                return "Generation error: \(detail)"
+            case .unexpectedError(let detail):
+                return "Unexpected error: \(detail)"
+            }
+        }
+    }
 
     init(conversationID: Conversation.ID) {
         self.conversationID = conversationID
@@ -41,7 +51,7 @@ final class ConversationViewModel {
     /// The whole conversation history.
     var messages: [Message] {
         guard let conversationID else { return [] }
-        let history = try? messagesProvider.get(parentID: conversationID.rawValue)
+        let history = try? messagesProvider.get(referenceID: conversationID.rawValue)
         return history ?? []
     }
 
@@ -52,36 +62,32 @@ final class ConversationViewModel {
     }
 
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
-    func generate(
-        chat prompt: String, context: [String: String] = [:], toolChoice: Tool? = nil,
-        agentID: Agent.ID? = nil
-    ) throws {
+    func generate(chat prompt: String, images: [Data] = [], context: [String: String] = [:], toolChoice: Tool? = nil, agentID: Agent.ID? = nil) async throws {
         guard let conversationID else { return }
-        generateTask = try API.shared.generate(
-            conversationID: conversationID, prompt: prompt, context: context,
-            toolChoice: toolChoice, agentID: agentID)
-    }
-
-    /// Generate a response using images as inputs alongside text. This will eventually be combined with generate(chat: ...) above.
-    func generate(chat prompt: String, images: [Data], context: [String: String] = [:]) throws {
-        guard let conversationID else { return }
-        generateTask = try API.shared.generate(
-            conversationID: conversationID, prompt: prompt, images: images, context: context)
+        do {
+            try await API.shared.generate(
+                conversationID: conversationID,
+                prompt: prompt,
+                context: context,
+                images: images,
+                toolChoice: toolChoice,
+                agentID: agentID
+            ).value
+        } catch {
+            throw Error.generationError("\(error)")
+        }
     }
 
     /// Generate an image from a given prompt. This is an explicit way to generate an image, most happen through tool use.
-    func generate(image prompt: String) throws {
+    func generate(image prompt: String) async throws {
         guard let conversationID else { return }
-        generateTask = try API.shared.generate(conversationID: conversationID, image: prompt)
-    }
-
-    /// Cancel any of the generate tasks above.
-    func cancel() {
-        generateTask?.cancel()
-        streamingTokens = nil
-        Task {
-            guard let conversationID else { return }
-            try await conversationsProvider.upsert(state: .none, conversationID: conversationID)
+        do {
+            try await API.shared.generate(
+                conversationID: conversationID,
+                image: prompt
+            ).value
+        } catch {
+            throw Error.generationError("Image generation failed: \(error)")
         }
     }
 
