@@ -9,18 +9,18 @@ let mock_conversation = Conversation(
 
 let mock_messages: [Message] = [
     .init(
-        referenceID: mock_conversation.id.rawValue,
+        referenceID: mock_conversation.id,
         role: .user,
         content: "Write a report on the latest o1 model release from OpenAI"
     )
 ]
 
-let mock_run_id = Run.ID.id
+let mock_run_id = String.id
 
 let mock_run = Run(
     messages: [
         .init(
-            referenceID: mock_conversation.id.rawValue,
+            referenceID: mock_conversation.id,
             runID: mock_run_id,
             role: .assistant,
             content: """
@@ -39,7 +39,7 @@ let mock_run = Run(
             ]
         ),
         .init(
-            referenceID: mock_conversation.id.rawValue,
+            referenceID: mock_conversation.id,
             runID: mock_run_id,
             role: .tool,
             content: """
@@ -122,7 +122,7 @@ let mock_run = Run(
             metadata: .init(["label": "Searched web for 'OpenAI latest o1 models'"])
         ),
         .init(
-            referenceID: mock_conversation.id.rawValue,
+            referenceID: mock_conversation.id,
             runID: mock_run_id,
             role: .assistant,
             content: """
@@ -141,7 +141,7 @@ let mock_run = Run(
             ]
         ),
         .init(
-            referenceID: mock_conversation.id.rawValue,
+            referenceID: mock_conversation.id,
             runID: mock_run_id,
             role: .tool,
             content: """
@@ -174,7 +174,7 @@ let mock_run = Run(
             metadata: .init(["label": "Browsed 'https://www.theverge.com'"])
         ),
         .init(
-            referenceID: mock_conversation.id.rawValue,
+            referenceID: mock_conversation.id,
             runID: mock_run_id,
             role: .assistant,
             content: """

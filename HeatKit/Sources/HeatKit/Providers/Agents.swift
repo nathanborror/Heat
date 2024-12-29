@@ -6,7 +6,7 @@ import OSLog
 private let logger = Logger(subsystem: "Agents", category: "Providers")
 
 public struct Agent: Codable, Identifiable, Sendable {
-    public var id: ID<Agent>
+    public var id: String
     public var kind: Kind
     public var name: String
     public var instructions: String
@@ -21,7 +21,7 @@ public struct Agent: Codable, Identifiable, Sendable {
         case prompt
     }
 
-    public init(id: Agent.ID = .id, kind: Kind, name: String, instructions: String, context: [String: String] = [:],
+    public init(id: String = .id, kind: Kind, name: String, instructions: String, context: [String: String] = [:],
                 tags: [String] = [], toolIDs: Set<String> = []) {
         self.id = id
         self.kind = kind
@@ -57,13 +57,13 @@ public final class AgentsProvider {
     public private(set) var updated: Date = .now
 
     public enum Error: Swift.Error, CustomStringConvertible {
-        case notFound(Agent.ID)
+        case notFound(String)
         case persistenceError(String)
 
         public var description: String {
             switch self {
             case .notFound(let id):
-                "Agent not found: \(id.rawValue)"
+                "Agent not found: \(id)"
             case .persistenceError(let detail):
                 "Agent persistence error: \(detail)"
             }
@@ -107,7 +107,7 @@ public final class AgentsProvider {
 
 extension AgentsProvider {
 
-    public func get(_ id: Agent.ID) throws -> Agent {
+    public func get(_ id: String) throws -> Agent {
         guard let agent = agents.first(where: { $0.id == id }) else {
             throw Error.notFound(id)
         }
@@ -128,7 +128,7 @@ extension AgentsProvider {
         try await save()
     }
 
-    public func delete(_ id: Agent.ID) async throws {
+    public func delete(_ id: String) async throws {
         await ready()
         agents.removeAll(where: { $0.id == id })
         try await save()

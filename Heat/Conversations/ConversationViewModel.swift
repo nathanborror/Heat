@@ -7,7 +7,7 @@ private let logger = Logger(subsystem: "ConversationViewModel", category: "App")
 
 @MainActor @Observable
 final class ConversationViewModel {
-    var conversationID: Conversation.ID? = nil
+    var conversationID: String? = nil
 
     private let conversationsProvider = ConversationsProvider.shared
     private let messagesProvider = MessagesProvider.shared
@@ -27,7 +27,7 @@ final class ConversationViewModel {
         }
     }
 
-    init(conversationID: Conversation.ID) {
+    init(conversationID: String) {
         self.conversationID = conversationID
     }
 
@@ -51,7 +51,7 @@ final class ConversationViewModel {
     /// The whole conversation history.
     var messages: [Message] {
         guard let conversationID else { return [] }
-        let history = try? messagesProvider.get(referenceID: conversationID.rawValue)
+        let history = try? messagesProvider.get(referenceID: conversationID)
         return history ?? []
     }
 
@@ -62,7 +62,7 @@ final class ConversationViewModel {
     }
 
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
-    func generate(chat prompt: String, images: [Data] = [], context: [String: String] = [:], toolChoice: Tool? = nil, agentID: Agent.ID? = nil) async throws {
+    func generate(chat prompt: String, images: [Data] = [], context: [String: String] = [:], toolChoice: Tool? = nil, agentID: String? = nil) async throws {
         guard let conversationID else { return }
         do {
             try await API.shared.generate(
@@ -108,7 +108,7 @@ final class ConversationViewModel {
                     runs.append(currentRun)
                 }
                 currentRun = Run(
-                    id: message.runID ?? Run.ID(message.id.rawValue),
+                    id: message.runID ?? message.id,
                     messages: [message],
                     started: message.created,
                     ended: message.modified

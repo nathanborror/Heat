@@ -6,7 +6,7 @@ public final class API {
     public static let shared = API()
     
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
-    public func generate(conversationID: Conversation.ID, prompt: String, context: [String: String] = [:], images: [Data] = [], toolChoice: Tool? = nil, agentID: Agent.ID? = nil) throws -> Task<(), Error> {
+    public func generate(conversationID: String, prompt: String, context: [String: String] = [:], images: [Data] = [], toolChoice: Tool? = nil, agentID: String? = nil) throws -> Task<(), Error> {
         guard !prompt.isEmpty else { return Task {()} }
         
         // Providers
@@ -30,12 +30,12 @@ public final class API {
             let textContent = Message.Content.text(PromptTemplate(prompt, with: context))
 
             let userMessage = Message(role: .user, contents: [textContent] + imageContent)
-            try await messagesProvider.upsert(message: userMessage, referenceID: conversation.id.rawValue)
+            try await messagesProvider.upsert(message: userMessage, referenceID: conversation.id)
             try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
             // Fetch messages
-            let messages = try messagesProvider.get(referenceID: conversationID.rawValue)
+            let messages = try messagesProvider.get(referenceID: conversationID)
 
             // Initial request
             var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
@@ -52,10 +52,10 @@ public final class API {
                 // Indicate which agent was used
                 var message = message
                 if let agentID {
-                    message.metadata?.agentID = agentID.rawValue
+                    message.metadata?.agentID = agentID
                 }
 
-                try await messagesProvider.upsert(message: message, referenceID: conversation.id.rawValue)
+                try await messagesProvider.upsert(message: message, referenceID: conversation.id)
                 try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             }
 
@@ -72,7 +72,7 @@ public final class API {
     }
     
     /// Generate an image from a given prompt. This is an explicit way to generate an image, most happen through tool use.
-    public func generate(conversationID: Conversation.ID, image prompt: String) throws -> Task<(), Error> {
+    public func generate(conversationID: String, image prompt: String) throws -> Task<(), Error> {
         guard !prompt.isEmpty else { return Task {()} }
         
         // Providers
@@ -89,7 +89,7 @@ public final class API {
             
             // New user message
             let userMessage = Message(role: .user, content: prompt)
-            try await messagesProvider.upsert(message: userMessage, referenceID: conversation.id.rawValue)
+            try await messagesProvider.upsert(message: userMessage, referenceID: conversation.id)
             try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
             try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
             
@@ -105,7 +105,7 @@ public final class API {
                     .text("A generated image using the prompt:\n\(prompt)")
                 ]
             )
-            try await messagesProvider.upsert(message: message, referenceID: conversation.id.rawValue)
+            try await messagesProvider.upsert(message: message, referenceID: conversation.id)
             try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
             try await messagesProvider.flush()
         }
@@ -114,7 +114,7 @@ public final class API {
     // MARK: - Private
 
     /// Generate a title for the conversation.
-    private func generateTitle(conversationID: Conversation.ID) async throws -> Bool {
+    private func generateTitle(conversationID: String) async throws -> Bool {
 
         // Providers
         let conversationsProvider = ConversationsProvider.shared
@@ -122,7 +122,7 @@ public final class API {
         let preferencesProvider = PreferencesProvider.shared
         
         let conversation = try conversationsProvider.get(conversationID)
-        let messages = try messagesProvider.get(referenceID: conversationID.rawValue)
+        let messages = try messagesProvider.get(referenceID: conversationID)
 
         guard conversation.title == nil else {
             return false
@@ -156,7 +156,7 @@ public final class API {
     }
     
     /// Generate conversation suggestions related to what's being talked about.
-    private func generateSuggestions(conversationID: Conversation.ID) async throws -> Bool {
+    private func generateSuggestions(conversationID: String) async throws -> Bool {
 
         // Providers
         let conversationsProvider = ConversationsProvider.shared
@@ -164,7 +164,7 @@ public final class API {
         let preferencesProvider = PreferencesProvider.shared
         
         let conversation = try conversationsProvider.get(conversationID)
-        let messages = try messagesProvider.get(referenceID: conversationID.rawValue)
+        let messages = try messagesProvider.get(referenceID: conversationID)
 
         let service = try preferencesProvider.preferredChatService()
         let model = try preferencesProvider.preferredChatModel()

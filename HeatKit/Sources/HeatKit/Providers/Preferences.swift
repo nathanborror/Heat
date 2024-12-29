@@ -6,7 +6,7 @@ import OSLog
 private let logger = Logger(subsystem: "Preferences", category: "Providers")
 
 public struct Preferences: Codable, Sendable {
-    public var defaultAssistantID: ID<Agent>? = Defaults.assistantDefaultID
+    public var defaultAssistantID: String? = Defaults.assistantDefaultID
     public var shouldStream = true
     public var textRendering: TextRendering = .markdown
     public var debug = false
@@ -47,8 +47,8 @@ public final class PreferencesProvider {
     }
 
     public enum Error: Swift.Error, CustomStringConvertible {
-        case serviceNotFound(Service.ID?)
-        case modelNotFound(Model.ID?)
+        case serviceNotFound(String?)
+        case modelNotFound(String?)
         case persistenceError(String)
         case missingService
         case missingServiceModel
@@ -56,9 +56,9 @@ public final class PreferencesProvider {
         public var description: String {
             switch self {
             case .serviceNotFound(let id):
-                "Service not found: \(id?.rawValue ?? "empty")"
+                "Service not found: \(id ?? "empty")"
             case .modelNotFound(let id):
-                "Service Model not found: \(id?.rawValue ?? "empty")"
+                "Service Model not found: \(id ?? "empty")"
             case .persistenceError(let detail):
                 "Preferences persistence error: \(detail)"
             case .missingService:
@@ -135,12 +135,12 @@ extension PreferencesProvider {
 
     public func get(serviceID: Service.ServiceID?) throws -> Service {
         guard let service = services.first(where: { $0.id == serviceID }) else {
-            throw Error.serviceNotFound(serviceID)
+            throw Error.serviceNotFound(serviceID?.rawValue)
         }
         return service
     }
 
-    public func get(modelID: Model.ID?, serviceID: Service.ServiceID?) throws -> Model {
+    public func get(modelID: String?, serviceID: Service.ServiceID?) throws -> Model {
         let service = try get(serviceID: serviceID)
         guard let model = service.models.first(where: { $0.id == modelID }) else {
             throw Error.modelNotFound(modelID)

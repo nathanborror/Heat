@@ -131,9 +131,9 @@ struct ModelPicker: View {
     let title: String
     let models: [Model]
 
-    @Binding var selection: Model.ID?
+    @Binding var selection: String?
 
-    init(_ title: String, models: [Model], selection: Binding<Model.ID?>) {
+    init(_ title: String, models: [Model], selection: Binding<String?>) {
         self.title = title
         self.models = models
         self._selection = selection
@@ -141,7 +141,7 @@ struct ModelPicker: View {
 
     var modelsByFamily: [String: [Model]] {
         Dictionary(grouping: models) { model in
-            model.family ?? model.id.rawValue
+            model.family ?? model.id
         }
     }
 
@@ -170,7 +170,7 @@ struct ModelPicker: View {
             } label: {
                 Group {
                     if let selection, let model = models.first(where: { $0.id == selection }) {
-                        Text(model.name ?? model.id.rawValue)
+                        Text(model.name ?? model.id)
                     } else {
                         HStack {
                             Text("Select Model")
@@ -192,7 +192,7 @@ struct ModelPicker: View {
             selection = model.id
         } label: {
             HStack {
-                Text(model.name ?? model.id.rawValue)
+                Text(model.name ?? model.id)
                 if let selection, selection == model.id {
                     Spacer()
                     Image(systemName: "checkmark")

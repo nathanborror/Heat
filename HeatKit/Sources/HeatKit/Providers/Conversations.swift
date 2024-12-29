@@ -6,7 +6,7 @@ import OSLog
 private let logger = Logger(subsystem: "Conversations", category: "Providers")
 
 public struct Conversation: Codable, Identifiable, Sendable {
-    public var id: ID<Conversation>
+    public var id: String
     public var title: String?
     public var subtitle: String?
     public var instructions: String
@@ -23,7 +23,7 @@ public struct Conversation: Codable, Identifiable, Sendable {
         case none
     }
 
-    public init(id: Conversation.ID = .id, title: String? = nil, subtitle: String? = nil, instructions: String = "",
+    public init(id: String = .id, title: String? = nil, subtitle: String? = nil, instructions: String = "",
                 suggestions: [String] = [], toolIDs: Set<String> = [], state: State = .none) {
         self.id = id
         self.title = title
@@ -59,13 +59,13 @@ public final class ConversationsProvider {
     public private(set) var updated: Date = .now
 
     public enum Error: Swift.Error {
-        case notFound(Conversation.ID)
+        case notFound(String)
         case persistenceError(String)
 
         public var description: String {
             switch self {
             case .notFound(let id):
-                "Conversation not found: \(id.rawValue)"
+                "Conversation not found: \(id)"
             case .persistenceError(let detail):
                 "Conversation persistence error: \(detail)"
             }
@@ -109,7 +109,7 @@ public final class ConversationsProvider {
 
 extension  ConversationsProvider {
 
-    public func get(_ id: Conversation.ID) throws -> Conversation {
+    public func get(_ id: String) throws -> Conversation {
         guard let conversation = conversations.first(where: { $0.id == id }) else {
             throw Error.notFound(id)
         }
@@ -136,35 +136,35 @@ extension  ConversationsProvider {
         try await save()
     }
 
-    public func upsert(title: String, conversationID: Conversation.ID) async throws {
+    public func upsert(title: String, conversationID: String) async throws {
         await ready()
         var conversation = try get(conversationID)
         conversation.title = title.isEmpty ? nil : title
         try await upsert(conversation)
     }
 
-    public func upsert(instructions: String, conversationID: Conversation.ID) async throws {
+    public func upsert(instructions: String, conversationID: String) async throws {
         await ready()
         var conversation = try get(conversationID)
         conversation.instructions = instructions
         try await upsert(conversation)
     }
 
-    public func upsert(suggestions: [String], conversationID: Conversation.ID) async throws {
+    public func upsert(suggestions: [String], conversationID: String) async throws {
         await ready()
         var conversation = try get(conversationID)
         conversation.suggestions = suggestions
         try await upsert(conversation)
     }
 
-    public func upsert(state: Conversation.State, conversationID: Conversation.ID) async throws {
+    public func upsert(state: Conversation.State, conversationID: String) async throws {
         await ready()
         var conversation = try get(conversationID)
         conversation.state = state
         try await upsert(conversation)
     }
 
-    public func delete(_ id: Conversation.ID) async throws {
+    public func delete(_ id: String) async throws {
         await ready()
         conversations.removeAll(where: { $0.id == id })
         try await save()

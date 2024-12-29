@@ -15,7 +15,7 @@ struct MainApp: App {
 
     @State private var state = AppState.development
 
-    @State private var selectedConversationID: Conversation.ID? = nil
+    @State private var selectedConversationID: String? = nil
     @State private var sheet: Sheet? = nil
 
     @State private var showingError = false

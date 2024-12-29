@@ -13,13 +13,13 @@ public final class MessagesProvider {
     public private(set) var updated: Date = .now
 
     public enum Error: Swift.Error {
-        case notFound(Message.ID)
+        case notFound(String)
         case persistenceError(String)
 
         public var description: String {
             switch self {
             case .notFound(let id):
-                "Message not found: \(id.rawValue)"
+                "Message not found: \(id)"
             case .persistenceError(let detail):
                 "Message persistence error: \(detail)"
             }
@@ -63,7 +63,7 @@ public final class MessagesProvider {
 
 extension MessagesProvider {
 
-    public func get(_ id: Message.ID) throws -> Message {
+    public func get(_ id: String) throws -> Message {
         guard let message = messages.first(where: { $0.id == id }) else {
             throw Error.notFound(id)
         }
@@ -93,7 +93,7 @@ extension MessagesProvider {
         ping() // intentionally not saving here due to streaming
     }
 
-    public func delete(_ id: Message.ID) async throws {
+    public func delete(_ id: String) async throws {
         await ready()
         messages.removeAll(where: { $0.id == id })
         try await save()

@@ -9,7 +9,7 @@ struct ServiceSetup: View {
     @State var serviceID: Service.ServiceID = .ollama
     @State var serviceAPIKey: String = ""
     @State var serviceModels: [Model] = []
-    @State var serviceModelID: Model.ID? = nil
+    @State var serviceModelID: String? = nil
 
     var body: some View {
         VStack(spacing: 24) {
@@ -52,7 +52,7 @@ struct ServiceSetup: View {
                         Text("None").tag(String?.none)
                         Divider()
                         ForEach(serviceModels) { model in
-                            Text(model.name ?? model.id.rawValue).tag(model.id)
+                            Text(model.name ?? model.id).tag(model.id)
                         }
                     }
                 }
@@ -107,8 +107,8 @@ struct ServiceSetup: View {
 
         // Establish preferred models to use from the service
         // Since these are hard-coded they could become out-of-dated
-        var preferredChatModel: Model.ID = .init("")
-        var preferredSummarizationModel: Model.ID = .init("")
+        var preferredChatModel: String = .init("")
+        var preferredSummarizationModel: String = .init("")
 
         switch serviceID {
         case .anthropic:
