@@ -16,7 +16,7 @@ public struct MemoryTool {
             include names, important dates, facts about the user, and interests. Basically anything meaninful
             that would help relate to the user more.
             """,
-        parameters: JSONSchema(
+        parameters: .init(
             type: .object,
             properties: [
                 "items": .init(

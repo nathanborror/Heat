@@ -51,7 +51,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "bdef3c0c76601a62a8f702370fc05ee3d789c8a4"
+        "revision" : "79abeb7ec645a34c1b5dd8e8bcd068791a7f8595"
       }
     },
     {
@@ -78,7 +78,7 @@
       "location" : "https://github.com/nathanborror/swift-elevenlabs",
       "state" : {
         "branch" : "main",
-        "revision" : "472f0ce330e54864144250436c0f78e8897d7b43"
+        "revision" : "2da6102f39beba3b06fa62e9751618b2999ad6a0"
       }
     },
     {
@@ -96,7 +96,16 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "41f19bfc3b87dbb572c670aaa78410ff7828b001"
+        "revision" : "d62ac504a6d6f295b614e2996d5b60cd7456bf48"
+      }
+    },
+    {
+      "identity" : "swift-json",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/swift-json",
+      "state" : {
+        "branch" : "main",
+        "revision" : "50e18f57a3e52bc2e4db280dbde8e8cc6793e94a"
       }
     },
     {
@@ -114,7 +123,7 @@
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
-        "revision" : "1b57cab1adf9c89ea99cf05b8ff858c42c5fad64"
+        "revision" : "fb19a90a78e825b10272fd86420427477686c137"
       }
     },
     {
@@ -123,7 +132,7 @@
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "4480bf945e44b083d262a69c4a423db22a3cf54b"
+        "revision" : "2b9d6efa3f641ef3d848c495764de712f469ed15"
       }
     },
     {
@@ -132,7 +141,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "17873133d611012638c99562a24a1877609b8d4b"
+        "revision" : "aa65e654e74da60dd8c6e240c0e803efe3806a6e"
       }
     },
     {
@@ -150,7 +159,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "2f2c55fabcdd81a1022e15c719a837cfe67ec530"
+        "revision" : "36d5cf5d09fd32d7feda4d31907cff1031932e9e"
       }
     }
   ],

@@ -14,7 +14,7 @@ public struct TitleTool {
             Return a title if there is a clear topic of conversation. The title should be under 4 words.
             Nothing is returned if there is no topic or if the conversation is just greetings.
             """,
-        parameters: JSONSchema(
+        parameters: .init(
             type: .object,
             properties: [
                 "title": .init(

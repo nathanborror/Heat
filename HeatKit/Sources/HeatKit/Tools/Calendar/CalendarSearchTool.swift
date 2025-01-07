@@ -15,7 +15,7 @@ public struct CalendarSearchTool {
         description: """
             Searches the user's calendar. You must always include a `start` and an `end` date.
             """,
-        parameters: JSONSchema(
+        parameters: .init(
             type: .object,
             properties: [
                 "start": .init(

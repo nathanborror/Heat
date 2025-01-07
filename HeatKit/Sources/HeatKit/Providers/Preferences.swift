@@ -13,12 +13,12 @@ public struct Preferences: Codable, Sendable {
     public var preferred: Services = .init()
 
     public struct Services: Codable, Sendable {
-        public var chatServiceID: Service.ServiceID? = nil
-        public var imageServiceID: Service.ServiceID? = nil
-        public var embeddingServiceID: Service.ServiceID? = nil
-        public var transcriptionServiceID: Service.ServiceID? = nil
-        public var speechServiceID: Service.ServiceID? = nil
-        public var summarizationServiceID: Service.ServiceID? = nil
+        public var chatServiceID: String? = nil
+        public var imageServiceID: String? = nil
+        public var embeddingServiceID: String? = nil
+        public var transcriptionServiceID: String? = nil
+        public var speechServiceID: String? = nil
+        public var summarizationServiceID: String? = nil
     }
 
     public enum TextRendering: String, CaseIterable, Codable, Sendable {
@@ -133,14 +133,14 @@ public final class PreferencesProvider {
 
 extension PreferencesProvider {
 
-    public func get(serviceID: Service.ServiceID?) throws -> Service {
+    public func get(serviceID: String?) throws -> Service {
         guard let service = services.first(where: { $0.id == serviceID }) else {
-            throw Error.serviceNotFound(serviceID?.rawValue)
+            throw Error.serviceNotFound(serviceID)
         }
         return service
     }
 
-    public func get(modelID: String?, serviceID: Service.ServiceID?) throws -> Model {
+    public func get(modelID: String?, serviceID: String?) throws -> Model {
         let service = try get(serviceID: serviceID)
         guard let model = service.models.first(where: { $0.id == modelID }) else {
             throw Error.modelNotFound(modelID)
@@ -164,14 +164,14 @@ extension PreferencesProvider {
         try await save()
     }
 
-    public func upsert(token: String, serviceID: Service.ServiceID) async throws {
+    public func upsert(token: String, serviceID: String) async throws {
         await ready()
         var service = try get(serviceID: serviceID)
         service.token = token
         try await upsert(service: service)
     }
 
-    public func initialize(serviceID: Service.ServiceID) async throws {
+    public func initialize(serviceID: String) async throws {
         await ready()
         var service = try get(serviceID: serviceID)
         do {
@@ -190,7 +190,7 @@ extension PreferencesProvider {
     public func initializeServices() async throws {
         await ready()
         for service in services {
-            if service.id == .ollama || !service.token.isEmpty {
+            if service.id == Service.ServiceID.ollama.rawValue || !service.token.isEmpty {
                 try await initialize(serviceID: service.id)
             }
         }

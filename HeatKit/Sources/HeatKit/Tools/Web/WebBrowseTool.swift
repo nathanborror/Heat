@@ -22,7 +22,7 @@ public struct WebBrowseTool {
     public static let function = Tool.Function(
         name: "browse_web",
         description: "Browse a webpage URL using the given instructions.",
-        parameters: JSONSchema(
+        parameters: .init(
             type: .object,
             properties: [
                 "instructions": .init(

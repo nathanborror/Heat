@@ -23,7 +23,7 @@ public struct WebSearchTool {
     public static let function = Tool.Function(
         name: "web_search",
         description: "Return a search query used to search the web for website only or image only results.",
-        parameters: JSONSchema(
+        parameters: .init(
             type: .object,
             properties: [
                 "query": .init(

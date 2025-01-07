@@ -14,7 +14,7 @@ public struct SuggestTool {
             Return a list of suggested replies related to the conversation. Remember, these are messages the
             user can respond with. Think about what they might want to say.
             """,
-        parameters: JSONSchema(
+        parameters: .init(
             type: .object,
             properties: [
                 "prompts": .init(

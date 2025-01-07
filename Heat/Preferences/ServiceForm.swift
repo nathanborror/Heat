@@ -103,7 +103,7 @@ struct ServiceForm: View {
 
             service = try state.preferencesProvider.get(serviceID: service.id)
 
-            switch service.id {
+            switch Service.ServiceID(rawValue: service.id) {
             case .openAI:
                 service.applyPreferredModels(Defaults.openAI)
             case .anthropic:

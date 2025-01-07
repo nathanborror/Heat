@@ -11,7 +11,7 @@ public struct ImageGeneratorTool {
     public static let function = Tool.Function(
         name: "generate_images",
         description: "Return thoughtful, detailed image prompts.",
-        parameters: JSONSchema(
+        parameters: .init(
             type: .object,
             properties: [
                 "prompts": .init(
