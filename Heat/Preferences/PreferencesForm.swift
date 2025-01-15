@@ -133,7 +133,7 @@ struct PreferencesForm: View {
 
     func servicePickerView(_ prop: KeyPath<Service, Bool>) -> some View {
         Group {
-            Text("None").tag(Service.ServiceID?.none)
+            Text("None").tag(String?.none)
             Divider()
             ForEach(state.preferencesProvider.services.filter { $0[keyPath: prop] }) { service in
                 Text(service.name).tag(service.id)
