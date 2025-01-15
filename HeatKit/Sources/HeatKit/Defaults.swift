@@ -118,8 +118,10 @@ public struct Defaults {
 
     public static let services: [Service] = [
         anthropic,
+        deepseek,
         elevenlabs,
         fal,
+        grok,
         groq,
         mistral,
         ollama,
@@ -133,6 +135,13 @@ public struct Defaults {
             name: "Anthropic"
         )
 
+    public static let deepseek =
+        Service(
+            id: .deepseek,
+            name: "DeepSeek",
+            host: "https://api.deepseek.com/v1"
+        )
+
     public static let elevenlabs =
         Service(
             id: .elevenLabs,
@@ -143,6 +152,13 @@ public struct Defaults {
         Service(
             id: .fal,
             name: "Fal"
+        )
+
+    public static let grok =
+        Service(
+            id: .grok,
+            name: "Grok",
+            host: "https://api.x.ai/v1"
         )
 
     public static let groq =
