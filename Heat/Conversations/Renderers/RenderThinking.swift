@@ -23,6 +23,15 @@ struct RenderThinking: View {
 
             if disclosed {
                 RenderText(tag.content, tags: ["reflection"])
+                    .padding(.leading)
+                    .overlay(
+                        Rectangle()
+                            .fill(.primary.opacity(0.5))
+                            .frame(width: 1)
+                            .frame(maxHeight: .infinity),
+                        alignment: .leading
+                    )
+                    .opacity(0.5)
             }
         }
     }
