@@ -70,11 +70,14 @@ struct RenderModifier: ViewModifier {
         case .user:
             switch state.textRendering {
             case .markdown:
-                content
-                    .markdownTheme(.user)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(.tint, in: .rect(cornerRadius: 10))
+                HStack {
+                    content
+                        .markdownTheme(.user)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.tint, in: .rect(cornerRadius: 10))
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
             case .attributed:
                 content
                     .foregroundStyle(.white)
