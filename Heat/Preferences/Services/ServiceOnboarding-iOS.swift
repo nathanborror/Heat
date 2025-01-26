@@ -2,7 +2,7 @@ import SwiftUI
 import GenKit
 import HeatKit
 
-struct ServiceSetup: View {
+struct ServiceOnboarding: View {
     @Environment(AppState.self) var state
     @Environment(\.dismiss) private var dismiss
 
@@ -12,25 +12,8 @@ struct ServiceSetup: View {
     @State var serviceModelID: String? = nil
 
     var body: some View {
-        VStack(spacing: 24) {
-            HStack(alignment: .center) {
-                Spacer()
-                Image("IconDesktop")
-                    .resizable()
-                    .frame(width: 64, height: 64)
-                Spacer()
-            }
-
-            VStack(spacing: 16) {
-                Text("Welcome to Heat")
-                    .font(.headline)
-                Text("Pick a Chat Service and provide an API key. For Ollama there's no need for an API key but you will need to pick an installed model to use.")
-                    .font(.subheadline)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true) // HACK: Prevents occasional word truncation
-            }
-
-            VStack {
+        Form {
+            Section {
                 Picker("Service", selection: $serviceID) {
                     Text("Anthropic").tag(Service.ServiceID.anthropic)
                     Text("Groq").tag(Service.ServiceID.groq)
@@ -41,10 +24,11 @@ struct ServiceSetup: View {
                 }
 
                 // Hide API Key when Ollama is selected because it doesn't require one.
-                if serviceID != .ollama {
-                    TextField("API Key", text: $serviceAPIKey)
-                        .textFieldStyle(.roundedBorder)
-                }
+                TextField("API Key", text: $serviceAPIKey)
+                    .disabled(serviceID == .ollama)
+                    .onSubmit {
+                        
+                    }
 
                 // Only show models when Ollama is selected and models are loaded.
                 if serviceID == .ollama && !serviceModels.isEmpty {
@@ -56,18 +40,19 @@ struct ServiceSetup: View {
                         }
                     }
                 }
-            }
-            .labelsHidden()
-
-            HStack {
-                Spacer()
-                Button("Open Preferences", action: handleOpenPreferences)
-                Button("Continue", action: { Task { try await handleContinue() }})
-                        .buttonStyle(.borderedProminent)
+            } footer: {
+                Text("Pick a Chat Service and provide an API key. For Ollama there's no need for an API key but you will need to pick an installed model to use.")
             }
         }
-        .padding(32)
-        .frame(width: 340)
+        .navigationTitle("Pick Service")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Continue") {
+                    Task { try await handleContinue() }
+                }
+            }
+        }
         .onChange(of: serviceID) { oldValue, newValue in
             handleServiceChange()
         }
@@ -93,10 +78,6 @@ struct ServiceSetup: View {
         default:
             break
         }
-    }
-
-    func handleOpenPreferences() {
-        // dismiss the dialog and openURL that opens the preferences sheet
     }
 
     func handleContinue() async throws {

@@ -43,7 +43,9 @@ struct AssistantPicker: View {
         .font(.subheadline)
         .buttonStyle(.plain)
         .sheet(isPresented: $showWelcomeSheet) {
-            ServiceSetup()
+            NavigationStack {
+                ServiceOnboarding()
+            }
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {

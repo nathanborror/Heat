@@ -42,7 +42,7 @@ public final class PreferencesProvider {
     public enum Status {
         case ready
         case waiting
-        case needsServiceSetup
+        case needsServiceOnboarding
         case needsPreferredService
     }
 
@@ -118,7 +118,7 @@ public final class PreferencesProvider {
     private func statusCheck() {
         // Check for chat service support
         if services.filter({ $0.supportsChats }).isEmpty {
-            status = .needsServiceSetup
+            status = .needsServiceOnboarding
             return
         }
         // Check for preferred chat service

@@ -56,7 +56,8 @@
 		D885D7612C9727220099CB51 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = D885D7602C9727220099CB51 /* Mocks.swift */; };
 		D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D23082B3CFB5100CCCC61 /* MessageView.swift */; };
 		D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */; };
-		D8D050AF2CBB1400004C66EE /* ServiceSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D050AE2CBB1400004C66EE /* ServiceSetup.swift */; };
+		D8B6392F2D46106D000B2A41 /* ServiceOnboarding-iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B6392E2D46106D000B2A41 /* ServiceOnboarding-iOS.swift */; platformFilter = ios; };
+		D8D050AF2CBB1400004C66EE /* ServiceOnboarding-macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D050AE2CBB1400004C66EE /* ServiceOnboarding-macOS.swift */; platformFilters = (macos, ); };
 		D8D050B12CBB1455004C66EE /* AssistantPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D050B02CBB1455004C66EE /* AssistantPicker.swift */; };
 		D8D145852D0916EE0025ED75 /* Image+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D145842D0916EE0025ED75 /* Image+.swift */; };
 		D8E1FC182B704CDD006C9366 /* ServiceForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E1FC172B704CDD006C9366 /* ServiceForm.swift */; };
@@ -115,7 +116,8 @@
 		D885D7602C9727220099CB51 /* Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
 		D88D23082B3CFB5100CCCC61 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicator.swift; sourceTree = "<group>"; };
-		D8D050AE2CBB1400004C66EE /* ServiceSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceSetup.swift; sourceTree = "<group>"; };
+		D8B6392E2D46106D000B2A41 /* ServiceOnboarding-iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ServiceOnboarding-iOS.swift"; sourceTree = "<group>"; };
+		D8D050AE2CBB1400004C66EE /* ServiceOnboarding-macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ServiceOnboarding-macOS.swift"; sourceTree = "<group>"; };
 		D8D050B02CBB1455004C66EE /* AssistantPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantPicker.swift; sourceTree = "<group>"; };
 		D8D145842D0916EE0025ED75 /* Image+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+.swift"; sourceTree = "<group>"; };
 		D8E1FC172B704CDD006C9366 /* ServiceForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceForm.swift; sourceTree = "<group>"; };
@@ -237,7 +239,6 @@
 				D45CC1F92B8A5C1A009DFDF4 /* Suggestions.swift */,
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 				D85FE37E2C8FCA0B004CA2F3 /* RunView.swift */,
-				D8D050AE2CBB1400004C66EE /* ServiceSetup.swift */,
 				D8D050B02CBB1455004C66EE /* AssistantPicker.swift */,
 			);
 			path = Views;
@@ -300,14 +301,24 @@
 			path = Renderers;
 			sourceTree = "<group>";
 		};
+		D8B639302D46108A000B2A41 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				D8E1FC192B704CE3006C9366 /* ServiceList.swift */,
+				D8E1FC172B704CDD006C9366 /* ServiceForm.swift */,
+				D8D050AE2CBB1400004C66EE /* ServiceOnboarding-macOS.swift */,
+				D8B6392E2D46106D000B2A41 /* ServiceOnboarding-iOS.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		D8E1FC162B704CD2006C9366 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
 				D41E19492AE58D1B002516C1 /* Agents */,
+				D8B639302D46108A000B2A41 /* Services */,
 				D8247E2C2BD41C3100D918C0 /* Memory */,
 				D41E194B2AE591EA002516C1 /* PreferencesForm.swift */,
-				D8E1FC192B704CE3006C9366 /* ServiceList.swift */,
-				D8E1FC172B704CDD006C9366 /* ServiceForm.swift */,
 				D884AAFD2BD9B40000B90E9B /* PermissionsList.swift */,
 			);
 			path = Preferences;
@@ -407,7 +418,7 @@
 				D4FBFBEA2CED03E100266BF1 /* App-iOS.swift in Sources */,
 				D884AAFE2BD9B40000B90E9B /* PermissionsList.swift in Sources */,
 				D4F518BD2CAF47CE005E147E /* MessageList.swift in Sources */,
-				D8D050AF2CBB1400004C66EE /* ServiceSetup.swift in Sources */,
+				D8D050AF2CBB1400004C66EE /* ServiceOnboarding-macOS.swift in Sources */,
 				D85FAE062C84C80E00DA153F /* RenderArtifact.swift in Sources */,
 				D8247E2E2BD41C3A00D918C0 /* MemoryList.swift in Sources */,
 				D838D6A72B0A65F100988FDD /* ConversationViewModel.swift in Sources */,
@@ -420,6 +431,7 @@
 				D41E19402AE4CD4F002516C1 /* VideoView.swift in Sources */,
 				D884AB002BD9B9DE00B90E9B /* LocationManager.swift in Sources */,
 				D4B2D2692B6563DB0017FB52 /* MessageField.swift in Sources */,
+				D8B6392F2D46106D000B2A41 /* ServiceOnboarding-iOS.swift in Sources */,
 				D8015CC92CB8F4D60068749D /* RenderAnyTag.swift in Sources */,
 				D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */,
 				D8E1FC1A2B704CE3006C9366 /* ServiceList.swift in Sources */,
