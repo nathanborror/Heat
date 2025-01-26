@@ -13,7 +13,7 @@ struct RenderTag: View {
         switch tag.name {
         case "artifact":
             RenderArtifact(tag)
-        case "thinking":
+        case "thinking", "think":
             RenderThinking(tag)
         case "reflection":
             RenderReflection(tag)
