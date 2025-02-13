@@ -22,7 +22,7 @@ struct MessageView: View {
                    ToolCallView(toolCall)
                }
             case .tool:
-               ToolContentsView(message.contents)
+               ToolContentsView(message.content, name: message.name)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -71,15 +71,39 @@ struct UserContentsView: View {
 }
 
 struct ToolContentsView: View {
-    let contents: [Message.Content]
+    let content: String
+    let name: String
 
-    init(_ contents: [Message.Content]?) {
-        self.contents = contents ?? []
+    @State var disclosed = false
+
+    init(_ content: String?, name: String?) {
+        self.content = content ?? ""
+        self.name = name ?? "Unknown Tool"
     }
 
     var body: some View {
-        ContentsView(contents)
-            .render(role: .tool)
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
+                disclosed.toggle()
+            } label: {
+                ToolResponseName(name)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+
+            if disclosed {
+                Text(content)
+                    .padding(.leading)
+                    .overlay(
+                        Rectangle()
+                            .fill(.primary.opacity(0.5))
+                            .frame(width: 1)
+                            .frame(maxHeight: .infinity),
+                        alignment: .leading
+                    )
+                    .opacity(0.5)
+            }
+        }
     }
 }
 
@@ -150,6 +174,15 @@ struct ToolCallView: View {
 
             if disclosed {
                 Text(toolCall.function.arguments)
+                    .padding(.leading)
+                    .overlay(
+                        Rectangle()
+                            .fill(.primary.opacity(0.5))
+                            .frame(width: 1)
+                            .frame(maxHeight: .infinity),
+                        alignment: .leading
+                    )
+                    .opacity(0.5)
             }
         }
     }
@@ -182,6 +215,39 @@ struct ToolCallName: View {
             }
         } else {
             Text("Unknown tool...")
+        }
+    }
+}
+
+// Tool Responses
+
+struct ToolResponseName: View {
+    let name: String
+
+    init(_ name: String) {
+        self.name = name
+    }
+
+    var body: some View {
+        if let tool = Toolbox(name: name) {
+            switch tool {
+            case .generateImages:
+                Text("Generated image(s)")
+            case .generateMemory:
+                Text("Saved memory")
+            case .generateSuggestions:
+                Text("Prepared suggestions")
+            case .generateTitle:
+                Text("Prepared title")
+            case .searchCalendar:
+                Text("Searched calendar")
+            case .searchWeb:
+                Text("Searched web")
+            case .browseWeb:
+                Text("Browsed website")
+            }
+        } else {
+            Text("Unknown tool")
         }
     }
 }
