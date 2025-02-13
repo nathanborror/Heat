@@ -15,7 +15,6 @@ struct LauncherPanelView: View {
 
 //#if os(macOS)
 //import SwiftUI
-//import SwiftData
 //import OSLog
 //import GenKit
 //import HeatKit
@@ -27,13 +26,9 @@ struct LauncherPanelView: View {
 //    @Environment(ConversationsProvider.self) var conversationsProvider
 //    @Environment(PreferencesProvider.self) var preferencesProvider
 //
-//    @Environment(\.modelContext) private var modelContext
-//
 //    @State private var content = ""
 //    @State private var isShowingContent = false
 //    @State private var isShowingError = false
-//
-//    @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
 //
 //    @Binding var selected: String?
 //

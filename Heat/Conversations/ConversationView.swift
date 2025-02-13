@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 import OSLog
 import GenKit
 import HeatKit
@@ -8,9 +7,6 @@ private let logger = Logger(subsystem: "ConversationView", category: "App")
 
 struct ConversationView: View {
     @Environment(AppState.self) var state
-    @Environment(\.modelContext) private var modelContext
-
-    @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
 
     @Binding var selected: String?
 
@@ -94,6 +90,7 @@ struct ConversationView: View {
             guard let conversationViewModel else { return }
 
             // Context full of memories
+            let memories = try await state.memoryProvider.get()
             let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
 
             // Try to generate a response

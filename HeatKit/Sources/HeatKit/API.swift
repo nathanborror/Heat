@@ -214,7 +214,7 @@ public final class API {
                 return .init(messages: messages, shouldContinue: false)
             case .generateMemory:
                 let messages = await MemoryTool.handle(toolCall)
-                return .init(messages: messages, shouldContinue: true)
+                return .init(messages: messages, shouldContinue: false)
             case .searchCalendar:
                 let messages = await CalendarSearchTool.handle(toolCall)
                 return .init(messages: messages, shouldContinue: true)

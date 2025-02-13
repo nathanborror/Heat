@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 import OSLog
 import CoreServices
 import EventKit
@@ -63,7 +62,6 @@ struct MainApp: App {
         .defaultPosition(.center)
         .defaultLaunchBehavior(.presented)
         .environment(state)
-        .modelContainer(for: Memory.self)
         .commands {
             CommandGroup(replacing: .appSettings) {
                 Button {

@@ -1,6 +1,5 @@
 import Foundation
 import SharedKit
-import SwiftData
 import GenKit
 
 public struct MemoryTool {
@@ -42,21 +41,19 @@ extension MemoryTool.Arguments {
 
 extension MemoryTool {
     
-    @MainActor
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
             let args = try Arguments(toolCall.function.arguments)
-            let container = try ModelContainer(for: Memory.self)
-            
+
             for item in args.items {
-                container.mainContext.insert(Memory(content: item))
+                try await MemoryProvider.shared.upsert(.init(content: item))
             }
+
             return [.init(
                 role: .tool,
-                content: "Saved to memory.",
+                content: "Saved memory",
                 toolCallID: toolCall.id,
-                name: toolCall.function.name,
-                metadata: .init(["label": args.items.count == 1 ? "Stored memory" : "Stored \(args.items.count) memories"])
+                name: toolCall.function.name
             )]
         } catch {
             return [.init(

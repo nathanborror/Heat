@@ -1,14 +1,10 @@
 import SwiftUI
-import SwiftData
 import SharedKit
 import HeatKit
 
 struct MessageList: View {
     @Environment(AppState.self) var state
     @Environment(ConversationViewModel.self) var conversationViewModel
-    @Environment(\.modelContext) private var modelContext
-
-    @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -61,6 +57,7 @@ struct MessageList: View {
     func handleSubmit(_ prompt: String) {
         Task {
             do {
+                let memories = try await state.memoryProvider.get()
                 let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
                 try await conversationViewModel.generate(chat: prompt, context: context)
             } catch {

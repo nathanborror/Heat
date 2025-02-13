@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 import OSLog
 import CoreServices
 import EventKit
@@ -61,7 +60,6 @@ struct MainApp: App {
                     }
             }
             .environment(state)
-            .modelContainer(for: Memory.self)
             .alert("Error", isPresented: $showingError, presenting: error) { _ in
                 Button("OK", role: .cancel) {}
             } message: { error in

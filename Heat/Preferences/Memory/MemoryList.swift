@@ -1,10 +1,10 @@
 import SwiftUI
-import SwiftData
 import HeatKit
 
 struct MemoryList: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Memory.created, order: .forward) var memories: [Memory]
+    @Environment(AppState.self) var state
+
+    @State var memories: [Memory] = []
 
     var body: some View {
         Form {
@@ -37,14 +37,27 @@ struct MemoryList: View {
                 }
             }
         }
+        .onAppear {
+            handleLoad()
+        }
+    }
+
+    func handleLoad() {
+        Task {
+            do {
+                let memories = try await state.memoryProvider.get()
+                self.memories = memories
+            } catch {
+                print(error)
+            }
+        }
     }
 
     func handleSave(_ text: String) {
-        let memory = Memory(content: text)
-        modelContext.insert(memory)
+        print("not implemented")
     }
 
     func handleDelete(_ memory: Memory) {
-        modelContext.delete(memory)
+        Task { try await state.memoryProvider.delete(memory.id) }
     }
 }

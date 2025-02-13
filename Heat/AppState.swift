@@ -40,6 +40,7 @@ final class AppState {
     let agentsProvider: AgentsProvider
     let conversationsProvider: ConversationsProvider
     let messagesProvider: MessagesProvider
+    let memoryProvider: MemoryProvider
     let preferencesProvider: PreferencesProvider
 
     // Shortcuts
@@ -59,6 +60,7 @@ final class AppState {
         self.agentsProvider = .shared
         self.conversationsProvider = .shared
         self.messagesProvider = .shared
+        self.memoryProvider = .shared
         self.preferencesProvider = .shared
     }
 
@@ -67,6 +69,7 @@ final class AppState {
             try await agentsProvider.reset()
             try await conversationsProvider.reset()
             try await messagesProvider.reset()
+            try await memoryProvider.reset()
             try await preferencesProvider.reset()
         } catch {
             throw Error.restorationError("\(error)")
@@ -78,3 +81,4 @@ final class AppState {
         }
     }
 }
+
