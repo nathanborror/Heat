@@ -40,18 +40,7 @@ struct MessageField: View {
 
                 // Attached images
                 if !imagePickerViewModel.imagesSelected.isEmpty {
-                    ScrollView(.horizontal) {
-                        HStack(alignment: .bottom) {
-                            ForEach(imagePickerViewModel.imagesSelected) { selected in
-                                ConversationInputImage(id: selected.id, image: selected.image)
-                                    .environment(imagePickerViewModel)
-                                    .padding(.top, 8)
-                            }
-                        }
-                        .padding(.horizontal, 8)
-                    }
-                    .scrollIndicators(.hidden)
-                    .scrollClipDisabled()
+                    attachments
                 }
 
                 // Input field with buttons
@@ -59,59 +48,12 @@ struct MessageField: View {
 
                     // Command menu
                     if command == .text {
-                        Menu {
-                            Button(action: { showingPhotos = true }) {
-                                Label("Attach Photo", systemImage: "photo")
-                            }
-                            Button(action: { command = .imagine }) {
-                                Label("Create Image", systemImage: "paintpalette")
-                            }
-                            Menu {
-                                ForEach(state.agentsProvider.agents.filter { $0.kind == .prompt }) { agent in
-                                    Button {
-                                        showingAgent = agent
-                                    } label: {
-                                        Text(agent.name)
-                                    }
-                                }
-                            } label: {
-                                Label("Use Agent", systemImage: "puzzlepiece")
-                            }
-                        } label: {
-                            Image(systemName: "plus")
-                                .modifier(ConversationInlineButtonModifier())
-                        }
-                        .buttonStyle(.plain)
+                        commandMenu
                     }
 
                     // Selected command
                     if command != .text {
-                        HStack {
-                            Text(command.rawValue)
-                            Button(action: { self.command = .text }) {
-                                Image(systemName: "xmark")
-                                    .imageScale(.small)
-                                    .opacity(0.5)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        #if os(macOS)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .foregroundStyle(.white)
-                        .background(.tint, in: .rect(cornerRadius: 8))
-                        .padding(.bottom, 3)
-                        .padding(.leading, 3)
-                        .padding(.trailing, 8)
-                        #else
-                        .font(.subheadline)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .foregroundStyle(.white)
-                        .background(.tint, in: .rect(cornerRadius: 6))
-                        .padding(.bottom, 5)
-                        .padding(.horizontal, 5)
-                        #endif
+                        commandSelected
                     }
 
                     // Text input
@@ -167,6 +109,76 @@ struct MessageField: View {
                 }
             }
         }
+    }
+
+    var attachments: some View {
+        ScrollView(.horizontal) {
+            HStack(alignment: .bottom) {
+                ForEach(imagePickerViewModel.imagesSelected) { selected in
+                    ConversationInputImage(id: selected.id, image: selected.image)
+                        .environment(imagePickerViewModel)
+                        .padding(.top, 8)
+                }
+            }
+            .padding(.horizontal, 8)
+        }
+        .scrollIndicators(.hidden)
+        .scrollClipDisabled()
+    }
+
+    var commandMenu: some View {
+        Menu {
+            Button(action: { showingPhotos = true }) {
+                Label("Attach Photo", systemImage: "photo")
+            }
+            Button(action: { command = .imagine }) {
+                Label("Create Image", systemImage: "paintpalette")
+            }
+            Menu {
+                ForEach(state.agentsProvider.agents.filter { $0.kind == .prompt }) { agent in
+                    Button {
+                        showingAgent = agent
+                    } label: {
+                        Text(agent.name)
+                    }
+                }
+            } label: {
+                Label("Use Agent", systemImage: "puzzlepiece")
+            }
+        } label: {
+            Image(systemName: "plus")
+                .modifier(ConversationInlineButtonModifier())
+        }
+        .buttonStyle(.plain)
+    }
+
+    var commandSelected: some View {
+        HStack {
+            Text(command.rawValue)
+            Button(action: { self.command = .text }) {
+                Image(systemName: "xmark")
+                    .imageScale(.small)
+                    .opacity(0.5)
+            }
+            .buttonStyle(.plain)
+        }
+        #if os(macOS)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .foregroundStyle(.white)
+        .background(.tint, in: .rect(cornerRadius: 8))
+        .padding(.bottom, 3)
+        .padding(.leading, 3)
+        .padding(.trailing, 8)
+        #else
+        .font(.subheadline)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .foregroundStyle(.white)
+        .background(.tint, in: .rect(cornerRadius: 6))
+        .padding(.bottom, 5)
+        .padding(.horizontal, 5)
+        #endif
     }
 
     func handleSubmit() async throws {
