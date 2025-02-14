@@ -45,7 +45,7 @@ public final class API {
             req.with(context: context)
             
             // Generate response stream
-            let stream = ChatSession.shared.stream(req)
+            let stream = ChatSession.shared.stream(req, runLoopLimit: 20)
             for try await message in stream {
                 try Task.checkCancellation()
 
