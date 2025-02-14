@@ -13,6 +13,8 @@ final class ConversationViewModel {
     private let messagesProvider = MessagesProvider.shared
     private let preferencesProvider = PreferencesProvider.shared
 
+    private var generateTask: Task<(), Swift.Error>? = nil
+
     enum Error: Swift.Error, CustomStringConvertible {
         case generationError(String)
         case unexpectedError(String)
@@ -27,7 +29,7 @@ final class ConversationViewModel {
         }
     }
 
-    init(conversationID: String) {
+    init(conversationID: String? = nil) {
         self.conversationID = conversationID
     }
 
@@ -64,18 +66,14 @@ final class ConversationViewModel {
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
     func generate(chat prompt: String, images: [Data] = [], context: [String: String] = [:], toolChoice: Tool? = nil, agentID: String? = nil) async throws {
         guard let conversationID else { return }
-        do {
-            try await API.shared.generate(
-                conversationID: conversationID,
-                prompt: prompt,
-                context: context,
-                images: images,
-                toolChoice: toolChoice,
-                agentID: agentID
-            ).value
-        } catch {
-            throw Error.generationError("\(error)")
-        }
+        generateTask = try API.shared.generate(
+            conversationID: conversationID,
+            prompt: prompt,
+            context: context,
+            images: images,
+            toolChoice: toolChoice,
+            agentID: agentID
+        )
     }
 
     /// Generate an image from a given prompt. This is an explicit way to generate an image, most happen through tool use.
@@ -89,6 +87,10 @@ final class ConversationViewModel {
         } catch {
             throw Error.generationError("Image generation failed: \(error)")
         }
+    }
+
+    func cancel() {
+        generateTask?.cancel()
     }
 
     // MARK: - Private

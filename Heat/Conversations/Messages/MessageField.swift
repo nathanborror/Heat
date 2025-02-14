@@ -8,6 +8,7 @@ private let logger = Logger(subsystem: "MessageField", category: "App")
 
 struct MessageField: View {
     @Environment(AppState.self) var state
+    @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.colorScheme) var colorScheme
 
     typealias ActionHandler = (String, [Data], Command) -> Void
@@ -26,6 +27,7 @@ struct MessageField: View {
     @State private var command: Command = .text
     @State private var showingPhotos = false
     @State private var showingAgent: Agent? = nil
+    @State private var showingStop = false
 
     @FocusState private var isFocused: Bool
 
@@ -79,7 +81,7 @@ struct MessageField: View {
             .background(.primary.opacity((colorScheme == .dark) ? 0.1 : 0.05))
             .clipShape(.rect(cornerRadius: 10))
 
-            if showStopGenerating {
+            if showingStop {
                 Button(action: handleStop) {
                     Image(systemName: "stop.fill")
                         .modifier(ConversationButtonModifier())
@@ -107,6 +109,14 @@ struct MessageField: View {
                 MessageFieldAgent(agent: agent) { agent in
                     agentAction?(agent)
                 }
+            }
+        }
+        .onChange(of: conversationViewModel.conversation?.state) { _, newValue in
+            switch newValue {
+            case .processing, .streaming, .suggesting:
+                showingStop = true
+            default:
+                showingStop = false
             }
         }
     }
@@ -209,7 +219,7 @@ struct MessageField: View {
     }
 
     func handleStop() {
-        print("not implemented")
+        conversationViewModel.cancel()
     }
 
     private func clear() {
@@ -219,7 +229,6 @@ struct MessageField: View {
     }
 
     private var showInputPadding: Bool      { !content.isEmpty }
-    private var showStopGenerating: Bool    { false } // TODO: Fix this
     private var showSubmit: Bool            { !content.isEmpty }
 
     #if os(macOS)
