@@ -211,7 +211,7 @@ public final class API {
             switch tool {
             case .generateImages:
                 let messages = await ImageGeneratorTool.handle(toolCall)
-                return .init(messages: messages, shouldContinue: false)
+                return .init(messages: messages, shouldContinue: true)
             case .generateMemory:
                 let messages = await MemoryTool.handle(toolCall)
                 return .init(messages: messages, shouldContinue: false)

@@ -22,7 +22,7 @@ struct MessageView: View {
                    ToolCallView(toolCall)
                }
             case .tool:
-               ToolContentsView(message.content, name: message.name)
+               ToolContentsView(message)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -71,14 +71,12 @@ struct UserContentsView: View {
 }
 
 struct ToolContentsView: View {
-    let content: String
-    let name: String
+    let message: Message
 
     @State var disclosed = false
 
-    init(_ content: String?, name: String?) {
-        self.content = content ?? ""
-        self.name = name ?? "Unknown Tool"
+    init(_ message: Message) {
+        self.message = message
     }
 
     var body: some View {
@@ -86,22 +84,37 @@ struct ToolContentsView: View {
             Button {
                 disclosed.toggle()
             } label: {
-                ToolResponseName(name)
+                ToolResponseName(message.name ?? "Unknown Tool")
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
 
             if disclosed {
-                Text(content)
-                    .padding(.leading)
-                    .overlay(
-                        Rectangle()
-                            .fill(.primary.opacity(0.5))
-                            .frame(width: 1)
-                            .frame(maxHeight: .infinity),
-                        alignment: .leading
-                    )
-                    .opacity(0.5)
+                VStack(alignment: .leading) {
+                    if let contents = message.contents {
+                        ForEach(contents.indices, id: \.self) { index in
+                            switch contents[index] {
+                            case .text(let text):
+                                Text(text)
+                                    .padding(.leading)
+                                    .overlay(
+                                        Rectangle()
+                                            .fill(.primary.opacity(0.5))
+                                            .frame(width: 1)
+                                            .frame(maxHeight: .infinity)
+                                            .opacity(0.5),
+                                        alignment: .leading
+                                    )
+                            case .image(let data, _):
+                                PictureView(data: data)
+                                    .frame(width: 300, height: 300)
+                                    .clipShape(.rect(cornerRadius: 10))
+                            case .audio:
+                                Text("Audio")
+                            }
+                        }
+                    }
+                }
             }
         }
     }
