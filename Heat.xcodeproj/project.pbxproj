@@ -24,6 +24,7 @@
 		D4B2D2692B6563DB0017FB52 /* MessageField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2682B6563DB0017FB52 /* MessageField.swift */; };
 		D4B4F9282C8BB17A00C82284 /* RenderReflection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B4F9272C8BB17A00C82284 /* RenderReflection.swift */; };
 		D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */; };
+		D4EDDC812D5E91190079D53E /* Message+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4EDDC802D5E91190079D53E /* Message+.swift */; };
 		D4F518BD2CAF47CE005E147E /* MessageList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F518BC2CAF47CE005E147E /* MessageList.swift */; };
 		D4F518BF2CAF8BA8005E147E /* RenderOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F518BE2CAF8BA8005E147E /* RenderOutput.swift */; };
 		D4FBFBEA2CED03E100266BF1 /* App-iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FBFBE92CED03E100266BF1 /* App-iOS.swift */; platformFilter = ios; };
@@ -87,6 +88,7 @@
 		D4B2D2682B6563DB0017FB52 /* MessageField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageField.swift; sourceTree = "<group>"; };
 		D4B4F9272C8BB17A00C82284 /* RenderReflection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderReflection.swift; sourceTree = "<group>"; };
 		D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		D4EDDC802D5E91190079D53E /* Message+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Message+.swift"; sourceTree = "<group>"; };
 		D4F518BC2CAF47CE005E147E /* MessageList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageList.swift; sourceTree = "<group>"; };
 		D4F518BE2CAF8BA8005E147E /* RenderOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderOutput.swift; sourceTree = "<group>"; };
 		D4FBFBE92CED03E100266BF1 /* App-iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App-iOS.swift"; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				D80F73B52C95F0E0001B2778 /* AttributedString+.swift */,
 				D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */,
 				D8D145842D0916EE0025ED75 /* Image+.swift */,
+				D4EDDC802D5E91190079D53E /* Message+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -406,6 +409,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D8271A5C2C7A4E83008C345B /* CodeHighlighter.swift in Sources */,
+				D4EDDC812D5E91190079D53E /* Message+.swift in Sources */,
 				D85FE37F2C8FCA0B004CA2F3 /* RunView.swift in Sources */,
 				D4B2D2672B649DFD0017FB52 /* ConversationList.swift in Sources */,
 				D8F118362CF14BDF005EF99B /* AppState.swift in Sources */,

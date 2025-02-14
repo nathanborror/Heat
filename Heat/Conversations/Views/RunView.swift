@@ -3,9 +3,9 @@ import GenKit
 import HeatKit
 
 struct RunView: View {
-    @Environment(\.colorScheme) var colorScheme
-
     let run: Run
+
+    @State private var showAllMessages = false
 
     init(_ run: Run) {
         self.run = run
@@ -13,8 +13,22 @@ struct RunView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            if run.messages.count > 1 {
+                Button {
+                    showAllMessages.toggle()
+                } label: {
+                    Text("Show All Messages")
+                }
+            }
+
             ForEach(run.messages) { message in
-                MessageView(message)
+                if showAllMessages {
+                    MessageView(message)
+                } else {
+                    if message.shouldShowInRun {
+                        MessageView(message)
+                    }
+                }
             }
         }
     }
