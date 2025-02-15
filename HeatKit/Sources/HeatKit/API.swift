@@ -46,17 +46,21 @@ public final class API {
             
             // Generate response stream
             let stream = ChatSession.shared.stream(req, runLoopLimit: 20)
-            for try await message in stream {
-                try Task.checkCancellation()
+            do {
+                for try await message in stream {
+                    try Task.checkCancellation()
 
-                // Indicate which agent was used
-                var message = message
-                if let agentID {
-                    message.metadata?.agentID = agentID
+                    // Indicate which agent was used
+                    var message = message
+                    if let agentID {
+                        message.metadata?.agentID = agentID
+                    }
+
+                    try await messagesProvider.upsert(message: message, referenceID: conversation.id)
+                    try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
                 }
-
-                try await messagesProvider.upsert(message: message, referenceID: conversation.id)
-                try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
+            } catch {
+                print(error)
             }
 
             // Save messages
