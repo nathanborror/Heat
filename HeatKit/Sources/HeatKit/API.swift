@@ -135,8 +135,8 @@ public final class API {
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: PromptTemplate(TitleInstructions, with: ["HISTORY": history]))
-        
+        req.with(history: [.init(role: .user, content: PromptTemplate(TitleInstructions, with: ["HISTORY": history]))])
+
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
         for try await message in stream {
@@ -173,8 +173,8 @@ public final class API {
 
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: PromptTemplate(SuggestionsInstructions, with: ["HISTORY": history]))
-        
+        req.with(history: [.init(role: .user, content: PromptTemplate(SuggestionsInstructions, with: ["HISTORY": history]))])
+
         // Indicate we are suggesting
         try await conversationsProvider.upsert(state: .suggesting, conversationID: conversation.id)
         
