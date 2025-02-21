@@ -19,6 +19,7 @@ struct RunView: View {
                 } label: {
                     Text("Show All Messages")
                 }
+                .buttonStyle(.bordered)
             }
 
             ForEach(run.messages) { message in
