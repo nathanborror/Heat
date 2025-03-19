@@ -93,8 +93,8 @@ struct ServiceOnboarding: View {
 
         switch serviceID {
         case .anthropic:
-            preferredChatModel = .init("claude-3-5-sonnet-20240620")
-            preferredSummarizationModel = .init("claude-3-haiku-20240307")
+            preferredChatModel = .init("claude-3-7-sonnet-latest")
+            preferredSummarizationModel = .init("claude-3-5-haiku-latest")
         case .groq:
             preferredChatModel = .init("llama-3.1-70b-versatile")
             preferredSummarizationModel = .init("llama-3.1-8b-instant")
