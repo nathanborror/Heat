@@ -65,7 +65,7 @@ extension CalendarSearchTool {
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
             let args = try Arguments(toolCall.function.arguments)
-            let events = try CalendarSession.shared.events(between: args.start, end: args.end)
+            let events = try await CalendarSession.shared.events(between: args.start, end: args.end)
             return [.init(
                 role: .tool,
                 content: events.map { $0.title }.joined(separator: "\n"),
