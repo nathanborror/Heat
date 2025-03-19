@@ -48,6 +48,9 @@ struct RenderImageSearch: View {
     }
 
     func performQuery() async throws {
+        guard tag.hasClosingTag else {
+            return
+        }
         guard let content = tag.content else {
             throw RenderTagError.missingContent
         }
