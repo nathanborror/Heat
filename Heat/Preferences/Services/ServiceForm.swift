@@ -38,7 +38,7 @@ struct ServiceForm: View {
                     .onSubmit { handleSetDefaults() }
 
                 Button {
-                    handleSetDefaults()
+                    handleLoadModels()
                 } label: {
                     Text("Load Models")
                 }
@@ -95,6 +95,17 @@ struct ServiceForm: View {
 
     func handleSave() {
         Task { try await state.preferencesProvider.upsert(service: service) }
+    }
+
+    func handleLoadModels() {
+        Task {
+            do {
+                let client = service.modelService()
+                service.models = try await client.models()
+            } catch {
+                print(error)
+            }
+        }
     }
 
     func handleSetDefaults() {
