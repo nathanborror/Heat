@@ -110,8 +110,9 @@ final class ConversationViewModel {
                 if !currentRun.messages.isEmpty {
                     runs.append(currentRun)
                 }
+                let runID = (message.runID != nil && !message.runID!.isEmpty) ? message.runID! : message.id
                 currentRun = Run(
-                    id: message.runID ?? message.id,
+                    id: runID,
                     messages: [message],
                     started: message.created,
                     ended: message.modified
