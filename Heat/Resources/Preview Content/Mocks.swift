@@ -119,7 +119,7 @@ let mock_run = Run(
                 </news_search_results>
                 """,
             name: Toolbox.browseWeb.name,
-            metadata: .init(["label": "Searched web for 'OpenAI latest o1 models'"])
+            metadata: ["label": .string("Searched web for 'OpenAI latest o1 models'")]
         ),
         .init(
             referenceID: mock_conversation.id,
@@ -171,7 +171,7 @@ let mock_run = Run(
                 </website>
                 """,
             name: Toolbox.browseWeb.name,
-            metadata: .init(["label": "Browsed 'https://www.theverge.com'"])
+            metadata: ["label": .string("Browsed 'https://www.theverge.com'")]
         ),
         .init(
             referenceID: mock_conversation.id,

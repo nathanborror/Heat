@@ -72,12 +72,12 @@ extension WebSearchTool {
                 return [.init(
                     role: .tool,
                     content: PromptTemplate(BrowseSearchResultsInstructions, with: [
-                        "QUERY": args.query,
-                        "RESULTS": results.joined(separator: "\n"),
+                        "QUERY": .string(args.query),
+                        "RESULTS": .string(results.joined(separator: "\n")),
                     ]),
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,
-                    metadata: .init(["label": "Searched web for '\(args.query)'"])
+                    metadata: ["label": .string("Searched web for '\(args.query)'")]
                 )]
             case .image:
                 let searchResponse = try await WebSearchSession.shared.searchImages(query: args.query)
@@ -97,7 +97,7 @@ extension WebSearchTool {
                     content: content,
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,
-                    metadata: .init(["label": "Searched web images for '\(args.query)'"])
+                    metadata: ["label": .string("Searched web images for '\(args.query)'")]
                 )]
             }
             

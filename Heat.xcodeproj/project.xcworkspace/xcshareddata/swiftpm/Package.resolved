@@ -1,4 +1,5 @@
 {
+  "originHash" : "fa6cef81856a887d0e791902fc8b08981391d99ecb58ae82ac21297bd4d9c459",
   "pins" : [
     {
       "identity" : "fuzi",
@@ -24,7 +25,7 @@
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
       "state" : {
         "branch" : "main",
-        "revision" : "7ecc38bb6edf7d087d30e737057b8d8a9b7f51eb"
+        "revision" : "045cf174010beb335fa1d2567d18c057b8787165"
       }
     },
     {
@@ -51,7 +52,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "80b5ba418155ff01f5538ded77236fded136a1ad"
+        "revision" : "1da5a1aa4b8fe9ca2ba0d5841ac3feec77e69b85"
       }
     },
     {
@@ -60,7 +61,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "385cfb2ad9dac8a27374a269879855e86055ec5c"
+        "revision" : "d67151befa39533a6a449136c7992537cbf8ec99"
       }
     },
     {
@@ -78,7 +79,7 @@
       "location" : "https://github.com/nathanborror/swift-elevenlabs",
       "state" : {
         "branch" : "main",
-        "revision" : "2da6102f39beba3b06fa62e9751618b2999ad6a0"
+        "revision" : "b06be3a7a4a5552141480f19d83ec9dabdbfc95c"
       }
     },
     {
@@ -96,7 +97,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "6bc70d60876e0f78715450156cbc084a246b23bf"
+        "revision" : "c1167f8e2d47bd7b8b59b3ed8b09fc9458e30ada"
       }
     },
     {
@@ -141,7 +142,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "9ec3129a574eac27492181896752dcacfab2f5d8"
+        "revision" : "a86fb2e1101d31cf687ff9ebc95cdfbf8b652b5f"
       }
     },
     {
@@ -159,9 +160,9 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "d4e4994642ba4706280d8d1ec89cff6eb98684eb"
+        "revision" : "3159eb54575d9f8b432bc236f7f46a8d6431d563"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

@@ -73,7 +73,7 @@ extension WebBrowseTool {
                     """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
-                metadata: .init(["label": label])
+                metadata: ["label": .string(label)]
             )]
         } catch {
             return [.init(

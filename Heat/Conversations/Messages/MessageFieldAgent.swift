@@ -1,4 +1,5 @@
 import SwiftUI
+import SharedKit
 import HeatKit
 
 struct MessageFieldAgent: View {
@@ -13,8 +14,8 @@ struct MessageFieldAgent: View {
                 ForEach(Array(agent.context.keys), id: \.self) { key in
                     TextField(key,
                         text: Binding(
-                            get: { agent.context[key] ?? "" },
-                            set: { agent.context[key] = $0 }
+                            get: { "\(agent.context[key] ?? "")" },
+                            set: { agent.context[key] = .string($0) }
                         ),
                         axis: .vertical
                     )

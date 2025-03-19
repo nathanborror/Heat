@@ -1,5 +1,6 @@
 import SwiftUI
 import OSLog
+import SharedKit
 import GenKit
 import HeatKit
 
@@ -92,7 +93,7 @@ struct ConversationView: View {
 
             // Context full of memories
             let memories = try await state.memoryProvider.get()
-            let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
+            let context: [String: Value] = ["MEMORIES": .string(memories.map { $0.content }.joined(separator: "\n"))]
 
             // Try to generate a response
             do {

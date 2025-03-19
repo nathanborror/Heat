@@ -1,7 +1,8 @@
+import SwiftUI
+import OSLog
+import SharedKit
 import GenKit
 import HeatKit
-import OSLog
-import SwiftUI
 
 private let logger = Logger(subsystem: "ConversationViewModel", category: "App")
 
@@ -64,7 +65,7 @@ final class ConversationViewModel {
     }
 
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
-    func generate(chat prompt: String, images: [Data] = [], context: [String: String] = [:], toolChoice: Tool? = nil, agentID: String? = nil) async throws {
+    func generate(chat prompt: String, images: [Data] = [], context: [String: Value] = [:], toolChoice: Tool? = nil, agentID: String? = nil) async throws {
         guard let conversationID else { return }
         generateTask = try API.shared.generate(
             conversationID: conversationID,

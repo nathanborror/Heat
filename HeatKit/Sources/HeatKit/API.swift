@@ -1,4 +1,5 @@
 import Foundation
+import SharedKit
 import GenKit
 
 @MainActor @Observable
@@ -6,7 +7,7 @@ public final class API {
     public static let shared = API()
     
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
-    public func generate(conversationID: String, prompt: String, context: [String: String] = [:], images: [Data] = [], toolChoice: Tool? = nil, agentID: String? = nil) throws -> Task<(), Error> {
+    public func generate(conversationID: String, prompt: String, context: [String: Value] = [:], images: [Data] = [], toolChoice: Tool? = nil, agentID: String? = nil) throws -> Task<(), Error> {
         guard !prompt.isEmpty else { return Task {()} }
         
         // Providers
@@ -23,8 +24,8 @@ public final class API {
             
             // Augment context
             var context = context
-            context["DATETIME"] = Date.now.formatted()
-            
+            context["DATETIME"] = .string(Date.now.formatted())
+
             // New user message
             let imageContent = images.map { Message.Content.image(data: $0, format: .jpeg) }
             let textContent = Message.Content.text(PromptTemplate(prompt, with: context))
@@ -53,7 +54,7 @@ public final class API {
                     // Indicate which agent was used
                     var message = message
                     if let agentID {
-                        message.metadata?.agentID = agentID
+                        message.metadata["agentID"] = .string(agentID)
                     }
 
                     try await messagesProvider.upsert(message: message, referenceID: conversation.id)
@@ -139,7 +140,7 @@ public final class API {
         
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(history: [.init(role: .user, content: PromptTemplate(TitleInstructions, with: ["HISTORY": history]))])
+        req.with(history: [.init(role: .user, content: PromptTemplate(TitleInstructions, with: ["HISTORY": .string(history)]))])
 
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)
@@ -177,7 +178,7 @@ public final class API {
 
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(history: [.init(role: .user, content: PromptTemplate(SuggestionsInstructions, with: ["HISTORY": history]))])
+        req.with(history: [.init(role: .user, content: PromptTemplate(SuggestionsInstructions, with: ["HISTORY": .string(history)]))])
 
         // Indicate we are suggesting
         try await conversationsProvider.upsert(state: .suggesting, conversationID: conversation.id)
@@ -237,7 +238,7 @@ public final class API {
                 content: "Unknown tool.",
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
-                metadata: .init(["label": "Unknown tool"])
+                metadata: ["label": .string("Unknown tool")]
             )
             return .init(messages: [toolResponse], shouldContinue: false)
         }

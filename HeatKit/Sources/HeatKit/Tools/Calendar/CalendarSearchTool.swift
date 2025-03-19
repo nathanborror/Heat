@@ -71,7 +71,7 @@ extension CalendarSearchTool {
                 content: events.map { $0.title }.joined(separator: "\n"),
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
-                metadata: .init(["label": "Found \(events.count) calendar items."])
+                metadata: ["label": .string("Found \(events.count) calendar items.")]
             )]
         } catch {
             return [.init(
@@ -79,7 +79,7 @@ extension CalendarSearchTool {
                 content: "You do not have calendar access. Tell the user to open Preferences and navigate to Permissions to enable calendar access.",
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
-                metadata: .init(["label": "Error accessing calendar"])
+                metadata: ["label": .string("Error accessing calendar")]
             )]
         }
     }

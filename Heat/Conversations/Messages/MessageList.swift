@@ -58,7 +58,7 @@ struct MessageList: View {
         Task {
             do {
                 let memories = try await state.memoryProvider.get()
-                let context = ["MEMORIES": memories.map { $0.content }.joined(separator: "\n")]
+                let context: [String: Value] = ["MEMORIES": .string(memories.map { $0.content }.joined(separator: "\n"))]
                 try await conversationViewModel.generate(chat: prompt, context: context)
             } catch {
                 print(error)

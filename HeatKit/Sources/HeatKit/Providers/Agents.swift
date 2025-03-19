@@ -10,7 +10,7 @@ public struct Agent: Codable, Identifiable, Sendable {
     public var kind: Kind
     public var name: String
     public var instructions: String
-    public var context: [String: String]    // Context variables that will be injected into the instructions prompt
+    public var context: [String: Value]     // Context variables that will be injected into the instructions prompt
     public var tags: [String]               // XML tags that are expected in the output
     public var toolIDs: Set<String>
     public var created: Date
@@ -21,7 +21,7 @@ public struct Agent: Codable, Identifiable, Sendable {
         case prompt
     }
 
-    public init(id: String = .id, kind: Kind, name: String, instructions: String, context: [String: String] = [:],
+    public init(id: String = .id, kind: Kind, name: String, instructions: String, context: [String: Value] = [:],
                 tags: [String] = [], toolIDs: Set<String> = []) {
         self.id = id
         self.kind = kind

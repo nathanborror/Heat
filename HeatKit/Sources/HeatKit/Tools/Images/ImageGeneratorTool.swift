@@ -54,7 +54,7 @@ extension ImageGeneratorTool {
                 contents: content + [.text(args.prompts.joined(separator: "\n\n"))],
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
-                metadata: .init(["label": args.prompts.count == 1 ? "Generating an image" : "Generating \(args.prompts.count) images"])
+                metadata: ["label": .string(args.prompts.count == 1 ? "Generating an image" : "Generating \(args.prompts.count) images")]
             )]
         } catch {
             return [.init(
