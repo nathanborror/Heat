@@ -17,7 +17,6 @@ struct TypingIndicator: View {
                 .clipShape(.rect(cornerRadius: 2))
                 .opacity(isVisible ? 1 : 0)
         }
-        .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .onAppear {
             handleBlink()
