@@ -67,11 +67,12 @@ public final class API {
             // Save messages
             try await messagesProvider.flush()
             
-            // Generate suggestions and title in parallel
+            // Generate suggestions, title and memories in parallel
             Task {
                 async let suggestions = generateSuggestions(conversationID: conversationID)
                 async let title = generateTitle(conversationID: conversationID)
-                try await (_, _) = (suggestions, title)
+                async let memories = generateMemories(conversationID: conversationID)
+                try await (_, _, _) = (suggestions, title, memories)
             }
         }
     }
@@ -208,7 +209,53 @@ public final class API {
         // Success
         return true
     }
-    
+
+    /// Generates memories to store based on the last user message in the conversation.
+    private func generateMemories(conversationID: String) async throws -> Bool {
+
+        // Providers
+        let messagesProvider = MessagesProvider.shared
+        let memoryProvider = MemoryProvider.shared
+        let preferencesProvider = PreferencesProvider.shared
+
+        let service = try preferencesProvider.preferredChatService()
+        let model = try preferencesProvider.preferredChatModel()
+
+        // Gather context
+        let messages = try messagesProvider.get(referenceID: conversationID)
+        let memories = try await memoryProvider.get()
+        let existingMemories = memories.map { $0.content }.joined(separator: "\n")
+        let lastUserMessage = messages.last(where: { $0.role == .user })
+
+        // Prepare request
+        let req = ChatServiceRequest(model: model, messages: [
+            .init(
+                role: .user,
+                content: PromptTemplate(MemoryInstructions, with: [
+                    "CONTENT": .string(lastUserMessage?.content ?? ""),
+                    "MEMORIES": .string(existingMemories)
+                ])
+            )
+        ])
+
+        // Make request
+        let resp = try await service.completion(req)
+        guard let content = resp.content else { return false }
+
+        // Parse response content
+        let name = "memories"
+        let result = try ContentParser.shared.parse(input: content, tags: [name])
+        let tag = result.first(tag: name)
+
+        guard let memories = tag?.content else { return false }
+        for memory in memories.split(separator: "\n") {
+            try await memoryProvider.upsert(.init(content: String(memory)))
+        }
+
+        // Success
+        return true
+    }
+
     /// Determine which tool is being called, execute the tool request if needed and return a tool call response before another turn of the conversation happens.
     @Sendable
     private func prepareToolResponse(toolCall: ToolCall) async throws -> ToolCallResponse {
