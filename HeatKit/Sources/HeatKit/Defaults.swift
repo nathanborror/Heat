@@ -36,7 +36,6 @@ public struct Defaults {
             Toolbox.browseWeb.name,
             Toolbox.searchWeb.name,
             Toolbox.searchCalendar.name,
-            Toolbox.generateMemory.name,
         ]
     )
 
@@ -57,7 +56,6 @@ public struct Defaults {
             Toolbox.browseWeb.name,
             Toolbox.searchWeb.name,
             Toolbox.searchCalendar.name,
-            Toolbox.generateMemory.name,
         ]
     )
 
@@ -71,7 +69,6 @@ public struct Defaults {
             Toolbox.browseWeb.name,
             Toolbox.searchWeb.name,
             Toolbox.searchCalendar.name,
-            Toolbox.generateMemory.name,
         ]
     )
 

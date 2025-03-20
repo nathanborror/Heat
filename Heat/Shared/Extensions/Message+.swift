@@ -11,12 +11,6 @@ extension Message {
             switch toolName {
             case .generateImages:
                 return true
-            case .generateMemory:
-                return true
-            case .generateSuggestions:
-                return true
-            case .generateTitle:
-                return true
             case .searchCalendar:
                 return false
             case .searchWeb:
@@ -29,8 +23,6 @@ extension Message {
         if role == .assistant, let toolCalls = toolCalls {
             for toolCall in toolCalls {
                 switch Toolbox(name: toolCall.function.name) {
-                case .generateMemory:
-                    return true
                 case .generateImages:
                     return true
                 default:

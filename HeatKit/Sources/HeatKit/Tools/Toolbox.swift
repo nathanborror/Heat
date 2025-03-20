@@ -4,9 +4,6 @@ import GenKit
 
 public enum Toolbox: CaseIterable, Sendable {
     case generateImages
-    case generateMemory
-    case generateSuggestions
-    case generateTitle
     case searchCalendar
     case searchWeb
     case browseWeb
@@ -17,12 +14,6 @@ public enum Toolbox: CaseIterable, Sendable {
         switch name {
         case ImageGeneratorTool.function.name:
             self = .generateImages
-        case MemoryTool.function.name:
-            self = .generateMemory
-        case SuggestTool.function.name:
-            self = .generateSuggestions
-        case TitleTool.function.name:
-            self = .generateTitle
         case CalendarSearchTool.function.name:
             self = .searchCalendar
         case WebSearchTool.function.name:
@@ -38,12 +29,6 @@ public enum Toolbox: CaseIterable, Sendable {
         switch self {
         case .generateImages:
             Tool(function: ImageGeneratorTool.function)
-        case .generateMemory:
-            Tool(function: MemoryTool.function)
-        case .generateSuggestions:
-            Tool(function: SuggestTool.function)
-        case .generateTitle:
-            Tool(function: TitleTool.function)
         case .searchCalendar:
             Tool(function: CalendarSearchTool.function)
         case .searchWeb:
@@ -57,27 +42,11 @@ public enum Toolbox: CaseIterable, Sendable {
         tool.function.name
     }
     
-    public var message: Message? {
-        switch self {
-        case .generateSuggestions:
-            SuggestTool.message
-        case .generateTitle:
-            TitleTool.message
-        default:
-            nil
-        }
-    }
-    
     public static func get(names: Set<String>) -> [Tool] {
         return Toolbox.allCases
             .filter { names.contains($0.tool.function.name) }
             .map { $0.tool }
     }
-    
-    public static let ignore: [Toolbox] = [
-        .generateTitle,
-        .generateSuggestions,
-    ]
 }
 
 public enum ToolboxError: Error {

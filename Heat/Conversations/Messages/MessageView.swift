@@ -213,12 +213,6 @@ struct ToolCallName: View {
             switch tool {
             case .generateImages:
                 Text("Generating image(s)...")
-            case .generateMemory:
-                Text("Saving memory...")
-            case .generateSuggestions:
-                Text("Preparing suggestions...")
-            case .generateTitle:
-                Text("Preparing title...")
             case .searchCalendar:
                 Text("Searching calendar...")
             case .searchWeb:
@@ -246,12 +240,6 @@ struct ToolResponseName: View {
             switch tool {
             case .generateImages:
                 Text("Generated image(s)")
-            case .generateMemory:
-                Text("Saved memory")
-            case .generateSuggestions:
-                Text("Prepared suggestions")
-            case .generateTitle:
-                Text("Prepared title")
             case .searchCalendar:
                 Text("Searched calendar")
             case .searchWeb:

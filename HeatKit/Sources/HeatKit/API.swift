@@ -217,9 +217,6 @@ public final class API {
             case .generateImages:
                 let messages = await ImageGeneratorTool.handle(toolCall)
                 return .init(messages: messages, shouldContinue: true)
-            case .generateMemory:
-                let messages = await MemoryTool.handle(toolCall)
-                return .init(messages: messages, shouldContinue: false)
             case .searchCalendar:
                 let messages = await CalendarSearchTool.handle(toolCall)
                 return .init(messages: messages, shouldContinue: true)
@@ -229,8 +226,6 @@ public final class API {
             case .browseWeb:
                 let messages = await WebBrowseTool.handle(toolCall)
                 return .init(messages: messages, shouldContinue: true)
-            case .generateSuggestions, .generateTitle:
-                return .init(messages: [], shouldContinue: false)
             }
         } else {
             let toolResponse = Message(
