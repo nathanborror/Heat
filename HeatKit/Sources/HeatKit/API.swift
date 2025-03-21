@@ -47,33 +47,26 @@ public final class API {
             
             // Generate response stream
             let stream = ChatSession.shared.stream(req, runLoopLimit: 20)
-            do {
-                for try await message in stream {
-                    try Task.checkCancellation()
+            for try await message in stream {
+                try Task.checkCancellation()
 
-                    // Indicate which agent was used
-                    var message = message
-                    if let agentID {
-                        message.metadata["agentID"] = .string(agentID)
-                    }
-
-                    try await messagesProvider.upsert(message: message, referenceID: conversation.id)
-                    try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
+                // Indicate which agent was used
+                var message = message
+                if let agentID {
+                    message.metadata["agentID"] = .string(agentID)
                 }
-            } catch {
-                print(error)
+
+                try await messagesProvider.upsert(message: message, referenceID: conversation.id)
+                try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
             }
 
             // Save messages
             try await messagesProvider.flush()
-            
-            // Generate suggestions, title and memories in parallel
-            Task {
-                async let suggestions = generateSuggestions(conversationID: conversationID)
-                async let title = generateTitle(conversationID: conversationID)
-                async let memories = generateMemories(conversationID: conversationID)
-                try await (_, _, _) = (suggestions, title, memories)
-            }
+
+            // Generate suggestions, title and memories
+            try await generateSuggestions(conversationID: conversationID)
+            try await generateTitle(conversationID: conversationID)
+            try await generateMemories(conversationID: conversationID)
         }
     }
     
@@ -120,7 +113,7 @@ public final class API {
     // MARK: - Private
 
     /// Generate a title for the conversation.
-    private func generateTitle(conversationID: String) async throws -> Bool {
+    private func generateTitle(conversationID: String) async throws {
 
         // Providers
         let conversationsProvider = ConversationsProvider.shared
@@ -131,7 +124,7 @@ public final class API {
         let messages = try messagesProvider.get(referenceID: conversationID)
 
         guard conversation.title == nil else {
-            return false
+            return
         }
         
         let service = try preferencesProvider.preferredChatService()
@@ -156,13 +149,10 @@ public final class API {
             guard let title = tag?.content else { continue }
             try await conversationsProvider.upsert(title: title, conversationID: conversation.id)
         }
-        
-        // Success
-        return true
     }
     
     /// Generate conversation suggestions related to what's being talked about.
-    private func generateSuggestions(conversationID: String) async throws -> Bool {
+    private func generateSuggestions(conversationID: String) async throws {
 
         // Providers
         let conversationsProvider = ConversationsProvider.shared
@@ -205,13 +195,10 @@ public final class API {
         
         // Set conversation state
         try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
-        
-        // Success
-        return true
     }
 
     /// Generates memories to store based on the last user message in the conversation.
-    private func generateMemories(conversationID: String) async throws -> Bool {
+    private func generateMemories(conversationID: String) async throws {
 
         // Providers
         let messagesProvider = MessagesProvider.shared
@@ -240,20 +227,17 @@ public final class API {
 
         // Make request
         let resp = try await service.completion(req)
-        guard let content = resp.content else { return false }
+        guard let content = resp.content else { return }
 
         // Parse response content
         let name = "memories"
         let result = try ContentParser.shared.parse(input: content, tags: [name])
         let tag = result.first(tag: name)
 
-        guard let memories = tag?.content else { return false }
+        guard let memories = tag?.content else { return }
         for memory in memories.split(separator: "\n") {
             try await memoryProvider.upsert(.init(content: String(memory)))
         }
-
-        // Success
-        return true
     }
 
     /// Determine which tool is being called, execute the tool request if needed and return a tool call response before another turn of the conversation happens.
