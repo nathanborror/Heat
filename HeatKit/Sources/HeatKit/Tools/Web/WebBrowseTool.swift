@@ -63,13 +63,15 @@ extension WebBrowseTool {
             return [.init(
                 role: .tool,
                 content: """
-                    <website>
+                    Below is the resulting webpage summary. Use this result to inform your final response to the user.
+                    
+                    <result>
                         <title>\(summary.title)</title>
                         <url>\(args.url)</url>
                         <summary>
                             \(summary.content ?? "No Content")
                         </summary>
-                    </website>
+                    </result>
                     """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
