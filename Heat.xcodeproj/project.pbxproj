@@ -80,7 +80,6 @@
 		D41E193D2AE4CD20002516C1 /* PictureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureView.swift; sourceTree = "<group>"; };
 		D41E193F2AE4CD4F002516C1 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
 		D41E194B2AE591EA002516C1 /* PreferencesForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesForm.swift; sourceTree = "<group>"; };
-		D443C3ED2BE1536B00C97FBD /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Heat.app; path = /Users/nathan/Work/Projects/Heat/build/Debug/Heat.app; sourceTree = "<absolute>"; };
 		D45CC1F92B8A5C1A009DFDF4 /* Suggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suggestions.swift; sourceTree = "<group>"; };
 		D4713D6F2AEAB9670005597E /* Operators.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
 		D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownUI+.swift"; sourceTree = "<group>"; };
@@ -93,6 +92,7 @@
 		D4F518BE2CAF8BA8005E147E /* RenderOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderOutput.swift; sourceTree = "<group>"; };
 		D4FBFBE92CED03E100266BF1 /* App-iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App-iOS.swift"; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		D800BF8D2D8C73F300CD1D99 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8015CC62CB8EDBF0068749D /* MessageFieldAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageFieldAgent.swift; sourceTree = "<group>"; };
 		D8015CC82CB8F4D60068749D /* RenderAnyTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderAnyTag.swift; sourceTree = "<group>"; };
 		D80F73B52C95F0E0001B2778 /* AttributedString+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributedString+.swift"; sourceTree = "<group>"; };
@@ -159,6 +159,7 @@
 			children = (
 				D41E191D2AE45C9B002516C1 /* Heat */,
 				D41E192D2AE45CE2002516C1 /* HeatKit */,
+				D800BF8D2D8C73F300CD1D99 /* Heat.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -349,7 +350,7 @@
 				D87386082CB19EE1005625B9 /* KeyboardShortcuts */,
 			);
 			productName = Heat;
-			productReference = D443C3ED2BE1536B00C97FBD /* Heat.app */;
+			productReference = D800BF8D2D8C73F300CD1D99 /* Heat.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -499,7 +500,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -562,7 +563,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -592,11 +593,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Heat/Resources/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 294VZ3T33E;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Heat/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Search your music with the Assistant.";
 				INFOPLIST_KEY_NSHomeKitUsageDescription = "Manage your home accessories with the Assistant.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location is provided as additional context to personalize your experience.";
@@ -644,11 +646,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Heat/Resources/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 294VZ3T33E;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Heat/Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Search your music with the Assistant.";
 				INFOPLIST_KEY_NSHomeKitUsageDescription = "Manage your home accessories with the Assistant.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location is provided as additional context to personalize your experience.";
