@@ -17,7 +17,7 @@ struct RunView: View {
                 Button {
                     showAllMessages.toggle()
                 } label: {
-                    Text("Show All Messages")
+                    Text("Show Work")
                 }
                 .buttonStyle(.bordered)
             }
