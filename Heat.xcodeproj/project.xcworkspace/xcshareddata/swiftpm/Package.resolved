@@ -1,5 +1,5 @@
 {
-  "originHash" : "fa6cef81856a887d0e791902fc8b08981391d99ecb58ae82ac21297bd4d9c459",
+  "originHash" : "47be69eba375f02a5486fe8b5c52e51f7d4aaae83190e4472204fe9271c1192c",
   "pins" : [
     {
       "identity" : "fuzi",
@@ -97,7 +97,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "c1167f8e2d47bd7b8b59b3ed8b09fc9458e30ada"
+        "revision" : "29cd7a645a97e7289af610aaf4ccef34c9a7ed55"
       }
     },
     {

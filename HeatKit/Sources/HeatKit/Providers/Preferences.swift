@@ -7,6 +7,7 @@ private let logger = Logger(subsystem: "Preferences", category: "Providers")
 
 public struct Preferences: Codable, Sendable {
     public var defaultAssistantID: String? = Defaults.assistantDefaultID
+    public var defaultVoiceID: String? = nil
     public var shouldStream = true
     public var textRendering: TextRendering = .markdown
     public var debug = false

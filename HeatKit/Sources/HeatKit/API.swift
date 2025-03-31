@@ -109,7 +109,39 @@ public final class API {
             try await messagesProvider.flush()
         }
     }
-    
+
+    public func speak(message: Message, voice: String) throws {
+        guard let content = message.content else { return }
+
+        let messagesProvider = MessagesProvider.shared
+        let preferencesProvider = PreferencesProvider.shared
+
+        // Service and model
+        let service = try preferencesProvider.preferredSpeechService()
+        let model = try preferencesProvider.preferredSpeechModel()
+
+        Task {
+            do {
+                print("[START] Generating Audio...")
+                let request = SpeechServiceRequest(voice: voice, model: model, input: content)
+                let data = try await service.speak(request)
+
+                let filename = "\(String.id).mp3"
+                let url = URL.documentsDirectory.appending(path: "audio").appending(path: filename)
+                try data.write(to: url, options: .atomic, createDirectories: true)
+
+                var message = message
+                message.metadata["audio"] = .string(filename)
+
+                try await messagesProvider.upsert(message: message, referenceID: message.referenceID!)
+                try await messagesProvider.flush()
+                print("[END] Generating Audio")
+            } catch {
+                print(error)
+            }
+        }
+    }
+
     // MARK: - Private
 
     /// Generate a title for the conversation.

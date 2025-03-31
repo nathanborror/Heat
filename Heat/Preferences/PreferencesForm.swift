@@ -8,9 +8,9 @@ struct PreferencesForm: View {
     @Environment(\.dismiss) private var dismiss
 
     @State var preferences: Preferences
+    @State var voices: [Voice] = []
 
     @State private var showingDeleteConfirmation = false
-    @State private var showingAdditionalServices = false
 
     var body: some View {
         Form {
@@ -34,6 +34,14 @@ struct PreferencesForm: View {
                         Text(agent.name).tag(agent.id)
                     }
                 }
+
+                Picker("Default Voice", selection: $preferences.defaultVoiceID) {
+                    Text("None").tag(String?.none)
+                    Divider()
+                    ForEach(voices) { voice in
+                        Text(voice.name ?? voice.id).tag(voice.id)
+                    }
+                }
             } header: {
                 Text("Experience")
             }
@@ -48,28 +56,15 @@ struct PreferencesForm: View {
                 Picker("Summarization", selection: $preferences.preferred.summarizationServiceID) {
                     servicePickerView(\.supportsSummarization)
                 }
-
-                if showingAdditionalServices {
-                    Picker("Embeddings", selection: $preferences.preferred.embeddingServiceID) {
-                        servicePickerView(\.supportsEmbeddings)
-                    }
-                    Picker("Transcriptions", selection: $preferences.preferred.transcriptionServiceID) {
-                        servicePickerView(\.supportsTranscriptions)
-                    }
-                    Picker("Speech", selection: $preferences.preferred.speechServiceID) {
-                        servicePickerView(\.supportsSpeech)
-                    }
-                } else {
-                    Button {
-                        showingAdditionalServices = true
-                    } label: {
-                        Text("Additional services")
-                    }
-                    #if os(macOS)
-                    .buttonStyle(.link)
-                    #endif
+                Picker("Embeddings", selection: $preferences.preferred.embeddingServiceID) {
+                    servicePickerView(\.supportsEmbeddings)
                 }
-
+                Picker("Transcriptions", selection: $preferences.preferred.transcriptionServiceID) {
+                    servicePickerView(\.supportsTranscriptions)
+                }
+                Picker("Speech", selection: $preferences.preferred.speechServiceID) {
+                    servicePickerView(\.supportsSpeech)
+                }
             } header: {
                 Text("Preferred Services")
             } footer: {
@@ -86,16 +81,11 @@ struct PreferencesForm: View {
                 NavigationLink("Permissions") {
                     PermissionsList()
                 }
+                Toggle("Debug", isOn: $preferences.debug)
             } header: {
                 Text("Advanced")
             } footer: {
                 Text("Configure services, prompt agents and third-party permissions.")
-            }
-
-            Section {
-                Toggle("Debug", isOn: $preferences.debug)
-            } footer: {
-                Text("Displays additional debug output throughout the app.")
             }
 
             Section {
@@ -128,6 +118,20 @@ struct PreferencesForm: View {
             Button("Delete", role: .destructive, action: handleDeleteAll)
         } message: {
             Text("This will delete all app data and preferences.")
+        }
+        .onAppear {
+            handleLoadVoices()
+        }
+    }
+
+    func handleLoadVoices() {
+        Task {
+            do {
+                let service = try state.preferencesProvider.preferredSpeechService()
+                voices = try await service.voices()
+            } catch {
+                print(error)
+            }
         }
     }
 

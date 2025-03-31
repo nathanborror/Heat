@@ -8,8 +8,6 @@ struct ServiceForm: View {
 
     @State var service: Service
 
-    @State private var showingAdditionalServices = false
-
     private var showSelections: Bool {
         !service.models.isEmpty
     }
@@ -36,7 +34,9 @@ struct ServiceForm: View {
                     #endif
                     .submitLabel(.next)
                     .onSubmit { handleSetDefaults() }
+            }
 
+            Section {
                 Button {
                     handleLoadModels()
                 } label: {
@@ -53,21 +53,9 @@ struct ServiceForm: View {
                     ModelPicker("Chats", models: service.models, selection: $service.preferredChatModel)
                     ModelPicker("Images", models: service.models, selection: $service.preferredImageModel)
                     ModelPicker("Summarization", models: service.models, selection: $service.preferredSummarizationModel)
-
-                    if showingAdditionalServices {
-                        ModelPicker("Embeddings", models: service.models, selection: $service.preferredEmbeddingModel)
-                        ModelPicker("Transcriptions", models: service.models, selection: $service.preferredTranscriptionModel)
-                        ModelPicker("Speech", models: service.models, selection: $service.preferredSpeechModel)
-                    } else {
-                        Button {
-                            showingAdditionalServices = true
-                        } label: {
-                            Text("Additional services")
-                        }
-                        #if os(macOS)
-                        .buttonStyle(.link)
-                        #endif
-                    }
+                    ModelPicker("Embeddings", models: service.models, selection: $service.preferredEmbeddingModel)
+                    ModelPicker("Transcriptions", models: service.models, selection: $service.preferredTranscriptionModel)
+                    ModelPicker("Speech", models: service.models, selection: $service.preferredSpeechModel)
                 } else {
                     ContentUnavailableView {
                         Label("No models", systemImage: "network")
@@ -183,12 +171,7 @@ struct ModelPicker: View {
                     if let selection, let model = models.first(where: { $0.id == selection }) {
                         Text(model.name ?? model.id)
                     } else {
-                        HStack {
-                            Text("Select Model")
-                            Image(systemName: "chevron.up.chevron.down")
-                                .imageScale(.small)
-                                .foregroundStyle(.secondary)
-                        }
+                        Text("—")
                     }
                 }
                 .foregroundStyle(.secondary)
