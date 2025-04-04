@@ -21,7 +21,7 @@ public final class API {
         
         return Task {
             let conversation = try conversationsProvider.get(conversationID)
-            
+
             // Augment context
             var context = context
             context["DATETIME"] = .string(Date.now.formatted())
@@ -44,23 +44,32 @@ public final class API {
             req.with(history: messages)
             req.with(tools: Toolbox.get(names: conversation.toolIDs))
             req.with(context: context)
-            
+
             // Generate response stream
             let stream = ChatSession.shared.stream(req, runLoopLimit: 20)
-            for try await message in stream {
-                try Task.checkCancellation()
+            do {
+                for try await message in stream {
+                    try Task.checkCancellation()
 
-                // Indicate which agent was used
-                var message = message
-                if let agentID {
-                    message.metadata["agentID"] = .string(agentID)
+                    // Indicate which agent was used
+                    var message = message
+                    if let agentID {
+                        message.metadata["agentID"] = .string(agentID)
+                    }
+
+                    try await messagesProvider.upsert(message: message, referenceID: conversation.id)
+                    try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
                 }
+            } catch {
+                // Save messages and return conversation to resting state
+                try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
+                try await messagesProvider.flush()
 
-                try await messagesProvider.upsert(message: message, referenceID: conversation.id)
-                try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
+                throw error
             }
 
-            // Save messages
+            // Save messages and return conversation to resting state
+            try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
             try await messagesProvider.flush()
 
             // Generate suggestions, title and memories
@@ -94,19 +103,29 @@ public final class API {
             
             // Generate image
             let req = ImagineServiceRequest(model: model, prompt: prompt)
-            let data = try await service.imagine(req)
-            
-            // Save images as assistant response
-            let contents: [Message.Content] = data.map { .image(data: $0, format: .jpeg) }
-            let message = Message(
-                role: .assistant,
-                contents: contents + [
-                    .text("A generated image using the prompt:\n\(prompt)")
-                ]
-            )
-            try await messagesProvider.upsert(message: message, referenceID: conversation.id)
-            try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
-            try await messagesProvider.flush()
+            do {
+                let data = try await service.imagine(req)
+
+                // Save images as assistant response
+                let contents: [Message.Content] = data.map { .image(data: $0, format: .jpeg) }
+                let message = Message(
+                    role: .assistant,
+                    contents: contents + [
+                        .text("A generated image using the prompt:\n\(prompt)")
+                    ]
+                )
+                try await messagesProvider.upsert(message: message, referenceID: conversation.id)
+
+                // Save messages and return conversation to resting state
+                try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
+                try await messagesProvider.flush()
+            } catch {
+                // Save messages and return conversation to resting state
+                try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
+                try await messagesProvider.flush()
+
+                throw error
+            }
         }
     }
 

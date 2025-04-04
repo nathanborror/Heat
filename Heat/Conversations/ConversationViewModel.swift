@@ -17,15 +17,18 @@ final class ConversationViewModel {
     private var generateTask: Task<(), Swift.Error>? = nil
 
     enum Error: Swift.Error, CustomStringConvertible {
+        case missingConversation
         case generationError(String)
         case unexpectedError(String)
 
         public var description: String {
             switch self {
+            case .missingConversation:
+                "Missing conversation"
             case .generationError(let detail):
-                return "Generation error: \(detail)"
+                "Generation error: \(detail)"
             case .unexpectedError(let detail):
-                return "Unexpected error: \(detail)"
+                "Unexpected error: \(detail)"
             }
         }
     }
@@ -66,7 +69,9 @@ final class ConversationViewModel {
 
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
     func generate(chat prompt: String, images: [Data] = [], context: [String: Value] = [:], toolChoice: Tool? = nil, agentID: String? = nil) async throws {
-        guard let conversationID else { return }
+        guard let conversationID else {
+            throw Error.missingConversation
+        }
         generateTask = try API.shared.generate(
             conversationID: conversationID,
             prompt: prompt,
@@ -75,19 +80,19 @@ final class ConversationViewModel {
             toolChoice: toolChoice,
             agentID: agentID
         )
+        try await generateTask?.value
     }
 
     /// Generate an image from a given prompt. This is an explicit way to generate an image, most happen through tool use.
     func generate(image prompt: String) async throws {
-        guard let conversationID else { return }
-        do {
-            try await API.shared.generate(
-                conversationID: conversationID,
-                image: prompt
-            ).value
-        } catch {
-            throw Error.generationError("Image generation failed: \(error)")
+        guard let conversationID else {
+            throw Error.missingConversation
         }
+        generateTask = try API.shared.generate(
+            conversationID: conversationID,
+            image: prompt
+        )
+        try await generateTask?.value
     }
 
     func cancel() {
