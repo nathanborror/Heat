@@ -29,43 +29,45 @@ struct MessageView: View {
                    ToolCallView(toolCall)
                }
 
-               HStack(alignment: .center, spacing: 16) {
-                   Button {
-                       handleCopy()
-                   } label: {
-                       Image(systemName: isCopied ? "checkmark" : "square.on.square")
-                           .frame(width: 16, height: 16)
-                   }
-
-                   Button {
-                       handleRegenerate()
-                   } label: {
-                       Image(systemName: "arrow.counterclockwise")
-                           .frame(width: 16, height: 16)
-                   }
-
-                   if let filename = message.metadata["audio"]?.stringValue {
+               if message.toolCalls?.isEmpty ?? false {
+                   HStack(alignment: .center, spacing: 16) {
                        Button {
-                           handlePlaySpeech(filename)
+                           handleCopy()
                        } label: {
-                           Image(systemName: isPlaying ? "pause" : "play")
+                           Image(systemName: isCopied ? "checkmark" : "square.on.square")
                                .frame(width: 16, height: 16)
                        }
-                   } else {
+
                        Button {
-                           handleGenerateSpeech()
+                           handleRegenerate()
                        } label: {
-                           Image(systemName: "speaker.wave.2")
+                           Image(systemName: "arrow.counterclockwise")
                                .frame(width: 16, height: 16)
                        }
+
+                       if let filename = message.metadata["audio"]?.stringValue {
+                           Button {
+                               handlePlaySpeech(filename)
+                           } label: {
+                               Image(systemName: isPlaying ? "pause" : "play")
+                                   .frame(width: 16, height: 16)
+                           }
+                       } else {
+                           Button {
+                               handleGenerateSpeech()
+                           } label: {
+                               Image(systemName: "speaker.wave.2")
+                                   .frame(width: 16, height: 16)
+                           }
+                       }
                    }
+                    #if !os(macOS)
+                    .imageScale(.small)
+                    .padding(.bottom)
+                    #endif
+                   .buttonStyle(.borderless)
+                   .foregroundStyle(.tertiary)
                }
-                #if !os(macOS)
-                .imageScale(.small)
-                .padding(.bottom)
-                #endif
-               .buttonStyle(.borderless)
-               .foregroundStyle(.tertiary)
             case .tool:
                ToolContentsView(message)
             }
