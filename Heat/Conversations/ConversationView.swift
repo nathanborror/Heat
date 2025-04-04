@@ -25,6 +25,10 @@ struct ConversationView: View {
                 }
             }
         }
+        .navigationTitle(conversationViewModel.title)
+        #if os(macOS)
+        .navigationSubtitle(conversationViewModel.subtitle)
+        #endif
         .safeAreaInset(edge: .bottom, alignment: .center) {
             MessageField { prompt, images, command in
                 handleSubmit(prompt, images: images, command: command)

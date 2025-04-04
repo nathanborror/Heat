@@ -67,6 +67,17 @@ final class ConversationViewModel {
         return prepareRuns()
     }
 
+    var title: String {
+        conversation?.title ?? "Heat"
+    }
+
+    var subtitle: String {
+        guard let model = try? preferencesProvider.preferredChatModel() else {
+            return "Unknown model"
+        }
+        return model.name ?? model.id
+    }
+
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
     func generate(chat prompt: String, images: [Data] = [], context: [String: Value] = [:], toolChoice: Tool? = nil, agentID: String? = nil) async throws {
         guard let conversationID else {
