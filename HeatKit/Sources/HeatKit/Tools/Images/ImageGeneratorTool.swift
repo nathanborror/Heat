@@ -45,13 +45,13 @@ extension ImageGeneratorTool {
             let imageModel = try await PreferencesProvider.shared.preferredImageModel()
             
             // Generate image attachments
-            var content = [Message.Content]()
+            var contents = [Message.Content]()
             for prompt in args.prompts {
-                content += try await makeImages(prompt: prompt, service: imageService, model: imageModel)
+                contents += try await makeImages(prompt: prompt, service: imageService, model: imageModel)
             }
             return [.init(
                 role: .tool,
-                contents: content + [.text(args.prompts.joined(separator: "\n\n"))],
+                contents: contents,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
                 metadata: ["label": .string(args.prompts.count == 1 ? "Generating an image" : "Generating \(args.prompts.count) images")]
@@ -69,8 +69,8 @@ extension ImageGeneratorTool {
     private static func makeImages(prompt: String, service: ImageService, model: Model) async throws -> [Message.Content] {
         var out = [Message.Content]()
         try await ImageSession.shared.generate(service: service, model: model, prompt: prompt) { images in
-            // TODO: Add prompt info to `image`
             out = images.map { .image(data: $0, format: .jpeg) }
+            out += [.text(prompt)]
         }
         return out
     }
