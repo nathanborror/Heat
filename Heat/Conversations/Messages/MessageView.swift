@@ -260,12 +260,30 @@ struct ContentImageView: View {
                 }
                 .buttonStyle(.plain)
                 .popover(isPresented: $showingDetailText) {
-                    Text(detail)
-                        .frame(width: 300)
-                        .padding()
+                    NavigationStack {
+                        ContentImagePromptView(text: detail)
+                    }
+                    #if os(macOS)
+                    .frame(width: 300)
+                    .frame(maxHeight: 200)
+                    #endif
                 }
             }
         }
+    }
+}
+
+struct ContentImagePromptView: View {
+    let text: String
+
+    var body: some View {
+        ScrollView {
+            Text(text)
+                .padding()
+        }
+        #if !os(macOS)
+        .navigationTitle("Prompt")
+        #endif
     }
 }
 
