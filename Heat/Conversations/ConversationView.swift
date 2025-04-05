@@ -25,8 +25,8 @@ struct ConversationView: View {
                 }
             }
         }
-        .navigationTitle(conversationViewModel.title)
         #if os(macOS)
+        .navigationTitle(conversationViewModel.title)
         .navigationSubtitle(conversationViewModel.subtitle)
         #endif
         .safeAreaInset(edge: .bottom, alignment: .center) {
