@@ -24,7 +24,7 @@ extension Message {
             for toolCall in toolCalls {
                 switch Toolbox(name: toolCall.function.name) {
                 case .generateImages:
-                    return true
+                    return false
                 default:
                     return false
                 }
@@ -33,5 +33,17 @@ extension Message {
 
         // When in doubt, show message
         return true
+    }
+
+    var hasImage: Bool {
+        for content in contents ?? [] {
+            switch content {
+            case .image:
+                return true
+            default:
+                continue
+            }
+        }
+        return false
     }
 }

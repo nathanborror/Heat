@@ -80,7 +80,7 @@ struct ConversationView: View {
         }
     }
 
-    func handleSubmit(_ prompt: String, images: [Data] = [], command: MessageField.Command = .text) {
+    func handleSubmit(_ prompt: String, images: [URL] = [], command: MessageField.Command = .text) {
         Task {
             // Create a new conversation if one isn't already selected
             if conversationViewModel.conversationID == nil {

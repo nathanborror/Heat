@@ -1,5 +1,6 @@
 import SwiftUI
 import AVKit
+import QuickLook
 import GenKit
 import HeatKit
 
@@ -172,7 +173,8 @@ struct UserContentsView: View {
 struct ToolContentsView: View {
     let message: Message
 
-    @State var disclosed = false
+    @State var isDisclosed = false
+    @State var imagePreviewURL: URL? = nil
 
     init(_ message: Message) {
         self.message = message
@@ -181,39 +183,21 @@ struct ToolContentsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Button {
-                disclosed.toggle()
+                isDisclosed.toggle()
             } label: {
                 ToolResponseName(message.name ?? "Unknown Tool")
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
 
-            if disclosed {
-                VStack(alignment: .leading) {
-                    if let contents = message.contents {
-                        ForEach(contents.indices, id: \.self) { index in
-                            switch contents[index] {
-                            case .text(let text):
-                                Text(text)
-                                    .padding(.leading)
-                                    .overlay(
-                                        Rectangle()
-                                            .fill(.primary.opacity(0.5))
-                                            .frame(width: 1)
-                                            .frame(maxHeight: .infinity)
-                                            .opacity(0.5),
-                                        alignment: .leading
-                                    )
-                            case .image(let data, _):
-                                PictureView(data: data)
-                                    .frame(width: 300, height: 300)
-                                    .clipShape(.rect(cornerRadius: 10))
-                            case .audio:
-                                Text("Audio")
-                            }
-                        }
-                    }
-                }
+            if isDisclosed {
+                ContentsView(message.contents)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .onAppear {
+            if message.hasImage {
+                isDisclosed = true
             }
         }
     }
@@ -233,16 +217,54 @@ struct ContentsView: View {
                     switch contents[$0] {
                     case .text(let text):
                         RenderText(text, tags: ["thinking", "think", "artifact", "output", "image_search_query"])
-                    case .image(let data, _):
-                        PictureView(data: data)
-                            .frame(width: 200, height: 200)
-                            .clipShape(.rect(cornerRadius: 10))
+                    case .image(let image):
+                        ContentImageView(url: image.url, detail: image.detail)
                     case .audio:
                         Text("Audio is unhandled right now.")
                     }
                 }
             }
             .fixedSize(horizontal: false, vertical: true) // HACK: Prevents occasional word truncation
+        }
+    }
+}
+
+struct ContentImageView: View {
+    let url: URL
+    let detail: String?
+
+    @State private var showingPreviewURL: URL? = nil
+    @State private var showingDetailText = false
+
+    var body: some View {
+        Button {
+            showingPreviewURL = url
+        } label: {
+            PictureView(url: url)
+                .frame(width: 300, height: 300)
+                .clipShape(.rect(cornerRadius: 10))
+        }
+        .buttonStyle(.plain)
+        .quickLookPreview($showingPreviewURL)
+        .overlay(alignment: .bottomTrailing) {
+            if let detail {
+                Button {
+                    showingDetailText.toggle()
+                } label: {
+                    Image(systemName: "text.magnifyingglass")
+                        .imageScale(.large)
+                        .frame(width: 32, height: 32)
+                        .background(.ultraThinMaterial, in: .rect(cornerRadius: 5))
+                        .foregroundStyle(.white)
+                        .padding(5)
+                }
+                .buttonStyle(.plain)
+                .popover(isPresented: $showingDetailText) {
+                    Text(detail)
+                        .frame(width: 300)
+                        .padding()
+                }
+            }
         }
     }
 }
@@ -268,7 +290,7 @@ struct ForEachToolCall<Content: View>: View {
 struct ToolCallView: View {
     let toolCall: ToolCall
 
-    @State var disclosed = false
+    @State var isDisclosed = false
 
     init(_ toolCall: ToolCall) {
         self.toolCall = toolCall
@@ -277,24 +299,16 @@ struct ToolCallView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Button {
-                disclosed.toggle()
+                isDisclosed.toggle()
             } label: {
                 ToolCallName(toolCall.function.name)
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
 
-            if disclosed {
+            if isDisclosed {
                 Text(toolCall.function.arguments)
-                    .padding(.leading)
-                    .overlay(
-                        Rectangle()
-                            .fill(.primary.opacity(0.5))
-                            .frame(width: 1)
-                            .frame(maxHeight: .infinity),
-                        alignment: .leading
-                    )
-                    .opacity(0.5)
+                    .foregroundStyle(.secondary)
             }
         }
     }

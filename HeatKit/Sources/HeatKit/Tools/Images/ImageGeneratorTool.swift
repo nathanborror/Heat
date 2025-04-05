@@ -69,8 +69,12 @@ extension ImageGeneratorTool {
     private static func makeImages(prompt: String, service: ImageService, model: Model) async throws -> [Message.Content] {
         var out = [Message.Content]()
         try await ImageSession.shared.generate(service: service, model: model, prompt: prompt) { images in
-            out = images.map { .image(data: $0, format: .jpeg) }
-            out += [.text(prompt)]
+            for imageData in images {
+                let filename = "\(String.id).png"
+                let url = URL.documentsDirectory.appending(path: "images").appending(path: filename)
+                try imageData.write(to: url, options: .atomic, createDirectories: true)
+                out += [.image(.init(url: url, format: .png, detail: prompt))]
+            }
         }
         return out
     }

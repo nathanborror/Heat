@@ -7,7 +7,7 @@ public final class API {
     public static let shared = API()
     
     /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
-    public func generate(conversationID: String, prompt: String, context: [String: Value] = [:], images: [Data] = [], toolChoice: Tool? = nil, agentID: String? = nil) throws -> Task<(), Error> {
+    public func generate(conversationID: String, prompt: String, context: [String: Value] = [:], images: [URL] = [], toolChoice: Tool? = nil, agentID: String? = nil) throws -> Task<(), Error> {
         guard !prompt.isEmpty else { return Task {()} }
         
         // Providers
@@ -27,7 +27,7 @@ public final class API {
             context["DATETIME"] = .string(Date.now.formatted())
 
             // New user message
-            let imageContent = images.map { Message.Content.image(data: $0, format: .jpeg) }
+            let imageContent = images.map { Message.Content.image(.init(url: $0, format: .jpeg)) }
             let textContent = Message.Content.text(PromptTemplate(prompt, with: context))
 
             let userMessage = Message(role: .user, contents: [textContent] + imageContent)
@@ -104,14 +104,21 @@ public final class API {
             // Generate image
             let req = ImagineServiceRequest(model: model, prompt: prompt)
             do {
-                let data = try await service.imagine(req)
+                let images = try await service.imagine(req)
+
+                var contents: [Message.Content] = []
+                for imageData in images {
+                    let filename = "\(String.id).png"
+                    let url = URL.documentsDirectory.appending(path: "images").appending(path: filename)
+                    try imageData.write(to: url, options: .atomic, createDirectories: true)
+                    contents += [.image(.init(url: url, format: .png))]
+                }
 
                 // Save images as assistant response
-                let contents: [Message.Content] = data.map { .image(data: $0, format: .jpeg) }
                 let message = Message(
                     role: .assistant,
                     contents: contents + [
-                        .text("A generated image using the prompt:\n\(prompt)")
+                        .text(prompt)
                     ]
                 )
                 try await messagesProvider.upsert(message: message, referenceID: conversation.id)

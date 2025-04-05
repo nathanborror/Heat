@@ -11,7 +11,7 @@ struct MessageField: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.colorScheme) var colorScheme
 
-    typealias ActionHandler = (String, [Data], Command) -> Void
+    typealias ActionHandler = (String, [URL], Command) -> Void
     typealias AgentHandler = (Agent) -> Void
 
     let action: ActionHandler
@@ -209,7 +209,16 @@ struct MessageField: View {
             let images = imagePickerViewModel.imagesSelected.map {
                 $0.image?.resizedToMaxDimension(1568)?.jpegData(compressionQuality: 0.8)
             }.compactMap { $0 }
-            action(content, images, .text)
+
+            var imageURLs = [URL]()
+            for imageData in images {
+                let filename = "\(String.id).jpg"
+                let url = URL.documentsDirectory.appending(path: "images").appending(path: filename)
+                try imageData.write(to: url, options: .atomic, createDirectories: true)
+                imageURLs.append(url)
+            }
+
+            action(content, imageURLs, .text)
             return
         }
 

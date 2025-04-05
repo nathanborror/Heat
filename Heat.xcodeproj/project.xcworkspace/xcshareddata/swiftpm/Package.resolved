@@ -88,7 +88,7 @@
       "location" : "https://github.com/nathanborror/swift-fal",
       "state" : {
         "branch" : "main",
-        "revision" : "bb6ebada9c54294b7e1e63457084dadcd198cffe"
+        "revision" : "171f20e6b3cc11b69437d99273955485e86847a1"
       }
     },
     {
@@ -97,7 +97,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "29cd7a645a97e7289af610aaf4ccef34c9a7ed55"
+        "revision" : "146cb526c948a490b2bb2e1c2ae2986f07fb95b9"
       }
     },
     {

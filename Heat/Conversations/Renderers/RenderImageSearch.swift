@@ -1,4 +1,5 @@
 import SwiftUI
+import QuickLook
 import GenKit
 import HeatKit
 
@@ -18,20 +19,12 @@ struct RenderImageSearch: View {
             ScrollView(.horizontal) {
                 HStack(spacing: 6) {
                     ForEach(results.prefix(10).indices, id: \.self) { index in
-                        if let imageURL = results[index].image {
-                            PictureView(url: imageURL)
-                                .scaleEffect(1.1)
-                                .frame(width: width, height: height)
-                                .clipShape(.rect(cornerRadius: 5))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 5)
-                                        .stroke(Color.primary.opacity(0.1), lineWidth: 1)
-                                }
-                                .onTapGesture { openURL(results[index].url) }
+                        if let url = results[index].image {
+                            RenderImageView(url: url)
                         }
                     }
                 }
-                .frame(height: height)
+                .frame(height: 200)
             }
             .scrollIndicators(.hidden)
             .clipShape(.rect(cornerRadius: 5))
@@ -57,7 +50,27 @@ struct RenderImageSearch: View {
         let resp = try await WebSearchSession.shared.searchImages(query: content)
         results = resp.results
     }
+}
 
-    private let width: CGFloat = 200
-    private let height: CGFloat = 200
+struct RenderImageView: View {
+    let url: URL
+
+    @State private var previewURL: URL? = nil
+
+    var body: some View {
+        Button {
+            previewURL = url
+        } label: {
+            PictureView(url: url)
+                .scaleEffect(1.1)
+                .frame(width: 200, height: 200)
+                .clipShape(.rect(cornerRadius: 5))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                }
+        }
+        .buttonStyle(.plain)
+        .quickLookPreview($previewURL)
+    }
 }
