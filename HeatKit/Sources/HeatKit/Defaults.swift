@@ -17,7 +17,7 @@ public struct Defaults {
         agentCreativeWriter,
     ]
 
-    public static let assistantDefaultID = agentAssistantThoughtful.id
+    public static let assistantDefaultID = agentAssistantWithTools.id
 
     public static let agentAssistant = Agent(
         id: .init("bundle-assistant"),
