@@ -1,5 +1,5 @@
 {
-  "originHash" : "47be69eba375f02a5486fe8b5c52e51f7d4aaae83190e4472204fe9271c1192c",
+  "originHash" : "f292308c58c3cf24b7568f7f8d6dc44bb364380c9bbebef01ea7f5ec7dbe5319",
   "pins" : [
     {
       "identity" : "fuzi",
@@ -35,15 +35,6 @@
       "state" : {
         "revision" : "2849f5323265386e200484b0d0f896e73c3411b9",
         "version" : "6.0.1"
-      }
-    },
-    {
-      "identity" : "sqlitevec",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jkrukowski/SQLiteVec",
-      "state" : {
-        "branch" : "main",
-        "revision" : "eaa734a8c7615e2ef791c218280292f27d33db39"
       }
     },
     {

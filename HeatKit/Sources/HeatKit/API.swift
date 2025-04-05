@@ -268,7 +268,7 @@ public final class API {
 
         // Gather context
         let messages = try messagesProvider.get(referenceID: conversationID)
-        let memories = try await memoryProvider.get()
+        let memories = memoryProvider.memories
         let existingMemories = memories.map { $0.content }.joined(separator: "\n")
         let lastUserMessage = messages.last(where: { $0.role == .user })
 

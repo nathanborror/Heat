@@ -43,14 +43,8 @@ struct MemoryList: View {
     }
 
     func handleLoad() {
-        Task {
-            do {
-                let memories = try await state.memoryProvider.get()
-                self.memories = memories
-            } catch {
-                print(error)
-            }
-        }
+        let memories = state.memoryProvider.memories
+        self.memories = memories
     }
 
     func handleSave(_ text: String) {

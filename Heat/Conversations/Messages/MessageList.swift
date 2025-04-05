@@ -57,12 +57,11 @@ struct MessageList: View {
     func handleSubmit(_ prompt: String) {
         Task {
             do {
-                let memories = try await state.memoryProvider.get()
+                let memories = state.memoryProvider.memories
                 let context: [String: Value] = ["MEMORIES": .string(memories.map { $0.content }.joined(separator: "\n"))]
                 try await conversationViewModel.generate(chat: prompt, context: context)
             } catch {
                 print(error)
-//                conversationViewModel.error = error
             }
         }
     }

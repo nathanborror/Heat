@@ -18,7 +18,6 @@ let package = Package(
         .package(url: "https://github.com/nathanborror/swift-shared-kit", branch: "main"),
         .package(url: "https://github.com/nathanborror/swift-gen-kit", branch: "main"),
         .package(url: "https://github.com/cezheng/Fuzi", branch: "master"),
-        .package(url: "https://github.com/jkrukowski/SQLiteVec", branch: "main"),
     ],
     targets: [
         .target(
@@ -27,7 +26,6 @@ let package = Package(
                 .product(name: "SharedKit", package: "swift-shared-kit"),
                 .product(name: "GenKit", package: "swift-gen-kit"),
                 .product(name: "Fuzi", package: "Fuzi"),
-                .product(name: "SQLiteVec", package: "SQLiteVec"),
             ]
         ),
     ]

@@ -96,7 +96,7 @@ struct ConversationView: View {
             guard conversationViewModel.conversationID != nil else { return }
 
             // Context full of memories
-            let memories = try await state.memoryProvider.get()
+            let memories = state.memoryProvider.memories
             let context: [String: Value] = ["MEMORIES": .string(memories.map { $0.content }.joined(separator: "\n"))]
 
             // Try to generate a response
