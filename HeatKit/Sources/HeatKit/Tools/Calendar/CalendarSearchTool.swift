@@ -15,23 +15,17 @@ public struct CalendarSearchTool {
         description: """
             Searches the user's calendar. You must always include a `start` and an `end` date.
             """,
-        parameters: .init(
-            type: .object,
+        parameters: .object(
             properties: [
-                "start": .init(
-                    type: .string,
+                "start": .string(
                     description: "A start date and time. (Example: 2024-01-02T00:00)",
                     format: "date-time"
                 ),
-                "end": .init(
-                    type: .string,
+                "end": .string(
                     description: "An end date and time. (Example: 2024-02-02T23:59)",
                     format: "date-time"
                 ),
-                "query": .init(
-                    type: .string,
-                    description: "An optional search query"
-                ),
+                "query": .string(description: "An optional search query"),
             ],
             required: ["start", "end"]
         )

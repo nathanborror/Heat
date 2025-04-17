@@ -11,13 +11,13 @@ public struct ImageGeneratorTool {
     public static let function = Tool.Function(
         name: "generate_images",
         description: "Return thoughtful, detailed image prompts.",
-        parameters: .init(
-            type: .object,
+        parameters: .object(
             properties: [
-                "prompts": .init(
-                    type: .array,
+                "prompts": .array(
                     description: "A list of detailed prompts describing images to generate.",
-                    items: .init(type: .string, minItems: 1, maxItems: 9)
+                    items: .string(),
+                    minItems: 1,
+                    maxItems: 9
                 ),
             ],
             required: ["prompts"]

@@ -22,21 +22,11 @@ public struct WebBrowseTool {
     public static let function = Tool.Function(
         name: "browse_web",
         description: "Browse a webpage URL using the given instructions.",
-        parameters: .init(
-            type: .object,
+        parameters: .object(
             properties: [
-                "instructions": .init(
-                    type: .string,
-                    description: "Instructions on how to scrape information from the webpage URL."
-                ),
-                "title": .init(
-                    type: .string,
-                    description: "A webpage title"
-                ),
-                "url": .init(
-                    type: .string,
-                    description: "A webpage URL"
-                ),
+                "instructions": .string(description: "Instructions on how to scrape information from the webpage URL."),
+                "title": .string(description: "A webpage title"),
+                "url": .string(description: "A webpage URL"),
             ],
             required: ["instructions", "url", "title"]
         )

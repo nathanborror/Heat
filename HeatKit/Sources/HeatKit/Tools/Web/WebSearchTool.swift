@@ -23,18 +23,10 @@ public struct WebSearchTool {
     public static let function = Tool.Function(
         name: "web_search",
         description: "Return a search query used to search the web for website only or image only results.",
-        parameters: .init(
-            type: .object,
+        parameters: .object(
             properties: [
-                "query": .init(
-                    type: .string,
-                    description: "A web search query"
-                ),
-                "kind": .init(
-                    type: .string,
-                    description: "A kind of search (e.g. web or image)",
-                    enumValues: Kind.allCases.map { $0.rawValue }
-                ),
+                "query": .string(description: "A web search query"),
+                "kind": .string(description: "A kind of search", enum: Kind.allCases.map { .string($0.rawValue) }),
             ],
             required: ["query", "kind"]
         )

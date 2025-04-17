@@ -20,6 +20,15 @@
       }
     },
     {
+      "identity" : "jsonschema",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/loopwork-ai/JSONSchema",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a60be45fa2ff42d342424f90a0859ee3e09aca2a"
+      }
+    },
+    {
       "identity" : "keyboardshortcuts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
@@ -43,7 +52,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "1da5a1aa4b8fe9ca2ba0d5841ac3feec77e69b85"
+        "revision" : "be77b1e0b1d6bc41e8a35ade0aaa8e8eb65aa310"
       }
     },
     {
@@ -88,16 +97,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "146cb526c948a490b2bb2e1c2ae2986f07fb95b9"
-      }
-    },
-    {
-      "identity" : "swift-json",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/nathanborror/swift-json",
-      "state" : {
-        "branch" : "main",
-        "revision" : "50e18f57a3e52bc2e4db280dbde8e8cc6793e94a"
+        "revision" : "6cdbf8b03435ed608773513be5e9105d39fffafa"
       }
     },
     {
@@ -115,7 +115,7 @@
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
-        "revision" : "fb19a90a78e825b10272fd86420427477686c137"
+        "revision" : "235fd786cc1eddc9749e92a8fe2eb507716c76fa"
       }
     },
     {
@@ -124,7 +124,7 @@
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "2b9d6efa3f641ef3d848c495764de712f469ed15"
+        "revision" : "2b181645e255b29006fa008e70a4c4b034b1015c"
       }
     },
     {
@@ -133,7 +133,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "975ab1bb32bb6c74515f6ed138f29cfd34b4b623"
+        "revision" : "d6471bd7daa14d70ef8066c73e378ddc63efaf4a"
       }
     },
     {
