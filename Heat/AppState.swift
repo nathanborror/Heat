@@ -11,14 +11,14 @@
 import SwiftUI
 import OSLog
 import HeatKit
+import UniformTypeIdentifiers
 
 private let logger = Logger(subsystem: "AppState", category: "App")
 
 @MainActor @Observable
 final class AppState {
 
-    static let release = AppState()
-    static let development = AppState()
+    static let shared = AppState()
 
     enum Error: Swift.Error, CustomStringConvertible {
         case restorationError(String)
@@ -34,51 +34,117 @@ final class AppState {
         }
     }
 
+    var selectedFileID: String? = nil
+
     // Providers oversee a specific top-level kind of data and provide methods
     // for mutating and storing the data they're responsible for.
 
-    let agentsProvider: AgentsProvider
-    let conversationsProvider: ConversationsProvider
-    let messagesProvider: MessagesProvider
-    let memoryProvider: MemoryProvider
-    let preferencesProvider: PreferencesProvider
+    private let filesProvider: FilesProvider
+    private let logsProvider: LogsProvider
 
     // Shortcuts
 
-    var debug: Bool { preferencesProvider.preferences.debug }
-    var textRendering: Preferences.TextRendering { preferencesProvider.preferences.textRendering }
-
-    private let storage = UserDefaults.standard
-
-    enum Kind {
-        case preview
-        case development
-        case release
+    var areModelsAvailable: Bool {
+        API.shared.config.serviceChatDefault != nil
     }
 
-    private init(kind: Kind = .development) {
-        self.agentsProvider = .shared
-        self.conversationsProvider = .shared
-        self.messagesProvider = .shared
-        self.memoryProvider = .shared
-        self.preferencesProvider = .shared
+    var config: Config {
+        filesProvider.config
     }
 
-    func reset() async throws {
+    var files: [File] {
+        filesProvider.files
+    }
+
+    var fileTree: [FileTree] {
+        let files = try? API.shared.fileListTree()
+        return files ?? []
+    }
+
+    var logs: [Log] {
+        logsProvider.logs
+    }
+
+    private init() {
+        self.filesProvider = .shared
+        self.logsProvider = .shared
+
+        logger.info("🍱 \(URL.documentsDirectory.path())")
+
+        Task { try await ready() }
+    }
+
+    func restore() async throws {
+        try await filesProvider.restore()
+        try await logsProvider.restore()
+    }
+
+    func ready() async throws {
+        async let filesReady: Void = filesProvider.ready()
+        async let logsReady: Void = logsProvider.ready()
+        _ = try await [filesReady, logsReady]
+    }
+
+    @discardableResult
+    func ping() async throws -> Bool {
+        try await ready()
+        return true
+    }
+
+    func resetAll() {
         do {
-            try await agentsProvider.reset()
-            try await conversationsProvider.reset()
-            try await messagesProvider.reset()
-            try await memoryProvider.reset()
-            try await preferencesProvider.reset()
+            // Reset providers
+            filesProvider.reset()
+            logsProvider.reset()
+
+            // Delete all files
+            try FileManager.default.removeItems(at: URL.documentsDirectory)
         } catch {
-            throw Error.restorationError("\(error)")
+            log(error: error)
         }
-        do {
-            try await preferencesProvider.initializeServices()
-        } catch {
-            throw Error.serviceError("\(error)")
+    }
+
+    // MARK: - File Handling
+
+    func fileCreateConversation(name: String? = nil) async throws -> String {
+        let object = Conversation(
+            instructions: Defaults.agentAssistant.instructions,
+            toolIDs: Defaults.agentAssistant.toolIDs
+        )
+        return try await fileCreate(filename: "\(String.id).conversation", mimetype: .json, object: object)
+    }
+
+    func fileCreate(filename: String, mimetype: UTType, object: any Encodable) async throws -> String {
+        let directory = try currentFilePath()
+        let path = directory?.appending(path: filename).path ?? filename
+        let file = File(path: path, name: "Untitled", mimetype: mimetype)
+        let fileID = try await API.shared.fileCreate(file, object: object)
+        return fileID
+    }
+
+    private func currentFilePath() throws -> URL? {
+        guard let fileID = selectedFileID, let file = try? API.shared.file(fileID) else {
+            return nil
         }
+        if file.isDirectory {
+            return URL(string: file.path)
+        }
+        guard let parentFilePath = URL(string: file.path)?.deletingLastPathComponent().path else {
+            return nil
+        }
+        guard parentFilePath != "." else {
+            return nil
+        }
+        return URL(string: parentFilePath)
+    }
+
+    // MARK: - Logging
+
+    func log(error: Swift.Error) {
+        print(error)
+    }
+
+    func logsReset() {
+        print("not implemented")
     }
 }
-

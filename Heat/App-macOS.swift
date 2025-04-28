@@ -13,49 +13,28 @@ struct MainApp: App {
     @Environment(\.openWindow) var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
-    @State private var state = AppState.development
-
-    @State private var selectedConversationID: String? = nil
-    @State private var showingLauncher = false
-    @State private var sheet: Sheet? = nil
-    @State private var launcherPanel: LauncherPanel? = nil
+    @State private var state = AppState.shared
 
     @State private var showingError = false
     @State private var error: (any CustomStringConvertible)? = nil
 
-    enum Sheet: String, Identifiable {
-        case conversationList
-        case preferences
-        var id: String { rawValue }
-    }
-
     var body: some Scene {
         Window("Heat", id: "heat") {
             NavigationSplitView {
-                ConversationList(selected: $selectedConversationID)
+                FileList(selected: $state.selectedFileID)
                     .frame(minWidth: 200)
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
-                ConversationView(selected: $selectedConversationID)
+                ConversationView(fileID: $state.selectedFileID)
             }
             .containerBackground(.background, for: .window)
-            .sheet(item: $sheet) { sheet in
-                NavigationStack {
-                    switch sheet {
-                    case .preferences:
-                        PreferencesForm(preferences: state.preferencesProvider.preferences)
-                    case .conversationList:
-                        ConversationList(selected: $selectedConversationID)
-                    }
-                }
-            }
             .alert("Error", isPresented: $showingError, presenting: error) { _ in
                 Button("OK", role: .cancel) {}
             } message: { error in
                 Text(error.description)
             }
             .onAppear {
-                handleInit()
+                Task { await appReady() }
             }
         }
         .defaultSize(width: 600, height: 700)
@@ -63,91 +42,38 @@ struct MainApp: App {
         .defaultLaunchBehavior(.presented)
         .environment(state)
         .commands {
-            CommandGroup(replacing: .appSettings) {
-                Button {
-                    sheet = .preferences
-                } label: {
-                    Label("Preferences", systemImage: "slider.horizontal.3")
-                }
-                .keyboardShortcut(",", modifiers: .command)
-            }
             CommandGroup(after: .appInfo) {
                 Button("Reset") {
-                    handleReset(true)
+                    Task { await appReset() }
                 }
             }
         }
 
-        Window("Setup", id: "setup") {
-            Text("Setup preferences")
+        Settings {
+            PreferencesView()
+                .frame(minWidth: 600)
         }
-        .windowManagerRole(.associated)
-        .windowLevel(.floating)
-        .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 400, height: 400)
-        .defaultPosition(.center)
-        .restorationBehavior(.disabled)
+        .environment(state)
+    }
 
-        Window("Launcher", id: "launcher") {
-            LauncherPanelView()
-                .containerBackground(.ultraThinMaterial, for: .window)
-                .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
-        }
-        .windowManagerRole(.associated)
-        .windowLevel(.floating)
-        .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 400, height: 70)
-        .defaultPosition(.center)
-        .restorationBehavior(.disabled)
-
-        MenuBarExtra {
-            Button("Quit") {
-                NSApplication.shared.terminate(nil)
-            }
-            .keyboardShortcut("q")
-        } label: {
-            Label("Heat", systemImage: "flame.fill")
+    func appActive() async {
+        do {
+            try await state.ready()
+        } catch {
+            state.log(error: error)
         }
     }
 
-    func handleInit() {
-        handleReset()
-        handleHotKeySetup()
-    }
-
-    func handleReset(_ force: Bool = false) {
-        if BundleVersion.shared.isBundleVersionNew() || force {
-            Task { try await state.reset() }
+    func appReady() async {
+        do {
+            try await state.ping()
+        } catch {
+            state.log(error: error)
         }
     }
 
-    func handleHotKeySetup() {
-        KeyboardShortcuts.onKeyUp(for: .toggleLauncher) { [self] in
-            if showingLauncher {
-                //dismissWindow(id: "launcher")
-                hideLauncherWindow()
-            } else {
-                //openWindow(id: "launcher")
-                showLauncherWindow()
-            }
-            showingLauncher.toggle()
-        }
+    func appReset() async {
+        state.resetAll()
+        await appReady()
     }
-
-    func showLauncherWindow() {
-        if launcherPanel == nil {
-            launcherPanel = LauncherPanel(LauncherPanelView())
-        }
-        if launcherPanel?.isVisible == false {
-            launcherPanel?.orderFrontRegardless()
-        }
-    }
-
-    func hideLauncherWindow() {
-        launcherPanel?.close()
-    }
-}
-
-extension KeyboardShortcuts.Name {
-    static let toggleLauncher = Self("toggleLauncher", default: .init(.h, modifiers: [.shift, .command]))
 }

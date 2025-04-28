@@ -4,9 +4,9 @@ import SharedKit
 
 public struct Defaults {
 
-    // MARK: - Agents
+    // MARK: - Instructions
 
-    public static let agents = [
+    public static let instructions = [
         agentAssistant,
         agentAssistantWithTools,
         agentAssistantThoughtful,
@@ -19,14 +19,14 @@ public struct Defaults {
 
     public static let assistantDefaultID = agentAssistantWithTools.id
 
-    public static let agentAssistant = Agent(
+    public static let agentAssistant = Instruction(
         id: .init("bundle-assistant"),
         kind: .assistant,
         name: "Basic Assistant",
         instructions: AssistantInstructions
     )
 
-    public static let agentAssistantWithTools = Agent(
+    public static let agentAssistantWithTools = Instruction(
         id: .init("bundle-assistant-with-tools"),
         kind: .assistant,
         name: "Basic Assistant (with tools)",
@@ -39,14 +39,14 @@ public struct Defaults {
         ]
     )
 
-    public static let agentReasoner = Agent(
+    public static let agentReasoner = Instruction(
         id: .init("bundle-assistant-reasoner"),
         kind: .assistant,
         name: "Basic Assistant (CoT)",
         instructions: AdvancedReasoningInstructions
     )
 
-    public static let agentAssistantThoughtful = Agent(
+    public static let agentAssistantThoughtful = Instruction(
         id: .init("bundle-assistant-thoughtful"),
         kind: .assistant,
         name: "Basic Assistant (Thoughtful)",
@@ -59,7 +59,7 @@ public struct Defaults {
         ]
     )
 
-    public static let agentAssistantCreator = Agent(
+    public static let agentAssistantCreator = Instruction(
         id: .init("bundle-assistant-creator"),
         kind: .assistant,
         name: "Creator Assistant",
@@ -72,7 +72,7 @@ public struct Defaults {
         ]
     )
 
-    public static let agentInvestigator = Agent(
+    public static let agentInvestigator = Instruction(
         id: .init("bundle-investigator"),
         kind: .prompt,
         name: "Investigate",
@@ -86,7 +86,7 @@ public struct Defaults {
         ]
     )
 
-    public static let agentReporter = Agent(
+    public static let agentReporter = Instruction(
         id: .init("bundle-reporter"),
         kind: .prompt,
         name: "Report",
@@ -100,7 +100,7 @@ public struct Defaults {
         ]
     )
 
-    public static let agentCreativeWriter = Agent(
+    public static let agentCreativeWriter = Instruction(
         id: .init("bundle-creative-writer"),
         kind: .prompt,
         name: "Creative Writer",
