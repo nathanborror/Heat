@@ -3,7 +3,8 @@ import SwiftUI
 
 struct FileList: View {
     @Environment(AppState.self) var state
-
+    @Environment(\.dismiss) var dismiss
+    
     @Binding var selected: String?
 
     @State private var isEditingFile = false
@@ -17,7 +18,8 @@ struct FileList: View {
         }
         .listStyle(.sidebar)
         .scrollDismissesKeyboard(.interactively)
-        .navigationTitle("History")
+        .navigationTitle("Files")
+        #if os(macOS)
         .contextMenu(forSelectionType: String.self) { fileIDs in
             Group {
                 Button("Show in Finder") { handleShowFinder(fileIDs) }
@@ -28,6 +30,7 @@ struct FileList: View {
         } primaryAction: { fileIDs in
             print("not implemented")
         }
+        #endif
         .sheet(isPresented: $isEditingFile) {
             if let fileID = state.selectedFileID {
                 NavigationStack {
@@ -38,15 +41,6 @@ struct FileList: View {
         #if os(iOS)
         .onChange(of: selected) { _, newValue in
             if newValue != nil { dismiss() }
-        }
-        .overlay {
-            if state.conversationsProvider.conversations.isEmpty {
-                ContentUnavailableView {
-                    Label("Conversation history", systemImage: "clock")
-                } description: {
-                    Text("Your history is empty.")
-                }
-            }
         }
         #endif
     }

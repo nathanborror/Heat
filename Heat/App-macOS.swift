@@ -65,7 +65,7 @@ struct MainApp: App {
         .commands {
             CommandGroup(after: .appInfo) {
                 Button("Reset") {
-                    Task { await appReset() }
+                    Task { await appActive() }
                 }
             }
         }
@@ -85,16 +85,8 @@ struct MainApp: App {
         }
     }
 
-    func appReady() async {
-        do {
-            try await state.ping()
-        } catch {
-            state.log(error: error)
-        }
-    }
-
     func appReset() async {
         state.resetAll()
-        await appReady()
+        await appActive()
     }
 }
