@@ -185,8 +185,9 @@ final class ConversationViewModel {
             let name = "title"
             let result = try ContentParser.shared.parse(input: content, tags: [name])
             let tag = result.first(tag: name)
+            let tagIsEmpty = tag?.content?.isEmpty ?? true
 
-            file.name = tag?.content
+            file.name = tagIsEmpty ? nil : tag?.content
             file.modified = .now
         }
     }

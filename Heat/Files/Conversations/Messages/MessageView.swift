@@ -29,98 +29,11 @@ struct MessageView: View {
                ForEachToolCall(message.toolCalls) { toolCall in
                    ToolCallView(toolCall)
                }
-
-               if message.toolCalls?.isEmpty ?? false {
-                   HStack(alignment: .center, spacing: 16) {
-                       Button {
-                           handleCopy()
-                       } label: {
-                           Image(systemName: isCopied ? "checkmark" : "square.on.square")
-                               .frame(width: 16, height: 16)
-                       }
-
-                       Button {
-                           handleRegenerate()
-                       } label: {
-                           Image(systemName: "arrow.counterclockwise")
-                               .frame(width: 16, height: 16)
-                       }
-
-                       if let filename = message.metadata["audio"]?.stringValue {
-                           Button {
-                               handlePlaySpeech(filename)
-                           } label: {
-                               Image(systemName: isPlaying ? "pause" : "play")
-                                   .frame(width: 16, height: 16)
-                           }
-                       } else {
-                           Button {
-                               handleGenerateSpeech()
-                           } label: {
-                               Image(systemName: "speaker.wave.2")
-                                   .frame(width: 16, height: 16)
-                           }
-                       }
-                   }
-                    #if !os(macOS)
-                    .imageScale(.small)
-                    .padding(.bottom)
-                    #endif
-                   .buttonStyle(.borderless)
-                   .foregroundStyle(.tertiary)
-               }
             case .tool:
                ToolContentsView(message)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func handleCopy() {
-        guard let content = message.content else { return }
-        #if os(macOS)
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(content, forType: .string)
-        #else
-        let pasteboard = UIPasteboard.general
-        pasteboard.string = content
-        #endif
-
-        withAnimation(.easeInOut(duration: 0.15)) {
-            isCopied = true
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation(.easeInOut(duration: 0.15)) {
-                isCopied = false
-            }
-        }
-    }
-
-    private func handleRegenerate() {
-        print("not implemented")
-    }
-
-    private func handleGenerateSpeech() {
-        print("not implemented")
-    }
-
-    private func handlePlaySpeech(_ filename: String) {
-        if let player {
-            if player.timeControlStatus == .playing {
-                player.pause()
-                isPlaying = false
-            } else {
-                player.play()
-                isPlaying = true
-            }
-        } else {
-            let url = URL.documentsDirectory.appending(path: "audio").appending(path: filename)
-            player = AVPlayer(url: url)
-            player?.play()
-            isPlaying = true
-        }
     }
 }
 
@@ -216,6 +129,8 @@ struct ContentsView: View {
                         ContentImageView(url: image.url, detail: image.detail)
                     case .audio:
                         Text("Audio is unhandled right now.")
+                    case .json:
+                        Text("JSON is unhandled right now")
                     }
                 }
             }

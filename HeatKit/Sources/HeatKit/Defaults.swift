@@ -123,6 +123,7 @@ public struct Defaults {
         fal,
         grok,
         groq,
+        llama,
         mistral,
         ollama,
         openAI,
@@ -166,6 +167,12 @@ public struct Defaults {
             id: .groq,
             name: "Groq",
             host: "https://api.groq.com/openai/v1"
+        )
+
+    public static let llama =
+        Service(
+            id: .llama,
+            name: "Llama"
         )
 
     public static let mistral =

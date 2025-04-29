@@ -52,7 +52,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "d67151befa39533a6a449136c7992537cbf8ec99"
+        "revision" : "cf4c4727ff253fe92c15f05b58dec666475fb7f5"
       }
     },
     {
@@ -79,7 +79,7 @@
       "location" : "https://github.com/nathanborror/swift-fal",
       "state" : {
         "branch" : "main",
-        "revision" : "171f20e6b3cc11b69437d99273955485e86847a1"
+        "revision" : "b100d9ba8d0f7d0111fc4489fdc1eee4b9bc2046"
       }
     },
     {
@@ -88,7 +88,16 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "6cdbf8b03435ed608773513be5e9105d39fffafa"
+        "revision" : "95291e05c2f599e3bc508f33edf36009360b43e3"
+      }
+    },
+    {
+      "identity" : "swift-llama",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nathanborror/swift-llama",
+      "state" : {
+        "branch" : "main",
+        "revision" : "0deb90a90f399ecd89ab3407287f30cad96d666d"
       }
     },
     {
@@ -124,7 +133,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "d6471bd7daa14d70ef8066c73e378ddc63efaf4a"
+        "revision" : "a96b97765c5348115788c936017392d00f0bd943"
       }
     },
     {

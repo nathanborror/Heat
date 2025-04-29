@@ -58,6 +58,8 @@ struct ConversationViewInspector: View {
                                     Text(audio.url.absoluteString)
                                 }
                                 .foregroundStyle(.secondary)
+                            case .json:
+                                Text("JSON is unhandled right now")
                             }
                         }
                     }
