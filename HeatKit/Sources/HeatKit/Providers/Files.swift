@@ -78,8 +78,8 @@ extension File {
         mimetype == .directory
     }
 
-    public var isMagic: Bool {
-        isJSON && path.hasSuffix("magic")
+    public var isDocument: Bool {
+        isJSON && path.hasSuffix("document")
     }
 
     public var isConversation: Bool {

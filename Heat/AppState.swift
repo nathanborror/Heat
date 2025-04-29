@@ -106,20 +106,44 @@ final class AppState {
 
     // MARK: - File Handling
 
-    func fileCreateConversation(name: String? = nil) async throws -> String {
+    func folderCreate() async throws -> String {
+        let filename = "\(String.id)"
+        let fileID = try await fileCreate(filename: filename, mimetype: .directory)
+        selectedFileID = fileID
+        return fileID
+    }
+
+    func fileCreateConversation() async throws -> String {
         let object = Conversation(
             instructions: Defaults.agentAssistant.instructions,
             toolIDs: Defaults.agentAssistant.toolIDs
         )
-        return try await fileCreate(filename: "\(String.id).conversation", mimetype: .json, object: object)
+        let filename = "\(String.id).conversation"
+        let fileID = try await fileCreate(filename: filename, mimetype: .json, object: object)
+        selectedFileID = fileID
+        return fileID
     }
 
-    func fileCreate(filename: String, mimetype: UTType, object: any Encodable) async throws -> String {
+    func fileCreateDocument() async throws -> String {
+        let object = Document()
+        let filename = "\(String.id).document"
+        let fileID = try await fileCreate(filename: filename, mimetype: .json, object: object)
+        selectedFileID = fileID
+        return fileID
+    }
+
+    private func fileCreate(filename: String, mimetype: UTType, object: any Encodable) async throws -> String {
         let directory = try currentFilePath()
         let path = directory?.appending(path: filename).path ?? filename
-        let file = File(path: path, name: "Untitled", mimetype: mimetype)
-        let fileID = try await API.shared.fileCreate(file, object: object)
-        return fileID
+        let file = File(path: path, mimetype: mimetype)
+        return try await API.shared.fileCreate(file, object: object)
+    }
+
+    private func fileCreate(filename: String, mimetype: UTType) async throws -> String {
+        let directory = try currentFilePath()
+        let path = directory?.appending(path: filename).path ?? filename
+        let file = File(path: path, mimetype: mimetype)
+        return try await API.shared.fileCreate(file)
     }
 
     private func currentFilePath() throws -> URL? {

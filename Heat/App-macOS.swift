@@ -4,7 +4,6 @@ import CoreServices
 import EventKit
 import SharedKit
 import HeatKit
-import KeyboardShortcuts
 
 private let logger = Logger(subsystem: "MainApp", category: "App")
 
@@ -25,9 +24,31 @@ struct MainApp: App {
                     .frame(minWidth: 200)
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
-                ConversationView(fileID: $state.selectedFileID)
+                if let fileID = state.selectedFileID {
+                    FileDetail(fileID: fileID)
+                } else {
+                    ContentUnavailableView("No file selected", systemImage: "doc.plaintext")
+                }
             }
             .containerBackground(.background, for: .window)
+            .toolbar {
+                ToolbarItem {
+                    Menu {
+                        Button("New Conversation") {
+                            Task { try await state.fileCreateConversation() }
+                        }
+                        Button("New Document") {
+                            Task { try await state.fileCreateDocument() }
+                        }
+                        Button("New Folder") {
+                            Task { try await state.folderCreate() }
+                        }
+                    } label: {
+                        Label("New File", systemImage: "plus")
+                    }
+                    .menuIndicator(.hidden)
+                }
+            }
             .alert("Error", isPresented: $showingError, presenting: error) { _ in
                 Button("OK", role: .cancel) {}
             } message: { error in

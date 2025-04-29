@@ -25,6 +25,22 @@
 		D4EDDC812D5E91190079D53E /* Message+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4EDDC802D5E91190079D53E /* Message+.swift */; };
 		D4F518BD2CAF47CE005E147E /* MessageList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F518BC2CAF47CE005E147E /* MessageList.swift */; };
 		D4F518BF2CAF8BA8005E147E /* RenderOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F518BE2CAF8BA8005E147E /* RenderOutput.swift */; };
+		D4FB72652DC01C46008CC1DF /* FileRow-iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72642DC01C46008CC1DF /* FileRow-iOS.swift */; platformFilter = ios; };
+		D4FB72672DC01C4C008CC1DF /* FileRow-macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72662DC01C4C008CC1DF /* FileRow-macOS.swift */; platformFilters = (macos, ); };
+		D4FB72692DC01F4B008CC1DF /* FileDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72682DC01F4B008CC1DF /* FileDetail.swift */; };
+		D4FB726B2DC02813008CC1DF /* FileForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB726A2DC02813008CC1DF /* FileForm.swift */; };
+		D4FB726E2DC03772008CC1DF /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB726D2DC03772008CC1DF /* DocumentView.swift */; };
+		D4FB727D2DC037BF008CC1DF /* RoleAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72722DC037BF008CC1DF /* RoleAttachment.swift */; };
+		D4FB727E2DC037BF008CC1DF /* MagicEditor+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72782DC037BF008CC1DF /* MagicEditor+SwiftUI.swift */; };
+		D4FB727F2DC037BF008CC1DF /* RoleFragment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72742DC037BF008CC1DF /* RoleFragment.swift */; };
+		D4FB72802DC037BF008CC1DF /* MagicContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB727B2DC037BF008CC1DF /* MagicContextMenu.swift */; };
+		D4FB72812DC037BF008CC1DF /* MagicEditor-macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72772DC037BF008CC1DF /* MagicEditor-macOS.swift */; platformFilters = (macos, ); };
+		D4FB72822DC037BF008CC1DF /* MagicEditorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72792DC037BF008CC1DF /* MagicEditorManager.swift */; };
+		D4FB72832DC037BF008CC1DF /* MagicFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB727A2DC037BF008CC1DF /* MagicFunctions.swift */; };
+		D4FB72842DC037BF008CC1DF /* ArticleAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72702DC037BF008CC1DF /* ArticleAttachment.swift */; };
+		D4FB72852DC037BF008CC1DF /* MagicAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72712DC037BF008CC1DF /* MagicAttachment.swift */; };
+		D4FB72862DC037BF008CC1DF /* MagicEditor-iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72762DC037BF008CC1DF /* MagicEditor-iOS.swift */; platformFilter = ios; };
+		D4FB72882DC04151008CC1DF /* DocumentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB72872DC04151008CC1DF /* DocumentViewModel.swift */; };
 		D4FBFBEA2CED03E100266BF1 /* App-iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FBFBE92CED03E100266BF1 /* App-iOS.swift */; platformFilter = ios; };
 		D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FECDD22B817A3900E1BA13 /* HapticManager.swift */; };
 		D8015CC72CB8EDBF0068749D /* MessageInstructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8015CC62CB8EDBF0068749D /* MessageInstructions.swift */; };
@@ -91,6 +107,22 @@
 		D4EDDC802D5E91190079D53E /* Message+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Message+.swift"; sourceTree = "<group>"; };
 		D4F518BC2CAF47CE005E147E /* MessageList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageList.swift; sourceTree = "<group>"; };
 		D4F518BE2CAF8BA8005E147E /* RenderOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderOutput.swift; sourceTree = "<group>"; };
+		D4FB72642DC01C46008CC1DF /* FileRow-iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileRow-iOS.swift"; sourceTree = "<group>"; };
+		D4FB72662DC01C4C008CC1DF /* FileRow-macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileRow-macOS.swift"; sourceTree = "<group>"; };
+		D4FB72682DC01F4B008CC1DF /* FileDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDetail.swift; sourceTree = "<group>"; };
+		D4FB726A2DC02813008CC1DF /* FileForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileForm.swift; sourceTree = "<group>"; };
+		D4FB726D2DC03772008CC1DF /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
+		D4FB72702DC037BF008CC1DF /* ArticleAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleAttachment.swift; sourceTree = "<group>"; };
+		D4FB72712DC037BF008CC1DF /* MagicAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicAttachment.swift; sourceTree = "<group>"; };
+		D4FB72722DC037BF008CC1DF /* RoleAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoleAttachment.swift; sourceTree = "<group>"; };
+		D4FB72742DC037BF008CC1DF /* RoleFragment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoleFragment.swift; sourceTree = "<group>"; };
+		D4FB72762DC037BF008CC1DF /* MagicEditor-iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MagicEditor-iOS.swift"; sourceTree = "<group>"; };
+		D4FB72772DC037BF008CC1DF /* MagicEditor-macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MagicEditor-macOS.swift"; sourceTree = "<group>"; };
+		D4FB72782DC037BF008CC1DF /* MagicEditor+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MagicEditor+SwiftUI.swift"; sourceTree = "<group>"; };
+		D4FB72792DC037BF008CC1DF /* MagicEditorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicEditorManager.swift; sourceTree = "<group>"; };
+		D4FB727A2DC037BF008CC1DF /* MagicFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicFunctions.swift; sourceTree = "<group>"; };
+		D4FB727B2DC037BF008CC1DF /* MagicContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagicContextMenu.swift; sourceTree = "<group>"; };
+		D4FB72872DC04151008CC1DF /* DocumentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentViewModel.swift; sourceTree = "<group>"; };
 		D4FBFBE92CED03E100266BF1 /* App-iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App-iOS.swift"; sourceTree = "<group>"; };
 		D4FECDD22B817A3900E1BA13 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		D800BF8D2D8C73F300CD1D99 /* Heat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Heat.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -196,6 +228,7 @@
 		D41E193C2AE4CD12002516C1 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				D4FB726F2DC03794008CC1DF /* MagicEditor */,
 				D88D23072B3CFB2C00CCCC61 /* Views */,
 				D4017C8E2B6EEF9E001CE137 /* Extensions */,
 				D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */,
@@ -238,6 +271,65 @@
 				D45CC1F92B8A5C1A009DFDF4 /* Suggestions.swift */,
 				D88D230C2B3CFB5D00CCCC61 /* TypingIndicator.swift */,
 				D85FE37E2C8FCA0B004CA2F3 /* RunView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D4FB72632DC01C3D008CC1DF /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D4FB72642DC01C46008CC1DF /* FileRow-iOS.swift */,
+				D4FB72662DC01C4C008CC1DF /* FileRow-macOS.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D4FB726C2DC03755008CC1DF /* Documents */ = {
+			isa = PBXGroup;
+			children = (
+				D4FB726D2DC03772008CC1DF /* DocumentView.swift */,
+				D4FB72872DC04151008CC1DF /* DocumentViewModel.swift */,
+			);
+			path = Documents;
+			sourceTree = "<group>";
+		};
+		D4FB726F2DC03794008CC1DF /* MagicEditor */ = {
+			isa = PBXGroup;
+			children = (
+				D4FB72732DC037BF008CC1DF /* Attachments */,
+				D4FB72752DC037BF008CC1DF /* Fragments */,
+				D4FB727C2DC037BF008CC1DF /* Views */,
+				D4FB72762DC037BF008CC1DF /* MagicEditor-iOS.swift */,
+				D4FB72772DC037BF008CC1DF /* MagicEditor-macOS.swift */,
+				D4FB72782DC037BF008CC1DF /* MagicEditor+SwiftUI.swift */,
+				D4FB72792DC037BF008CC1DF /* MagicEditorManager.swift */,
+				D4FB727A2DC037BF008CC1DF /* MagicFunctions.swift */,
+			);
+			path = MagicEditor;
+			sourceTree = "<group>";
+		};
+		D4FB72732DC037BF008CC1DF /* Attachments */ = {
+			isa = PBXGroup;
+			children = (
+				D4FB72702DC037BF008CC1DF /* ArticleAttachment.swift */,
+				D4FB72712DC037BF008CC1DF /* MagicAttachment.swift */,
+				D4FB72722DC037BF008CC1DF /* RoleAttachment.swift */,
+			);
+			path = Attachments;
+			sourceTree = "<group>";
+		};
+		D4FB72752DC037BF008CC1DF /* Fragments */ = {
+			isa = PBXGroup;
+			children = (
+				D4FB72742DC037BF008CC1DF /* RoleFragment.swift */,
+			);
+			path = Fragments;
+			sourceTree = "<group>";
+		};
+		D4FB727C2DC037BF008CC1DF /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D4FB727B2DC037BF008CC1DF /* MagicContextMenu.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -339,8 +431,12 @@
 		D8F5C1642DBE8BF400E3C1DC /* Files */ = {
 			isa = PBXGroup;
 			children = (
+				D4FB72632DC01C3D008CC1DF /* Views */,
 				D41E194A2AE58D29002516C1 /* Conversations */,
+				D4FB726C2DC03755008CC1DF /* Documents */,
 				D8F5C1652DBE8C0700E3C1DC /* FileList.swift */,
+				D4FB726A2DC02813008CC1DF /* FileForm.swift */,
+				D4FB72682DC01F4B008CC1DF /* FileDetail.swift */,
 			);
 			path = Files;
 			sourceTree = "<group>";
@@ -423,6 +519,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4FB72672DC01C4C008CC1DF /* FileRow-macOS.swift in Sources */,
 				D8271A5C2C7A4E83008C345B /* CodeHighlighter.swift in Sources */,
 				D4EDDC812D5E91190079D53E /* Message+.swift in Sources */,
 				D85FE37F2C8FCA0B004CA2F3 /* RunView.swift in Sources */,
@@ -436,6 +533,7 @@
 				D884AAF92BD7F54500B90E9B /* VisualEffectView.swift in Sources */,
 				D4A2C5672B8BF9CE0004F27B /* MarkdownUI+.swift in Sources */,
 				D816DE7E2C7F9C6000F9D44F /* Modifiers.swift in Sources */,
+				D4FB72692DC01F4B008CC1DF /* FileDetail.swift in Sources */,
 				D8F5C15F2DBD2CEB00E3C1DC /* InstructionView.swift in Sources */,
 				D8F5C1662DBE8C0700E3C1DC /* FileList.swift in Sources */,
 				D4FBFBEA2CED03E100266BF1 /* App-iOS.swift in Sources */,
@@ -456,10 +554,21 @@
 				D8B6392F2D46106D000B2A41 /* ServiceOnboarding-iOS.swift in Sources */,
 				D8015CC92CB8F4D60068749D /* RenderAnyTag.swift in Sources */,
 				D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */,
+				D4FB726E2DC03772008CC1DF /* DocumentView.swift in Sources */,
 				D8E1FC1A2B704CE3006C9366 /* ServiceView.swift in Sources */,
 				D8271A602C7CD5C3008C345B /* MemoryForm.swift in Sources */,
 				D80F73B62C95F0E0001B2778 /* AttributedString+.swift in Sources */,
 				D8F5C1512DBD28EE00E3C1DC /* SettingsView-macOS.swift in Sources */,
+				D4FB727D2DC037BF008CC1DF /* RoleAttachment.swift in Sources */,
+				D4FB727E2DC037BF008CC1DF /* MagicEditor+SwiftUI.swift in Sources */,
+				D4FB727F2DC037BF008CC1DF /* RoleFragment.swift in Sources */,
+				D4FB72802DC037BF008CC1DF /* MagicContextMenu.swift in Sources */,
+				D4FB72812DC037BF008CC1DF /* MagicEditor-macOS.swift in Sources */,
+				D4FB72822DC037BF008CC1DF /* MagicEditorManager.swift in Sources */,
+				D4FB72832DC037BF008CC1DF /* MagicFunctions.swift in Sources */,
+				D4FB72842DC037BF008CC1DF /* ArticleAttachment.swift in Sources */,
+				D4FB72852DC037BF008CC1DF /* MagicAttachment.swift in Sources */,
+				D4FB72862DC037BF008CC1DF /* MagicEditor-iOS.swift in Sources */,
 				D85FAE022C84052900DA153F /* RenderText.swift in Sources */,
 				D85FAE082C84C83600DA153F /* RenderThinking.swift in Sources */,
 				D4713D702AEAB9670005597E /* Operators.swift in Sources */,
@@ -470,9 +579,12 @@
 				D88D23092B3CFB5100CCCC61 /* MessageView.swift in Sources */,
 				D4F518BF2CAF8BA8005E147E /* RenderOutput.swift in Sources */,
 				D4FECDD32B817A3900E1BA13 /* HapticManager.swift in Sources */,
+				D4FB72882DC04151008CC1DF /* DocumentViewModel.swift in Sources */,
 				D4B4F9282C8BB17A00C82284 /* RenderReflection.swift in Sources */,
 				D4017C8D2B6EEF70001CE137 /* Squircle.swift in Sources */,
 				D8D145852D0916EE0025ED75 /* Image+.swift in Sources */,
+				D4FB726B2DC02813008CC1DF /* FileForm.swift in Sources */,
+				D4FB72652DC01C46008CC1DF /* FileRow-iOS.swift in Sources */,
 				D41E19352AE4C665002516C1 /* InstructionForm.swift in Sources */,
 				D88D230D2B3CFB5D00CCCC61 /* TypingIndicator.swift in Sources */,
 				D41E194C2AE591EA002516C1 /* GeneralView.swift in Sources */,

@@ -162,8 +162,9 @@ final class ConversationViewModel {
     }
 
     func generateTitle() async throws {
-        let (service, model) = try API.shared.preferredChatService()
         guard file.name == nil else { return }
+
+        let (service, model) = try API.shared.preferredChatService()
 
         // Flatted message history
         let messages = conversation.messages

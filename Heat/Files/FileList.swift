@@ -6,24 +6,35 @@ struct FileList: View {
 
     @Binding var selected: String?
 
+    @State private var isEditingFile = false
+
     var body: some View {
         List(selection: $selected) {
-            Section {
-                ForEach(state.files) { file in
-                    Label(file.name ?? "Untitled", systemImage: "bubble")
-                        .tag(file.id)
-                }
+            ForEach(state.fileTree) { tree in
+                FileRow(tree: tree, depth: 0)
+                    .tag(tree.id)
             }
         }
-//        OutlineGroup(state.fileTree, children: \.children) { ref in
-//            if let file = try? API.shared.file(ref.id) {
-//                Label(file.name ?? "Untitled", systemImage: "bubble")
-//                    .tag(file.id)
-//            }
-//        }
         .listStyle(.sidebar)
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle("History")
+        .contextMenu(forSelectionType: String.self) { fileIDs in
+            Group {
+                Button("Show in Finder") { handleShowFinder(fileIDs) }
+                Button("Edit") { handleEdit(fileIDs) }
+                Divider()
+                Button("Delete", role: .destructive) { handleDelete(fileIDs) }
+            }
+        } primaryAction: { fileIDs in
+            print("not implemented")
+        }
+        .sheet(isPresented: $isEditingFile) {
+            if let fileID = state.selectedFileID {
+                NavigationStack {
+                    FileForm(fileID: fileID)
+                }
+            }
+        }
         #if os(iOS)
         .onChange(of: selected) { _, newValue in
             if newValue != nil { dismiss() }
@@ -38,5 +49,36 @@ struct FileList: View {
             }
         }
         #endif
+    }
+
+    func handleShowFinder(_ fileIDs: Set<String>) {
+        #if os(macOS)
+        guard let fileID = fileIDs.first else { return }
+        guard let file = try? API.shared.file(fileID) else { return }
+
+        let url = URL.documentsDirectory
+            .appending(path: file.path)
+
+        if url.hasDirectoryPath {
+            NSWorkspace.shared.open(url)
+        } else {
+            NSWorkspace.shared.activateFileViewerSelecting([url])
+        }
+        #endif
+    }
+
+    func handleEdit(_ fileIDs: Set<String>) {
+        if let fileID = fileIDs.first {
+            state.selectedFileID = fileID
+            isEditingFile = true
+        }
+    }
+
+    func handleDelete(_ fileIDs: Set<String>) {
+        Task {
+            for fileID in fileIDs {
+                try await API.shared.fileDelete(fileID)
+            }
+        }
     }
 }

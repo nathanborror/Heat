@@ -3,7 +3,9 @@ import HeatKit
 
 struct ConversationView: View {
     @Environment(AppState.self) var state
-    @Binding var fileID: String?
+
+    let fileID: String
+
     @State private var conversationViewModel: ConversationViewModel? = nil
 
     var body: some View {
@@ -42,7 +44,6 @@ struct ConversationView: View {
     }
 
     func handleLoad() {
-        guard let fileID else { return }
         Task {
             do {
                 let file = try API.shared.file(fileID)
@@ -59,7 +60,7 @@ struct ConversationView: View {
 
             // Create new conversation if one doesn't exist
             if conversationViewModel == nil {
-                let fileID = try await state.fileCreateConversation(name: nil)
+                let fileID = try await state.fileCreateConversation()
                 let file = try API.shared.file(fileID)
                 let conversation = try await API.shared.fileData(fileID, type: Conversation.self)
                 conversationViewModel = .init(conversation: conversation, file: file)

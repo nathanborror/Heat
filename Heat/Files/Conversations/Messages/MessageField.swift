@@ -110,13 +110,13 @@ struct ConversationButtonModifier: ViewModifier {
             .fontWeight(.medium)
             .frame(width: width, height: height)
             .foregroundStyle(.white)
-            .background(.tint, in: .circle)
+            .background(.tint, in: .rect(cornerRadius: 8))
             .padding(.vertical, 2)
     }
 
     #if os(macOS)
-    private var width: CGFloat = 32
-    private var height: CGFloat = 32
+    private var width: CGFloat = 30
+    private var height: CGFloat = 30
     #else
     private var width: CGFloat = 40
     private var height: CGFloat = 40
