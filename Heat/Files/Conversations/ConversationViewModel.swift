@@ -129,10 +129,11 @@ final class ConversationViewModel {
         // Flattened message history
         let messages = conversation.messages
         let history = preparePlainTextHistory(messages)
+        let content = PromptTemplate(SuggestionsInstructions, with: ["HISTORY": .string(history)])
 
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: PromptTemplate(SuggestionsInstructions, with: ["HISTORY": .string(history)]))
+        req.with(history: [.init(role: .user, content: content)])
 
         // Indicate we are suggesting
         conversation.state = .suggesting
@@ -169,10 +170,11 @@ final class ConversationViewModel {
         // Flatted message history
         let messages = conversation.messages
         let history = preparePlainTextHistory(messages)
+        let content = PromptTemplate(TitleInstructions, with: ["HISTORY": .string(history)])
 
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
-        req.with(system: PromptTemplate(TitleInstructions, with: ["HISTORY": .string(history)]))
+        req.with(history: [.init(role: .user, content: content)])
 
         // Generate suggestions stream
         let stream = ChatSession.shared.stream(req)

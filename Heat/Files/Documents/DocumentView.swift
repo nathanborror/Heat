@@ -8,31 +8,42 @@ struct DocumentView: View {
 
     let fileID: String
 
-    @State private var editorManager = MagicEditorManager()
-    @State private var contextMenuManager = MagicContextMenuManager()
+    @State var documentViewModel: DocumentViewModel
+
+    init(file: File) {
+        self.fileID = file.id
+        self.documentViewModel = .init(file: file)
+    }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            MagicEditor(viewModel: $editorManager)
+            MagicEditor(viewModel: $documentViewModel.editorManager)
 
-            if editorManager.showingContextMenu {
-                MagicContextMenu(manager: contextMenuManager)
+            if documentViewModel.editorManager.showingContextMenu {
+                MagicContextMenu(manager: documentViewModel.contextMenuManager)
                     .frame(width: 150)
-                    .offset(x: editorManager.contextMenuPosition.x, y: editorManager.contextMenuPosition.y)
+                    .offset(
+                        x: documentViewModel.editorManager.contextMenuPosition.x,
+                        y: documentViewModel.editorManager.contextMenuPosition.y
+                    )
             }
         }
+        .navigationTitle(documentViewModel.title)
+        #if os(macOS)
+        .navigationSubtitle(documentViewModel.subtitle)
+        #endif
         .padding()
         .toolbar {
             ToolbarItem {
                 Menu {
                     Button("User") {
-                        handleInsert(role: "user")
+                        documentViewModel.handleInsert(role: "user")
                     }
                     Button("Assistant") {
-                        handleInsert(role: "assistant")
+                        documentViewModel.handleInsert(role: "assistant")
                     }
                     Button("System") {
-                        handleInsert(role: "system")
+                        documentViewModel.handleInsert(role: "system")
                     }
                 } label: {
                     Label("Insert", systemImage: "paperclip")
@@ -41,32 +52,35 @@ struct DocumentView: View {
             }
             ToolbarItem {
                 Button {
-                    editorManager.bold()
+                    documentViewModel.editorManager.bold()
                 } label: {
                     Label("Bold", systemImage: "bold")
                 }
             }
             ToolbarItem {
                 Button {
-                    Task { try await handleGenerate() }
+                    Task { try await documentViewModel.handleGenerate() }
                 } label: {
                     Label("Submit", systemImage: "arrow.up")
                 }
             }
         }
-        .onChange(of: editorManager.contextMenuNotification) { _, newValue in
+        .onChange(of: documentViewModel.editorManager.contextMenuNotification) { _, newValue in
             switch newValue?.kind {
             case .submit:
-                Task { try await handleGenerate() }
+                Task { try await documentViewModel.handleGenerate() }
             case .up:
-                contextMenuManager.handleSelectionMoveUp()
+                documentViewModel.contextMenuManager.handleSelectionMoveUp()
             case .down:
-                contextMenuManager.handleSelectionMoveDown()
+                documentViewModel.contextMenuManager.handleSelectionMoveDown()
             case .select:
-                contextMenuManager.handleSelection()
+                documentViewModel.contextMenuManager.handleSelection()
             case .none:
                 break
             }
+        }
+        .onChange(of: fileID) { oldValue, newValue in
+            handleLoad()
         }
         .onAppear {
             handleLoad()
@@ -80,23 +94,7 @@ struct DocumentView: View {
         Task {
             do {
                 let document = try await API.shared.fileData(fileID, type: Document.self)
-                editorManager.read(document: document)
-
-                // Set context menu options
-                contextMenuManager.options = [
-                    .init(label: "User") {
-                        editorManager.backspace()
-                        handleInsert(role: "user")
-                    },
-                    .init(label: "Assistant") {
-                        editorManager.backspace()
-                        handleInsert(role: "assistant")
-                    },
-                    .init(label: "System") {
-                        editorManager.backspace()
-                        handleInsert(role: "system")
-                    }
-                ]
+                documentViewModel.read(document)
             } catch {
                 state.log(error: error)
             }
@@ -105,76 +103,10 @@ struct DocumentView: View {
 
     func handleSave() {
         do {
-            let document = try editorManager.encode()
+            let document = try documentViewModel.editorManager.encode()
             Task { try await API.shared.fileUpdate(fileID, object: document) }
         } catch {
             state.log(error: error)
         }
-    }
-
-    func handleInsert(role: String) {
-        let attachment = RoleAttachment(role: role)
-        editorManager.insert(attachment: attachment)
-        editorManager.insert(text: "\n")
-        editorManager.showingContextMenu = false
-    }
-
-    func handleGenerate() async throws {
-        var document = try editorManager.encode()
-
-        // Encode messages from document
-        let messages = document.encodeMessages()
-
-        // Insert assistant marker
-        editorManager.insert(text: "\n\n")
-        handleInsert(role: "assistant")
-
-        let location = editorManager.selectedRange.location
-        var content = ""
-
-        let (service, model) = try API.shared.preferredChatService()
-
-        var context: [String: Value] = [:]
-        context["DATETIME"] = .string(Date.now.formatted())
-
-        document.state = .processing
-
-        // Initial request
-        var req = ChatSessionRequest(service: service, model: model)
-        req.with(history: messages)
-
-        // Generate response stream
-        let stream = ChatSession.shared.stream(req)
-        for try await message in stream {
-            try Task.checkCancellation()
-
-            let delta = String(message.content?.trimmingPrefix(content) ?? "")
-            editorManager.insert(text: delta, at: location + content.count)
-            content = message.content ?? content
-        }
-
-        let finalLocation = location + content.count
-        editorManager.insert(text: "\n\n", at: finalLocation)
-        editorManager.selectedRange = .init(location: finalLocation+2, length: 0)
-        handleInsert(role: "user")
-
-        // Reset conversation state
-        document.state = .none
-
-        // Cache conversation
-        try await API.shared.fileUpdate(fileID, object: document)
-    }
-
-    private func preparePlainTextHistory(_ messages: [Message]) -> String {
-        var out = ""
-        for message in messages {
-            out += message.role.rawValue + ":\n"
-            for content in message.contents ?? [] {
-                guard case .text(let text) = content else { continue }
-                out += text + "\n"
-            }
-            out += "\n"
-        }
-        return out
     }
 }

@@ -16,8 +16,8 @@ struct FileDetail: View {
                     .id(fileID)
             }
             if file.isDocument {
-               DocumentView(fileID: fileID)
-                    .id(fileID)
+               DocumentView(file: file)
+                    .id(file.id)
             }
         }
     }
