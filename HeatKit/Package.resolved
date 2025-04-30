@@ -1,5 +1,5 @@
 {
-  "originHash" : "065f8e379cdb6b3f29449e230dff3dde76c7c504e1da020f6f4d884d24e485bd",
+  "originHash" : "f1036dce6c01ad40d89915bc0ce260c29e0453a71e3f1331f777c421f2bd196f",
   "pins" : [
     {
       "identity" : "fuzi",
@@ -20,6 +20,15 @@
       }
     },
     {
+      "identity" : "jsonschema",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/loopwork-ai/JSONSchema",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a60be45fa2ff42d342424f90a0859ee3e09aca2a"
+      }
+    },
+    {
       "identity" : "networkimage",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gonzalezreal/NetworkImage",
@@ -34,7 +43,7 @@
       "location" : "https://github.com/nathanborror/swift-anthropic",
       "state" : {
         "branch" : "main",
-        "revision" : "228d90120accff6bd38beb0e1631a7a04851f556"
+        "revision" : "be77b1e0b1d6bc41e8a35ade0aaa8e8eb65aa310"
       }
     },
     {
@@ -43,7 +52,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "e3d8a3dd42079ac0d3429246a59602c6f6bf9a21"
+        "revision" : "cf4c4727ff253fe92c15f05b58dec666475fb7f5"
       }
     },
     {
@@ -61,7 +70,7 @@
       "location" : "https://github.com/nathanborror/swift-elevenlabs",
       "state" : {
         "branch" : "main",
-        "revision" : "80718d036fe5a4680184b5c3f2eebcbce538788f"
+        "revision" : "b06be3a7a4a5552141480f19d83ec9dabdbfc95c"
       }
     },
     {
@@ -70,7 +79,7 @@
       "location" : "https://github.com/nathanborror/swift-fal",
       "state" : {
         "branch" : "main",
-        "revision" : "a504e5f199153123e71675a80923f4e273e805dd"
+        "revision" : "b100d9ba8d0f7d0111fc4489fdc1eee4b9bc2046"
       }
     },
     {
@@ -79,16 +88,16 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "49734229c8b512a0a1c907aef40c09a410f5e8e1"
+        "revision" : "a4a03969e507bb2da33db74ba92ea67c6aea2c27"
       }
     },
     {
-      "identity" : "swift-google-gen",
+      "identity" : "swift-llama",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/nathanborror/swift-google-gen",
+      "location" : "https://github.com/nathanborror/swift-llama",
       "state" : {
         "branch" : "main",
-        "revision" : "0845fbb77004c9c80f97e91e13aacd7090f44b1f"
+        "revision" : "0deb90a90f399ecd89ab3407287f30cad96d666d"
       }
     },
     {
@@ -106,7 +115,7 @@
       "location" : "https://github.com/nathanborror/swift-mistral",
       "state" : {
         "branch" : "main",
-        "revision" : "b684e503b4b4642d485be9b1c6131093ccd7f46d"
+        "revision" : "235fd786cc1eddc9749e92a8fe2eb507716c76fa"
       }
     },
     {
@@ -115,7 +124,7 @@
       "location" : "https://github.com/nathanborror/swift-ollama",
       "state" : {
         "branch" : "main",
-        "revision" : "5a4615bf2c0177311c9c78a3b497a038f2342125"
+        "revision" : "24904d7c7456930f2dce0aa9d790703f7c218157"
       }
     },
     {
@@ -124,7 +133,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "be985538576d902c363a103a689c95f790590132"
+        "revision" : "a96b97765c5348115788c936017392d00f0bd943"
       }
     },
     {
@@ -133,7 +142,7 @@
       "location" : "https://github.com/nathanborror/swift-perplexity",
       "state" : {
         "branch" : "main",
-        "revision" : "9776db2f5d097817c34f547bf2e11160ebaad2c7"
+        "revision" : "7c16384e287f940133619ffdbda8c5a369d1ad37"
       }
     },
     {
@@ -142,7 +151,7 @@
       "location" : "https://github.com/nathanborror/swift-shared-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "91f187c5439537856869b5a33d7f6efc3b6af555"
+        "revision" : "3159eb54575d9f8b432bc236f7f46a8d6431d563"
       }
     }
   ],

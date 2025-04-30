@@ -10,7 +10,7 @@ struct InstructionList: View {
 
     var body: some View {
         List(selection: $selection) {
-            ForEach(instructions) { file in
+            ForEach(state.instructions) { file in
                 Text(file.name ?? "Untitled")
                     .tag(file.id)
             }

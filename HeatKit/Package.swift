@@ -26,9 +26,6 @@ let package = Package(
                 .product(name: "SharedKit", package: "swift-shared-kit"),
                 .product(name: "GenKit", package: "swift-gen-kit"),
                 .product(name: "Fuzi", package: "Fuzi"),
-            ],
-            resources: [
-                .process("Instructions"),
             ]
         ),
     ]

@@ -122,10 +122,13 @@ final class DocumentViewModel {
 
         let (service, model) = try API.shared.preferredChatService()
 
+        // Cached instructions
+        let instruction = try state.file(Instruction.self, fileID: Defaults.instructionTitleID)
+
         // Flatted message history
         let messages = document.encodeMessages()
         let history = preparePlainTextHistory(messages)
-        let content = PromptTemplate(TitleInstructions, with: ["HISTORY": .string(history)])
+        let content = PromptTemplate(instruction.instructions, with: ["history": .string(history)])
 
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)

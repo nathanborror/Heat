@@ -129,10 +129,13 @@ final class ConversationViewModel {
     func generateSuggestions() async throws {
         let (service, model) = try API.shared.preferredChatService()
 
+        // Cached instructions
+        let instruction = try state.file(Instruction.self, fileID: Defaults.instructionSuggestionsID)
+
         // Flattened message history
         let messages = conversation.messages
         let history = preparePlainTextHistory(messages)
-        let content = PromptTemplate(SuggestionsInstructions, with: ["HISTORY": .string(history)])
+        let content = PromptTemplate(instruction.instructions, with: ["history": .string(history)])
 
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)
@@ -170,10 +173,13 @@ final class ConversationViewModel {
 
         let (service, model) = try API.shared.preferredChatService()
 
+        // Cached instructions
+        let instruction = try state.file(Instruction.self, fileID: Defaults.instructionTitleID)
+
         // Flatted message history
         let messages = conversation.messages
         let history = preparePlainTextHistory(messages)
-        let content = PromptTemplate(TitleInstructions, with: ["HISTORY": .string(history)])
+        let content = PromptTemplate(instruction.instructions, with: ["history": .string(history)])
 
         // Initial request
         var req = ChatSessionRequest(service: service, model: model)

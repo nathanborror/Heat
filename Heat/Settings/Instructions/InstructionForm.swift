@@ -78,7 +78,7 @@ struct InstructionProfileForm: View {
     let fileID: String?
 
     @State var name = ""
-    @State var kind: Instruction.Kind = .assistant
+    @State var kind = Instruction.Kind.assistant
 
     init(_ fileID: String? = nil) {
         self.fileID = fileID
@@ -86,6 +86,11 @@ struct InstructionProfileForm: View {
 
     var body: some View {
         Form {
+            if let fileID {
+                TextField("ID", text: .constant(fileID))
+                    .disabled(true)
+            }
+            
             TextField("Name", text: $name)
 
             Picker("Kind", selection: $kind) {
@@ -108,8 +113,10 @@ struct InstructionProfileForm: View {
             do {
                 let data = try await API.shared.fileData(fileID)
                 let instruction = try JSONDecoder().decode(Instruction.self, from: data)
-                name = instruction.name
                 kind = instruction.kind
+
+                let file = try API.shared.file(fileID)
+                name = file.name ?? ""
             } catch {
                 print(error)
             }
@@ -120,14 +127,16 @@ struct InstructionProfileForm: View {
         guard let fileID else { return }
         Task {
             do {
+                // Update file data
                 let data = try await API.shared.fileData(fileID)
                 var instruction = try JSONDecoder().decode(Instruction.self, from: data)
-                instruction.name = name
                 instruction.kind = kind
+                try await API.shared.fileUpdate(fileID, object: instruction)
 
-                Task {
-                    try await API.shared.fileUpdate(fileID, object: instruction)
-                }
+                // Update metadata
+                var file = try API.shared.file(fileID)
+                file.name = name.isEmpty ? nil : name
+                try await API.shared.fileUpdate(file)
             } catch {
                 print(error)
             }

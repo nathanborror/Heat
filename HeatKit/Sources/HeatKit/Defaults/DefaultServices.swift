@@ -2,21 +2,7 @@ import Foundation
 import GenKit
 import SharedKit
 
-public struct Defaults {
-
-    public static let services: [Service] = [
-        anthropic,
-        deepseek,
-        elevenlabs,
-        fal,
-        grok,
-        groq,
-        llama,
-        mistral,
-        ollama,
-        openAI,
-        perplexity,
-    ]
+extension Defaults {
 
     public static let anthropic =
         Service(

@@ -32,7 +32,7 @@ struct MessageInstructions: View {
         }
         .padding()
         .frame(maxHeight: 400)
-        .navigationTitle(instruction.name)
+        .navigationTitle("Instructions")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button {
