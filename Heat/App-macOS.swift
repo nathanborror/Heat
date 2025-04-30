@@ -55,7 +55,7 @@ struct MainApp: App {
                 Text(error.description)
             }
             .onAppear {
-                Task { await appReady() }
+                Task { await appActive() }
             }
         }
         .defaultSize(width: 600, height: 700)
