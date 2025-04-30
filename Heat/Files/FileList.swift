@@ -27,8 +27,6 @@ struct FileList: View {
                 Divider()
                 Button("Delete", role: .destructive) { handleDelete(fileIDs) }
             }
-        } primaryAction: { fileIDs in
-            print("not implemented")
         }
         #endif
         .sheet(isPresented: $isEditingFile) {

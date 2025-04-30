@@ -165,10 +165,10 @@ final class AppState {
     // MARK: - Logging
 
     func log(error: Swift.Error) {
-        print(error)
+        logsProvider.log(error: error)
     }
 
     func logsReset() {
-        print("not implemented")
+        logsProvider.reset()
     }
 }

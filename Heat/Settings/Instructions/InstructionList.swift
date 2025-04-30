@@ -6,13 +6,13 @@ struct InstructionList: View {
 
     @Binding var selection: String?
 
-    @State var instructions: [Instruction] = []
+    @State var instructions: [File] = []
 
     var body: some View {
         List(selection: $selection) {
-            ForEach(instructions) { instruction in
-                Text(instruction.name)
-                    .tag(instruction.id)
+            ForEach(instructions) { file in
+                Text(file.name ?? "Untitled")
+                    .tag(file.id)
             }
         }
         .navigationTitle("Instructions")

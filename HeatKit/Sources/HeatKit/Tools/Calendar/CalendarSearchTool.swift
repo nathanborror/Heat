@@ -11,7 +11,7 @@ public struct CalendarSearchTool {
     }
     
     public static let function = Tool.Function(
-        name: "search_calendar",
+        name: "calendar_search",
         description: """
             Searches the user's calendar. You must always include a `start` and an `end` date.
             """,

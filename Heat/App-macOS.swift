@@ -63,11 +63,6 @@ struct MainApp: App {
         .defaultLaunchBehavior(.presented)
         .environment(state)
         .commands {
-            CommandGroup(after: .appInfo) {
-                Button("Reset") {
-                    Task { await appActive() }
-                }
-            }
             CommandMenu("Heat") {
                 Button("New Conversation") {
                     Task { try await state.fileCreateConversation() }
@@ -81,6 +76,12 @@ struct MainApp: App {
 
                 Button("New Folder") {
                     Task { try await state.folderCreate() }
+                }
+
+                Divider()
+
+                Button("Reset All Data") {
+                    Task { await appReset() }
                 }
             }
         }

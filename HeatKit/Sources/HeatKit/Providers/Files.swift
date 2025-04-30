@@ -86,6 +86,10 @@ extension File {
         isJSON && path.hasSuffix("conversation")
     }
 
+    public var isInstruction: Bool {
+        isJSON && path.hasSuffix("instruction")
+    }
+    
     public var isJSON: Bool {
         mimetype == .json
     }

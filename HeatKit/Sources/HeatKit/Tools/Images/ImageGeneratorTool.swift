@@ -9,7 +9,7 @@ public struct ImageGeneratorTool {
     }
 
     public static let function = Tool.Function(
-        name: "generate_images",
+        name: "image_generator",
         description: "Return thoughtful, detailed image prompts.",
         parameters: .object(
             properties: [

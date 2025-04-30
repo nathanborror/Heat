@@ -97,6 +97,17 @@ extension API {
         return try await fileCreate(file, object: object)
     }
 
+    public func fileCreateInstruction(id: String = .id, name: String, kind: Instruction.Kind, instructions: String) async throws -> String {
+        let object = Instruction(kind: kind, instructions: instructions)
+        let file = File(
+            id: id,
+            path: ".app/instructions/\(id).instruction",
+            name: name,
+            mimetype: .json
+        )
+        return try await fileCreate(file, object: object)
+    }
+
     public func fileCreate(_ file: File, object: any Encodable) async throws -> String {
         // Cache and upload file metadata
         try await filesProvider.cacheFileMetadata(file)

@@ -7,22 +7,13 @@ import HeatKit
 @MainActor
 class InstructionsManager {
 
-    var instructions: [Instruction]
+    var instructions: [File]
 
-    init(instructions: [Instruction]) {
+    init(instructions: [File]) {
         self.instructions = instructions
     }
 
-    func get(_ instructionID: String?) -> Instruction? {
+    func get(_ instructionID: String?) -> File? {
         instructions.first(where: { $0.id == instructionID })
-    }
-
-    func update(_ instruction: Instruction) {
-        guard let index = instructions.firstIndex(where: { $0.id == instruction.id }) else { return }
-        instructions[index] = instruction
-        save()
-    }
-
-    func save() {
     }
 }
