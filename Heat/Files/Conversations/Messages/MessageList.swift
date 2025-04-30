@@ -16,7 +16,6 @@ struct MessageList: View {
                         RunView(run)
                     }
                 }
-                .padding(.horizontal, 12)
 
                 VStack(alignment: .leading, spacing: 0) {
                     // Assistant typing indicator when processing
@@ -36,7 +35,6 @@ struct MessageList: View {
                         }
                     }
                 }
-                .padding(.horizontal, 12)
                 .id("bottom")
             }
             .onChange(of: conversationViewModel.file.modified) { _, _ in
