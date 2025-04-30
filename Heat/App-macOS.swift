@@ -68,6 +68,21 @@ struct MainApp: App {
                     Task { await appActive() }
                 }
             }
+            CommandMenu("Heat") {
+                Button("New Conversation") {
+                    Task { try await state.fileCreateConversation() }
+                }
+                .keyboardShortcut("n", modifiers: .command)
+
+                Button("New Document") {
+                    Task { try await state.fileCreateDocument() }
+                }
+                .keyboardShortcut("n", modifiers: [.command, .shift])
+
+                Button("New Folder") {
+                    Task { try await state.folderCreate() }
+                }
+            }
         }
 
         Settings {
