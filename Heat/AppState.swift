@@ -115,8 +115,8 @@ final class AppState {
 
     func fileCreateConversation() async throws -> String {
         let object = Conversation(
-            instructions: Defaults.agentAssistant.instructions,
-            toolIDs: Defaults.agentAssistant.toolIDs
+            instructions: Defaults.agentAssistantWithTools.instructions,
+            toolIDs: Defaults.agentAssistantWithTools.toolIDs
         )
         let filename = "\(String.id).conversation"
         let fileID = try await fileCreate(filename: filename, mimetype: .json, object: object)
