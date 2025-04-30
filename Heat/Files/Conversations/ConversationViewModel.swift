@@ -9,7 +9,7 @@ private let logger = Logger(subsystem: "ConversationViewModel", category: "App")
 @Observable @MainActor
 final class ConversationViewModel {
     var file: File
-    var conversation: Conversation
+    var conversation: Conversation = .init()
 
     private let state = AppState.shared
     private var generateTask: Task<(), Swift.Error>? = nil
@@ -29,11 +29,6 @@ final class ConversationViewModel {
                 return "Not Found error: \(detail)"
             }
         }
-    }
-
-    init(conversation: Conversation, file: File) {
-        self.conversation = conversation
-        self.file = file
     }
 
     /// Suggested replies the user can use to respond.
@@ -64,6 +59,14 @@ final class ConversationViewModel {
     var subtitle: String {
         guard let (_, model) = try? API.shared.preferredChatService() else { return "Unknown model" }
         return model.name ?? model.id
+    }
+
+    init(file: File) {
+        self.file = file
+    }
+
+    func read(_ conversation: Conversation) {
+        self.conversation = conversation
     }
 
     // MARK: - Generators

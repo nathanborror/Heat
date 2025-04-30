@@ -23,4 +23,8 @@ public struct Conversation: Codable, Sendable {
         self.state = state
         self.messages = messages
     }
+
+    public var isEmpty: Bool {
+        instructions.isEmpty && messages.isEmpty
+    }
 }

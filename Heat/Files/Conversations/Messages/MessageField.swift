@@ -7,6 +7,7 @@ private let logger = Logger(subsystem: "MessageField", category: "App")
 
 struct MessageField: View {
     @Environment(AppState.self) var state
+    @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.colorScheme) var colorScheme
 
     typealias ActionHandler = (String, Instruction?) -> Void
@@ -84,7 +85,7 @@ struct MessageField: View {
     }
 
     func handleStop() {
-        print("not implemented")
+        conversationViewModel.cancel()
     }
 
     private func clear() {

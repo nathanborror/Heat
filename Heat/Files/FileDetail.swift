@@ -12,8 +12,8 @@ struct FileDetail: View {
                 ContentUnavailableView(file.name ?? "Untitled Folder", systemImage: "folder")
             }
             if file.isConversation {
-                ConversationView(fileID: fileID)
-                    .id(fileID)
+                ConversationView(file: file)
+                    .id(file.id)
             }
             if file.isDocument {
                DocumentView(file: file)
