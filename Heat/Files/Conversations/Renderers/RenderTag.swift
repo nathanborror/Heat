@@ -17,7 +17,7 @@ struct RenderTag: View {
             RenderThinking(tag)
         case "reflection":
             RenderReflection(tag)
-        case "output":
+        case "output", "summary":
             RenderOutput(tag)
         case "image_search_query":
             RenderImageSearch(tag)

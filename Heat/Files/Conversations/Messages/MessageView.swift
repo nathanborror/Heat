@@ -124,7 +124,7 @@ struct ContentsView: View {
                 ForEach(contents.indices, id: \.self) {
                     switch contents[$0] {
                     case .text(let text):
-                        RenderText(text, tags: ["thinking", "think", "artifact", "output", "image_search_query"])
+                        RenderText(text, tags: ["thinking", "think", "artifact", "output", "summary", "image_search_query"])
                     case .image(let image):
                         ContentImageView(url: image.url, detail: image.detail)
                     case .audio:
