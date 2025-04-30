@@ -15,9 +15,6 @@ struct ServiceDefaults: View {
             Picker("Images", selection: $manager.serviceImageDefault) {
                 servicePickerView(\.supportsImages)
             }
-            Picker("Summarization", selection: $manager.serviceSummarizationDefault) {
-                servicePickerView(\.supportsSummarization)
-            }
             Picker("Embeddings", selection: $manager.serviceEmbeddingDefault) {
                 servicePickerView(\.supportsEmbeddings)
             }
@@ -26,6 +23,9 @@ struct ServiceDefaults: View {
             }
             Picker("Speech", selection: $manager.serviceSpeechDefault) {
                 servicePickerView(\.supportsSpeech)
+            }
+            Picker("Summarization", selection: $manager.serviceSummarizationDefault) {
+                servicePickerView(\.supportsSummarization)
             }
         }
     }
