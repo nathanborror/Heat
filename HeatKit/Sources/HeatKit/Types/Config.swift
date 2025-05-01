@@ -19,12 +19,29 @@ public struct Config: Codable, Sendable {
     }
 }
 
+// MARK: - Personalization
+
 extension Config {
 
-    public var instructionID: String {
-        set { metadata["instructionID"] = .string(newValue) }
-        get { metadata["instructionID"]?.stringValue ?? "" }
+    public var userName: String? {
+        set { metadata["userName"] = (newValue != nil) ? .string(newValue!) : nil }
+        get { metadata["userName"]?.stringValue }
     }
+
+    public var userLocation: String? {
+        set { metadata["userLocation"] = (newValue != nil) ? .string(newValue!) : nil }
+        get { metadata["userLocation"]?.stringValue }
+    }
+
+    public var userBiography: String? {
+        set { metadata["userBiography"] = (newValue != nil) ? .string(newValue!) : nil }
+        get { metadata["userBiography"]?.stringValue }
+    }
+}
+
+// MARK: - Service Defaults
+
+extension Config {
 
     public var serviceChatDefault: String? {
         set { metadata["serviceChatDefault"] = (newValue != nil) ? .string(newValue!) : nil }

@@ -150,6 +150,9 @@ struct InstructionToolsForm: View {
     let fileID: String
 
     @State var toolIDs: Set<String> = []
+    @State var selection: String? = nil
+    @State var newToolID = ""
+    @State var isAddingTool = false
 
     init(_ fileID: String) {
         self.fileID = fileID
@@ -157,15 +160,15 @@ struct InstructionToolsForm: View {
 
     var body: some View {
         VStack {
-            List {
+            List(selection: $selection) {
                 ForEach(Array(toolIDs.sorted(by: <)), id: \.self) { toolID in
                     Text(toolID)
-                        .swipeActions {
-                            Button(role: .destructive) {
-                                toolIDs.remove(toolID)
-                            } label: {
-                                Label("Trash", systemImage: "trash")
-                            }
+                        .tag(toolID)
+                }
+                if isAddingTool {
+                    TextField("Tool ID", text: $newToolID)
+                        .onSubmit {
+                            handleInsertTool()
                         }
                 }
             }
@@ -177,13 +180,16 @@ struct InstructionToolsForm: View {
 
             HStack {
                 ControlGroup {
-                    Button(action: {}) {
-                        Label("Decrease", systemImage: "minus")
+                    Button("Decrease", systemImage: "minus") {
+                        if let selection {
+                            toolIDs.remove(selection)
+                        }
                     }
-                    .disabled(true)
-
-                    Button(action: {}) {
-                        Label("Increase", systemImage: "plus")
+                    Button("Increase", systemImage: "plus") {
+                        if !newToolID.isEmpty {
+                            handleInsertTool()
+                        }
+                        isAddingTool = true
                     }
                 }
                 .frame(width: 60)
@@ -199,31 +205,37 @@ struct InstructionToolsForm: View {
     }
 
     func handleAppear() {
-        Task {
-            do {
-                let data = try await API.shared.fileData(fileID)
-                let instruction = try JSONDecoder().decode(Instruction.self, from: data)
-                toolIDs = instruction.toolIDs
-            } catch {
-                print(error)
-            }
+        do {
+            let instruction = try state.file(Instruction.self, fileID: fileID)
+            toolIDs = instruction.toolIDs
+        } catch {
+            state.log(error: error)
         }
     }
 
     func handleDisappear() {
         Task {
             do {
-                let data = try await API.shared.fileData(fileID)
-                var instruction = try JSONDecoder().decode(Instruction.self, from: data)
-                instruction.toolIDs = toolIDs
-
-                Task {
-                    try await API.shared.fileUpdate(fileID, object: instruction)
+                if !newToolID.isEmpty {
+                    handleInsertTool()
                 }
+                var instruction = try state.file(Instruction.self, fileID: fileID)
+                instruction.toolIDs = toolIDs
+                try await API.shared.fileUpdate(fileID, object: instruction)
             } catch {
-                print(error)
+                state.log(error: error)
             }
         }
+    }
+
+    func handleInsertTool() {
+        guard !newToolID.isEmpty else {
+            isAddingTool = false
+            return
+        }
+        toolIDs.insert(newToolID)
+        newToolID = ""
+        isAddingTool = false
     }
 }
 

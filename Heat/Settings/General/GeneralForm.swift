@@ -55,21 +55,9 @@ struct GeneralForm: View {
 struct ConfigUserForm: View {
     @Environment(AppState.self) var state
 
-    @State var name: String
-    @State var bio: String
-    @State var location: String
-    @State var birthdate: Date?
-
-    private var defaultDate: Date {
-        Calendar.current.date(byAdding: .year, value: -18, to: Date()) ?? .now
-    }
-
-    init() {
-        self.name = ""
-        self.bio = ""
-        self.location = ""
-        self.birthdate = defaultDate
-    }
+    @State var name = ""
+    @State var bio = ""
+    @State var location = ""
 
     var body: some View {
         Form {
@@ -79,38 +67,34 @@ struct ConfigUserForm: View {
                     .autocorrectionDisabled(false)
                 TextField("Bio", text: $bio, axis: .vertical)
             }
-
-            Section {
-                Toggle("Show Birth Date", isOn: Binding(
-                    get: { birthdate != nil },
-                    set: { if !$0 { birthdate = nil } else { birthdate = defaultDate } }
-                ))
-
-                if birthdate != nil {
-                    DatePicker(
-                        "Birthday",
-                        selection: Binding(
-                            get: { birthdate ?? defaultDate },
-                            set: { birthdate = $0 }
-                        ),
-                        displayedComponents: [.date]
-                    )
-                }
-            }
         }
         .onAppear {
-            handleAppear()
+            handleLoad()
         }
         .onDisappear {
             handleDisappear()
         }
     }
 
-    func handleAppear() {
-        print("not implemented")
+    func handleLoad() {
+        let config = state.config
+        name = config.userName ?? ""
+        location = config.userLocation ?? ""
+        bio = config.userBiography ?? ""
     }
 
     func handleDisappear() {
-        print("not implemented")
+        Task {
+            var config = state.config
+            config.userName = name.isEmpty ? nil : name
+            config.userLocation = location.isEmpty ? nil : location
+            config.userBiography = bio.isEmpty ? nil : bio
+
+            do {
+                try await API.shared.configUpdate(config)
+            } catch {
+                state.log(error: error)
+            }
+        }
     }
 }
