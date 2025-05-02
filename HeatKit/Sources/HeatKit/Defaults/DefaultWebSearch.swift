@@ -3,7 +3,7 @@ import Foundation
 extension Defaults {
 
     public static let webSearchInstruction = Instruction(
-        kind: .prompt,
+        kind: .task,
         instructions: """
             Select relevant website results, scrape their page and summarize it. Use the <search_results> below to select at least 3 results to scrape and summarize. Choose the most relevant and diverse sources that would provide comprehensive information about the search query, "{{query}}". \
 

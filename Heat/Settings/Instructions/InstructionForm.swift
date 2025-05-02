@@ -78,7 +78,7 @@ struct InstructionProfileForm: View {
     let fileID: String?
 
     @State var name = ""
-    @State var kind = Instruction.Kind.assistant
+    @State var kind = Instruction.Kind.template
 
     init(_ fileID: String? = nil) {
         self.fileID = fileID

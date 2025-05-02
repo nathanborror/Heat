@@ -2,19 +2,24 @@ import SwiftUI
 import HeatKit
 
 struct MessageInstructions: View {
+    @Environment(AppState.self) var state
     @Environment(\.dismiss) var dismiss
 
-    @State var instruction: Instruction
-    let action: (Instruction) -> Void
+    let file: File
+    let action: (String, [String: String], Set<String>) -> Void
+
+    @State private var instructions = ""
+    @State private var context: [String: String] = [:]
+    @State private var toolIDs: Set<String> = []
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                ForEach(Array(instruction.context.keys), id: \.self) { key in
+                ForEach(Array(context.keys), id: \.self) { key in
                     TextField(key,
                         text: Binding(
-                            get: { instruction.context[key] ?? "" },
-                            set: { instruction.context[key] = $0 }
+                            get: { context[key] ?? "" },
+                            set: { context[key] = $0 }
                         ),
                         axis: .vertical
                     )
@@ -25,7 +30,7 @@ struct MessageInstructions: View {
                     .clipShape(.rect(cornerRadius: 10))
                 }
 
-                Text(instruction.instructions)
+                Text(instructions)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 4)
             }
@@ -35,24 +40,34 @@ struct MessageInstructions: View {
         .navigationTitle("Instructions")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button {
+                Button("Done") {
                     handleSubmit()
                     dismiss()
-                } label: {
-                    Text("Done")
                 }
             }
             ToolbarItem(placement: .cancellationAction) {
-                Button {
+                Button("Cancel") {
                     dismiss()
-                } label: {
-                    Text("Cancel")
                 }
             }
+        }
+        .onAppear {
+            handleLoad()
+        }
+    }
+
+    func handleLoad() {
+        do {
+            let instruction = try state.file(Instruction.self, fileID: file.id)
+            context = instruction.context
+            instructions = instruction.instructions
+            toolIDs = instruction.toolIDs
+        } catch {
+            state.log(error: error)
         }
     }
 
     func handleSubmit() {
-        action(instruction)
+        action(instructions, context, toolIDs)
     }
 }

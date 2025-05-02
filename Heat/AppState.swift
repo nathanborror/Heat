@@ -155,6 +155,10 @@ final class AppState {
         return fileID
     }
 
+    func fileUpdate(_ object: any Encodable, fileID: String) async throws {
+        try await filesProvider.cacheFileObject(object, fileID: fileID)
+    }
+
     private func fileCreate(id: String, filename: String, path: String? = nil, name: String? = nil, mimetype: UTType, object: any Encodable) async throws -> String {
         let directory = try currentFilePath()
         let path = path ?? directory?.appending(path: filename).path ?? filename

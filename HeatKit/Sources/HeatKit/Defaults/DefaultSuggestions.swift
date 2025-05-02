@@ -3,7 +3,7 @@ import Foundation
 extension Defaults {
 
     public static let suggestionsInstruction = Instruction(
-        kind: .prompt,
+        kind: .task,
         instructions: """
             You are tasked with generating a list of brief suggested replies based on a chat session between a user and an AI assistant. These suggestions should anticipate what the user might say next in the conversation. Here is the chat history:
 

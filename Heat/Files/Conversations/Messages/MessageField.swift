@@ -10,11 +10,12 @@ struct MessageField: View {
     @Environment(ConversationViewModel.self) var conversationViewModel
     @Environment(\.colorScheme) var colorScheme
 
-    typealias ActionHandler = (String, Instruction?) -> Void
+    typealias ActionHandler = (String, [String: String]?, Set<String>?) -> Void
 
     let action: ActionHandler
 
     @State private var content = ""
+    @State private var instructionFile: File? = nil
 
     @FocusState private var isFocused: Bool
 
@@ -27,7 +28,13 @@ struct MessageField: View {
             Divider()
             HStack(alignment: .bottom, spacing: 0) {
                 Menu {
-                    Text("Empty")
+                    ForEach(state.instructions) { file in
+                        if let instruction = try? state.file(Instruction.self, fileID: file.id), instruction.kind == .template {
+                            Button(file.name ?? "Untitled") {
+                                instructionFile = file
+                            }
+                        }
+                    }
                 } label: {
                     Image(systemName: "plus")
                         .modifier(ConversationInlineButtonModifier())
@@ -76,11 +83,19 @@ struct MessageField: View {
                 }
             }
             .padding(4)
+            .sheet(item: $instructionFile) { file in
+                NavigationStack {
+                    MessageInstructions(file: file) { (instructions, context, toolIDs) in
+                        action(instructions, context, toolIDs)
+                        clear()
+                    }
+                }
+            }
         }
     }
 
     func handleSubmit() async throws {
-        action(content, nil)
+        action(content, nil, nil)
         clear()
     }
 

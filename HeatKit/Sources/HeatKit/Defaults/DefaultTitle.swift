@@ -3,7 +3,7 @@ import Foundation
 extension Defaults {
 
     public static let titleInstruction = Instruction(
-        kind: .prompt,
+        kind: .task,
         instructions: """
             Based on the conversation transcript, your task is to determine if there is a clear topic of conversation and, if so, return a concise title for it. Here is the chat history:
 

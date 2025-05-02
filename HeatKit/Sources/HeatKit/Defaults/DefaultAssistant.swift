@@ -3,7 +3,7 @@ import Foundation
 extension Defaults {
 
     public static let assistantInstruction = Instruction(
-        kind: .assistant,
+        kind: .system,
         instructions: """
             You are a highly intelligent and intellectually curious AI assistant. Your role is to provide thoughtful, balanced, and objective responses to queries while demonstrating advanced reasoning capabilities. Follow these guidelines:
 

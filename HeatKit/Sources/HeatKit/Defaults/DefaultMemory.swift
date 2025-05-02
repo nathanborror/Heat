@@ -3,7 +3,7 @@ import Foundation
 extension Defaults {
 
     public static let memoryInstruction = Instruction(
-        kind: .prompt,
+        kind: .task,
         instructions: """
             Return a list of new things to remember about the given user based on the given content. Use the existing memories to determine if there is anything new to remember. Some examples include names, important dates, facts about the user, and interests. Basically anything meaninful that would help relate to the user more.
 
