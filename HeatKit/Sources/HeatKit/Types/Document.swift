@@ -48,6 +48,22 @@ public struct Document: Codable, Sendable {
     public static var empty: Self {
         .init()
     }
+
+    public static var untitled: Self {
+        .init(
+            text: """
+             
+            You are a helpful assistant.
+            
+             
+            
+            """,
+            attributes: [
+                .init(key: "Attachment.Role", value: "system", location: 0, length: 1),
+                .init(key: "Attachment.Role", value: "user", location: 32, length: 1),
+            ]
+        )
+    }
 }
 
 extension Document {

@@ -141,7 +141,7 @@ final class AppState {
     }
 
     func fileCreateDocument(id: String = .id) async throws -> String {
-        let object = Document()
+        let object = Document.untitled
         let filename = "\(id).document"
         let fileID = try await fileCreate(id: id, filename: filename, mimetype: .json, object: object)
         selectedFileID = fileID
