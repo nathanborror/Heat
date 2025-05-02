@@ -268,20 +268,18 @@ struct InstructionTextForm: View {
     }
 
     func handleAppear() {
-        Task {
-            do {
-                let instruction = try await API.shared.fileData(fileID, type: Instruction.self)
-                instructions = instruction.instructions
-            } catch {
-                print(error)
-            }
+        do {
+            let instruction = try state.file(Instruction.self, fileID: fileID)
+            instructions = instruction.instructions
+        } catch {
+            print(error)
         }
     }
 
     func handleDisappear() {
         Task {
             do {
-                var instruction = try await API.shared.fileData(fileID, type: Instruction.self)
+                var instruction = try state.file(Instruction.self, fileID: fileID)
                 instruction.instructions = instructions
                 try await API.shared.fileUpdate(fileID, object: instruction)
             } catch {

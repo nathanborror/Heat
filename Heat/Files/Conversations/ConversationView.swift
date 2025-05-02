@@ -36,13 +36,11 @@ struct ConversationView: View {
     }
 
     func handleLoad() {
-        Task {
-            do {
-                let conversation = try await API.shared.fileData(fileID, type: Conversation.self)
-                conversationViewModel.read(conversation)
-            } catch {
-                state.log(error: error)
-            }
+        do {
+            let conversation = try state.file(Conversation.self, fileID: fileID)
+            conversationViewModel.read(conversation)
+        } catch {
+            state.log(error: error)
         }
     }
 
@@ -50,7 +48,7 @@ struct ConversationView: View {
         Task {
             do {
                 if conversationViewModel.conversation.isEmpty {
-                    let conversation = try await API.shared.fileData(fileID, type: Conversation.self)
+                    let conversation = try state.file(Conversation.self, fileID: fileID)
                     conversationViewModel.read(conversation)
                 }
 

@@ -91,13 +91,11 @@ struct DocumentView: View {
     }
 
     func handleLoad() {
-        Task {
-            do {
-                let document = try await API.shared.fileData(fileID, type: Document.self)
-                documentViewModel.read(document)
-            } catch {
-                state.log(error: error)
-            }
+        do {
+            let document = try state.file(Document.self, fileID: fileID)
+            documentViewModel.read(document)
+        } catch {
+            state.log(error: error)
         }
     }
 
