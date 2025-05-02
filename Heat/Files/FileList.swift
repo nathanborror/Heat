@@ -16,7 +16,11 @@ struct FileList: View {
                     .tag(tree.id)
             }
         }
+        #if os(macOS)
         .listStyle(.sidebar)
+        #else
+        .listStyle(.plain)
+        #endif
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle("Files")
         #if os(macOS)
@@ -34,6 +38,11 @@ struct FileList: View {
                 NavigationStack {
                     FileForm(fileID: fileID)
                 }
+            }
+        }
+        .overlay(alignment: .center) {
+            if state.fileTree.isEmpty {
+                ContentUnavailableView("No files found", systemImage: "doc.on.doc")
             }
         }
         #if os(iOS)

@@ -33,7 +33,7 @@ struct MainApp: App {
                     if let fileID = state.selectedFileID {
                         FileDetail(fileID: fileID)
                     } else {
-                        ContentUnavailableView("No file selected", systemImage: "doc.plaintext")
+                        ContentUnavailableView("No file selected", systemImage: "doc")
                     }
                 }
                 .toolbar {
@@ -46,7 +46,7 @@ struct MainApp: App {
                                 sheet = .settings
                             }
                             Divider()
-                            Button("Reset All Data") {
+                            Button("Reset All Data", role: .destructive) {
                                 Task { await appReset() }
                             }
                         } label: {
