@@ -42,7 +42,11 @@ struct FileList: View {
         }
         .overlay(alignment: .center) {
             if state.fileTree.isEmpty {
-                ContentUnavailableView("No files found", systemImage: "doc.on.doc")
+                ContentUnavailableView {
+                    Label("No files", systemImage: "doc.on.doc")
+                } description: {
+                    Text("New files you create will appear here.")
+                }
             }
         }
         #if os(iOS)

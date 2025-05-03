@@ -9,7 +9,9 @@ struct FileDetail: View {
     var body: some View {
         if let fileID, let file = try? API.shared.file(fileID) {
             if file.isDirectory {
-                ContentUnavailableView(file.name ?? "Untitled folder", systemImage: "folder")
+                ContentUnavailableView {
+                    Label(file.name ?? "Untitled folder", systemImage: "folder")
+                }
             }
             if file.isConversation {
                 ConversationView(file: file)

@@ -21,7 +21,7 @@
 		D4A2C5672B8BF9CE0004F27B /* MarkdownUI+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */; };
 		D4B2D2692B6563DB0017FB52 /* MessageField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B2D2682B6563DB0017FB52 /* MessageField.swift */; };
 		D4B4F9282C8BB17A00C82284 /* RenderReflection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B4F9272C8BB17A00C82284 /* RenderReflection.swift */; };
-		D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */; };
+		D4C68E942BCC8AC500EFEF24 /* PhotoPickerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C68E932BCC8AC500EFEF24 /* PhotoPickerModel.swift */; };
 		D4EDDC812D5E91190079D53E /* Message+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4EDDC802D5E91190079D53E /* Message+.swift */; };
 		D4F518BD2CAF47CE005E147E /* MessageList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F518BC2CAF47CE005E147E /* MessageList.swift */; };
 		D4F518BF2CAF8BA8005E147E /* RenderOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4F518BE2CAF8BA8005E147E /* RenderOutput.swift */; };
@@ -97,7 +97,7 @@
 		D4A2C5662B8BF9CE0004F27B /* MarkdownUI+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownUI+.swift"; sourceTree = "<group>"; };
 		D4B2D2682B6563DB0017FB52 /* MessageField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageField.swift; sourceTree = "<group>"; };
 		D4B4F9272C8BB17A00C82284 /* RenderReflection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderReflection.swift; sourceTree = "<group>"; };
-		D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		D4C68E932BCC8AC500EFEF24 /* PhotoPickerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerModel.swift; sourceTree = "<group>"; };
 		D4EDDC802D5E91190079D53E /* Message+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Message+.swift"; sourceTree = "<group>"; };
 		D4F518BC2CAF47CE005E147E /* MessageList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageList.swift; sourceTree = "<group>"; };
 		D4F518BE2CAF8BA8005E147E /* RenderOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderOutput.swift; sourceTree = "<group>"; };
@@ -219,7 +219,7 @@
 				D4FB726F2DC03794008CC1DF /* MagicEditor */,
 				D88D23072B3CFB2C00CCCC61 /* Views */,
 				D4017C8E2B6EEF9E001CE137 /* Extensions */,
-				D4C68E932BCC8AC500EFEF24 /* ImagePicker.swift */,
+				D4C68E932BCC8AC500EFEF24 /* PhotoPickerModel.swift */,
 				D4713D6F2AEAB9670005597E /* Operators.swift */,
 				D4FECDD22B817A3900E1BA13 /* HapticManager.swift */,
 				D884AAF42BD7F50E00B90E9B /* FloatingPanel.swift */,
@@ -522,7 +522,7 @@
 				D884AB002BD9B9DE00B90E9B /* LocationManager.swift in Sources */,
 				D4B2D2692B6563DB0017FB52 /* MessageField.swift in Sources */,
 				D8015CC92CB8F4D60068749D /* RenderAnyTag.swift in Sources */,
-				D4C68E942BCC8AC500EFEF24 /* ImagePicker.swift in Sources */,
+				D4C68E942BCC8AC500EFEF24 /* PhotoPickerModel.swift in Sources */,
 				D4FB726E2DC03772008CC1DF /* DocumentView.swift in Sources */,
 				D8E1FC1A2B704CE3006C9366 /* ServiceView.swift in Sources */,
 				D80F73B62C95F0E0001B2778 /* AttributedString+.swift in Sources */,

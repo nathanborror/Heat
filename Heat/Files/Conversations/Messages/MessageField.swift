@@ -16,6 +16,8 @@ struct MessageField: View {
 
     @State private var content = ""
     @State private var instructionFile: File? = nil
+    @State private var photoPickerModel = PhotoPickerModel()
+    @State private var showingPhotoPicker = false
 
     @FocusState private var isFocused: Bool
 
@@ -25,9 +27,28 @@ struct MessageField: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if !photoPickerModel.selections.isEmpty {
+                ScrollView(.horizontal) {
+                    HStack(alignment: .bottom) {
+                        ForEach(photoPickerModel.selections) { selected in
+                            MessageFieldPhoto(id: selected.id, image: selected.photo)
+                                .environment(photoPickerModel)
+                                .padding(.top, 8)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                }
+                .scrollIndicators(.hidden)
+                .scrollClipDisabled()
+            }
+
             Divider()
             HStack(alignment: .bottom, spacing: 0) {
                 Menu {
+                    Button("Attach Image") {
+                        showingPhotoPicker = true
+                    }
+                    Divider()
                     ForEach(state.instructions) { file in
                         if let instruction = try? state.file(Instruction.self, fileID: file.id), instruction.kind == .template {
                             Button(file.name ?? "Untitled") {
@@ -37,7 +58,9 @@ struct MessageField: View {
                     }
                 } label: {
                     Image(systemName: "plus")
-                        .modifier(ConversationInlineButtonModifier())
+                        .foregroundStyle(.secondary)
+                        .tint(.primary)
+                        .frame(width: inlineButtonSize.width, height: inlineButtonSize.height)
                 }
                 .buttonStyle(.plain)
 
@@ -63,7 +86,11 @@ struct MessageField: View {
                 if showStopGenerating {
                     Button(action: handleStop) {
                         Image(systemName: "stop.fill")
-                            .modifier(ConversationButtonModifier())
+                            .fontWeight(.medium)
+                            .frame(width: primaryButtonSize.width, height: primaryButtonSize.height)
+                            .foregroundStyle(.white)
+                            .background(.tint, in: .rect(cornerRadius: 8))
+                            .padding(.vertical, 2)
                     }
                     .buttonStyle(.plain)
                 } else if showSubmit {
@@ -77,7 +104,11 @@ struct MessageField: View {
                         }
                     } label: {
                         Image(systemName: "arrow.up")
-                            .modifier(ConversationButtonModifier())
+                            .fontWeight(.medium)
+                            .frame(width: primaryButtonSize.width, height: primaryButtonSize.height)
+                            .foregroundStyle(.white)
+                            .background(.tint, in: .rect(cornerRadius: 8))
+                            .padding(.vertical, 2)
                     }
                     .buttonStyle(.plain)
                 }
@@ -91,6 +122,14 @@ struct MessageField: View {
                     }
                 }
             }
+            .photosPicker(
+                isPresented: $showingPhotoPicker,
+                selection: $photoPickerModel.items,
+                maxSelectionCount: 3,
+                selectionBehavior: .ordered,
+                matching: .images,
+                photoLibrary: .shared()
+            )
         }
     }
 
@@ -114,44 +153,59 @@ struct MessageField: View {
     #if os(macOS)
     private var minHeight: CGFloat = 0
     private var verticalPadding: CGFloat = 9
+    private var inlineButtonSize = CGSize(width: 34, height: 34)
+    private var primaryButtonSize = CGSize(width: 30, height: 30)
     #else
     private var minHeight: CGFloat = 44
     private var verticalPadding: CGFloat = 11
+    private var inlineButtonSize = CGSize(width: 44, height: 44)
+    private var primaryButtonSize = CGSize(width: 40, height: 40)
     #endif
 }
 
-struct ConversationButtonModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .fontWeight(.medium)
-            .frame(width: width, height: height)
-            .foregroundStyle(.white)
-            .background(.tint, in: .rect(cornerRadius: 8))
-            .padding(.vertical, 2)
-    }
+struct MessageFieldPhoto: View {
+    @Environment(PhotoPickerModel.self) var imagePickerViewModel
 
+    let id: String
     #if os(macOS)
-    private var width: CGFloat = 30
-    private var height: CGFloat = 30
+    let image: NSImage?
     #else
-    private var width: CGFloat = 40
-    private var height: CGFloat = 40
+    let image: UIImage?
     #endif
-}
 
-struct ConversationInlineButtonModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .foregroundStyle(.secondary)
-            .tint(.primary)
-            .frame(width: width, height: height)
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            if let image {
+                #if os(macOS)
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 100, height: 100)
+                    .clipShape(.rect(cornerRadius: 10))
+                #else
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 100, height: 100)
+                    .clipShape(.rect(cornerRadius: 10))
+                #endif
+            } else {
+                Rectangle()
+                    .fill(.secondary)
+                    .frame(width: 100, height: 100)
+                    .clipShape(.rect(cornerRadius: 10))
+            }
+
+            Button {
+                imagePickerViewModel.remove(id: id)
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .imageScale(.medium)
+                    .padding(4)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.regularMaterial)
+            .shadow(color: .primary.opacity(0.25), radius: 5)
+        }
     }
-
-    #if os(macOS)
-    private var width: CGFloat = 34
-    private var height: CGFloat = 34
-    #else
-    private var width: CGFloat = 44
-    private var height: CGFloat = 44
-    #endif
 }

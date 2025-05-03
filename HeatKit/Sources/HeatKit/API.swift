@@ -7,8 +7,15 @@ import GenKit
 public final class API {
     public static let shared = API()
 
-    let filesProvider = FilesProvider.shared
-    let logsProvider = LogsProvider.shared
+    private let filesProvider = FilesProvider.shared
+    private let logsProvider = LogsProvider.shared
+
+    private var session: URLSession = {
+        let cfg = URLSessionConfiguration.ephemeral
+        cfg.timeoutIntervalForRequest = 60       // keep it conservative
+        cfg.waitsForConnectivity = true          // keeps behaviour similar
+        return URLSession(configuration: cfg)
+    }()
 
     public enum Error: Swift.Error, CustomStringConvertible {
         case missingConfig
@@ -132,19 +139,19 @@ extension API {
     public func preferredChatService() throws -> (ChatService, Model) {
         let service = try get(serviceID: config.serviceChatDefault, config: config)
         let model = try get(modelID: service.preferredChatModel, service: service)
-        return (try service.chatService(), model)
+        return (try service.chatService(session: session), model)
     }
 
     public func preferredImageService() throws -> (ImageService, Model) {
         let service = try get(serviceID: config.serviceImageDefault, config: config)
         let model = try get(modelID: service.preferredImageModel, service: service)
-        return (try service.imageService(), model)
+        return (try service.imageService(session: session), model)
     }
 
     public func preferredSummarizationService() throws -> (ChatService, Model) {
         let service = try get(serviceID: config.serviceSummarizationDefault, config: config)
         let model = try get(modelID: service.preferredSummarizationModel, service: service)
-        return (try service.summarizationService(), model)
+        return (try service.summarizationService(session: session), model)
     }
 
     public func get(serviceID: String?, config: Config) throws -> Service {
@@ -154,7 +161,7 @@ extension API {
         return service
     }
 
-    private func get(modelID: String?, service: Service) throws -> Model {
+    public func get(modelID: String?, service: Service) throws -> Model {
         guard let model = service.models.first(where: { $0.id == modelID }) else {
             throw Error.missingModel
         }

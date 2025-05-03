@@ -31,8 +31,8 @@ struct DocumentView: View {
         .navigationTitle(documentViewModel.title)
         #if os(macOS)
         .navigationSubtitle(documentViewModel.subtitle)
-        #endif
         .padding()
+        #endif
         .toolbar {
             ToolbarItem {
                 Menu {

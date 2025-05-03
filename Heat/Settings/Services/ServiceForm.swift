@@ -56,7 +56,7 @@ struct ServiceForm: View {
     func handleLoadModels() {
         Task {
             do {
-                let client = service.modelService()
+                let client = service.modelService(session: nil)
                 service.models = try await client.models()
                 manager.update(service: service)
             } catch {

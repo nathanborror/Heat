@@ -27,7 +27,21 @@ struct MainApp: App {
                 if let fileID = state.selectedFileID {
                     FileDetail(fileID: fileID)
                 } else {
-                    ContentUnavailableView("No file selected", systemImage: "doc.plaintext")
+                    ContentUnavailableView {
+                        Label("No file selected", systemImage: "doc.plaintext")
+                    } description: {
+                        VStack(spacing: 16) {
+                            Text("Selected files will be editable here.")
+
+                            Button("Create New Conversation") {
+                                Task { try await state.fileCreateConversation() }
+                            }
+                            Button("Create New Document") {
+                                Task { try await state.fileCreateDocument() }
+                            }
+                        }
+                        .buttonStyle(.link)
+                    }
                 }
             }
             .containerBackground(.background, for: .window)
