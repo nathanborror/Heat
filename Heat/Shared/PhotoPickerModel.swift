@@ -140,7 +140,7 @@ struct PhotoTransfer: Transferable {
             guard let image = NSImage(data: data) else {
                 throw TransferError.importFailed
             }
-            return ImageTransfer(image: image)
+            return PhotoTransfer(image: image)
             #else
             guard let image = UIImage(data: data) else {
                 throw TransferError.importFailed
