@@ -1,342 +1,171 @@
 import Foundation
+import SwiftUI
 import SharedKit
 import GenKit
 
 @MainActor @Observable
 public final class API {
     public static let shared = API()
-    
-    /// Generate a response using text as the only input. Add context—often memories—to augment the system prompt. Optionally force a tool call.
-    public func generate(conversationID: String, prompt: String, context: [String: Value] = [:], images: [URL] = [], toolChoice: Tool? = nil, agentID: String? = nil) throws -> Task<(), Error> {
-        guard !prompt.isEmpty else { return Task {()} }
-        
-        // Providers
-        let conversationsProvider = ConversationsProvider.shared
-        let messagesProvider = MessagesProvider.shared
-        let preferencesProvider = PreferencesProvider.shared
-        
-        // Service and model
-        let service = try preferencesProvider.preferredChatService()
-        let model = try preferencesProvider.preferredChatModel()
-        
-        return Task {
-            let conversation = try conversationsProvider.get(conversationID)
 
-            // Augment context
-            var context = context
-            context["DATETIME"] = .string(Date.now.formatted())
+    private let filesProvider = FilesProvider.shared
+    private let logsProvider = LogsProvider.shared
 
-            // New user message
-            let imageContent = images.map { Message.Content.image(.init(url: $0, format: .jpeg)) }
-            let textContent = Message.Content.text(PromptTemplate(prompt, with: context))
+    private var session: URLSession = {
+        let cfg = URLSessionConfiguration.ephemeral
+        cfg.timeoutIntervalForRequest = 60       // keep it conservative
+        cfg.waitsForConnectivity = true          // keeps behaviour similar
+        return URLSession(configuration: cfg)
+    }()
 
-            let userMessage = Message(role: .user, contents: [textContent] + imageContent)
-            try await messagesProvider.upsert(message: userMessage, referenceID: conversation.id)
-            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
-            try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
-            
-            // Fetch messages
-            let messages = try messagesProvider.get(referenceID: conversationID)
+    public enum Error: Swift.Error, CustomStringConvertible {
+        case missingConfig
+        case missingService
+        case missingModel
 
-            // Initial request
-            var req = ChatSessionRequest(service: service, model: model, toolCallback: prepareToolResponse)
-            req.with(system: PromptTemplate(conversation.instructions, with: context))
-            req.with(history: messages)
-            req.with(tools: Toolbox.get(names: conversation.toolIDs))
-            req.with(context: context)
-
-            // Generate response stream
-            let stream = ChatSession.shared.stream(req, runLoopLimit: 20)
-            do {
-                for try await message in stream {
-                    try Task.checkCancellation()
-
-                    // Indicate which agent was used
-                    var message = message
-                    if let agentID {
-                        message.metadata["agentID"] = .string(agentID)
-                    }
-
-                    try await messagesProvider.upsert(message: message, referenceID: conversation.id)
-                    try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
-                }
-            } catch {
-                // Save messages and return conversation to resting state
-                try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
-                try await messagesProvider.flush()
-
-                throw error
-            }
-
-            // Save messages and return conversation to resting state
-            try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
-            try await messagesProvider.flush()
-
-            // Generate suggestions, title and memories
-            try await generateSuggestions(conversationID: conversationID)
-            try await generateTitle(conversationID: conversationID)
-            try await generateMemories(conversationID: conversationID)
-        }
-    }
-    
-    /// Generate an image from a given prompt. This is an explicit way to generate an image, most happen through tool use.
-    public func generate(conversationID: String, image prompt: String) throws -> Task<(), Error> {
-        guard !prompt.isEmpty else { return Task {()} }
-        
-        // Providers
-        let conversationsProvider = ConversationsProvider.shared
-        let messagesProvider = MessagesProvider.shared
-        let preferencesProvider = PreferencesProvider.shared
-        
-        // Service and model
-        let service = try preferencesProvider.preferredImageService()
-        let model = try preferencesProvider.preferredImageModel()
-        
-        return Task {
-            let conversation = try conversationsProvider.get(conversationID)
-            
-            // New user message
-            let userMessage = Message(role: .user, content: prompt)
-            try await messagesProvider.upsert(message: userMessage, referenceID: conversation.id)
-            try await conversationsProvider.upsert(suggestions: [], conversationID: conversation.id)
-            try await conversationsProvider.upsert(state: .processing, conversationID: conversation.id)
-            
-            // Generate image
-            let req = ImagineServiceRequest(model: model, prompt: prompt)
-            do {
-                let images = try await service.imagine(req)
-
-                var contents: [Message.Content] = []
-                for imageData in images {
-                    let filename = "\(String.id).png"
-                    let url = URL.documentsDirectory.appending(path: "images").appending(path: filename)
-                    try imageData.write(to: url, options: .atomic, createDirectories: true)
-                    contents += [.image(.init(url: url, format: .png))]
-                }
-
-                // Save images as assistant response
-                let message = Message(
-                    role: .assistant,
-                    contents: contents + [
-                        .text(prompt)
-                    ]
-                )
-                try await messagesProvider.upsert(message: message, referenceID: conversation.id)
-
-                // Save messages and return conversation to resting state
-                try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
-                try await messagesProvider.flush()
-            } catch {
-                // Save messages and return conversation to resting state
-                try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
-                try await messagesProvider.flush()
-
-                throw error
+        public var description: String {
+            switch self {
+            case .missingConfig:
+                "Missing config file"
+            case .missingService:
+                "Missing service ID"
+            case .missingModel:
+                "Missing model ID"
             }
         }
-    }
-
-    public func speak(message: Message, voice: String) throws {
-        guard let content = message.content else { return }
-
-        let messagesProvider = MessagesProvider.shared
-        let preferencesProvider = PreferencesProvider.shared
-
-        // Service and model
-        let service = try preferencesProvider.preferredSpeechService()
-        let model = try preferencesProvider.preferredSpeechModel()
-
-        Task {
-            do {
-                print("[START] Generating Audio...")
-                let request = SpeechServiceRequest(voice: voice, model: model, input: content)
-                let data = try await service.speak(request)
-
-                let filename = "\(String.id).mp3"
-                let url = URL.documentsDirectory.appending(path: "audio").appending(path: filename)
-                try data.write(to: url, options: .atomic, createDirectories: true)
-
-                var message = message
-                message.metadata["audio"] = .string(filename)
-
-                try await messagesProvider.upsert(message: message, referenceID: message.referenceID!)
-                try await messagesProvider.flush()
-                print("[END] Generating Audio")
-            } catch {
-                print(error)
-            }
-        }
-    }
-
-    // MARK: - Private
-
-    /// Generate a title for the conversation.
-    private func generateTitle(conversationID: String) async throws {
-
-        // Providers
-        let conversationsProvider = ConversationsProvider.shared
-        let messagesProvider = MessagesProvider.shared
-        let preferencesProvider = PreferencesProvider.shared
-        
-        let conversation = try conversationsProvider.get(conversationID)
-        let messages = try messagesProvider.get(referenceID: conversationID)
-
-        guard conversation.title == nil else {
-            return
-        }
-        
-        let service = try preferencesProvider.preferredChatService()
-        let model = try preferencesProvider.preferredChatModel()
-
-        let history = plainTextHistory(messages)
-        
-        // Initial request
-        var req = ChatSessionRequest(service: service, model: model)
-        req.with(history: [.init(role: .user, content: PromptTemplate(TitleInstructions, with: ["HISTORY": .string(history)]))])
-
-        // Generate suggestions stream
-        let stream = ChatSession.shared.stream(req)
-        for try await message in stream {
-            try Task.checkCancellation()
-            guard let content = message.content else { continue }
-
-            let name = "title"
-            let result = try ContentParser.shared.parse(input: content, tags: [name])
-            let tag = result.first(tag: name)
-            
-            guard let title = tag?.content else { continue }
-            try await conversationsProvider.upsert(title: title, conversationID: conversation.id)
-        }
-    }
-    
-    /// Generate conversation suggestions related to what's being talked about.
-    private func generateSuggestions(conversationID: String) async throws {
-
-        // Providers
-        let conversationsProvider = ConversationsProvider.shared
-        let messagesProvider = MessagesProvider.shared
-        let preferencesProvider = PreferencesProvider.shared
-        
-        let conversation = try conversationsProvider.get(conversationID)
-        let messages = try messagesProvider.get(referenceID: conversationID)
-
-        let service = try preferencesProvider.preferredChatService()
-        let model = try preferencesProvider.preferredChatModel()
-        
-        let history = plainTextHistory(messages)
-
-        // Initial request
-        var req = ChatSessionRequest(service: service, model: model)
-        req.with(history: [.init(role: .user, content: PromptTemplate(SuggestionsInstructions, with: ["HISTORY": .string(history)]))])
-
-        // Indicate we are suggesting
-        try await conversationsProvider.upsert(state: .suggesting, conversationID: conversation.id)
-        
-        // Generate suggestions stream
-        let stream = ChatSession.shared.stream(req)
-        for try await message in stream {
-            try Task.checkCancellation()
-            guard let content = message.content else { continue }
-
-            let name = "suggested_replies"
-            let result = try ContentParser.shared.parse(input: content, tags: [name])
-            let tag = result.first(tag: name)
-
-            guard let content = tag?.content else { continue }
-            let suggestions = content
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .components(separatedBy: .newlines)
-            
-            try await conversationsProvider.upsert(suggestions: suggestions, conversationID: conversation.id)
-            try await conversationsProvider.upsert(state: .streaming, conversationID: conversation.id)
-        }
-        
-        // Set conversation state
-        try await conversationsProvider.upsert(state: .none, conversationID: conversation.id)
-    }
-
-    /// Generates memories to store based on the last user message in the conversation.
-    private func generateMemories(conversationID: String) async throws {
-
-        // Providers
-        let messagesProvider = MessagesProvider.shared
-        let memoryProvider = MemoryProvider.shared
-        let preferencesProvider = PreferencesProvider.shared
-
-        let service = try preferencesProvider.preferredChatService()
-        let model = try preferencesProvider.preferredChatModel()
-
-        // Gather context
-        let messages = try messagesProvider.get(referenceID: conversationID)
-        let memories = memoryProvider.memories
-        let existingMemories = memories.map { $0.content }.joined(separator: "\n")
-        let lastUserMessage = messages.last(where: { $0.role == .user })
-
-        // Prepare request
-        let req = ChatServiceRequest(model: model, messages: [
-            .init(
-                role: .user,
-                content: PromptTemplate(MemoryInstructions, with: [
-                    "CONTENT": .string(lastUserMessage?.content ?? ""),
-                    "MEMORIES": .string(existingMemories)
-                ])
-            )
-        ])
-
-        // Make request
-        let resp = try await service.completion(req)
-        guard let content = resp.content else { return }
-
-        // Parse response content
-        let name = "memories"
-        let result = try ContentParser.shared.parse(input: content, tags: [name])
-        let tag = result.first(tag: name)
-
-        guard let memories = tag?.content else { return }
-        for memory in memories.split(separator: "\n") {
-            try await memoryProvider.upsert(.init(content: String(memory)))
-        }
-    }
-
-    /// Determine which tool is being called, execute the tool request if needed and return a tool call response before another turn of the conversation happens.
-    @Sendable
-    private func prepareToolResponse(toolCall: ToolCall) async throws -> ToolCallResponse {
-        if let tool = Toolbox(name: toolCall.function.name) {
-            switch tool {
-            case .generateImages:
-                let messages = await ImageGeneratorTool.handle(toolCall)
-                return .init(messages: messages, shouldContinue: true)
-            case .searchCalendar:
-                let messages = await CalendarSearchTool.handle(toolCall)
-                return .init(messages: messages, shouldContinue: true)
-            case .searchWeb:
-                let messages = await WebSearchTool.handle(toolCall)
-                return .init(messages: messages, shouldContinue: true)
-            case .browseWeb:
-                let messages = await WebBrowseTool.handle(toolCall)
-                return .init(messages: messages, shouldContinue: true)
-            }
-        } else {
-            let toolResponse = Message(
-                role: .tool,
-                content: "Unknown tool.",
-                toolCallID: toolCall.id,
-                name: toolCall.function.name,
-                metadata: ["label": .string("Unknown tool")]
-            )
-            return .init(messages: [toolResponse], shouldContinue: false)
-        }
-    }
-
-    private func plainTextHistory(_ messages: [Message]) -> String {
-        var out = ""
-        for message in messages {
-            out += """
-                \(message.role.rawValue):
-                \(message.content ?? "")
-                
-                """
-        }
-        return out
     }
 }
+
+// MARK: - Config
+
+extension API {
+
+    public var config: Config {
+        filesProvider.config
+    }
+
+    /// Creates a new config and caches it locally. Does NOT upload to a remote server.
+    public func configCreate() async throws {
+        let config = Config()
+        try filesProvider.cacheConfig(config)
+    }
+
+    /// Updates the config by replacing the cached data. Does NOT upload to a remote server.
+    public func configUpdate(_ config: Config) async throws {
+        try filesProvider.cacheConfig(config)
+    }
+}
+
+// MARK: - Files
+
+extension API {
+
+    public func fileList(flag: String? = nil) -> [File] {
+        filesProvider.cachedFileList()
+            .filter { $0.flag == flag }
+            .sorted { $0.order < $1.order }
+    }
+
+    public func fileListTree(fileID: String? = nil) throws -> [FileTree] {
+        try filesProvider.cachedFileDirectoryTree(parentID: fileID)
+    }
+
+    public func file(_ fileID: String) throws -> File {
+        try filesProvider.cachedFileMetadata(fileID)
+    }
+
+    public func fileData<T: Decodable>(_ fileID: String, type: T.Type) async throws -> T {
+        try filesProvider.cachedFileObject(type, fileID: fileID)
+    }
+
+    public func fileData(_ fileID: String) async throws -> Data {
+        try filesProvider.cachedFileData(fileID)
+    }
+
+    // File Create
+
+    public func fileCreate(_ file: File, object: any Encodable) async throws -> String {
+        // Cache and upload file metadata
+        try await filesProvider.cacheFileMetadata(file)
+
+        // Cache file object
+        if !file.isDirectory {
+            try await filesProvider.cacheFileObject(object, fileID: file.id)
+        }
+        return file.id
+    }
+
+    public func fileCreate(_ file: File, data: Data = Data()) async throws -> String {
+        // Cache file metadata
+        try await filesProvider.cacheFileMetadata(file)
+
+        // Skip caching and uploading of file data if directory
+        if file.isDirectory {
+            return file.id
+        }
+
+        try await filesProvider.cacheFileData(data, fileID: file.id)
+        return file.id
+    }
+
+    // File Update
+
+    public func fileUpdate(_ file: File) async throws {
+        try await filesProvider.cacheFileMetadata(file)
+    }
+
+    public func fileUpdate<T: Encodable>(_ fileID: String, object: T) async throws {
+        try await filesProvider.cacheFileObject(object, fileID: fileID)
+    }
+
+    public func fileUpdate(_ fileID: String, data: Data) async throws {
+        try await filesProvider.cacheFileData(data, fileID: fileID)
+    }
+
+    public func fileUpdateOrder(_ indexSet: IndexSet, to offset: Int, context: [File]) async throws {
+        try await filesProvider.moveFiles(indexSet, to: offset, context: context)
+    }
+
+    // File Delete
+
+    public func fileDelete(_ fileID: String) async throws {
+        try await filesProvider.cacheFileDelete(fileID)
+    }
+}
+
+// MARK: - Services
+
+extension API {
+
+    public func preferredChatService() throws -> (ChatService, Model) {
+        let service = try get(serviceID: config.serviceChatDefault, config: config)
+        let model = try get(modelID: service.preferredChatModel, service: service)
+        return (try service.chatService(session: session), model)
+    }
+
+    public func preferredImageService() throws -> (ImageService, Model) {
+        let service = try get(serviceID: config.serviceImageDefault, config: config)
+        let model = try get(modelID: service.preferredImageModel, service: service)
+        return (try service.imageService(session: session), model)
+    }
+
+    public func preferredSummarizationService() throws -> (ChatService, Model) {
+        let service = try get(serviceID: config.serviceSummarizationDefault, config: config)
+        let model = try get(modelID: service.preferredSummarizationModel, service: service)
+        return (try service.summarizationService(session: session), model)
+    }
+
+    public func get(serviceID: String?, config: Config) throws -> Service {
+        guard let service = config.services.first(where: { $0.id == serviceID }) else {
+            throw Error.missingService
+        }
+        return service
+    }
+
+    public func get(modelID: String?, service: Service) throws -> Model {
+        guard let model = service.models.first(where: { $0.id == modelID }) else {
+            throw Error.missingModel
+        }
+        return model
+    }
+}
+

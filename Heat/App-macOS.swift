@@ -4,7 +4,6 @@ import CoreServices
 import EventKit
 import SharedKit
 import HeatKit
-import KeyboardShortcuts
 
 private let logger = Logger(subsystem: "MainApp", category: "App")
 
@@ -13,40 +12,55 @@ struct MainApp: App {
     @Environment(\.openWindow) var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
-    @State private var state = AppState.development
-
-    @State private var selectedConversationID: String? = nil
-    @State private var showingLauncher = false
-    @State private var sheet: Sheet? = nil
-    @State private var launcherPanel: LauncherPanel? = nil
+    @State private var state = AppState.shared
 
     @State private var showingError = false
     @State private var error: (any CustomStringConvertible)? = nil
 
-    enum Sheet: String, Identifiable {
-        case conversationList
-        case preferences
-        var id: String { rawValue }
-    }
-
     var body: some Scene {
         Window("Heat", id: "heat") {
             NavigationSplitView {
-                ConversationList(selected: $selectedConversationID)
+                FileList(selected: $state.selectedFileID)
                     .frame(minWidth: 200)
                     .navigationSplitViewStyle(.prominentDetail)
             } detail: {
-                ConversationView(selected: $selectedConversationID)
+                if let fileID = state.selectedFileID {
+                    FileDetail(fileID: fileID)
+                } else {
+                    ContentUnavailableView {
+                        Label("No file selected", systemImage: "doc.plaintext")
+                    } description: {
+                        VStack(spacing: 16) {
+                            Text("Selected files will be editable here.")
+
+                            Button("Create New Conversation") {
+                                Task { try await state.fileCreateConversation() }
+                            }
+                            Button("Create New Document") {
+                                Task { try await state.fileCreateDocument() }
+                            }
+                        }
+                        .buttonStyle(.link)
+                    }
+                }
             }
             .containerBackground(.background, for: .window)
-            .sheet(item: $sheet) { sheet in
-                NavigationStack {
-                    switch sheet {
-                    case .preferences:
-                        PreferencesForm(preferences: state.preferencesProvider.preferences)
-                    case .conversationList:
-                        ConversationList(selected: $selectedConversationID)
+            .toolbar {
+                ToolbarItem {
+                    Menu {
+                        Button("New Conversation") {
+                            Task { try await state.fileCreateConversation() }
+                        }
+                        Button("New Document") {
+                            Task { try await state.fileCreateDocument() }
+                        }
+                        Button("New Folder") {
+                            Task { try await state.folderCreate() }
+                        }
+                    } label: {
+                        Label("New File", systemImage: "plus")
                     }
+                    .menuIndicator(.hidden)
                 }
             }
             .alert("Error", isPresented: $showingError, presenting: error) { _ in
@@ -55,7 +69,7 @@ struct MainApp: App {
                 Text(error.description)
             }
             .onAppear {
-                handleInit()
+                Task { await appActive() }
             }
         }
         .defaultSize(width: 600, height: 700)
@@ -63,91 +77,46 @@ struct MainApp: App {
         .defaultLaunchBehavior(.presented)
         .environment(state)
         .commands {
-            CommandGroup(replacing: .appSettings) {
-                Button {
-                    sheet = .preferences
-                } label: {
-                    Label("Preferences", systemImage: "slider.horizontal.3")
+            CommandMenu("Heat") {
+                Button("New Conversation") {
+                    Task { try await state.fileCreateConversation() }
                 }
-                .keyboardShortcut(",", modifiers: .command)
-            }
-            CommandGroup(after: .appInfo) {
-                Button("Reset") {
-                    handleReset(true)
+                .keyboardShortcut("n", modifiers: .command)
+
+                Button("New Document") {
+                    Task { try await state.fileCreateDocument() }
+                }
+                .keyboardShortcut("n", modifiers: [.command, .shift])
+
+                Button("New Folder") {
+                    Task { try await state.folderCreate() }
+                }
+
+                Divider()
+
+                Button("Reset All Data") {
+                    Task { await appReset() }
                 }
             }
         }
 
-        Window("Setup", id: "setup") {
-            Text("Setup preferences")
+        Settings {
+            PreferencesView()
+                .frame(minWidth: 600)
         }
-        .windowManagerRole(.associated)
-        .windowLevel(.floating)
-        .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 400, height: 400)
-        .defaultPosition(.center)
-        .restorationBehavior(.disabled)
+        .environment(state)
+    }
 
-        Window("Launcher", id: "launcher") {
-            LauncherPanelView()
-                .containerBackground(.ultraThinMaterial, for: .window)
-                .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
-        }
-        .windowManagerRole(.associated)
-        .windowLevel(.floating)
-        .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 400, height: 70)
-        .defaultPosition(.center)
-        .restorationBehavior(.disabled)
-
-        MenuBarExtra {
-            Button("Quit") {
-                NSApplication.shared.terminate(nil)
-            }
-            .keyboardShortcut("q")
-        } label: {
-            Label("Heat", systemImage: "flame.fill")
+    func appActive() async {
+        do {
+            try await state.ready()
+        } catch {
+            state.log(error: error)
         }
     }
 
-    func handleInit() {
-        handleReset()
-        handleHotKeySetup()
+    func appReset() async {
+        state.resetAll()
+        await appActive()
     }
-
-    func handleReset(_ force: Bool = false) {
-        if BundleVersion.shared.isBundleVersionNew() || force {
-            Task { try await state.reset() }
-        }
-    }
-
-    func handleHotKeySetup() {
-        KeyboardShortcuts.onKeyUp(for: .toggleLauncher) { [self] in
-            if showingLauncher {
-                //dismissWindow(id: "launcher")
-                hideLauncherWindow()
-            } else {
-                //openWindow(id: "launcher")
-                showLauncherWindow()
-            }
-            showingLauncher.toggle()
-        }
-    }
-
-    func showLauncherWindow() {
-        if launcherPanel == nil {
-            launcherPanel = LauncherPanel(LauncherPanelView())
-        }
-        if launcherPanel?.isVisible == false {
-            launcherPanel?.orderFrontRegardless()
-        }
-    }
-
-    func hideLauncherWindow() {
-        launcherPanel?.close()
-    }
-}
-
-extension KeyboardShortcuts.Name {
-    static let toggleLauncher = Self("toggleLauncher", default: .init(.h, modifiers: [.shift, .command]))
 }

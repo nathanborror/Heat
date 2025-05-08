@@ -61,11 +61,15 @@ extension WebSearchTool {
                         </result>
                     """
                 }
+
+                // TODO: Use cached instructions
+                // Probably need to pass in these instructions at the call site instead of referencing Defaults here.
+
                 return [.init(
                     role: .tool,
-                    content: PromptTemplate(BrowseSearchResultsInstructions, with: [
-                        "QUERY": .string(args.query),
-                        "RESULTS": .string(results.joined(separator: "\n")),
+                    content: PromptTemplate(Defaults.webSearchInstruction.instructions, with: [
+                        "query": .string(args.query),
+                        "results": .string(results.joined(separator: "\n")),
                     ]),
                     toolCallID: toolCall.id,
                     name: toolCall.function.name,

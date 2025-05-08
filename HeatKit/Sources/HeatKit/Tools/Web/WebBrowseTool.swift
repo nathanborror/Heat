@@ -9,18 +9,18 @@ public struct WebBrowseTool {
         public var title: String
         public var url: String
     }
-    
+
     public struct Response: Codable, Identifiable {
         public let title: String
         public let url: String
         public let content: String?
         public let success: Bool
-        
+
         public var id: String { url }
     }
-    
+
     public static let function = Tool.Function(
-        name: "browse_web",
+        name: "web_browse",
         description: "Browse a webpage URL using the given instructions.",
         parameters: .object(
             properties: [
@@ -34,7 +34,7 @@ public struct WebBrowseTool {
 }
 
 extension WebBrowseTool.Arguments {
-    
+
     public init(_ arguments: String) throws {
         guard let data = arguments.data(using: .utf8) else {
             throw ToolboxError.failedDecoding
@@ -44,7 +44,7 @@ extension WebBrowseTool.Arguments {
 }
 
 extension WebBrowseTool {
-    
+
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
             let args = try Arguments(toolCall.function.arguments)
@@ -53,16 +53,14 @@ extension WebBrowseTool {
             return [.init(
                 role: .tool,
                 content: """
-                    Below is the resulting webpage summary. Use this result to inform your final response to the user.
-                    
-                    <result>
-                        <title>\(summary.title)</title>
-                        <url>\(args.url)</url>
-                        <summary>
-                            \(summary.content ?? "No Content")
-                        </summary>
-                    </result>
-                    """,
+                <website>
+                    <title>\(summary.title)</title>
+                    <url>\(args.url)</url>
+                    <summary>
+                        \(summary.content ?? "No Content")
+                    </summary>
+                </website>
+                """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name,
                 metadata: ["label": .string(label)]
@@ -71,24 +69,22 @@ extension WebBrowseTool {
             return [.init(
                 role: .tool,
                 content: """
-                    <error>
-                        \(error)
-                    </error>
-                    """,
+                <error>
+                    \(error.localizedDescription)
+                </error>
+                """,
                 toolCallID: toolCall.id,
                 name: toolCall.function.name
             )]
         }
     }
-    
+
     private static func summarize(_ args: Arguments) async throws -> Response {
-        let summarizationService = try await PreferencesProvider.shared.preferredSummarizationService()
-        let summarizationModel = try await PreferencesProvider.shared.preferredSummarizationModel()
-        
+        let (service, model) = try await API.shared.preferredSummarizationService()
         do {
             let summary = try await WebBrowseSession.shared.generateSummary(
-                service: summarizationService,
-                model: summarizationModel,
+                service: service,
+                model: model,
                 url: args.url,
                 instructions: args.instructions
             )
@@ -104,7 +100,7 @@ extension WebBrowseTool {
                 url: args.url,
                 content: """
                 <error>
-                    \(error)
+                    \(error.localizedDescription)
                 </error>
                 """,
                 success: false
