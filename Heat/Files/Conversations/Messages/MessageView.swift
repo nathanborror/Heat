@@ -127,10 +127,14 @@ struct ContentsView: View {
                         RenderText(text, tags: ["thinking", "think", "artifact", "output", "summary", "image_search_query"])
                     case .image(let image):
                         ContentImageView(url: image.url, detail: image.detail)
+
+                    // TODO: Handle these content types
                     case .audio:
                         Text("Audio is unhandled right now.")
                     case .json:
                         Text("JSON is unhandled right now")
+                    case .file:
+                        Text("File is unhandled right now")
                     }
                 }
             }
