@@ -39,12 +39,12 @@ public enum Toolbox: CaseIterable, Sendable {
     }
     
     public var name: String {
-        tool.function.name
+        tool.function?.name ?? ""
     }
     
     public static func get(names: Set<String>) -> [Tool] {
         return Toolbox.allCases
-            .filter { names.contains($0.tool.function.name) }
+            .filter { names.contains($0.tool.function?.name ?? "") }
             .map { $0.tool }
     }
 }

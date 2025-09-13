@@ -58,13 +58,13 @@ extension CalendarSearchTool {
     
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
-            let args = try Arguments(toolCall.function.arguments)
+            let args = try Arguments(toolCall.function?.arguments ?? "")
             let events = try await CalendarSession.shared.events(between: args.start, end: args.end)
             return [.init(
                 role: .tool,
                 content: events.map { $0.title }.joined(separator: "\n"),
                 toolCallID: toolCall.id,
-                name: toolCall.function.name,
+                name: toolCall.function?.name,
                 metadata: ["label": .string("Found \(events.count) calendar items.")]
             )]
         } catch {
@@ -72,7 +72,7 @@ extension CalendarSearchTool {
                 role: .tool,
                 content: "You do not have calendar access. Tell the user to open Preferences and navigate to Permissions to enable calendar access.",
                 toolCallID: toolCall.id,
-                name: toolCall.function.name,
+                name: toolCall.function?.name,
                 metadata: ["label": .string("Error accessing calendar")]
             )]
         }

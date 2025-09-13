@@ -131,6 +131,8 @@ struct ContentsView: View {
                         Text("Audio is unhandled right now.")
                     case .json:
                         Text("JSON is unhandled right now")
+                    case .file:
+                        Text("File is unhandled right now.")
                     }
                 }
             }
@@ -229,13 +231,13 @@ struct ToolCallView: View {
             Button {
                 isDisclosed.toggle()
             } label: {
-                ToolCallName(toolCall.function.name)
+                ToolCallName(toolCall.function?.name ?? "")
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
 
             if isDisclosed {
-                Text(toolCall.function.arguments)
+                Text(toolCall.function?.arguments ?? "")
                     .foregroundStyle(.secondary)
             }
         }

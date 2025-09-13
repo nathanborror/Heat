@@ -60,6 +60,8 @@ struct ConversationViewInspector: View {
                                 .foregroundStyle(.secondary)
                             case .json:
                                 Text("JSON is unhandled right now")
+                            case .file:
+                                Text("File is unhandled right now")
                             }
                         }
                     }
@@ -68,9 +70,9 @@ struct ConversationViewInspector: View {
                 if let toolCalls = message.toolCalls {
                     ForEach(toolCalls.indices, id: \.self) { index in
                         VStack(alignment: .leading) {
-                            Text(toolCalls[index].function.name)
+                            Text(toolCalls[index].function?.name ?? "Unknown")
                                 .fontWeight(.medium)
-                            Text(toolCalls[index].function.arguments)
+                            Text(toolCalls[index].function?.arguments ?? "Unknown")
                         }
                         .foregroundStyle(.secondary)
                     }

@@ -10,11 +10,9 @@ public struct Defaults {
         fal,
         grok,
         groq,
-        llama,
         mistral,
         ollama,
         openAI,
-        perplexity,
     ]
 
     public static let instructions: [(id: String, name: String, object: Instruction)] = [
