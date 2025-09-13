@@ -209,7 +209,7 @@ final class ConversationViewModel {
 
     @Sendable // Determine tool to execute and return response before next turn of the conversation
     private func prepareToolResponse(toolCall: ToolCall) async throws -> ToolCallResponse {
-        if let tool = Toolbox(name: toolCall.function.name) {
+        if let tool = Toolbox(name: toolCall.function?.name) {
             switch tool {
             case .generateImages:
                 let messages = await ImageGeneratorTool.handle(toolCall)
@@ -229,7 +229,7 @@ final class ConversationViewModel {
                 role: .tool,
                 content: "Unknown tool.",
                 toolCallID: toolCall.id,
-                name: toolCall.function.name,
+                name: toolCall.function?.name,
                 metadata: ["label": .string("Unknown tool")]
             )
             return .init(messages: [toolResponse], shouldContinue: false)

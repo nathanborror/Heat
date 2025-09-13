@@ -22,7 +22,7 @@ extension Message {
 
         if role == .assistant, let toolCalls = toolCalls {
             for toolCall in toolCalls {
-                switch Toolbox(name: toolCall.function.name) {
+                switch Toolbox(name: toolCall.function?.name) {
                 case .generateImages:
                     return false
                 default:

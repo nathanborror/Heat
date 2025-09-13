@@ -233,13 +233,13 @@ struct ToolCallView: View {
             Button {
                 isDisclosed.toggle()
             } label: {
-                ToolCallName(toolCall.function.name)
+                ToolCallName(toolCall.function?.name ?? "Unknown")
                     .foregroundStyle(.secondary)
             }
             .buttonStyle(.plain)
 
             if isDisclosed {
-                Text(toolCall.function.arguments)
+                Text(toolCall.function?.arguments ?? "Unknown")
                     .foregroundStyle(.secondary)
             }
         }

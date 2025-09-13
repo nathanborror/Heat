@@ -27,8 +27,8 @@ public struct ImageGeneratorTool {
 
 extension ImageGeneratorTool.Arguments {
 
-    public init(_ arguments: String) throws {
-        guard let data = arguments.data(using: .utf8) else {
+    public init(_ arguments: String?) throws {
+        guard let arguments, let data = arguments.data(using: .utf8) else {
             throw ToolboxError.failedDecoding
         }
         self = try JSONDecoder().decode(Self.self, from: data)
@@ -39,7 +39,7 @@ extension ImageGeneratorTool {
 
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
-            let args = try Arguments(toolCall.function.arguments)
+            let args = try Arguments(toolCall.function?.arguments)
             let (service, model) = try await API.shared.preferredImageService()
 
             // Generate image attachments
@@ -51,7 +51,7 @@ extension ImageGeneratorTool {
                 role: .tool,
                 contents: contents + [.text(args.prompts.joined(separator: "\n\n"))],
                 toolCallID: toolCall.id,
-                name: toolCall.function.name,
+                name: toolCall.function?.name,
                 metadata: ["label": args.prompts.count == 1 ? "Generating an image" : .string("Generating \(args.prompts.count) images")]
             )]
         } catch {
@@ -59,7 +59,7 @@ extension ImageGeneratorTool {
                 role: .tool,
                 content: "Tool Failed: \(error.localizedDescription)",
                 toolCallID: toolCall.id,
-                name: toolCall.function.name
+                name: toolCall.function?.name
             )]
         }
     }

@@ -35,8 +35,8 @@ public struct WebBrowseTool {
 
 extension WebBrowseTool.Arguments {
 
-    public init(_ arguments: String) throws {
-        guard let data = arguments.data(using: .utf8) else {
+    public init(_ arguments: String?) throws {
+        guard let arguments, let data = arguments.data(using: .utf8) else {
             throw ToolboxError.failedDecoding
         }
         self = try JSONDecoder().decode(Self.self, from: data)
@@ -47,7 +47,7 @@ extension WebBrowseTool {
 
     public static func handle(_ toolCall: ToolCall) async -> [Message] {
         do {
-            let args = try Arguments(toolCall.function.arguments)
+            let args = try Arguments(toolCall.function?.arguments)
             let summary = try await summarize(args)
             let label = "Read \(URL(string: args.url)?.host() ?? "")"
             return [.init(
@@ -62,7 +62,7 @@ extension WebBrowseTool {
                 </website>
                 """,
                 toolCallID: toolCall.id,
-                name: toolCall.function.name,
+                name: toolCall.function?.name,
                 metadata: ["label": .string(label)]
             )]
         } catch {
@@ -74,7 +74,7 @@ extension WebBrowseTool {
                 </error>
                 """,
                 toolCallID: toolCall.id,
-                name: toolCall.function.name
+                name: toolCall.function?.name
             )]
         }
     }

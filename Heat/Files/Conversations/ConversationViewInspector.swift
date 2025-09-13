@@ -65,7 +65,7 @@ struct ConversationViewInspector: View {
                                 }
                             case .file(let obj):
                                 VStack(alignment: .leading) {
-                                    Text("File: \(obj.url.absoluteString)")
+                                    Text("File: \(obj.path)")
                                     Text(obj.mimetype.preferredMIMEType ?? "Unknown MIME Type")
                                 }
                             }
@@ -76,9 +76,9 @@ struct ConversationViewInspector: View {
                 if let toolCalls = message.toolCalls {
                     ForEach(toolCalls.indices, id: \.self) { index in
                         VStack(alignment: .leading) {
-                            Text(toolCalls[index].function.name)
+                            Text(toolCalls[index].function?.name ?? "Unknown")
                                 .fontWeight(.medium)
-                            Text(toolCalls[index].function.arguments)
+                            Text(toolCalls[index].function?.arguments ?? "Unknown")
                         }
                         .foregroundStyle(.secondary)
                     }

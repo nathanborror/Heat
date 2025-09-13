@@ -16,7 +16,7 @@
       "location" : "https://github.com/raspu/Highlightr",
       "state" : {
         "branch" : "master",
-        "revision" : "bcf2d0590f32ac2528feb72d7e34f5b463801a47"
+        "revision" : "32561b17602e7f2c69a1defb264ade2d52314eb7"
       }
     },
     {
@@ -25,7 +25,7 @@
       "location" : "https://github.com/loopwork-ai/JSONSchema",
       "state" : {
         "branch" : "main",
-        "revision" : "1c3b710fb8e65e6a651abda0b32195ff6750d84b"
+        "revision" : "4c6f2467d5bc72b062c7a9b7e4cd77a09635ea8b"
       }
     },
     {
@@ -52,7 +52,7 @@
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
         "branch" : "main",
-        "revision" : "fb08c7b0136a75cf39859a69344d5e9e31804911"
+        "revision" : "e9051489bbf57424df25ea0ee3b44219c4ff5e88"
       }
     },
     {
@@ -62,6 +62,15 @@
       "state" : {
         "revision" : "b022b08312decdc46585e0b3440d97f6f22ef703",
         "version" : "0.6.0"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections.git",
+      "state" : {
+        "revision" : "8c0c0a8b49e080e54e5e328cc552821ff07cd341",
+        "version" : "1.2.1"
       }
     },
     {
@@ -88,7 +97,7 @@
       "location" : "https://github.com/nathanborror/swift-gen-kit",
       "state" : {
         "branch" : "main",
-        "revision" : "bdd03727703a2acf919a4975f167786a7e2c9d9b"
+        "revision" : "7b4d5721d87e98f47a729ac5b23a50c82a7d9d14"
       }
     },
     {
@@ -133,7 +142,7 @@
       "location" : "https://github.com/nathanborror/swift-openai",
       "state" : {
         "branch" : "main",
-        "revision" : "752fb110f4250d3cf444f9fd50081f8a4524ca93"
+        "revision" : "0b1dbbf98ff4fa95e07059dd03171710381213aa"
       }
     },
     {
@@ -142,7 +151,7 @@
       "location" : "https://github.com/nathanborror/swift-perplexity",
       "state" : {
         "branch" : "main",
-        "revision" : "c457e4358ecd2bd1f7e9d0bf5a1f67efd6646449"
+        "revision" : "caa4785f5c652ac6455defcee5d0d660c85a72d6"
       }
     },
     {

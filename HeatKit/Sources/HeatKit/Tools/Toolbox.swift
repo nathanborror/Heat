@@ -10,7 +10,7 @@ public enum Toolbox: CaseIterable, Sendable {
     
     // Because the name is influential in the prompting it may change so this is
     // a good place to put legacy names so they return the correct tool.
-    public init?(name: String) {
+    public init?(name: String?) {
         switch name {
         case ImageGeneratorTool.function.name:
             self = .generateImages
@@ -39,12 +39,12 @@ public enum Toolbox: CaseIterable, Sendable {
     }
     
     public var name: String {
-        tool.function.name
+        tool.function?.name ?? ""
     }
     
     public static func get(names: Set<String>) -> [Tool] {
         return Toolbox.allCases
-            .filter { names.contains($0.tool.function.name) }
+            .filter { names.contains($0.tool.function?.name ?? "") }
             .map { $0.tool }
     }
 }
